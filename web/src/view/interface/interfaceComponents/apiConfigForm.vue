@@ -1,0 +1,327 @@
+<template>
+  <div>
+    <div style="display: flex;">
+      <div style="width: 150px; margin-top: 5px; display: table; margin-left:20px; ">
+        <span>verify: </span>
+        <el-switch
+            v-model="reqData.verify"
+            class="mb-2"
+            size="large"
+            name="verify"
+        />
+      </div>
+      <div style="width: 150px; margin-top: 5px; display: table; margin-left:20px; ">
+        <span style="margin-right:5px;">默认配置:  </span>
+        <el-switch
+            v-model="reqData.default"
+            class="mb-2"
+            size="large"
+            name="默认配置"
+        />
+      </div>
+    </div>
+    <div style="width: 1000px; margin-top: 10px; display: flex;">
+      <el-input
+          v-model="reqData.name"
+          placeholder="请输入配置名称">
+        <template #prepend>配置名称</template>
+      </el-input>
+
+    </div>
+    <div style="width: 1000px; margin-top: 10px; display: flex;">
+      <el-input
+          v-model="reqData.base_url"
+          placeholder="请输入域名">
+        <template #prepend>域名</template>
+      </el-input>
+
+    </div>
+
+    <div class="request">
+      <el-tabs
+          style="margin-left: 20px;"
+          v-model="activeTag"
+      >
+        <el-tab-pane label="Header" name="Header">
+          <headers
+              @headerData="handleHeader"
+              @request="handleRequest"
+              :header="reqData ? reqData.headers_json : []"
+              :heights="heightDiv"
+          >
+          </headers>
+        </el-tab-pane>
+
+        <el-tab-pane label="Variables" name="Variables">
+          <variables
+              :heights="heightDiv"
+              @requestVariablesData="variablesVariables"
+              @request="handleRequest"
+              :variables="reqData ? reqData.variables_json : []"
+          >
+
+          </variables>
+        </el-tab-pane>
+
+        <el-tab-pane label="Parameters" name="params">
+          <params
+              @requestParamsData="requestParams"
+              @request="handleRequest"
+              :params="reqData ? reqData.parameters_json : []"
+              :heights="heightDiv"
+          >
+          </params>
+        </el-tab-pane>
+
+<!--        <el-tab-pane label="Hooks" name="Hooks">
+          <hooks
+              :heights="heightDiv"
+              @teardownHooksData="teardownHooks"
+              @setupHooksData="setupHooks"
+              :setupHooks="reqData ? reqData.setup_hooks : []"
+              :teardownHooks="reqData ? reqData.teardown_hooks : []"
+          >
+          </hooks>
+        </el-tab-pane>-->
+      </el-tabs>
+    </div>
+    <br/>
+    <el-button type="primary" @click="saves">保存</el-button>
+    <el-button type="info" @click="closeDialog">取消</el-button>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'apiConfigForm'
+}
+</script>
+
+<script setup>
+import Headers from '@/view/interface/interfaceComponents/Headers.vue'
+import Variables from '@/view/interface/interfaceComponents/Variables.vue'
+import Hooks from '@/view/interface/interfaceComponents/Hooks.vue'
+import Params from '@/view/interface/interfaceComponents/Params.vue'
+
+import {
+  createApiConfig,
+  updateApiConfig,
+  findApiConfig
+} from '@/api/apiConfig'
+
+// 自动获取字典
+import {getDictFunc} from '@/utils/format'
+import {useRoute, useRouter} from 'vue-router'
+import {ElMessage} from 'element-plus'
+import {ref, reactive} from 'vue'
+
+const emit = defineEmits(["close"]);
+const route = useRoute()
+const router = useRouter()
+const type = ref('')
+const formData = ref({
+  name: '',
+  base_url: '',
+  default: false,
+})
+const props = defineProps({
+  heights: ref(),
+  eventType: ref(),
+  formData: ref({
+    ID: 0,
+    parameters: [],
+    name: '',
+    base_url: '',
+    headers: [],
+    variables: '',
+    extract: '',
+    validate: '',
+    hooks: [],
+    apiMenuID: '',
+    verify: false,
+    default: false,
+  }),
+
+})
+
+const heightDiv = ref(false)
+const eventType = ref('')
+heightDiv.value = props.heights
+eventType.value = props.eventType
+
+
+// 初始化方法
+const init = async () => {
+  // 建议通过url传参获取目标数据ID 调用 find方法进行查询数据操作 从而决定本页面是create还是update 以下为id作为url参数示例
+  if (route.query.id) {
+    const res = await findApiConfig({ID: route.query.id})
+    if (res.code === 0) {
+      formData.value = res.data.reac
+      type.value = 'update'
+    }
+  } else {
+    type.value = 'create'
+  }
+}
+let reqData = reactive({
+  ID: 0,
+  parameters: [],
+  name: '',
+  base_url: '',
+  headers: [],
+  variables: '',
+  extract: '',
+  validate: '',
+  hooks: [],
+  apiMenuID: '',
+  verify: false,
+  default: false,
+  setup_hooks: [],
+  teardown_hooks: [],
+})
+
+init()
+const configLabel = reactive({
+  name: '',
+  base_url: '',
+})
+// 保存按钮
+const save = async () => {
+  let res
+  switch (type.value) {
+    case 'create':
+      res = await createApiConfig(formData.value)
+      break
+    case 'update':
+      res = await updateApiConfig(formData.value)
+      break
+    default:
+      res = await createApiConfig(formData.value)
+      break
+  }
+  if (res.code === 0) {
+    ElMessage({
+      type: 'success',
+      message: '创建/更改成功'
+    })
+  }
+}
+
+// 数据
+
+if (eventType.value === "update") {
+  reqData = props.formData.value
+  configLabel.base_url = reqData.base_url
+  configLabel.name = reqData.name
+}
+let headers = []
+let validate = []
+let requestId = []
+let requestFormData = []
+let requestParamsData = []
+let requestJsonData = {}
+let requestExtractData = []
+let requestValidateData = []
+let requestVariablesData = []
+let activeTag = 'Header'
+let teardownHook = []
+let setupHook = []
+const eventMsg = ref()
+
+const handleHeader = (tableData) => {
+  headers = tableData;
+}
+
+const variablesVariables = (requestVariables) => {
+  requestVariablesData = requestVariables;
+}
+
+const teardownHooks = (hooks) => {
+  teardownHook = hooks
+}
+
+const setupHooks = (hooks) => {
+  setupHook = hooks
+}
+
+const closeDialog = () => {
+  emit("close", true)
+}
+
+const handleRequest = (id) => {
+  if (id > 0) {
+    requestId.push(id)
+  }
+}
+
+const requestParams = (requestParams) => {
+  requestParamsData = requestParams;
+}
+
+const typeTransformation = (data) => {
+  let dataJson = {}
+  if (data.length > 0) {
+    data.forEach((item, index, arr) => {
+      dataJson[item.key] = item.value
+    })
+  }
+  return dataJson
+}
+
+const saves = () => {
+  // reqData.name = configLabel.name
+  // reqData.base_url = configLabel.base_url
+  reqData.headers = typeTransformation(headers)
+  reqData.headers_json = headers
+  reqData.setup_hooks = setupHook
+  reqData.teardown_hooks = teardownHook
+
+  reqData.parameters = typeTransformation(requestParamsData)
+  reqData.parameters_json = requestParamsData
+  // reqData.extract_json = requestExtractData
+  // reqData.validate = requestValidateData
+  reqData.variables = typeTransformation(requestVariablesData)
+  reqData.variables_json = requestVariablesData
+
+  createInterface()
+}
+
+const createInterface = async () => {
+  let res
+  switch (eventType.value) {
+    case 'create':
+      res = await createApiConfig(reqData)
+      eventMsg.value = "创建"
+      break
+    case 'update':
+      res = await updateApiConfig(reqData)
+      eventMsg.value = "修改"
+      break
+    default:
+      res = await createApiConfig(reqData)
+      eventMsg.value = "创建"
+      break
+  }
+  if (res.code === 0) {
+    ElMessage({
+      type: 'success',
+      message: eventMsg.value + '成功'
+    })
+    emit("close")
+  }
+}
+
+// 返回按钮
+const back = () => {
+  router.go(-1)
+}
+
+</script>
+
+<style>
+.request {
+  margin-top: 15px;
+  border: 1px solid #ddd;
+  height: 600px;
+}
+</style>

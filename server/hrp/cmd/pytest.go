@@ -1,0 +1,37 @@
+package cmd
+
+import (
+	"fmt"
+
+	"github.com/rs/zerolog/log"
+	"github.com/spf13/cobra"
+
+	"github.com/test-instructor/cheetah/server/hrp/internal/builtin"
+	"github.com/test-instructor/cheetah/server/hrp/internal/pytest"
+	"github.com/test-instructor/cheetah/server/hrp/internal/version"
+)
+
+var pytestCmd = &cobra.Command{
+	Use:   "pytest $path ...",
+	Short: "run API test with pytest",
+	Args:  cobra.MinimumNArgs(1),
+	PreRun: func(cmd *cobra.Command, args []string) {
+		setLogLevel(logLevel)
+	},
+	DisableFlagParsing: true, // allow to pass any args to pytest
+	RunE: func(cmd *cobra.Command, args []string) error {
+		packages := []string{
+			fmt.Sprintf("httprunner==%s", version.VERSION),
+		}
+		_, err := builtin.EnsurePython3Venv(venv, packages...)
+		if err != nil {
+			log.Error().Err(err).Msg("python3 venv is not ready")
+			return err
+		}
+		return pytest.RunPytest(args)
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(pytestCmd)
+}

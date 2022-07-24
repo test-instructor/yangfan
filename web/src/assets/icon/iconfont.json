@@ -1,0 +1,65 @@
+{
+  "id": "3176719",
+  "name": "gat",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "15550459",
+      "name": "copy-template",
+      "font_class": "copy-template",
+      "unicode": "e617",
+      "unicode_decimal": 58903
+    },
+    {
+      "icon_id": "18406209",
+      "name": "double-arrow-right",
+      "font_class": "double-arrow-right1",
+      "unicode": "e6f2",
+      "unicode_decimal": 59122
+    },
+    {
+      "icon_id": "5810266",
+      "name": "sort_transverse",
+      "font_class": "sort",
+      "unicode": "e805",
+      "unicode_decimal": 59397
+    },
+    {
+      "icon_id": "1381345",
+      "name": "copy",
+      "font_class": "copy",
+      "unicode": "e616",
+      "unicode_decimal": 58902
+    },
+    {
+      "icon_id": "11488028",
+      "name": "double-arrow-left",
+      "font_class": "double-arrow-left",
+      "unicode": "e74c",
+      "unicode_decimal": 59212
+    },
+    {
+      "icon_id": "32477",
+      "name": "delete",
+      "font_class": "delete",
+      "unicode": "e6b4",
+      "unicode_decimal": 59060
+    },
+    {
+      "icon_id": "38747",
+      "name": "add",
+      "font_class": "add",
+      "unicode": "e6da",
+      "unicode_decimal": 59098
+    },
+    {
+      "icon_id": "15838470",
+      "name": "edit",
+      "font_class": "edit",
+      "unicode": "e66e",
+      "unicode_decimal": 58990
+    }
+  ]
+}

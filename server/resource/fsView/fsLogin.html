@@ -1,0 +1,15 @@
+<html>
+
+
+<body>
+<h1>登录中，欢迎你：{{.Test}}</h1>
+
+</body>
+<script>
+    window.localStorage.setItem("token","{{.JWT}}")
+    setTimeout(()=>{
+        window.location.href = window.location.origin
+    },3000)
+</script>
+
+</html>
