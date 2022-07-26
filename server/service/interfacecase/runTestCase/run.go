@@ -8,6 +8,7 @@ import (
 	"github.com/test-instructor/cheetah/server/model/common/request"
 	"github.com/test-instructor/cheetah/server/model/interfacecase"
 	"gorm.io/gorm"
+	"math/rand"
 	"sync"
 	"testing"
 )
@@ -15,6 +16,12 @@ import (
 type ToTestCase struct {
 	Config    interfacecase.ApiConfig
 	TestSteps []interfacecase.ApiStep
+}
+
+func unLock(debugTalkFilePath string) {
+	global.DebugTalkFileLock.RLock()
+	global.DebugTalkLock[debugTalkFilePath].Unlock()
+	global.DebugTalkFileLock.RUnlock()
 }
 
 func getDebugTalkFile(projectID uint) (debugTalkByte []byte, err error) {
@@ -39,12 +46,16 @@ func RunTask(timerTaskID uint, castType interfacecase.CaseType, runType interfac
 	var err error
 	var reports interfacecase.ApiReport
 	var report interfacecase.ApiReport
-	debugTalkFilePath := CreateDebugTalk(fmt.Sprintf("Task_%d_debugTalk/", timerTaskID))
+	debugTalkFilePath := CreateDebugTalk(fmt.Sprintf("Task_%d_debugTalk_%d/", timerTaskID, rand.Int31n(99999999)))
+
+	global.DebugTalkFileLock.Lock()
 	if global.DebugTalkLock[debugTalkFilePath] == nil {
 		global.DebugTalkLock[debugTalkFilePath] = &sync.Mutex{}
 	}
 	global.DebugTalkLock[debugTalkFilePath].Lock()
-	defer global.DebugTalkLock[debugTalkFilePath].Unlock()
+	global.DebugTalkFileLock.Unlock()
+	defer unLock(debugTalkFilePath)
+
 	global.GVA_DB.Model(interfacecase.ApiDebugTalk{}).Where("")
 
 	var t *testing.T
@@ -78,16 +89,18 @@ func RunTask(timerTaskID uint, castType interfacecase.CaseType, runType interfac
 	report.Project.ID = apiConfig.ProjectID
 	global.GVA_DB.Create(&report)
 
-	var apiConfigName = apiConfig.Name
 	var l []hrp.ITestCase
 	debugTalkByte, _ := getDebugTalkFile(apiConfig.ProjectID)
 	hrp.BuildHashicorpPyPlugin(debugTalkByte, debugTalkFilePath)
 	defer hrp.RemoveHashicorpPyPlugin(debugTalkFilePath)
 	fmt.Println("用例数", len(timerTask.ApiTestCase))
+	apiConfig_json, _ := json.Marshal(apiConfig)
+	var tConfig hrp.TConfig
+	json.Unmarshal(apiConfig_json, &tConfig)
 	for _, testCase := range timerTask.ApiTestCase {
 		fmt.Println("用例id", testCase.ID)
-		apiConfig.Name = apiConfigName + "-" + testCase.Name
-		toTestCase := ToTestCase{Config: apiConfig, TestSteps: testCase.TStep}
+		fmt.Println("case name", testCase.Name)
+		toTestCase := ToTestCase{TestSteps: testCase.TStep}
 		caseJson, _ := json.Marshal(toTestCase)
 		global.GVA_LOG.Debug("测试用例json格式")
 		global.GVA_LOG.Debug("\n" + string(caseJson))
@@ -95,6 +108,8 @@ func RunTask(timerTaskID uint, castType interfacecase.CaseType, runType interfac
 			JsonString:        string(caseJson),
 			ID:                testCase.ID,
 			DebugTalkFilePath: debugTalkFilePath,
+			Config:            &tConfig,
+			Name:              testCase.Name,
 		}
 		testCase, _ := tc.ToTestCase()
 		l = append(l, testCase)
@@ -124,12 +139,15 @@ func RunCase(apiCaseID request.RunCaseReq) (reports interfacecase.ApiReport, err
 
 	var report interfacecase.ApiReport
 	var apiCases interfacecase.ApiTestCase
-	debugTalkFilePath := CreateDebugTalk(fmt.Sprintf("Task_%d_debugTalk/", apiCaseID))
+	debugTalkFilePath := CreateDebugTalk(fmt.Sprintf("Task_%d_debugTalk_%d/", apiCaseID, rand.Int31n(99999999)))
+
+	global.DebugTalkFileLock.Lock()
 	if global.DebugTalkLock[debugTalkFilePath] == nil {
 		global.DebugTalkLock[debugTalkFilePath] = &sync.Mutex{}
 	}
 	global.DebugTalkLock[debugTalkFilePath].Lock()
-	defer global.DebugTalkLock[debugTalkFilePath].Unlock()
+	global.DebugTalkFileLock.Unlock()
+	defer unLock(debugTalkFilePath)
 	apiConfig := interfacecase.ApiConfig{GVA_MODEL: global.GVA_MODEL{ID: apiCaseID.ConfigID}}
 	global.GVA_DB.Model(&interfacecase.ApiConfig{}).Preload("Project").First(&apiConfig)
 	global.GVA_DB.Model(&interfacecase.ApiTestCase{}).
@@ -156,9 +174,6 @@ func RunCase(apiCaseID request.RunCaseReq) (reports interfacecase.ApiReport, err
 		DebugTalkFilePath: debugTalkFilePath,
 	}
 	testCase, _ := tc.ToTestCase()
-	fmt.Println("------------------------------------")
-	fmt.Println(string(caseJson))
-	fmt.Println("==========================")
 	reports, errs := hrp.NewRunner(t).
 		SetHTTPStatOn().
 		SetFailfast(false).

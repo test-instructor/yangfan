@@ -30,11 +30,12 @@ type ApiStep struct {
 	ExtractJson   datatypes.JSON         `json:"extract_json" form:"extract_json"`
 	VariablesJson datatypes.JSON         `json:"variables_json" form:"variables_json"`
 	Hooks         string                 `json:"hooks" form:"hooks" gorm:"column:hooks;"`
-	SetupHooks    customType.TypeArgs    `json:"setup_hooks,omitempty" form:"setup_hooks,omitempty" gorm:"column:setup_hooks;"`
-	TeardownHooks customType.TypeArgs    `json:"teardown_hooks,omitempty" form:"teardown_hooks,omitempty" gorm:"column:teardown_hooks;"`
+	SetupHooks    customType.TypeArgs    `json:"setup_hooks,omitempty" form:"setup_hooks,omitempty" gorm:"column:setup_hooks;type:text"`
+	TeardownHooks customType.TypeArgs    `json:"teardown_hooks,omitempty" form:"teardown_hooks,omitempty" gorm:"column:teardown_hooks;type:text"`
 	ProjectID     uint                   `json:"-"`
 	TTestCase     []ApiTestCase          `json:"testCase" form:"testCase" gorm:"many2many:ApiCaseRelationship;"`
 	Sort          uint                   `json:"sort" form:"sort" gorm:"column:sort;"`
+	ExportHeader  datatypes.JSON         `json:"export_header" gorm:"column:export_header;comment:;type:text"`
 	Parent        uint                   `json:"-"`
 	Project       system.Project         `json:"-"`
 	ApiMenuID     uint                   `json:"-"`

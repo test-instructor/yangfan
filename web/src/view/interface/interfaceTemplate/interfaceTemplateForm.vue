@@ -85,8 +85,10 @@
         <el-tab-pane label="Header" name="Header">
           <headers
               @headerData="handleHeader"
+              @exportHeader="handleExportHeader"
               @request="handleRequest"
               :header="reqData ? reqData.request.headers_json : []"
+              :exportHeader="reqData ? reqData.export_header : []"
               :heights="heightDiv"
           >
           </headers>
@@ -250,6 +252,7 @@ const httpOption = async () => {
 httpOption()
 
 let headers = []
+let export_header = []
 let forms = []
 let requestId = []
 let validateId = []
@@ -282,6 +285,7 @@ let reqData = reactive({
   ID: 0,
   name: '',
   type: 0,
+  export_header: [],
   request: reactive({
     id: 0,
     agreement: '',
@@ -369,6 +373,7 @@ const saves = () => {
   reqData.teardown_hooks = teardownHook
   reqData.setup_hooks = setupHook
   params.menu = window.localStorage.getItem('menu')
+  reqData.export_header = export_header
   createInterface()
 }
 
@@ -399,6 +404,10 @@ const createInterface = async () => {
 
 const handleHeader = (tableData) => {
   headers = tableData;
+}
+const handleExportHeader = (tableData) => {
+  console.log("export_header------------", tableData)
+  export_header = tableData;
 }
 const requestForm = (requestForms) => {
   requestFormData = requestForms;

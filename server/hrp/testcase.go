@@ -24,6 +24,7 @@ type ITestCase interface {
 // TestCase implements ITestCase interface.
 type TestCase struct {
 	ID        uint
+	Name      string
 	Config    *TConfig
 	TestSteps []IStep
 }

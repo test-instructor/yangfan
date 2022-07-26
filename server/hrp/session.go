@@ -3,7 +3,8 @@ package hrp
 import (
 	_ "embed"
 	"encoding/json"
-	"github.com/test-instructor/cheetah/server/global"
+	"github.com/test-instructor/cheetah/server/model/interfacecase/hrp"
+	"net/textproto"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -72,6 +73,7 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 	// run step in sequential order
 	for _, step := range r.testCase.TestSteps {
 		// parse step name
+
 		parsedName, err := r.parser.ParseString(step.Name(), r.sessionVariables)
 		if err != nil {
 			parsedName = step.Name()
@@ -83,8 +85,6 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 		stepResult.Name = stepName
 		log.Info().Str("step", step.Name()).
 			Str("type", string(step.Type())).Msg("run step start")
-
-		//stepResult, err := step.Run(r)
 
 		stepResult.ParntID = step.Struct().ParntID
 		if err != nil {
@@ -110,9 +110,13 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 			Bool("success", stepResult.Success).
 			Interface("exportVars", stepResult.ExportVars).
 			Msg("run step end")
-		header, _ := json.Marshal(stepResult.Data)
-		global.GVA_LOG.Debug(string(header))
-		global.GVA_LOG.Debug(step.Struct().Name)
+		var StepResults hrp.StepResultStruct
+		stepResultStr, _ := json.Marshal(stepResult)
+		json.Unmarshal(stepResultStr, &StepResults)
+		for _, v := range step.Struct().ExportHeader {
+			headerKey := textproto.CanonicalMIMEHeaderKey(v)
+			r.testCase.Config.Headers[headerKey] = StepResults.Data.ReqResps.Request.Headers[headerKey]
+		}
 	}
 
 	// close websocket connection after all steps done

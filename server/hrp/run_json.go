@@ -48,6 +48,7 @@ func (r *HRPRunner) RunJsons(testcases ...ITestCase) (interfacecase.ApiReport, e
 	// run testcase one by one
 	for _, testcase := range testCases {
 		sessionRunner, err := r.NewSessionRunner(testcase)
+
 		if err != nil {
 			log.Error().Err(err).Msg("[Run] init session runner failed")
 			return interfacecase.ApiReport{}, err
@@ -65,6 +66,7 @@ func (r *HRPRunner) RunJsons(testcases ...ITestCase) (interfacecase.ApiReport, e
 			}
 			caseSummary := sessionRunner.GetSummary()
 			caseSummary.CaseID = testcase.ID
+			caseSummary.Name = testcase.Name
 			s.appendCaseSummary(caseSummary)
 		}
 	}
@@ -118,6 +120,8 @@ type TestCaseJson struct {
 	JsonString        string
 	ID                uint
 	DebugTalkFilePath string
+	Config            *TConfig
+	Name              string
 }
 
 func (testCaseJson *TestCaseJson) GetPath() string {
@@ -139,10 +143,11 @@ func (testCaseJson *TestCaseJson) ToTestCase() (*TestCase, error) {
 	}
 
 	tc.Config.Path = testCaseJson.GetPath()
-
+	testCaseJson.Config.Path = testCaseJson.GetPath()
 	testCase := &TestCase{
 		ID:     testCaseJson.ID,
-		Config: tc.Config,
+		Name:   testCaseJson.Name,
+		Config: testCaseJson.Config,
 	}
 
 	projectRootDir, err := GetProjectRootDirPath(testCaseJson.GetPath())

@@ -1,6 +1,7 @@
 <template>
   <el-table
       highlight-current-row
+      ref="exportHeaderKey"
       :data="tableData"
       :height="height"
       style="width: 98%;"
@@ -9,7 +10,11 @@
       @cell-mouse-enter="cellMouseEnter"
       @cell-mouse-leave="cellMouseLeave"
       @keyup="tableDatas"
+      @selection-change="handleSelectionChange"
+      row-key="key"
   >
+<!--    <el-table-column width="10" type="index" >-->
+    <el-table-column :reserve-selection="true" type="selection" width="55"/>
     <el-table-column
         label="标签"
         width="300"
@@ -79,10 +84,12 @@ export default {
     save: Boolean,
     // eslint-disable-next-line vue/require-default-prop,vue/require-prop-types
     header: ref(),
+    exportHeader: ref(),
     heights: ref()
   },
   data() {
     return {
+      multipleSelection:[],
       headerOptions: [{
         value: 'Accept'
       }, {
@@ -154,6 +161,25 @@ export default {
     if (this.header && this.header.length !== 0) {
       this.tableData = this.header;
     }
+
+
+    console.log("exportHeader=========v", this.exportHeader)
+    if (this.exportHeader){
+      this.exportHeader.forEach(v => {
+        this.tableData.forEach(item => {
+          if (item.key === v) {
+            this.multipleSelection.push(item)
+          }
+        })
+      })
+
+      this.$nextTick(() => {
+        this.multipleSelection.forEach(row => {
+          this.$refs.exportHeaderKey.toggleRowSelection(row, true) // 回显
+        })
+      })
+    }
+
   },
   computed: {
     height() {
@@ -172,6 +198,10 @@ export default {
     }
   },
   methods: {
+     handleSelectionChange (val) {
+       this.multipleSelection = val
+       this.tableDatas()
+    },
     tableDatas() {
       let emitdata = []
       for (let i in this.tableData) {
@@ -180,6 +210,13 @@ export default {
         }
       }
       this.$emit('headerData', emitdata)
+      let exportHeader = []
+      this.multipleSelection &&
+      this.multipleSelection.map(item => {
+        exportHeader.push(item.key)
+      })
+      console.log("export_header", exportHeader)
+      this.$emit('exportHeader', exportHeader)
     },
     querySearch(queryString, cb) {
       const headerOptions = this.headerOptions
@@ -199,14 +236,6 @@ export default {
 
     cellMouseLeave(row) {
       this.currentRow = ''
-    },
-
-    addLine() {
-      this.tableData.push({
-        key: '',
-        value: '',
-        desc: ''
-      })
     },
 
     handleEdit(index, row) {

@@ -1,10 +1,9 @@
 package global
 
 import (
-	"sync"
-
 	"github.com/songzhibin97/gkit/cache/local_cache"
 	"github.com/test-instructor/cheetah/server/utils/timer"
+	"sync"
 
 	"golang.org/x/sync/singleflight"
 
@@ -28,9 +27,10 @@ var (
 	GVA_Timer               timer.Timer = timer.NewTimerTask()
 	GVA_Concurrency_Control             = &singleflight.Group{}
 
-	BlackCache    local_cache.Cache
-	lock          sync.RWMutex
-	DebugTalkLock map[string]*sync.Mutex
+	BlackCache        local_cache.Cache
+	lock              sync.RWMutex
+	DebugTalkLock     = make(map[string]*sync.Mutex)
+	DebugTalkFileLock = sync.RWMutex{}
 )
 
 // GetGlobalDBByDBName 通过名称获取db list中的db

@@ -45,6 +45,7 @@ type TStep struct {
 	Extract       map[string]string      `json:"extract,omitempty" yaml:"extract,omitempty"`
 	Validators    []interface{}          `json:"validate,omitempty" yaml:"validate,omitempty"`
 	Export        []string               `json:"export,omitempty" yaml:"export,omitempty"`
+	ExportHeader  []string               `json:"export_header"`
 }
 
 // IStep represents interface for all types for teststeps, includes:

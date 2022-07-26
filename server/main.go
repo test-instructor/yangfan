@@ -5,7 +5,9 @@ import (
 	"github.com/test-instructor/cheetah/server/global"
 	"github.com/test-instructor/cheetah/server/initialize"
 	"go.uber.org/zap"
+	"math/rand"
 	"sync"
+	"time"
 )
 
 //go:generate go env -w GO111MODULE=on
@@ -21,6 +23,7 @@ import (
 // @name x-token
 // @BasePath /
 func main() {
+	rand.Seed(time.Now().UnixNano())
 	global.GVA_VP = core.Viper() // 初始化Viper
 	global.GVA_LOG = core.Zap()  // 初始化zap日志库
 	zap.ReplaceGlobals(global.GVA_LOG)

@@ -181,9 +181,12 @@ func TestJsonRunner(t *testing.T) {
         }
     ]
 }`
-	BuildHashicorpGoPlugin()
-	defer RemoveHashicorpGoPlugin()
-	testcase3 := &TestCaseJson{jsonString, 1}
+	BuildHashicorpPyPlugin([]byte{}, "")
+	defer RemoveHashicorpPyPlugin("")
+	testcase3 := &TestCaseJson{
+		JsonString: jsonString,
+		ID:         1,
+	}
 	testCase, _ := testcase3.ToTestCase()
 	err := NewRunner(t).Run(testCase)
 	if err != nil {

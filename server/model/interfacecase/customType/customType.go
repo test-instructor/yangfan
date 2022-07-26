@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strings"
 )
 
 type TypeArgsMap []map[string]interface{}
@@ -49,10 +48,28 @@ func (a TypeArgs) Value() (value driver.Value, err error) {
 
 func (a *TypeArgs) Scan(value interface{}) error {
 	str, ok := value.([]byte)
+	strs := string(str)
 	if !ok {
 		return errors.New("数据格式无法解析")
 	}
-	*a = strings.Split(string(str), ",")
+	tempStr := ""
+	for k, v := range strs {
+		if k < len(strs)-1 {
+			if string(v) == "," && string(strs[k+1]) == "$" {
+				*a = append(*a, tempStr)
+				tempStr = ""
+				fmt.Println(string(v))
+
+			} else {
+				tempStr += string(v)
+			}
+		} else {
+			tempStr += string(v)
+			*a = append(*a, tempStr)
+			break
+		}
+	}
+
 	return nil
 }
 
