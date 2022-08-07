@@ -38,8 +38,9 @@
         <el-table-column align="left" label="日期" width="180">
           <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
         </el-table-column>
-        <el-table-column align="left" label="配置名称" prop="name" width="120"/>
+        <el-table-column align="left" label="配置名称" prop="name" width="240"/>
         <el-table-column align="left" label="域名" prop="base_url" width="360"/>
+        <el-table-column align="left" label="前置用例" prop="setup_case.name" width="240"/>
         <el-table-column align="left" label="默认配置" prop="default" width="120">
           <template #default="scope">{{ formatBoolean(scope.row.default) }}</template>
         </el-table-column>
@@ -212,7 +213,7 @@ const onDelete = async () => {
   const ids = []
   if (multipleSelection.value.length === 0) {
     ElMessage({
-      type: 'warning',
+      type: 'error',
       message: '请选择要删除的数据'
     })
     return

@@ -103,16 +103,77 @@ func (taskApi *TimerTaskApi) UpdateTimerTask(c *gin.Context) {
 	}
 }
 
+func (taskApi *TimerTaskApi) SortTaskCase(c *gin.Context) {
+	var task []interfacecase.TimerTaskRelationship
+	_ = c.ShouldBindJSON(&task)
+	if err := taskService.SortTaskCase(task); err != nil {
+		global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		response.FailWithMessage("更新失败", c)
+	} else {
+		response.OkWithMessage("更新成功", c)
+	}
+}
+
+type addTaskCaseReq struct {
+	TaskID uint   `json:"task_id"`
+	CaseID []uint `json:"case_id"`
+}
+
+func (taskApi *TimerTaskApi) AddTaskCase(c *gin.Context) {
+	var task addTaskCaseReq
+	_ = c.ShouldBindJSON(&task)
+	if err := taskService.AddTaskCase(task.TaskID, task.CaseID); err != nil {
+		global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		response.FailWithMessage("更新失败", c)
+	} else {
+		response.OkWithMessage("更新成功", c)
+	}
+}
+
+func (taskApi *TimerTaskApi) DelTaskCase(c *gin.Context) {
+	var task interfacecase.TimerTaskRelationship
+	_ = c.ShouldBindJSON(&task)
+	if err := taskService.DelTaskCase(task); err != nil {
+		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		response.FailWithMessage("删除失败", c)
+	} else {
+		response.OkWithMessage("删除成功", c)
+	}
+}
+
+type taskTcaseResp struct {
+	Name     string     `json:"name"`
+	TestCase []testCase `json:"test_case"`
+}
+
+type testCase struct {
+	ID   uint                      `json:"id"`
+	Case interfacecase.ApiTestCase `json:"case"`
+}
+
 func (taskApi *TimerTaskApi) FindTaskTestCase(c *gin.Context) {
 	var task interfacecase.TimerTask
 	_ = c.ShouldBindQuery(&task)
 	projectsss, _ := c.Get("project")
 	task.Project = projectsss.(system.Project)
-	if err, reapicase := taskService.FindTaskTestCase(task.ID); err != nil {
+	var reapicase taskTcaseResp
+	err, resp := taskService.FindTaskTestCase(task.ID)
+	if err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
-		response.OkWithData(gin.H{"reapicase": reapicase}, c)
+		if len(resp) > 0 {
+			reapicase.Name = resp[0].TimerTask.Name
+			for _, v := range resp {
+				var testcase testCase
+				testcase.ID = v.ID
+				testcase.Case = v.ApiTestCase
+				reapicase.TestCase = append(reapicase.TestCase, testcase)
+			}
+			response.OkWithData(gin.H{"reapicase": reapicase}, c)
+		} else {
+			response.OkWithData(gin.H{"reapicase": reapicase}, c)
+		}
 	}
 }
 

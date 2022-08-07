@@ -45,7 +45,7 @@
         </el-table-column>
         <el-table-column align="left" label="状态" prop="default" width="120">
           <template #default="scope">
-            <el-tag :type="scope.row.success?'success':'info'">{{ scope.row.success ? '成功' : '失败' }}</el-tag>
+            <el-tag :type="successType(scope.row.success)[0]">{{ successType(scope.row.success)[1] }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column align="left" label="按钮组">
@@ -125,6 +125,16 @@ const onSubmit = () => {
     searchInfo.value.default = null
   }
   getTableData()
+}
+
+const successType = (type) => {
+  if (type===null){
+    return ['info', '运行中']
+  }else if (type === true){
+    return ['success', '成功']
+  }else {
+    return ['danger', '失败']
+  }
 }
 
 // 分页

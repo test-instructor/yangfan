@@ -44,6 +44,7 @@ func getDebugTalkFile(projectID uint) (debugTalkByte []byte, err error) {
 func RunTask(timerTaskID uint, castType interfacecase.CaseType, runType interfacecase.RunType) {
 	fmt.Println("开始定时任务")
 	var err error
+	var SetupCase bool
 	var reports interfacecase.ApiReport
 	var report interfacecase.ApiReport
 	debugTalkFilePath := CreateDebugTalk(fmt.Sprintf("Task_%d_debugTalk_%d/", timerTaskID, rand.Int31n(99999999)))
@@ -61,24 +62,31 @@ func RunTask(timerTaskID uint, castType interfacecase.CaseType, runType interfac
 	var t *testing.T
 
 	var timerTask interfacecase.TimerTask
-	var testCaseList interfacecase.ApiTestCase
+	var testCaseList []interfacecase.ApiTestCase
+	var timerTaskCase []interfacecase.TimerTaskRelationship
 
 	timerTask.ID = timerTaskID
 	err = global.GVA_DB.Model(interfacecase.TimerTask{}).
 		Preload("RunConfig").
-		Preload("ApiTestCase", func(caseDB *gorm.DB) *gorm.DB {
-			return caseDB.Preload("TStep", func(db2 *gorm.DB) *gorm.DB {
-				return db2.Order("Sort")
-			}).
-				Preload("TStep.Request")
-		}).
+		Preload("RunConfig.SetupCase").
+		Preload("RunConfig.SetupCase.TStep.Request").
 		First(&timerTask).Error
-
-	caseDB := global.GVA_DB.Model(interfacecase.ApiTestCase{})
-	caseDB.Find(&testCaseList)
-
+	caseDB := global.GVA_DB.Model(interfacecase.TimerTaskRelationship{}).
+		Preload("ApiTestCase").
+		Preload("ApiTestCase.TStep.Request").
+		Where("timer_task_id = ?", timerTaskID).
+		Order("Sort")
+	caseDB.Find(&timerTaskCase)
 	if err != nil {
 		return
+	}
+	if timerTask.RunConfig.SetupCase != nil {
+		SetupCase = true
+		testCaseList = append(testCaseList, *timerTask.RunConfig.SetupCase)
+	}
+
+	for _, v := range timerTaskCase {
+		testCaseList = append(testCaseList, v.ApiTestCase)
 	}
 
 	apiConfig := interfacecase.ApiConfig{GVA_MODEL: global.GVA_MODEL{ID: timerTask.RunConfig.ID}}
@@ -97,7 +105,7 @@ func RunTask(timerTaskID uint, castType interfacecase.CaseType, runType interfac
 	apiConfig_json, _ := json.Marshal(apiConfig)
 	var tConfig hrp.TConfig
 	json.Unmarshal(apiConfig_json, &tConfig)
-	for _, testCase := range timerTask.ApiTestCase {
+	for _, testCase := range testCaseList {
 		fmt.Println("用例id", testCase.ID)
 		fmt.Println("case name", testCase.Name)
 		toTestCase := ToTestCase{TestSteps: testCase.TStep}
@@ -125,6 +133,7 @@ func RunTask(timerTaskID uint, castType interfacecase.CaseType, runType interfac
 	reports.CreatedAt = report.CreatedAt
 	reports.Project.ID = apiConfig.ProjectID
 	reports.Status = 1
+	reports.SetupCase = SetupCase
 	global.GVA_DB.Save(&reports)
 }
 

@@ -117,6 +117,9 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 			headerKey := textproto.CanonicalMIMEHeaderKey(v)
 			r.testCase.Config.Headers[headerKey] = StepResults.Data.ReqResps.Request.Headers[headerKey]
 		}
+		for _, v := range step.Struct().ExportParameter {
+			r.testCase.Config.Variables[v] = StepResults.ExportVars[v]
+		}
 	}
 
 	// close websocket connection after all steps done

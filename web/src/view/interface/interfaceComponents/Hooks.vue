@@ -131,11 +131,9 @@ export default {
     if (this.teardownHooks&&this.teardownHooks.length>=1){
       let teardowns = []
       for (let content of this.teardownHooks) {
-        console.log("===================",content)
         let teardown = {teardown: content}
         teardowns.push(teardown)
       }
-      console.log("===================",teardowns)
       this.teardownData = teardowns
       this.teardownHooksDatas()
     }

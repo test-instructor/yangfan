@@ -62,9 +62,9 @@
       >
         <template #prepend>
           <el-select
-              style="width: 125px"
+              style="width: 150px"
               v-model="formLabelAlign.method"
-              placeholder="Select"
+              placeholder="请选址请求方法"
           >
             <el-option
                 v-for="item in httpOptions"
@@ -126,6 +126,8 @@
         <el-tab-pane label="Extract" name="Extract">
           <extract
               @requestExtractData="requestExtract"
+              @exportParameter="handleExportParameter"
+              :exportParameter="reqData ? reqData.export_parameter : []"
               :extract="reqData ? reqData.extract_json : []"
               :heights="heightDiv"
           >
@@ -253,7 +255,7 @@ httpOption()
 
 let headers = []
 let export_header = []
-let forms = []
+let export_parameter = []
 let requestId = []
 let validateId = []
 let validate = []
@@ -286,6 +288,7 @@ let reqData = reactive({
   name: '',
   type: 0,
   export_header: [],
+  export_parameter: [],
   request: reactive({
     id: 0,
     agreement: '',
@@ -345,10 +348,18 @@ const typeTransformation = (data) => {
 
 const saves = () => {
   if (formLabelAlign.name === "") {
-
+    ElMessage({
+      type: 'error',
+      message: '接口名称不能为空'
+    })
+    return
   }
   if (formLabelAlign.method === "") {
-
+    ElMessage({
+      type: 'error',
+      message: '请求方法不能为空'
+    })
+    return
   }
   reqData.type = props.apiType
   reqData.request.http2 = formLabelAlign.http2
@@ -374,6 +385,7 @@ const saves = () => {
   reqData.setup_hooks = setupHook
   params.menu = window.localStorage.getItem('menu')
   reqData.export_header = export_header
+  reqData.export_parameter = export_parameter
   createInterface()
 }
 
@@ -406,8 +418,10 @@ const handleHeader = (tableData) => {
   headers = tableData;
 }
 const handleExportHeader = (tableData) => {
-  console.log("export_header------------", tableData)
   export_header = tableData;
+}
+const handleExportParameter = (tableData) => {
+  export_parameter = tableData;
 }
 const requestForm = (requestForms) => {
   requestFormData = requestForms;

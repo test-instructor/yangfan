@@ -131,10 +131,14 @@ func (apicaseService *TestCaseService) GetTestCaseInfoList(info interfacecaseReq
 	if info.ApiMenuID > 0 {
 		db.Preload("ApiMenu").Joins("ApiMenu").Where("ApiMenu.ID = ?", info.ApiMenuID)
 	}
+
 	var apicases []interfacecase.ApiTestCase
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.Name != "" {
 		db = db.Where("name LIKE ?", "%"+info.Name+"%")
+	}
+	if info.FrontCase {
+		db.Where("front_case = ?", 1)
 	}
 	err = db.Count(&total).Error
 	if err != nil {

@@ -20,6 +20,14 @@ export const addTaskTestCase = (data) => {
     })
 }
 
+export const addTaskCase = (data) => {
+    return service({
+        url: baseURL + '/addTaskCase',
+        method: 'post',
+        data
+    })
+}
+
 export const setTaskCase = (data) => {
     return service({
         url: baseURL + '/setTaskCase',
@@ -27,6 +35,23 @@ export const setTaskCase = (data) => {
         data: data
     })
 }
+
+export const sortTaskCase = (data) => {
+    return service({
+        url: baseURL + '/sortTaskCase',
+        method: 'post',
+        data
+    })
+}
+
+export const delTaskCase = (data) => {
+    return service({
+        url: baseURL + '/delTaskCase',
+        method: 'delete',
+        data
+    })
+}
+
 
 
 // @Tags TimerTask

@@ -272,14 +272,17 @@ export default {
     },
     handleClick(data) {
       this.$emit('getTreeID', data.id)
+      if (Number(this.params.menutype) === 1 && Number(this.eventType) === 0) {
+        window.localStorage.setItem('menuAddCase', data.id)
+      }
       if (Number(this.params.menutype) === 1 && Number(this.eventType) === 1) {
         window.localStorage.setItem('menu', data.id)
       }
-      if (Number(this.params.menutype) === 2) {
-        window.localStorage.setItem('menuCase', data.id)
+      if (Number(this.params.menutype) === 2 && Number(this.eventType) === 0) {
+        window.localStorage.setItem('menuTaskAddCase', data.id)
       }
-      if (Number(this.params.menutype) === 1 && Number(this.eventType) === 0) {
-        window.localStorage.setItem('menuAddCase', data.id)
+      if (Number(this.params.menutype) === 2 && Number(this.eventType) === 1){
+        window.localStorage.setItem('menuCase', data.id)
       }
 
     },

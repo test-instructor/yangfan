@@ -44,29 +44,29 @@
           <template #default="scope">{{ formatDate(scope.row.nextRunTime) }}</template>
         </el-table-column>
         <el-table-column align="left" label="运行次数" prop="runNumber" width="120"/>
-        <el-table-column align="left" label="运行配置" prop="runConfig.name" width="120"/>
-        <el-table-column align="left" label="测试用例集" min-width="80">
-          <template #default="scope">
-            <el-cascader
-                v-model="scope.row.caseIds"
-                :clearable="false"
-                :options="caseOptions"
-                :props="{ multiple:true,checkStrictly: true, label:'caseName',value:'caseId', disabled:'disabled', emitPath:false}"
-                :show-all-levels="false"
-                collapse-tags
-                @visible-change="(flag)=>{changeCase(scope.row,flag)}"
-                @remove-tag="()=>{changeCase(scope.row,false)}"
-            />
-          </template>
-        </el-table-column>
+        <el-table-column align="left" label="运行配置" prop="runConfig.name" width="180"/>
+<!--        <el-table-column align="left" label="测试用例集" min-width="80">-->
+<!--          <template #default="scope">-->
+<!--            <el-cascader-->
+<!--                v-model="scope.row.caseIds"-->
+<!--                :clearable="false"-->
+<!--                :options="caseOptions"-->
+<!--                :props="{ multiple:true,checkStrictly: true, label:'caseName',value:'caseId', disabled:'disabled', emitPath:false}"-->
+<!--                :show-all-levels="false"-->
+<!--                collapse-tags-->
+<!--                @visible-change="(flag)=>{changeCase(scope.row,flag)}"-->
+<!--                @remove-tag="()=>{changeCase(scope.row,false)}"-->
+<!--            />-->
+<!--          </template>-->
+<!--        </el-table-column>-->
         <el-table-column align="left" label="备注" prop="describe" width="120"/>
         <el-table-column align="left" label="状态" prop="status" width="120">
           <template #default="scope">{{ scope.row.status ? '启用' : '禁用' }}</template>
         </el-table-column>
-        <el-table-column align="left" label="按钮组" width="240">
+        <el-table-column align="left" label="按钮组" width="360">
           <template #default="scope">
-            <el-button class="table-button" icon="detail" size="small" type="text" @click="runCase(scope.row)">运行
-            </el-button>
+            <el-button class="table-button" icon="detail" size="small" type="text" @click="detailTaskCaseFunc(scope.row)">任务详情</el-button>
+            <el-button class="table-button" icon="detail" size="small" type="text" @click="runCase(scope.row)">运行</el-button>
             <el-button class="table-button" icon="edit" size="small" type="text"
                        @click="updateTimerTaskFunc(scope.row)">变更
             </el-button>
@@ -174,6 +174,9 @@ import timerTaskCron from '@/view/interface/timerTask/timerTaskCron.vue'
 import {getApiConfigList} from "@/api/apiConfig";
 import {getTestCaseList} from "@/api/testCase";
 import {runTimerTask} from "@/api/runTestCase";
+import {useRouter} from "vue-router";
+
+const router = useRouter()
 
 // 自动化生成的字典（可能为空）以及字段
 const formData = ref({
@@ -367,6 +370,18 @@ const onDelete = async () => {
   }
 }
 
+const detailTaskCaseFunc = (row) => {
+  if (row) {
+    router.push({
+      name: 'taskCaseDetail', params: {
+        id: row.ID
+      }
+    })
+  } else {
+    router.push({name: 'taskCaseDetail'})
+  }
+}
+
 const runCase = async (row) => {
   let data = {ID: Number(row.ID)}
   const res = await runTimerTask(data)
@@ -438,6 +453,27 @@ const closeDialog = () => {
 }
 // 弹窗确定
 const enterDialog = async () => {
+  if (formData.value.name===''){
+    ElMessage({
+      type: 'error',
+      message: '配置名称不能为空'
+    })
+    return
+  }
+  if (formData.value.runConfig.ID===0){
+    ElMessage({
+      type: 'error',
+      message: '请选择运行配置'
+    })
+    return
+  }
+  if (formData.value.status && formData.value.runTime ===""){
+    ElMessage({
+      type: 'error',
+      message: '开启定时任务时时间配置不能为空'
+    })
+    return
+  }
   let res
   formData.value.case = []
   switch (type.value) {

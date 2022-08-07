@@ -11,7 +11,7 @@
       @cell-mouse-leave="cellMouseLeave"
       @keyup="tableDatas"
       @selection-change="handleSelectionChange"
-      row-key="key"
+      row-key="rowKeyID"
   >
 <!--    <el-table-column width="10" type="index" >-->
     <el-table-column :reserve-selection="true" type="selection" width="55"/>
@@ -76,7 +76,7 @@
 
 <script>
 import {ref} from "vue";
-
+import { getDict } from '@/utils/dictionary'
 
 export default {
   name: 'Header',
@@ -89,81 +89,22 @@ export default {
   },
   data() {
     return {
+      rowKeyID:0,
       multipleSelection:[],
-      headerOptions: [{
-        value: 'Accept'
-      }, {
-        value: 'Accept-Charset'
-      }, {
-        value: 'Accept-Language'
-      }, {
-        value: 'Accept-Datetime'
-      }, {
-        value: 'Authorization'
-      }, {
-        value: 'Cache-Control'
-      }, {
-        value: 'Connection'
-      }, {
-        value: 'Cookie'
-      }, {
-        value: 'Content-Length'
-      }, {
-        value: 'Content-MD5'
-      }, {
-        value: 'Content-Type'
-      }, {
-        value: 'Expect'
-      }, {
-        value: 'Date'
-      }, {
-        value: 'From'
-      }, {
-        value: 'Host'
-      }, {
-        value: 'If-Match'
-      }, {
-        value: 'If-Modified-Since'
-      }, {
-        value: 'If-None-Match'
-      }, {
-        value: 'If-Range'
-      }, {
-        value: 'If-Unmodified-Since'
-      }, {
-        value: 'Max-Forwards'
-      }, {
-        value: 'Origin'
-      }, {
-        value: 'Pragma'
-      }, {
-        value: 'Proxy-Authorization'
-      }, {
-        value: 'Range'
-      }, {
-        value: 'Referer'
-      }, {
-        value: 'TE'
-      }, {
-        value: 'User-Agent'
-      }, {
-        value: 'Upgrade'
-      }, {
-        value: 'Via'
-      }, {
-        value: 'Warning'
-      }],
+      headerOptions: [],
       currentRow: '',
-      tableData: [{key: '', value: '', desc: ''}]
+      tableData: [{key: '', value: '', desc: '', rowKeyID: 0}]
     }
   },
   created() {
+    this.typeOption()
     if (this.header && this.header.length !== 0) {
-      this.tableData = this.header;
+      this.tableData = [];
+      this.header.forEach(item =>{
+        item["rowKeyID"] = this.rowKeyID++
+        this.tableData.push(item)
+      })
     }
-
-
-    console.log("exportHeader=========v", this.exportHeader)
     if (this.exportHeader){
       this.exportHeader.forEach(v => {
         this.tableData.forEach(item => {
@@ -198,6 +139,14 @@ export default {
     }
   },
   methods: {
+    async typeOption() {
+      const res = await getDict('requestHeader')
+      res && res.forEach(item => {
+        let header = {}
+        header.value = item.label
+        this.headerOptions.push(header)
+      })
+    },
      handleSelectionChange (val) {
        this.multipleSelection = val
        this.tableDatas()
@@ -215,7 +164,6 @@ export default {
       this.multipleSelection.map(item => {
         exportHeader.push(item.key)
       })
-      console.log("export_header", exportHeader)
       this.$emit('exportHeader', exportHeader)
     },
     querySearch(queryString, cb) {
@@ -242,7 +190,8 @@ export default {
       this.tableData.push({
         key: '',
         value: '',
-        desc: ''
+        desc: '',
+        rowKeyID: this.rowKeyID++
       });
       this.tableDatas()
     },

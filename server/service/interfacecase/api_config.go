@@ -43,7 +43,7 @@ func (acService *ApiConfigService) UpdateApiConfig(ac interfacecase.ApiConfig) (
 
 func (acService *ApiConfigService) GetApiConfig(id uint) (err error, ac interfacecase.ApiConfig) {
 	err = global.GVA_DB.
-		Where("id = ?", id).First(&ac).Error
+		Where("id = ?", id).Preload("SetupCase").First(&ac).Error
 	return
 }
 
@@ -70,6 +70,7 @@ func (acService *ApiConfigService) GetApiConfigInfoList(info interfacecaseReq.Ap
 	}
 	//configStruct2 := configStruct{}
 	err = db.Preload("Project").
+		Preload("SetupCase").
 		Model(&interfacecase.ApiConfig{}).
 		Limit(limit).Offset(offset).Find(&acs, projectDB(db, info.Project.ID)).
 		Select("api_configs.id", "api_configs.name").

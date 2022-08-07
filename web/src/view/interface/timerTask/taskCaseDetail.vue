@@ -4,17 +4,17 @@
     <div class="gva-search-box">
 
       <el-form :inline="true" class="demo-form-inline">
-        <el-form-item label="用例名称">
-          <el-input v-model="caseName" placeholder="用例名称" />
+        <el-form-item label="任务名称">
+          <el-input v-model="caseName" placeholder="任务名称" />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="addApiCaseFunc" round>添加步骤</el-button>
+          <el-button type="primary" @click="addApiCaseFunc" round>添加测试用例</el-button>
         </el-form-item>
 
-<!--        <el-form-item>-->
-<!--          <el-button size="mini" type="primary" icon="search" @click="onSubmit">查询</el-button>-->
-<!--          <el-button size="mini" icon="refresh" @click="onReset">重置</el-button>-->
-<!--        </el-form-item>-->
+        <!--        <el-form-item>-->
+        <!--          <el-button size="mini" type="primary" icon="search" @click="onSubmit">查询</el-button>-->
+        <!--          <el-button size="mini" icon="refresh" @click="onReset">重置</el-button>-->
+        <!--        </el-form-item>-->
       </el-form>
     </div>
     <div class="gva-table-box">
@@ -23,7 +23,7 @@
           style="width: 100%"
           :show-header="false"
           :data="tableData"
-          row-key="ID"
+          row-key="id"
           :cell-style="{paddingTop: '4px', paddingBottom: '4px'}"
       >
         <el-table-column width="50" type="index" >
@@ -33,27 +33,18 @@
             align="center"
         >
           <template #default="scope">
-            <div class="block" :class="`block_${scope.row.request.method.toLowerCase()}`">
+            <div class="block" :class="`block_get`">
                   <span class="block-method block_method_color"
-                        :class="`block_method_${scope.row.request.method.toLowerCase()}`">
-                    {{ scope.row.request.method }}
+                        :class="`block_method_get`">
+                    {{ "CASE" }}
                   </span>
-              <div class="block">
-                    <span class="block-method block_method_color block_method_options"
-                          v-if="scope.row.creator==='yapi'"
-                          :title="'从YAPI导入的接口'">
-                      YAPI
-                    </span>
-              </div>
-              <span class="block-method block_url">{{ scope.row.request.url }}</span>
-              <span class="block-summary-description">{{ scope.row.name }}</span>
+              <span class="block-method block_url">{{ scope.row.case.name }}</span>
             </div>
           </template>
         </el-table-column>
 
         <el-table-column align="right" label="按钮组" width="150px">
           <template #default="scope">
-            <el-button type="text" icon="edit" size="small" class="table-button" @click="updateInterfaceTemplateFunc(scope.row)">变更</el-button>
             <el-button type="text" icon="delete" size="mini" @click="deleteRow(scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -82,103 +73,92 @@
     </el-dialog>
 
     <el-dialog
-        v-model="apiCaseVisible"
+        v-model="taskCaseVisible"
         :before-close="closeDialogAddCase"
-        :visible.sync="apiCaseVisible"
+        :visible.sync="taskCaseVisible"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
-        title="添加步骤"
-        width="1700px"
+        title="添加测试用例"
+        width="1250px"
         top="30px"
     >
-      <testCaseAdd
+      <taskCaseAdd
           @close="closeDialogAddCase"
-          v-if="apiCaseVisible"
-          :caseId="testCaseID"
+          v-if="taskCaseVisible"
+          @caseID="addTeseCase"
           ref="menuRole">
-      </testCaseAdd>
+      </taskCaseAdd>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button size="small" @click="closeDialog">取 消</el-button>
+          <el-button size="small" type="primary" @click="addTaskCases" >确 定</el-button>
+        </div>
+      </template>
     </el-dialog>
 
   </div>
 
 </template>
 
-
 <script setup>
 import {
-    createTestCase,
-    deleteTestCase,
-    deleteTestCaseByIds,
-    updateTestCase,
-    findTestCase,
-    getTestCaseList,
-    sortTestCase,
-    addTestCase,
-    delTestCase
+  createTestCase,
+  deleteTestCase,
+  deleteTestCaseByIds,
+  updateTestCase,
+  findTestCase,
+  getTestCaseList,
+  sortTestCase,
+  addTestCase,
+  delTestCase
 } from '@/api/testCase'
+
+import {
+  sortTaskCase,
+  findTaskTestCase,
+  addTaskCase,
+  delTaskCase
+} from '@/api/timerTask'
+
 import {useRoute} from "vue-router";
 import {reactive, ref, onMounted, watch} from "vue";
 
 import interfaceTempleForm from '@/view/interface/interfaceTemplate/interfaceTemplateForm.vue'
-import testCaseAdd from "@/view/interface/testCase/testCaseAdd.vue"
+import taskCaseAdd from "@/view/interface/timerTask/taskAddCase.vue"
 import {findInterfaceTemplate} from "@/api/interfaceTemplate";
 import {ElMessage, ElMessageBox} from "element-plus";
 import Sortable from 'sortablejs'
 
 const route = useRoute()
-const testCaseID = ref()
+const task_id = ref()
 const tableData = ref([])
 const apiTypes = 2
 const interfaceTempleFormVisible = ref(false)
-const apiCaseVisible = ref(false)
+const taskCaseVisible = ref(false)
 const dialogTitle = ref(false)
 const type = ref('')
 const heightDiv = ref()
 const caseName = ref()
+let caseID = []
 let sortIdList = ""
 heightDiv.value =  window.screen.height - 480
-const formDatas = reactive({
-  name: '',
-  request: reactive({
-    agreement: '',
-    method: '',
-    url: '',
-    params: '',
-    headers: '',
-    json: '',
-    data: '',
-  }),
-  variables: '',
-  extract: '',
-  validate: '',
-  hooks: '',
-  apiMenuID:'',
-})
-const sortData = ref({
-  ID: 0,
-  TStep: []
-})
+const formDatas = reactive({})
+const sortData = ref([])
 
 const  init = () => {
-  // getDbFunc()
-  // setFdMap()
   if (route.params.id>0){
-    testCaseID.value = route.params.id
+    task_id.value = Number(route.params.id)
   }else {
-    testCaseID.value = 1
+    task_id.value = 1
   }
-
-
-  if (testCaseID.value) {
-    getTestCaseDetailFunc(testCaseID.value)
+  if (task_id.value) {
+    getTaskCaseDetailFunc(task_id.value)
   }
 }
-const getTestCaseDetailFunc = async(testCaseID) => {
-  const res = await findTestCase({ ID: testCaseID })
+const getTaskCaseDetailFunc = async(task_id) => {
+  const res = await findTaskTestCase({ ID: task_id })
   if (res.code === 0) {
-    tableData.value = res.data.reapicase.TStep
-    caseName.value = res.data.reapicase.name
-    // dialogFormVisible.value = true
+    tableData.value = res.data.reapicase.test_case
   }
 }
 init()
@@ -195,19 +175,9 @@ watch(() => route.params.id, () => {
 })
 
 const addApiCaseFunc = async() => {
-  apiCaseVisible.value = true
-
+  taskCaseVisible.value = true
 }
 
-const updateInterfaceTemplateFunc = async(row) => {
-  const res = await findInterfaceTemplate({ ID: row.ID })
-  type.value = 'update'
-  dialogTitle.value = '编辑用例步骤'
-  if (res.code === 0) {
-    formDatas.value = res.data.reapicase
-    interfaceTempleFormVisible.value = true
-  }
-}
 
 const deleteRow = (row) => {
   ElMessageBox.confirm('确定要删除吗?', '提示', {
@@ -215,9 +185,9 @@ const deleteRow = (row) => {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(async () => {
-    const res = await delTestCase({apiID: row.ID, caseID: Number(testCaseID.value)})
+    const res = await delTaskCase({ID: row.id})
     if (res.code === 0) {
-      await getTestCaseDetailFunc(testCaseID.value)
+      await getTaskCaseDetailFunc(task_id.value)
       ElMessage({
         type: 'success',
         message: '用例删除成功'
@@ -231,9 +201,9 @@ onMounted(()=>{
 
 //行拖拽
 const rowDrop= async() => {
-  sortData.value.ID = Number(testCaseID.value)
+  sortData.value.ID = Number(task_id.value)
   const tbody = document.querySelector('.el-table__body-wrapper tbody')
-  let tSteps = []
+  let taskCases = []
 
   Sortable.create(tbody, {
     animation:1000,
@@ -241,50 +211,49 @@ const rowDrop= async() => {
       const currRow = tableData.value.splice(oldIndex, 1)[0]
       tableData.value.splice(newIndex, 0, currRow)
       tableData.value.forEach((item, index, arr) => {
-        let tStep = {ID:item.ID, sort:index+1}
-        tSteps.push(tStep)
+        let tStep = {ID:item.id, sort:index+1}
+        taskCases.push(tStep)
       })
-      sortData.value.TStep = tSteps
-      const res = await sortTestCase(sortData.value)
+      sortData.value = taskCases
+      const res = await sortTaskCase(taskCases)
       if (res.code === 0) {
-        await getTestCaseDetailFunc(testCaseID.value)
+        taskCases = []
+        await getTaskCaseDetailFunc(task_id.value)
         ElMessage({
           type: 'success',
           message: '已完成排序'
         })
       }
     }
-
   })
 
 }
 
 // 关闭弹窗
-const closeDialog = () => {
-  getTestCaseDetailFunc(testCaseID.value)
-  interfaceTempleFormVisible.value = false
-  formDatas.value = reactive({
-    name: '',
-    request: reactive({
-      agreement: '',
-      method: '',
-      url: '',
-      params: '',
-      headers: '',
-      json: '',
-      data: '',
-    }),
-    variables: '',
-    extract: '',
-    validate: '',
-    hooks: '',
-    apiMenuID:'',
-  })
+const closeDialog =  () => {
+  taskCaseVisible.value = false
+  getTaskCaseDetailFunc(task_id.value)
+}
+
+const addTaskCases = async () => {
+  const res = await addTaskCase({task_id: task_id.value, case_id: caseID})
+  if (res.code === 0) {
+    closeDialogAddCase()
+    ElMessage({
+      type: 'success',
+      message: '添加用例成功'
+    })
+  }
+
 }
 
 const closeDialogAddCase = () => {
-  apiCaseVisible.value = false
-  getTestCaseDetailFunc(testCaseID.value)
+  taskCaseVisible.value = false
+  getTaskCaseDetailFunc(task_id.value)
+}
+
+const addTeseCase = (caseIDs) => {
+  caseID = caseIDs
 }
 
 </script>

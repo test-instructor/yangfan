@@ -1,6 +1,7 @@
 <template>
   <el-table
       highlight-current-row
+      ref="exportParameterKey"
       strpe
       :height="height"
       :data="tableData"
@@ -9,7 +10,10 @@
       @cell-mouse-leave="cellMouseLeave"
       :cell-style="{paddingTop: '4px', paddingBottom: '4px'}"
       @keyup="extractData"
+      @selection-change="handleSelectionChange"
+      row-key="rowKeyID"
   >
+    <el-table-column :reserve-selection="true" type="selection" width="40"/>
     <el-table-column
         label="变量名"
         width="300">
@@ -19,7 +23,7 @@
     </el-table-column>
     <el-table-column
         label="抽取表达式"
-        width="420">
+        width="400">
       <template #default="scope">
         <el-input clearable v-model="scope.row.value" placeholder="抽取表达式"></el-input>
 
@@ -28,7 +32,7 @@
 
     <el-table-column
         label="描述"
-        width="375">
+        width="350">
       <template #default="scope">
         <el-input clearable v-model="scope.row.desc" placeholder="抽取值简要描述"></el-input>
       </template>
@@ -69,6 +73,7 @@ import {ref} from "vue";
 
 export default {
   props: {
+    exportParameter: ref(),
     save: Boolean,
     extract: ref(),
     heights: ref(),
@@ -88,13 +93,46 @@ export default {
     this.lenData = this.extract.length
     if (this.extract && this.extract.length !== 0) {
       this.tableData = this.extract;
+
+      this.tableData = [];
+      this.extract.forEach(item =>{
+        item["rowKeyID"] = this.rowKeyID++
+        this.tableData.push(item)
+      })
+    }
+    if (this.exportParameter){
+      this.exportParameter.forEach(v => {
+        this.tableData.forEach(item => {
+          if (item.key === v) {
+            this.multipleSelection.push(item)
+          }
+        })
+      })
+
+      this.$nextTick(() => {
+        this.multipleSelection.forEach(row => {
+          this.$refs.exportParameterKey.toggleRowSelection(row, true) // 回显
+        })
+      })
     }
   },
 
   methods: {
+    handleSelectionChange (val) {
+      this.multipleSelection = val
+      this.extractData()
+    },
     extractData() {
       this.lenData = this.tableData.length
       this.$emit('requestExtractData', this.tableData)
+
+
+      let exportParameter = []
+      this.multipleSelection &&
+      this.multipleSelection.map(item => {
+        exportParameter.push(item.key)
+      })
+      this.$emit('exportParameter', exportParameter)
     },
     cellMouseEnter(row) {
       this.currentRow = row;
@@ -149,10 +187,12 @@ export default {
     return {
       lenData: 0,
       currentRow: '',
+      multipleSelection:[],
       tableData: [{
         key: '',
         value: '',
-        desc: ''
+        desc: '',
+        rowKeyID: 0,
       }]
     }
   },

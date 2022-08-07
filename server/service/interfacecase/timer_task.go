@@ -58,18 +58,59 @@ func (taskService *TimerTaskService) UpdateTimerTask(task interfacecase.TimerTas
 	return err
 }
 
+func (taskService *TimerTaskService) AddTaskCase(taskID uint, caseIDs []uint) (err error) {
+
+	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+		for _, v := range caseIDs {
+			var task interfacecase.TimerTaskRelationship
+			task.TimerTask.ID = taskID
+			task.Sort = 9999
+			task.ApiTestCase.ID = v
+			err := tx.Model(interfacecase.TimerTaskRelationship{}).Save(&task).Error
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	return err
+}
+
+func (taskService *TimerTaskService) DelTaskCase(task interfacecase.TimerTaskRelationship) (err error) {
+	err = global.GVA_DB.Delete(&task).Error
+	return err
+}
+
+func (taskService *TimerTaskService) SortTaskCase(task []interfacecase.TimerTaskRelationship) (err error) {
+	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+		for _, v := range task {
+			err := tx.Find(&interfacecase.TimerTaskRelationship{
+				GVA_MODEL: global.GVA_MODEL{ID: v.ID},
+			}).Update("Sort", v.Sort).Error
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	return err
+}
+
 func (taskService *TimerTaskService) FindTaskTestCase(id uint) (err error, timerTaskRelationship []interfacecase.TimerTaskRelationship) {
 	timerTask := interfacecase.TimerTask{GVA_MODEL: global.GVA_MODEL{ID: id}}
 	global.GVA_DB.First(&timerTask)
-	//global.GVA_DB.Model(interfacecase.TimerTaskRelationship{}).
-	//	Order("Sort").
-	//	Preload("TStep").
-	//	Where("TimerTaskId = ?", id).Find(&timerTaskRelationship)
-
-	global.GVA_DB.Where("timer_task_id = ?", id).
+	global.GVA_DB.Model(interfacecase.TimerTaskRelationship{}).
+		Preload("TStep").
+		Where("timer_task_id = ?", id).
 		Preload("ApiTestCase").
-		Order("sort").
+		Preload("TimerTask").
+		Order("Sort").
 		Find(&timerTaskRelationship)
+
+	//global.GVA_DB.Where("timer_task_id = ?", id).
+	//	Preload("ApiTestCase").
+	//	Order("sort").
+	//	Find(&timerTaskRelationship)
 	return
 }
 

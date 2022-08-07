@@ -11,6 +11,7 @@ import (
 type ApiTestCase struct {
 	global.GVA_MODEL
 	Name      string         `json:"name" form:"name" gorm:"column:name;comment:;"`
+	FrontCase *bool          `json:"front_case" orm:"front_case"`
 	TStep     []ApiStep      `json:"TStep" form:"TStep" gorm:"many2many:ApiCaseRelationship;"`
 	TimerTask []TimerTask    `json:"case" form:"case" gorm:"many2many:TimerTaskRelationship;"`
 	ProjectID uint           `json:"-"`

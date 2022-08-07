@@ -22,7 +22,7 @@ var (
 type ApiReport struct {
 	global.GVA_MODEL
 	Name      string             `json:"name"`
-	Success   bool               `json:"success"`
+	Success   *bool              `json:"success"`
 	Stat      ApiReportStat      `json:"stat"`
 	StatID    uint               `json:"-"`
 	Time      ApiReportTime      `json:"time"`
@@ -34,6 +34,7 @@ type ApiReport struct {
 	Status    int                `json:"status"`
 	Project   system.Project     `json:"-"`
 	ProjectID uint               `json:"-"`
+	SetupCase bool               `json:"setup_case"`
 }
 
 type ApiReportTime struct {

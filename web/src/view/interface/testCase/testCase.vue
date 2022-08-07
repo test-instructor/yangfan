@@ -65,7 +65,7 @@
             <el-table-column align="left" label="日期" width="180">
               <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
             </el-table-column>
-            <el-table-column align="left" label="用例名称" prop="name" width="120"/>
+            <el-table-column align="left" label="用例名称" prop="name" width="240"/>
             <el-table-column align="left" label="按钮组" width="400">
               <template #default="scope">
                 <el-button type="text" icon="detail" size="small" class="table-button" @click="runCase(scope.row)">运行
@@ -100,7 +100,10 @@
     <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" title="弹窗操作">
       <el-form :model="formData" label-position="right" label-width="80px">
         <el-form-item label="用例名称:">
-          <el-input v-model="formData.name" clearable placeholder="请输入"/>
+          <el-input v-model="formData.name" clearable placeholder="请输入" />
+        </el-form-item>
+        <el-form-item label="前置用例:">
+          <el-switch v-model="formData.front_case" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -144,6 +147,7 @@ const router = useRouter()
 // 自动化生成的字典（可能为空）以及字段
 const formData = ref({
   name: '',
+  front_case: false,
 })
 
 // =========== 表格控制部分 ===========
@@ -353,6 +357,13 @@ const closeDialog = () => {
 }
 // 弹窗确定
 const enterDialog = async () => {
+  if (formData.value.name===''){
+    ElMessage({
+      type: 'error',
+      message: '用例名称不能为空'
+    })
+    return
+  }
   params.menu = treeID
   let res
   switch (type.value) {

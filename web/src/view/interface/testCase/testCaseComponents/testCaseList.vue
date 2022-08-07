@@ -172,7 +172,6 @@ const sortData = ref({
 
 watch(() => props.data, (newValue, oldValue) => {
   tableData.value = newValue
-  // console.log("props.data ==> ", newValue, oldValue);
 });
 
 
@@ -229,20 +228,6 @@ const rowDrop = async () => {
 
   Sortable.create(tbody, {
     async onEnd(evt) {
-      // console.log("拖动了行", "当前序号: " + newIndex)
-      // const { to, from, pullMode } = evt;
-      // const toContext = window.bridge.get(to)
-      // const fromContext = window.bridge.get(from)
-      // let { newIndex, oldIndex, item } = evt;
-      // const currRow = tableData.value.splice(oldIndex, 1)[0]
-      // tableData.value.splice(newIndex, 0, currRow)
-      // tableData.value.forEach((item, index, arr) => {
-      //   let tStep = {ID:item.ID, sort:index+1}
-      //   // tStep.ID = item.ID
-      //   tSteps.push(tStep)
-      // })
-      // sortData.value.TStep = tSteps
-      // const res = await sortTestCase(sortData.value)
     }
 
   })

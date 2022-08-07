@@ -19,6 +19,9 @@ func (s *TimerTaskRouter) InitTimerTaskRouter(Router *gin.RouterGroup) {
 		taskRouter.DELETE("deleteTimerTask", taskApi.DeleteTimerTask)           // 删除TimerTask
 		taskRouter.DELETE("deleteTimerTaskByIds", taskApi.DeleteTimerTaskByIds) // 批量删除TimerTask
 		taskRouter.PUT("updateTimerTask", taskApi.UpdateTimerTask)              // 更新TimerTask
+		taskRouter.POST("sortTaskCase", taskApi.SortTaskCase)
+		taskRouter.POST("addTaskCase", taskApi.AddTaskCase)
+		taskRouter.DELETE("delTaskCase", taskApi.DelTaskCase)
 		taskRouter.GET("findTaskTestCase", taskApi.FindTaskTestCase)
 		taskRouter.POST("addTaskTestCase", taskApi.AddTaskTestCase)
 		taskRouter.POST("setTaskCase", taskApi.SetTaskCase)

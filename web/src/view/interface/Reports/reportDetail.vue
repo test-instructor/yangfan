@@ -29,7 +29,12 @@
             <el-tag :type="scope.row.success?'success':'info'">{{ scope.row.success ? '成功' : '失败' }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column property="name" label="用例名称" width="320"></el-table-column>
+        <el-table-column property="name" label="用例名称" width="320">
+          <template #default="scope">
+            <el-tag type="danger" v-if="setupCaseShow(scope.row)">{{ '前置用例' }}</el-tag>
+            {{ scope.row.name }}
+          </template>
+        </el-table-column>
         <el-table-column label="运行时间" :formatter="runTime" width="160"></el-table-column>
         <el-table-column label="运行运行时长" width="120">
           <template #default="scope">
@@ -384,6 +389,10 @@ const tableKeyToValue = (data) => {
   }
   tableDatas.value = tableData
   return tableData
+}
+
+const setupCaseShow = (row) => {
+  return !!(reportData.value.setup_case && row.ID === reportData.value.details[0].ID);
 }
 
 const openDrawer = (row) => {
