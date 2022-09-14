@@ -1,5 +1,11 @@
 <template>
   <div class="search-component">
+    <div
+        v-if="btnShow"
+        class="user-box"
+    >
+      <a href="https://github.com/test-instructor/cheetah" target="_blank"><img style="width: 25px;height: 25px" src="@/assets/github.png" alt></a>
+    </div>
     <transition name="el-fade-in-linear">
       <div v-show="show" class="transition-box" style="display: inline-block;">
         <el-select
@@ -37,13 +43,14 @@
     >
       <Screenfull class="search-icon" :style="{cursor:'pointer'}" />
     </div>
+
     <div
-      v-if="btnShow"
-      class="user-box"
+        v-if="btnShow"
+        class="user-box"
     >
-      <div class="gvaIcon gvaIcon-customer-service" @click="toService"></div>
+      <selectProject/>
     </div>
-    <selectProject/>
+
   </div>
 </template>
 
