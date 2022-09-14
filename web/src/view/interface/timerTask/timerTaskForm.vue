@@ -1,38 +1,37 @@
 <template>
-  <template>
-    <div>
-      <div class="gva-form-box">
-        <el-form :model="formData" label-position="right" label-width="80px">
-          <el-form-item label="任务名称:">
-            <el-input v-model="formData.name" clearable placeholder="请输入"/>
-          </el-form-item>
-          <el-form-item label="时间配置:">
-            <el-input v-model="formData.runTime" clearable placeholder="请输入"/>
-          </el-form-item>
-          <el-form-item label="下次执行时间:">
-            <el-date-picker v-model="formData.nextRunTime" clearable placeholder="选择日期" type="date"></el-date-picker>
-          </el-form-item>
-          <el-form-item label="状态:">
-            <el-switch v-model="formData.status" active-color="#13ce66" active-text="是" clearable
-                       inactive-color="#ff4949" inactive-text="否"></el-switch>
-          </el-form-item>
-          <el-form-item label="备注:">
-            <el-input v-model="formData.describe" clearable placeholder="请输入"/>
-          </el-form-item>
-          <el-form-item label="运行次数:">
-            <el-input v-model.number="formData.runNumber" clearable placeholder="请输入"/>
-          </el-form-item>
-          <el-form-item label="运行配置:">
-            <el-input v-model="formData.runConfig" clearable placeholder="请输入"/>
-          </el-form-item>
-          <el-form-item>
-            <el-button size="mini" type="primary" @click="save">保存</el-button>
-            <el-button size="mini" type="primary" @click="back">返回</el-button>
-          </el-form-item>
-        </el-form>
-      </div>
+  <div>
+    <div class="gva-form-box">
+      <el-form :model="formData" label-position="right" label-width="80px">
+        <el-form-item label="任务名称:">
+          <el-input v-model="formData.name" clearable placeholder="请输入"/>
+        </el-form-item>
+        <el-form-item label="时间配置:">
+          <el-input v-model="formData.runTime" clearable placeholder="请输入"/>
+        </el-form-item>
+        <el-form-item label="下次执行时间:">
+          <el-date-picker v-model="formData.nextRunTime" clearable placeholder="选择日期" type="date"></el-date-picker>
+        </el-form-item>
+        <el-form-item label="定时执行:">
+          <el-switch v-model="formData.status" active-color="#13ce66" active-text="是" clearable
+                     inactive-color="#ff4949" inactive-text="否"></el-switch>
+        </el-form-item>
+        <el-form-item label="备注:">
+          <el-input v-model="formData.describe" clearable placeholder="请输入"/>
+        </el-form-item>
+        <el-form-item label="运行次数:">
+          <el-input v-model.number="formData.runNumber" clearable placeholder="请输入"/>
+        </el-form-item>
+        <el-form-item label="运行配置:">
+          <el-input v-model="formData.runConfig" clearable placeholder="请输入"/>
+        </el-form-item>
+        <el-form-item>
+          <el-button size="mini" type="primary" @click="save">保存</el-button>
+          <el-button size="mini" type="primary" @click="back">返回</el-button>
+        </el-form-item>
+      </el-form>
     </div>
-  </template>
+  </div>
+</template>
 
   <script>
     export default {

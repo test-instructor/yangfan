@@ -1,7 +1,7 @@
 import service from '@/utils/request'
 
 const project = JSON.parse(window.localStorage.getItem('project')).ID
-const baseURL = '/apicase/report/' + project
+const baseURL = '/case/report/' + project
 
 
 export const deleteReport = (data) => {

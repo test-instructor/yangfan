@@ -1,7 +1,7 @@
 import service from '@/utils/request'
 
 const project = JSON.parse(window.localStorage.getItem('project')).ID
-const baseURL = '/apicase/' + project
+const baseURL = '/case/' + project
 
 // @Tags InterfaceTemplate
 // @Summary 创建InterfaceTemplate

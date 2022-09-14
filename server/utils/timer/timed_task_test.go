@@ -21,8 +21,8 @@ func mockFunc() {
 	fmt.Println("1s...")
 }
 
-func TestNewTimerTask(t *testing.T) {
-	tm := NewTimerTask()
+func TestNewApiCase(t *testing.T) {
+	tm := NewApiCase()
 	_tm := tm.(*timer)
 
 	{

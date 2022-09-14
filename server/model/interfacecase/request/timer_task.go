@@ -6,7 +6,7 @@ import (
 )
 
 type TimerTaskSearch struct {
-	interfacecase.TimerTask
+	interfacecase.ApiTimerTask
 	request.PageInfo
 }
 

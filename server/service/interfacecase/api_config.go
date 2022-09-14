@@ -34,6 +34,9 @@ func (acService *ApiConfigService) DeleteApiConfigByIds(ids request.IdsReq) (err
 // UpdateApiConfig 更新ApiConfig记录
 
 func (acService *ApiConfigService) UpdateApiConfig(ac interfacecase.ApiConfig) (err error) {
+	var oId getOperationId
+	global.GVA_DB.Model(interfacecase.ApiConfig{}).Where("id = ?", ac.ID).First(&oId)
+	ac.CreatedByID = oId.CreatedByID
 	err = global.GVA_DB.Where(&interfacecase.ApiConfig{GVA_MODEL: global.GVA_MODEL{ID: ac.ID}}).
 		Save(&ac).Error
 	return err
@@ -45,11 +48,6 @@ func (acService *ApiConfigService) GetApiConfig(id uint) (err error, ac interfac
 	err = global.GVA_DB.
 		Where("id = ?", id).Preload("SetupCase").First(&ac).Error
 	return
-}
-
-type configStruct struct {
-	ID   uint
-	Name string
 }
 
 // GetApiConfigInfoList 分页获取ApiConfig记录
@@ -72,7 +70,7 @@ func (acService *ApiConfigService) GetApiConfigInfoList(info interfacecaseReq.Ap
 	err = db.Preload("Project").
 		Preload("SetupCase").
 		Model(&interfacecase.ApiConfig{}).
-		Limit(limit).Offset(offset).Find(&acs, projectDB(db, info.Project.ID)).
+		Limit(limit).Offset(offset).Find(&acs, projectDB(db, info.ProjectID)).
 		Select("api_configs.id", "api_configs.name").
 		Error
 	return err, acs, total

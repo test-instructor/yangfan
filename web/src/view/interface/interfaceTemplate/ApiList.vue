@@ -14,15 +14,6 @@
   width: 0;
 }
 
-.custom-tree-node {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 24px;
-  padding-right: 8px;
-}
-
 .parent {
   display: flex;
   padding: 0px;

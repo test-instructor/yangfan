@@ -76,7 +76,7 @@ func Routers() *gin.Engine {
 
 	//获取路由组实例
 	interfacecaseRouter := router.RouterGroupApp.Interfacecase
-	InterfaceGroup := Router.Group("apicase/:project")
+	InterfaceGroup := Router.Group("case/:project")
 	InterfaceGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler())
 	{
 		interfacecaseRouter.InitApiMenuRouter(InterfaceGroup)
@@ -85,14 +85,14 @@ func Routers() *gin.Engine {
 	}
 
 	runCaseRouter := router.RouterGroupApp.RunCase
-	runCaseGroup := Router.Group("apicase/run/:project")
+	runCaseGroup := Router.Group("case/run/:project")
 	runCaseGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler())
 	{
 		runCaseRouter.InitRunCaseRouter(runCaseGroup)
 	}
 
 	reportRouter := router.RouterGroupApp.Report
-	reportGroup := Router.Group("apicase/report/:project")
+	reportGroup := Router.Group("case/report/:project")
 	reportGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler())
 	{
 		reportRouter.InitReportRouter(reportGroup)
@@ -103,6 +103,13 @@ func Routers() *gin.Engine {
 	apiConfigGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler())
 	{
 		apiConfigRouter.InitApiConfigRouter(apiConfigGroup)
+	}
+
+	apiCaseRouter := router.RouterGroupApp.ApiCase
+	apiCaseGroup := Router.Group("testcase/:project")
+	apiCaseGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler())
+	{
+		apiCaseRouter.InitApiCaseRouter(apiCaseGroup)
 	}
 
 	timerTaskRouter := router.RouterGroupApp.TimerTask
@@ -118,6 +125,7 @@ func Routers() *gin.Engine {
 		apiConfigGroup,
 		runCaseGroup,
 		reportGroup,
+		apiCaseGroup,
 		timerTaskGroup,
 	) // 安装插件
 

@@ -1,15 +1,15 @@
 <template>
   <div class="parent">
-    <div class="left gva-search-box">
-      <interfaceTree
+    <div class="left">
+      <InterfaceTree
           menutype=1
           @getTreeID="setTreeID"
           eventType="1"
-      ></interfaceTree>
+      ></InterfaceTree>
     </div>
     <div class="right">
       <div class="right2">
-        <div class="gva-search-box">
+        <div class="gva-search-box" style="display: flex;">
           <el-form :inline="true" :model="searchInfo" class="demo-form-inline">
             <el-form-item label="接口名称">
               <el-input v-model="searchInfo.name" placeholder="搜索条件"/>
@@ -19,6 +19,7 @@
               <el-button size="mini" icon="refresh" @click="onReset">重置</el-button>
             </el-form-item>
           </el-form>
+          <EnvConfig @configId="configIdFun"></EnvConfig>
         </div>
         <div class="gva-table-box">
           <div class="gva-btn-list">
@@ -44,9 +45,6 @@
               row-key="ID"
               @selection-change="handleSelectionChange"
               :cell-style="{paddingTop: '4px', paddingBottom: '4px'}"
-              @cell-mouse-enter="cellMouseEnter"
-              @cell-mouse-leave="cellMouseLeave"
-              v-loading="loading"
           >
             <el-table-column type="selection" width="75"/>
             <el-table-column
@@ -68,18 +66,15 @@
                   </div>
                   <span class="block-method block_url">{{ scope.row.request.url }}</span>
                   <span class="block-summary-description">{{ scope.row.name }}</span>
-                  <!--                  <div>-->
-                  <!--                    <span class="el-icon-s-flag"-->
-                  <!--                          v-if="scope.row.cases.length > 0 "-->
-                  <!--                          :title="'API已经被用例引用,共计: '+scope.row.cases.length + '次'">-->
-                  <!--                    </span>-->
-                  <!--                  </div>-->
                 </div>
               </template>
             </el-table-column>
 
-            <el-table-column align="right" label="按钮组">
+            <el-table-column label="按钮组" width="240">
               <template #default="scope">
+                <el-button type="text" icon="debug" size="small" class="table-button"
+                           @click="runInterfaceTemplateFunc(scope.row)">调试
+                </el-button>
                 <el-button type="text" icon="edit" size="small" class="table-button"
                            @click="updateInterfaceTemplateFunc(scope.row)">变更
                 </el-button>
@@ -111,15 +106,16 @@
         width="1380px"
         top="30px"
     >
-      <interfaceTempleForm
+      <InterfaceTempleForm
           @close="closeDialog"
           v-if="interfaceTempleFormVisible"
           :heights="heightDiv"
           :eventType="type"
+          :cid="configId"
           :apiType="apiTypes"
           :formData="formDatas"
           ref="menuRole">
-      </interfaceTempleForm>
+      </InterfaceTempleForm>
 
     </el-dialog>
   </div>
@@ -141,14 +137,21 @@ import {
   getInterfaceTemplateList
 } from '@/api/interfaceTemplate'
 
+import {
+  runApi,
+} from '@/api/runTestCase'
+
 // 全量引入格式化工具 请按需保留
 import {formatDate} from '@/utils/format'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import {ref} from 'vue'
-import interfaceTree from '@/view/interface/interfaceComponents/interfaceTree.vue'
-import ApiList from '@/view/interface/interfaceTemplate/ApiList.vue'
-import interfaceTempleForm from '@/view/interface/interfaceTemplate/interfaceTemplateForm.vue'
+import InterfaceTree from '@/view/interface/interfaceComponents/interfaceTree.vue'
+import InterfaceTempleForm from '@/view/interface/interfaceTemplate/interfaceTemplateForm.vue'
+import EnvConfig from '@/view/interface/interfaceComponents/envConfig.vue'
 import {reactive} from "vue";
+import {useRouter} from "vue-router";
+const router = useRouter()
+const configId = ref(0)
 
 // 自动化生成的字典（可能为空）以及字段
 const formDatas = reactive({
@@ -225,7 +228,6 @@ const getTableData = async () => {
   }
 }
 
-getTableData()
 
 // ============== 表格控制部分结束 ===============
 
@@ -288,12 +290,42 @@ const onDelete = async () => {
 
 // 更新行
 const updateInterfaceTemplateFunc = async (row) => {
-  const res = await findInterfaceTemplate({ID: row.ID})
   type.value = 'update'
   dialogTitle.value = '编辑接口'
+  const res = await findInterfaceTemplate({ID: row.ID})
   if (res.code === 0) {
     formDatas.value = res.data.reapicase
     interfaceTempleFormVisible.value = true
+  }
+}
+
+const reportDetailFunc = (ID) => {
+  if (ID) {
+    router.push({
+      name: 'reportDetail', params: {
+        id: ID
+      }
+    })
+  } else {
+    router.push({name: 'reportDetail'})
+  }
+}
+
+const configIdFun = (id) => {
+  configId.value = id
+}
+
+const runInterfaceTemplateFunc = async (row) => {
+  if (configId.value === 0) {
+    ElMessage({
+      type: 'error',
+      message: '请选择配置后再运行'
+    })
+    return
+  }
+  const res = await runApi({caseID: row.ID, configID: configId.value, run_type: 1})
+  if (res.code === 0) {
+    reportDetailFunc(res.data.id)
   }
 }
 
@@ -314,7 +346,7 @@ const deleteInterfaceTemplateFunc = async (row) => {
 
 // 弹窗控制标记
 const interfaceTempleFormVisible = ref(false)
-const dialogTitle = ref(false)
+const dialogTitle = ref("")
 const heightDiv = ref()
 heightDiv.value = window.screen.height - 480
 
@@ -351,14 +383,6 @@ const closeDialog = () => {
 </script>
 
 <style>
-.custom-tree-node {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 14px;
-  padding-right: 8px;
-}
 
 .parent {
   width: 100%;
@@ -366,10 +390,11 @@ const closeDialog = () => {
 }
 
 .left {
+  margin-top: 10px;
   width: 300px;
   height: 98%;
   padding: 8px;
-
+  background: #ffffff;
 }
 
 .right {

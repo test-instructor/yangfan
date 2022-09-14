@@ -2,12 +2,10 @@ package initialize
 
 import (
 	"fmt"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	"strconv"
-
 	"github.com/robfig/cron/v3"
-
+	"github.com/test-instructor/cheetah/server/model/interfacecase"
 	"github.com/test-instructor/cheetah/server/service/interfacecase/runTestCase"
+	"strconv"
 
 	"github.com/test-instructor/cheetah/server/config"
 	"github.com/test-instructor/cheetah/server/global"
@@ -37,12 +35,12 @@ func Timer() {
 }
 
 func TimerTaskCase() {
-	var timerTaskCase []interfacecase.TimerTask
-	global.GVA_DB.Model(interfacecase.TimerTask{}).
+	var timerTaskCase []interfacecase.ApiTimerTask
+	global.GVA_DB.Model(interfacecase.ApiTimerTask{}).
 		Where("Status = ?", true).
 		Find(&timerTaskCase)
 	for _, task := range timerTaskCase {
-		id, err := global.GVA_Timer.AddTaskByFunc(strconv.Itoa(int(task.ID)), task.RunTime, runTestCase.RunTimerTask(task.ID), cron.WithSeconds())
+		id, err := global.GVA_Timer.AddTaskByFunc(strconv.Itoa(int(task.ID)), task.RunTime, runTestCase.RunTimerTaskBack(task.ID), cron.WithSeconds())
 		if err != nil {
 			return
 		}

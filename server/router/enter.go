@@ -13,6 +13,7 @@ type RouterGroup struct {
 	RunCase       interfacecase.RunCaseRouterGroup
 	ApiConfig     interfacecase.ApiConfigRouterGroup
 	Report        interfacecase.ReportRouter
+	ApiCase       interfacecase.ApiCaseGroup
 	TimerTask     interfacecase.TimerTaskGroup
 }
 

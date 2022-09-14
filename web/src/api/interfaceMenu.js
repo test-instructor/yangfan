@@ -1,7 +1,7 @@
 import service from '@/utils/request'
 
 const project = JSON.parse(window.localStorage.getItem('project')).ID
-const baseURL = '/apicase/' + project
+const baseURL = '/case/' + project
 
 export function getTree(params) {
     return service({
@@ -22,7 +22,7 @@ export function addTree(data, params) {
 
 export function editTree(data, params) {
     return service({
-        url: baseURL + '/updateApiMenu' + '?menutype=1',
+        url: baseURL + '/updateApiMenu',
         method: 'put',
         data,
         params
@@ -31,7 +31,7 @@ export function editTree(data, params) {
 
 export function delTree(data, params) {
     return service({
-        url: baseURL + '/deleteApiMenu' + '?menutype=1',
+        url: baseURL + '/deleteApiMenu',
         method: 'delete',
         data,
         params

@@ -37,7 +37,17 @@
         <el-table-column align="left" label="执行时间" width="180">
           <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
         </el-table-column>
-        <el-table-column align="left" label="报告名称" prop="name" width="120"/>
+        <el-table-column align="left" label="用例类型" width="120">
+          <template #default="scope">
+            <a-tag :key="caseType(scope.row.runType)[1]" :color="caseType(scope.row.runType)[1]">{{ caseType(scope.row.runType)[0] }}</a-tag>
+          </template>
+        </el-table-column>
+        <el-table-column align="left" label="执行类型" width="120">
+          <template #default="scope">
+            <a-tag :key="runType(scope.row.type)[1]" :color="runType(scope.row.type)[1]" effect="plain">{{ runType(scope.row.type)[0] }}</a-tag>
+          </template>
+        </el-table-column>
+        <el-table-column align="left" label="报告名称" prop="name" width="200"/>
         <el-table-column align="left" label="运行时长/秒" width="120">
           <template #default="scope">
             {{ Number(scope.row.time.duration).toFixed(2) }}
@@ -45,7 +55,7 @@
         </el-table-column>
         <el-table-column align="left" label="状态" prop="default" width="120">
           <template #default="scope">
-            <el-tag :type="successType(scope.row.success)[0]">{{ successType(scope.row.success)[1] }}</el-tag>
+            <el-tag :type="successType(scope.row.success)[0]" effect="dark">{{ successType(scope.row.success)[1] }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column align="left" label="按钮组">
@@ -147,6 +157,42 @@ const handleSizeChange = (val) => {
 const handleCurrentChange = (val) => {
   page.value = val
   getTableData()
+}
+
+const caseType = (t) => {
+  if (t===1){
+    return ["\u3000\xa0api\u3000\xa0", "green"]
+  }
+  if (t===2){
+    return ["\xa0\xa0套\u3000件\xa0\xa0", "cyan"]
+  }
+  if (t===3){
+    return ["\xa0\xa0用\u3000例\xa0\xa0", "arcoblue"]
+  }
+  if (t===4){
+    return ["定时任务", "orange"]
+  }
+  return ["定时任务"]
+}
+
+const runType = (t) => {
+  if (t===5){
+    return ["保存调试","#FF9A2E"]
+  }
+  if (t===1){
+    return ["调试运行","#F76560"]
+  }
+  if (t===2){
+    return ["立即运行","#C1FFC1"]
+  }
+  if (t===3){
+    return ["后台运行","#5EDFD6"]
+  }
+  if (t===4){
+    return ["定时执行","#C9E968"]
+  }
+  return 6
+
 }
 
 const reportDetailFunc = (row) => {

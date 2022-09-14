@@ -2,7 +2,7 @@ package interfacecase
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/api/v1"
+	v1 "github.com/test-instructor/cheetah/server/api/v1"
 	"github.com/test-instructor/cheetah/server/middleware"
 )
 

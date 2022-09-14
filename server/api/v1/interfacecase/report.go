@@ -6,8 +6,8 @@ import (
 	"github.com/test-instructor/cheetah/server/model/common/response"
 	"github.com/test-instructor/cheetah/server/model/interfacecase"
 	interfacecaseReq "github.com/test-instructor/cheetah/server/model/interfacecase/request"
-	"github.com/test-instructor/cheetah/server/model/system"
 	"github.com/test-instructor/cheetah/server/service"
+	"github.com/test-instructor/cheetah/server/utils"
 	"go.uber.org/zap"
 )
 
@@ -19,9 +19,7 @@ var reportService = service.ServiceGroupApp.InterfacecaseServiceGroup.ReportServ
 func (acApi *ReportApi) GetReportList(c *gin.Context) {
 	var pageInfo interfacecaseReq.ReportSearch
 	_ = c.ShouldBindQuery(&pageInfo)
-	project, _ := c.Get("project")
-	pageInfo.Project = project.(system.Project)
-
+	pageInfo.ProjectID = utils.GetUserProject(c)
 	if err, list, total := reportService.GetReportList(pageInfo); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)

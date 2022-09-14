@@ -17,7 +17,7 @@ func (reportService *ReportService) GetReportList(info interfacecaseReq.ReportSe
 	db := global.GVA_DB.
 		Model(&interfacecase.ApiReport{}).
 		Preload("Time").
-		Preload("Project").Joins("Project").Where("Project.ID = ?", info.Project.ID)
+		Preload("Project").Joins("Project").Where("Project.ID = ?", info.ProjectID)
 
 	var apiReport []interfacecase.ApiReport
 
@@ -30,7 +30,7 @@ func (reportService *ReportService) GetReportList(info interfacecaseReq.ReportSe
 	if err != nil {
 		return
 	}
-	fmt.Println(info.Project.ID)
+	fmt.Println(info.ProjectID)
 	err = db.Limit(limit).Offset(offset).Order("ID desc").Find(&apiReport).Error
 
 	return err, apiReport, total

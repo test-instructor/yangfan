@@ -16,11 +16,11 @@
   <div style="display: flex;">
     <div>
       <div class="left">
-        <interfaceTree
-            menutype=2
+        <InterfaceTree
+            menutype=3
             @getTreeID="setTreeID"
             eventType="0"
-        ></interfaceTree>
+        ></InterfaceTree>
       </div>
     </div>
     <div>
@@ -77,13 +77,13 @@
 <script>
 
 export default {
-  name: 'taskCaseAdd',
+  name: 'TaskCaseAdd',
 }
 </script>
 
 <script  setup>
 import draggable from "vuedraggable";
-import interfaceTree from '@/view/interface/interfaceComponents/interfaceTree.vue'
+import InterfaceTree from '@/view/interface/interfaceComponents/interfaceTree.vue'
 import {
   getInterfaceTemplateList
 } from '@/api/interfaceTemplate'
@@ -95,8 +95,10 @@ import {
   addTestCase, sortTestCase
 } from "@/api/testCase";
 import {ElMessage} from "element-plus";
-import {getApiConfigList} from "../../../api/apiConfig";
-import {getTestCaseList} from "../../../api/testCase";
+import {getApiConfigList} from "@/api/apiConfig";
+
+
+import { getApiCaseList } from '@/api/apiCase'
 
 const isRouterActive = ref(true)
 const emit = defineEmits(["close"]);
@@ -167,7 +169,7 @@ const log = (evt) => {
 
 // 查询
 const getTableData = async() => {
-  const table = await getTestCaseList({ type: apiTypes,menu: treeID, page: 1, pageSize: 99999})
+  const table = await getApiCaseList({ type: apiTypes,menu: treeID, page: 1, pageSize: 99999})
   if (table.code === 0) {
     apiData.value = table.data.list
 
@@ -191,14 +193,7 @@ const getTableData = async() => {
   height: 650px;
   overflow: auto;
 }
-.custom-tree-node {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 14px;
-  padding-right: 8px;
-}
+
 
 //.parent {
 //  width: 85%;
@@ -210,7 +205,7 @@ const getTableData = async() => {
   width: 300px;
   height: 98%;
   padding:8px;
-
+  background: #ffffff;
 }
 
 </style>

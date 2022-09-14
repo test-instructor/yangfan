@@ -23,6 +23,7 @@ func InstallPlugin(
 	ApiConfigGroup *gin.RouterGroup,
 	RunCaseGroup *gin.RouterGroup,
 	reportGroup *gin.RouterGroup,
+	apiCaseGroup *gin.RouterGroup,
 	timerTaskGroup *gin.RouterGroup,
 ) {
 	PublicGroup := Router.Group("")
@@ -80,6 +81,16 @@ func InstallPlugin(
 		global.GVA_CONFIG.Email.IsSSL,
 	))
 
+	PluginInit(apiCaseGroup, email.CreateEmailPlug(
+		global.GVA_CONFIG.Email.To,
+		global.GVA_CONFIG.Email.From,
+		global.GVA_CONFIG.Email.Host,
+		global.GVA_CONFIG.Email.Secret,
+		global.GVA_CONFIG.Email.Nickname,
+		global.GVA_CONFIG.Email.Port,
+		global.GVA_CONFIG.Email.IsSSL,
+	))
+
 	PluginInit(timerTaskGroup, email.CreateEmailPlug(
 		global.GVA_CONFIG.Email.To,
 		global.GVA_CONFIG.Email.From,
@@ -89,6 +100,7 @@ func InstallPlugin(
 		global.GVA_CONFIG.Email.Port,
 		global.GVA_CONFIG.Email.IsSSL,
 	))
+
 	//飞书登录
 	PluginInit(PublicGroup, fslogin.CreateFsLoginPlug(Router))
 }

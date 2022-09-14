@@ -1,40 +1,39 @@
 <template>
-  <el-input
-      v-model="filterText"
-      placeholder="输入关键字进行过滤"
-      style="margin-bottom:10px;"
-  />
-  <el-button
-      type="primary"
-      round style="margin-bottom:10px;"
-      @click="add_new_question"
-      v-if="eventType==='1'"
-  >添加一级节点
-  </el-button>
-
-  <el-tree
-      :data="trees"
-      :render-after-expand="true"
-      node-key="id"
-      :default-expand-all="true"
-      :expand-on-click-node="false"
-      :filter-node-method="filterNode"
-      ref="tree"
-      id="el-tree"
-      @node-drag-start="handleDragStart"
-      class="filter-tree"
-      @node-drag-enter="handleDragEnter"
-      @node-drag-leave="handleDragLeave"
-      @node-drag-over="handleDragOver"
-      @node-drag-end="handleDragEnd"
-      @node-drop="handleDrop"
-      @node-click="handleClick"
-  >
-
-    <template
-        #default="{ node, data }"
+  <div id="left">
+    <el-input
+        v-model="filterText"
+        placeholder="输入关键字进行过滤"
+        style="margin-bottom:10px;"
+    />
+    <el-button
+        type="primary"
+        round style="margin-bottom:10px;"
+        @click="add_new_question"
         v-if="eventType==='1'"
+    >添加一级节点
+    </el-button>
+
+    <el-tree
+        :data="trees"
+        :render-after-expand="true"
+        node-key="id"
+        :default-expand-all="true"
+        :expand-on-click-node="false"
+        :filter-node-method="filterNode"
+        ref="tree"
+        @node-drag-start="handleDragStart"
+        @node-drag-enter="handleDragEnter"
+        @node-drag-leave="handleDragLeave"
+        @node-drag-over="handleDragOver"
+        @node-drag-end="handleDragEnd"
+        @node-drop="handleDrop"
+        @node-click="handleClick"
     >
+
+      <template
+          #default="{ node, data }"
+          v-if="eventType==='1'"
+      >
           <span class="custom-tree-node">
             <span>{{ node.label }}</span>
             <span>
@@ -48,12 +47,6 @@
               >
                 <i class="iconfont icon-edit"></i>
               </a>
-              <!--              <a-->
-              <!--                @click="remove(node, data)"-->
-              <!--                >-->
-              <!--                <i class="el-icon-delete"></i>-->
-              <!--              </a>-->
-
               <a
                   @click="open(node, data)"
               >
@@ -62,12 +55,14 @@
 
             </span>
           </span>
-    </template>
-  </el-tree>
+      </template>
+    </el-tree>
+  </div>
 </template>
 
 <script>
 import {getTree, addTree, editTree, delTree} from '@/api/interfaceMenu'
+let treeID = 0
 
 const project_id = JSON.parse(window.localStorage.getItem('project')).ID
 export default {
@@ -87,17 +82,14 @@ export default {
   },
   watch: {
     filterText(val) {
-
+      this.$refs.tree.filter(val);
     }
   },
   created() {
     this.getTrees()
   },
   mounted() {
-    setTimeout(() => {
-      const dom = document.querySelector('#el-tree .el-tree-node__content');
-      dom && dom.click();
-    }, 1000)
+
   },
   methods: {
     add_new_question() {
@@ -186,10 +178,10 @@ export default {
       getTree(this.params).then((response) => {
         this.trees = response.data.list
         setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
+          const dom = document.querySelector('.el-tree .el-tree-node__content');
+          dom && dom.click();
+        }, 20)
       })
-      this.$emit('parentRun', this.trees[0])
     },
     filterNode(value, data) {
       if (!value) return true
@@ -199,7 +191,7 @@ export default {
     editTrees(editChild) {
       // 添加树节点
       var trees = {'id': editChild.id, 'name': editChild.label, 'parent': editChild.parent, 'project': project_id}
-      editTree(trees).then((response) => {
+      editTree(trees, this.params).then((response) => {
         this.trees = response.data.list
         setTimeout(() => {
           this.listLoading = false
@@ -240,7 +232,7 @@ export default {
 
     editTree(data, value) {
       data.label = value
-      this.editTrees(data, this.params)
+      this.editTrees(data)
     },
 
     remove(node, data) {
@@ -272,6 +264,7 @@ export default {
     },
     handleClick(data) {
       this.$emit('getTreeID', data.id)
+      treeID = data.id
       if (Number(this.params.menutype) === 1 && Number(this.eventType) === 0) {
         window.localStorage.setItem('menuAddCase', data.id)
       }
@@ -279,9 +272,15 @@ export default {
         window.localStorage.setItem('menu', data.id)
       }
       if (Number(this.params.menutype) === 2 && Number(this.eventType) === 0) {
-        window.localStorage.setItem('menuTaskAddCase', data.id)
+        window.localStorage.setItem('menuCaseAddStep', data.id)
       }
       if (Number(this.params.menutype) === 2 && Number(this.eventType) === 1){
+        window.localStorage.setItem('menuStep', data.id)
+      }
+      if (Number(this.params.menutype) === 3 && Number(this.eventType) === 0) {
+        window.localStorage.setItem('menuTaskAddStep', data.id)
+      }
+      if (Number(this.params.menutype) === 3 && Number(this.eventType) === 1){
         window.localStorage.setItem('menuCase', data.id)
       }
 
@@ -299,14 +298,6 @@ export default {
   width: 0;
 }
 
-.custom-tree-node {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 24px;
-  padding-right: 8px;
-}
 
 .parent {
   display: flex;
@@ -316,7 +307,7 @@ export default {
 }
 
 .left {
-  width: 600px;
+  width: 300px;
   height: 90%;
   overflow-y: auto;
 }
@@ -334,6 +325,15 @@ export default {
 /*树节点hover时的样式设置*/
 .el-tree-node__content:hover {
   background-color: #26b1ff87;
+}
+
+
+.custom-tree-node {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 16px;
 }
 
 </style>

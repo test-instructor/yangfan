@@ -8,7 +8,20 @@
             :cell-style="{ textAlign: 'center' }"
             :show-header="false">
           <el-table-column property="label" label="label" width="120"/>
-          <el-table-column property="name" label="label" width="278"/>
+
+          <el-table-column
+              width="278"
+              align="center"
+              label="value"
+          >
+            <template  #default="scope">
+              <span>
+                {{ scope.row.label==="运行状态"? (
+                  scope.row.name?"成功":"失败"
+              ):scope.row.name }}
+              </span>
+            </template>
+          </el-table-column>
         </el-table>
       </div>
       <div id="testcases">
@@ -18,25 +31,23 @@
     </div>
     <div style="width:960px;margin-left:20px;">
       <el-table
-          id="reportDataId"
           ref="reportDataId"
           :data="reportData.details"
           height="98%"
       >
-
         <el-table-column label="运行状态" width="80">
           <template #default="scope">
-            <el-tag :type="scope.row.success?'success':'info'">{{ scope.row.success ? '成功' : '失败' }}</el-tag>
+            <el-tag :type="scope.row.success?'success':'danger'" effect="dark">{{ scope.row.success ? '成功' : '失败' }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column property="name" label="用例名称" width="320">
           <template #default="scope">
-            <el-tag type="danger" v-if="setupCaseShow(scope.row)">{{ '前置用例' }}</el-tag>
+            <el-tag type="danger" v-if="setupCaseShow(scope.row)">{{ '前置套件' }}</el-tag>
             {{ scope.row.name }}
           </template>
         </el-table-column>
         <el-table-column label="运行时间" :formatter="runTime" width="160"></el-table-column>
-        <el-table-column label="运行运行时长" width="120">
+        <el-table-column label="运行时长/秒" width="120">
           <template #default="scope">
             {{ Number(scope.row.time.duration).toFixed(3) }}
           </template>
@@ -65,7 +76,7 @@
                   width="100"
               >
                 <template #default="scope">
-                  <el-tag :type="scope.row.success?'success':'info'">{{ scope.row.success ? '成功' : '失败' }}</el-tag>
+                  <el-tag :type="scope.row.success?'success':'danger'" effect="dark">{{ scope.row.success ? '成功' : '失败' }}</el-tag>
                 </template>
               </el-table-column>
               <el-table-column
@@ -73,12 +84,12 @@
                   align="center"
               >
                 <template #default="scope">
-                  <div class="block" :class="`block_${scope.row.data.req_resps.request.method.toLowerCase()}`">
+                  <div class="block" :class="`block_${dataMethod(scope.row)[0]}`">
                 <span class="block-method block_method_color"
-                      :class="`block_method_${scope.row.data.req_resps.request.method.toLowerCase()}`">
-                  {{ scope.row.data.req_resps.request.method }}
+                      :class="`block_method_${dataMethod(scope.row)[0]}`">
+                  {{ dataMethod(scope.row)[1] }}
                 </span>
-                    <span class="block-method block_url">{{ scope.row.data.req_resps.request.url }}</span>
+                    <span class="block-method block_url">{{ scope.row.data?scope.row.data.req_resps.request.url:"" }}</span>
                     <span class="block-summary-description">{{ scope.row.name }}</span>
                   </div>
                 </template>
@@ -98,7 +109,7 @@
       </el-table>
     </div>
 
-    <el-drawer v-if="drawer" v-model="drawer" :with-header="false" size="45%" title="请求详情">
+    <el-drawer v-show="drawer" v-model="drawer" :with-header="false" size="45%" title="请求详情">
       <div id="requestTimeEl"></div>
 
       <div
@@ -207,7 +218,7 @@
                 label="状态"
             >
               <template #default="scope">
-                <el-tag :type="scope.row.check_result==='pass'?'success':'danger'">
+                <el-tag :type="scope.row.check_result==='pass'?'success':'danger'" effect="dark">
                   {{
                     scope.row.check_result === 'pass' ? '成功' : '失败'
                   }}
@@ -315,6 +326,8 @@ import {BarChart} from 'echarts/charts';
 import {CanvasRenderer} from 'echarts/renderers';
 import { useRoute } from "vue-router";
 import {getCurrentInstance} from "vue";
+import {ElMessageBox} from "element-plus";
+import {formatDate} from "@/utils/format";
 
 const route = useRoute()
 echarts.use([
@@ -391,108 +404,127 @@ const tableKeyToValue = (data) => {
   return tableData
 }
 
+const dataMethod = (row) => {
+  if (!row.data){
+    return ["delete", "执行错误"]
+  }else {
+    let method = row.data.req_resps.request.method.toLowerCase()
+    return [method, method]
+  }
+}
+
 const setupCaseShow = (row) => {
   return !!(reportData.value.setup_case && row.ID === reportData.value.details[0].ID);
 }
 
 const openDrawer = (row) => {
-  drawer.value = true
-  validatorsTable.value = true
-  responseTable.value = true
-  requestTable.value = true
-  let requestData = []
-  let responseData = []
-  {
-    requestData.push({key: "url", value: row.data.req_resps.request.url})
-    requestData.push({key: "method", value: row.data.req_resps.request.method})
-    requestData.push({key: "headers", value: row.data.req_resps.request.headers, isTable: true})
-    requestData.push({key: "body", value: row.data.req_resps.request.body, isTable: true})
-    requestData.push({key: "data", value: row.data.req_resps.request.data, isTable: true})
-    requestData.push({key: "params", value: row.data.req_resps.request.params, isTable: true})
-    responseData.push({key: "status_code", value: row.data.req_resps.response.status_code})
-    responseData.push({key: "body", value: row.data.req_resps.response.body})
-    responseData.push({key: "cookies", value: row.data.req_resps.response.cookies, isTable: true})
-    responseData.push({key: "headers", value: row.data.req_resps.response.headers, isTable: true})
-  }
-  let export_vars = tableKeyToValue(row.export_vars)
-  activeRow.value = {
-    requestData: requestData,
-    responseData: responseData,
-    validators: row.data.validators,
-    exportVars: export_vars,
-  }
-  let series = [];
-  series = [
+  if (row.data){
+    drawer.value = true
+    validatorsTable.value = true
+    responseTable.value = true
+    requestTable.value = true
+    let requestData = []
+    let responseData = []
     {
-      name: 'DNS 解析',
-      type: 'bar',
-      stack: 'total',
-      label: {
-        show: true
-      },
-      emphasis: {
-        focus: 'series'
-      },
-      data: [row.httpstat.DNSLookup]
-    },
-    {
-      name: 'TCP 连接',
-      type: 'bar',
-      stack: 'total',
-      label: {
-        show: true
-      },
-      emphasis: {
-        focus: 'series'
-      },
-      data: [row.httpstat.TCPConnection]
-    },
-    {
-      name: 'TLS 握手',
-      type: 'bar',
-      stack: 'total',
-      label: {
-        show: true
-      },
-      emphasis: {
-        focus: 'series'
-      },
-      data: [row.httpstat.TLSHandshake]
-    },
-    {
-      name: '服务端处理',
-      type: 'bar',
-      stack: 'total',
-      label: {
-        show: true
-      },
-      emphasis: {
-        focus: 'series'
-      },
-      data: [row.httpstat.ServerProcessing]
-    },
-    {
-      name: '数据传输',
-      type: 'bar',
-      stack: 'total',
-      label: {
-        show: true
-      },
-      emphasis: {
-        focus: 'series'
-      },
-      data: [row.httpstat.ContentTransfer]
+      requestData.push({key: "url", value: row.data.req_resps.request.url})
+      requestData.push({key: "method", value: row.data.req_resps.request.method})
+      requestData.push({key: "headers", value: row.data.req_resps.request.headers, isTable: true})
+      requestData.push({key: "body", value: row.data.req_resps.request.body, isTable: true})
+      requestData.push({key: "data", value: row.data.req_resps.request.data, isTable: true})
+      requestData.push({key: "params", value: row.data.req_resps.request.params, isTable: true})
+      responseData.push({key: "status_code", value: row.data.req_resps.response.status_code})
+      responseData.push({key: "body", value: row.data.req_resps.response.body})
+      responseData.push({key: "cookies", value: row.data.req_resps.response.cookies, isTable: true})
+      responseData.push({key: "headers", value: row.data.req_resps.response.headers, isTable: true})
     }
-  ]
-  requestTimeOption.series = series
-  setTimeout(() => {
-    const requestTimeChartDom = document.getElementById('requestTimeEl');
-    const requestTimeChart = echarts.init(requestTimeChartDom, null, {
-      renderer: 'canvas',
-      useDirtyRect: false
-    });
-    requestTimeChart.setOption(requestTimeOption);
-  }, 100)
+    let export_vars = tableKeyToValue(row.export_vars)
+    activeRow.value = {
+      requestData: requestData,
+      responseData: responseData,
+      validators: row.data.validators,
+      exportVars: export_vars,
+    }
+    let series = [];
+    series = [
+      {
+        name: 'DNS 解析',
+        type: 'bar',
+        stack: 'total',
+        label: {
+          show: true
+        },
+        emphasis: {
+          focus: 'series'
+        },
+        data: [row.httpstat.DNSLookup]
+      },
+      {
+        name: 'TCP 连接',
+        type: 'bar',
+        stack: 'total',
+        label: {
+          show: true
+        },
+        emphasis: {
+          focus: 'series'
+        },
+        data: [row.httpstat.TCPConnection]
+      },
+      {
+        name: 'TLS 握手',
+        type: 'bar',
+        stack: 'total',
+        label: {
+          show: true
+        },
+        emphasis: {
+          focus: 'series'
+        },
+        data: [row.httpstat.TLSHandshake]
+      },
+      {
+        name: '服务端处理',
+        type: 'bar',
+        stack: 'total',
+        label: {
+          show: true
+        },
+        emphasis: {
+          focus: 'series'
+        },
+        data: [row.httpstat.ServerProcessing]
+      },
+      {
+        name: '数据传输',
+        type: 'bar',
+        stack: 'total',
+        label: {
+          show: true
+        },
+        emphasis: {
+          focus: 'series'
+        },
+        data: [row.httpstat.ContentTransfer]
+      }
+    ]
+    requestTimeOption.series = series
+    setTimeout(() => {
+      const requestTimeChartDom = document.getElementById('requestTimeEl');
+      const requestTimeChart = echarts.init(requestTimeChartDom, null, {
+        renderer: 'canvas',
+        useDirtyRect: false
+      });
+      requestTimeChart.setOption(requestTimeOption);
+    }, 50)
+  }else {
+    ElMessageBox.alert(
+        '当前用例执行错误，无法查看相信信息，请检查用例配置是否正确',
+        '用例执行出错',
+        {
+          type: 'error',
+        }
+    )
+  }
 }
 
 
@@ -521,8 +553,8 @@ const initData = async () => {
   tableDdata.value = reportData.value.details
   await getTestCaseDetailFunc(reportID)
   testCaseSimple.value.push({label: '运行状态', name: reportData.value.success, key: 'success'})
-  testCaseSimple.value.push({label: '开始时间', name: reportData.value.time.start_at, key: 'start_at'})
-  testCaseSimple.value.push({label: '运行时长', name: reportData.value.time.duration, key: 'duration'})
+  testCaseSimple.value.push({label: '开始时间', name: formatDate(reportData.value.time.start_at), key: 'start_at'})
+  testCaseSimple.value.push({label: '运行时长', name: reportData.value.time.duration.toFixed(2).toString() + "(秒)", key: 'duration'})
   testCasesData.value = [
     {value: reportData.value.stat.testcases['success'], name: '成功'},
     {value: reportData.value.stat.testcases['fail'], name: '失败'}
@@ -578,8 +610,9 @@ pieOption = {
 
 let testCaseChart = null
 let testStepChart = null
+currentInstance = getCurrentInstance()
 onMounted(async () => {
-  currentInstance = getCurrentInstance()
+
   pieOption.series[0].data = testCasesData.value
   pieOption.series[0].name = '用例运行情况'
   const testCaseDom = document.getElementById('testcases');
@@ -614,7 +647,7 @@ watch(
     })
 
 const toggleExpand = (row) => {
-  let table = currentInstance.ctx.$refs.reportDataId
+  let table = currentInstance.refs.reportDataId
   reportData.value.details.map((item) => {
     if (row.ID !== item.ID) {
       table.toggleRowExpansion(item, false)

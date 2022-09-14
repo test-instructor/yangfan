@@ -7,8 +7,8 @@ import (
 	"github.com/test-instructor/cheetah/server/model/common/response"
 	"github.com/test-instructor/cheetah/server/model/interfacecase"
 	interfacecaseReq "github.com/test-instructor/cheetah/server/model/interfacecase/request"
-	"github.com/test-instructor/cheetah/server/model/system"
 	"github.com/test-instructor/cheetah/server/service"
+	"github.com/test-instructor/cheetah/server/utils"
 	"go.uber.org/zap"
 )
 
@@ -27,10 +27,10 @@ var taskService = service.ServiceGroupApp.InterfacecaseServiceGroup.TimerTaskSer
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /task/createTimerTask [post]
 func (taskApi *TimerTaskApi) CreateTimerTask(c *gin.Context) {
-	var task interfacecase.TimerTask
+	var task interfacecase.ApiTimerTask
 	_ = c.ShouldBindJSON(&task)
-	projectsss, _ := c.Get("project")
-	task.Project = projectsss.(system.Project)
+	task.ProjectID = utils.GetUserProject(c)
+	task.CreatedByID = utils.GetUserID(c)
 	if err := taskService.CreateTimerTask(task); err != nil {
 		global.GVA_LOG.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
@@ -49,10 +49,10 @@ func (taskApi *TimerTaskApi) CreateTimerTask(c *gin.Context) {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
 // @Router /task/deleteTimerTask [delete]
 func (taskApi *TimerTaskApi) DeleteTimerTask(c *gin.Context) {
-	var task interfacecase.TimerTask
+	var task interfacecase.ApiTimerTask
 	_ = c.ShouldBindJSON(&task)
-	projectsss, _ := c.Get("project")
-	task.Project = projectsss.(system.Project)
+	task.ProjectID = utils.GetUserProject(c)
+	task.DeleteByID = utils.GetUserID(c)
 	if err := taskService.DeleteTimerTask(task); err != nil {
 		global.GVA_LOG.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
@@ -91,10 +91,10 @@ func (taskApi *TimerTaskApi) DeleteTimerTaskByIds(c *gin.Context) {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
 // @Router /task/updateTimerTask [put]
 func (taskApi *TimerTaskApi) UpdateTimerTask(c *gin.Context) {
-	var task interfacecase.TimerTask
+	var task interfacecase.ApiTimerTask
 	_ = c.ShouldBindJSON(&task)
-	projectsss, _ := c.Get("project")
-	task.Project = projectsss.(system.Project)
+	task.ProjectID = utils.GetUserProject(c)
+	task.UpdateByID = utils.GetUserID(c)
 	if err := taskService.UpdateTimerTask(task); err != nil {
 		global.GVA_LOG.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
@@ -104,7 +104,7 @@ func (taskApi *TimerTaskApi) UpdateTimerTask(c *gin.Context) {
 }
 
 func (taskApi *TimerTaskApi) SortTaskCase(c *gin.Context) {
-	var task []interfacecase.TimerTaskRelationship
+	var task []interfacecase.ApiTimerTaskRelationship
 	_ = c.ShouldBindJSON(&task)
 	if err := taskService.SortTaskCase(task); err != nil {
 		global.GVA_LOG.Error("更新失败!", zap.Error(err))
@@ -131,7 +131,7 @@ func (taskApi *TimerTaskApi) AddTaskCase(c *gin.Context) {
 }
 
 func (taskApi *TimerTaskApi) DelTaskCase(c *gin.Context) {
-	var task interfacecase.TimerTaskRelationship
+	var task interfacecase.ApiTimerTaskRelationship
 	_ = c.ShouldBindJSON(&task)
 	if err := taskService.DelTaskCase(task); err != nil {
 		global.GVA_LOG.Error("删除失败!", zap.Error(err))
@@ -147,27 +147,27 @@ type taskTcaseResp struct {
 }
 
 type testCase struct {
-	ID   uint                      `json:"id"`
-	Case interfacecase.ApiTestCase `json:"case"`
+	ID   uint                  `json:"id"`
+	Case interfacecase.ApiCase `json:"case"`
 }
 
 func (taskApi *TimerTaskApi) FindTaskTestCase(c *gin.Context) {
-	var task interfacecase.TimerTask
+	var task interfacecase.ApiTimerTask
 	_ = c.ShouldBindQuery(&task)
-	projectsss, _ := c.Get("project")
-	task.Project = projectsss.(system.Project)
+	global.GVA_DB.First(&task)
+	task.ProjectID = utils.GetUserProject(c)
 	var reapicase taskTcaseResp
 	err, resp := taskService.FindTaskTestCase(task.ID)
 	if err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
+		reapicase.Name = task.Name
 		if len(resp) > 0 {
-			reapicase.Name = resp[0].TimerTask.Name
 			for _, v := range resp {
 				var testcase testCase
 				testcase.ID = v.ID
-				testcase.Case = v.ApiTestCase
+				testcase.Case = v.ApiCase
 				reapicase.TestCase = append(reapicase.TestCase, testcase)
 			}
 			response.OkWithData(gin.H{"reapicase": reapicase}, c)
@@ -210,10 +210,9 @@ func (taskApi *TimerTaskApi) SetTaskCase(c *gin.Context) {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
 // @Router /task/findTimerTask [get]
 func (taskApi *TimerTaskApi) FindTimerTask(c *gin.Context) {
-	var task interfacecase.TimerTask
+	var task interfacecase.ApiTimerTask
 	_ = c.ShouldBindQuery(&task)
-	projectsss, _ := c.Get("project")
-	task.Project = projectsss.(system.Project)
+	task.ProjectID = utils.GetUserProject(c)
 	if err, retask := taskService.GetTimerTask(task.ID); err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
@@ -234,8 +233,7 @@ func (taskApi *TimerTaskApi) FindTimerTask(c *gin.Context) {
 func (taskApi *TimerTaskApi) GetTimerTaskList(c *gin.Context) {
 	var pageInfo interfacecaseReq.TimerTaskSearch
 	_ = c.ShouldBindQuery(&pageInfo)
-	projectsss, _ := c.Get("project")
-	pageInfo.Project = projectsss.(system.Project)
+	pageInfo.ProjectID = utils.GetUserProject(c)
 	if err, list, total := taskService.GetTimerTaskInfoList(pageInfo); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)

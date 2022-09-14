@@ -36,8 +36,8 @@
 import { nextTick, ref } from 'vue'
 
 const state = window.localStorage.getItem('token')
-const client_id = 'cli_a241057640bd900c' // 飞书的client_id
-const redirect_uri = 'http://127.0.0.1:8080/api/fsLogin/login' // 回调地址
+const client_id = ref(import.meta.env.VITE_FS_APP_ID).value  // 飞书的client_id
+const redirect_uri = ref(import.meta.env.VITE_FS_LOGIN).value // 回调地址
 const goto = `https://passport.feishu.cn/suite/passport/oauth/authorize?client_id=${client_id}&redirect_uri=${redirect_uri}&response_type=code&state=${state}`
 
 const dialogVisible = ref(false)

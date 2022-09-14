@@ -6,7 +6,6 @@ import (
 	"github.com/test-instructor/cheetah/server/model/common/request"
 	"github.com/test-instructor/cheetah/server/model/interfacecase"
 	interfacecaseReq "github.com/test-instructor/cheetah/server/model/interfacecase/request"
-	"github.com/test-instructor/cheetah/server/model/system"
 )
 
 /*
@@ -14,23 +13,27 @@ import (
 */
 type TreeList struct {
 	Id       uint        `json:"id"`
+	Key      uint        `json:"key"`
 	Label    string      `json:"label"`
+	Title    string      `json:"title"`
 	Parent   uint        `json:"pid"`
 	Children []*TreeList `json:"children"`
 }
 
-func (apicaseService *ApiMenuService) GetMenu(pid uint, menuType string, project system.Project) ([]*TreeList, error) {
+func (apicaseService *ApiMenuService) GetMenu(pid uint, menuType string, project uint) ([]*TreeList, error) {
 	var menu []interfacecase.ApiMenu
 
 	db := global.GVA_DB.Model(&interfacecase.ApiMenu{})
 
-	db.Where("Parent = ?", pid).Where("menu_type = ?", menuType).Find(&menu, projectDB(db, project.ID))
+	db.Where("Parent = ?", pid).Where("menu_type = ?", menuType).Find(&menu, projectDB(db, project))
 	treeList := []*TreeList{}
 	for _, v := range menu {
 		child, _ := apicaseService.GetMenu(v.ID, v.MenuType, project)
 		node := &TreeList{
 			Id:     v.ID,
+			Key:    v.ID,
 			Label:  v.Name,
+			Title:  v.Name,
 			Parent: v.Parent,
 		}
 		node.Children = child
@@ -67,6 +70,11 @@ func (apicaseService *ApiMenuService) DeleteApiMenuByIds(ids request.IdsReq) (er
 
 func (apicaseService *ApiMenuService) UpdateApiMenu(apicase interfacecase.ApiMenu) (err error) {
 	var apicaseTemp interfacecase.ApiMenu
+	var oId getOperationId
+	global.GVA_DB.Model(interfacecase.ApiMenu{}).Where("id = ?", apicase.ID).First(&oId)
+	apicaseTemp.CreatedByID = oId.CreatedByID
+	apicaseTemp.UpdateByID = apicase.UpdateByID
+
 	global.GVA_DB.Preload("Project").Where("id = ?", apicase.ID).First(&apicaseTemp)
 	apicaseTemp.Name = apicase.Name
 	err = global.GVA_DB.Save(&apicaseTemp).Error
@@ -93,7 +101,7 @@ func (apicaseService *ApiMenuService) GetApiMenuInfoList(info interfacecaseReq.A
 	if err != nil {
 		return
 	}
-	err = db.Preload("Project").Limit(limit).Offset(offset).Find(&apicases, projectDB(db, info.Project.ID)).Error
+	err = db.Preload("Project").Limit(limit).Offset(offset).Find(&apicases, projectDB(db, info.ProjectID)).Error
 	return err, apicases, total
 }
 

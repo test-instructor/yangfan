@@ -24,7 +24,7 @@ var (
 	GVA_VP     *viper.Viper
 	// GVA_LOG    *oplogging.Logger
 	GVA_LOG                 *zap.Logger
-	GVA_Timer               timer.Timer = timer.NewTimerTask()
+	GVA_Timer               timer.Timer = timer.NewApiCase()
 	GVA_Concurrency_Control             = &singleflight.Group{}
 
 	BlackCache        local_cache.Cache

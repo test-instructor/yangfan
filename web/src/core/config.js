@@ -4,8 +4,7 @@
 
 const config = {
   appName: 'cheetah',
-  // appLogo: 'https://www.gin-vue-admin.com/img/logo.png',
-  appLogo: '/src/assets/logo.png',
+  appLogo: 'https://cheetah-1259641046.cos.ap-nanjing.myqcloud.com/logo.png',
   showViteLogo: true
 }
 
@@ -24,7 +23,7 @@ export const viteLogo = (env) => {
     )
     console.log(
       chalk.green(
-        `> 加群方式:微信号：taylorter QQ群：873175584`
+        `> 加群方式:微信号：test-instructor QQ群：873175584`
       )
     )
     console.log(

@@ -131,7 +131,7 @@ export default {
                 break;
               case 2:
                 // 包含$是引用类型,可以任意类型
-                if (value.indexOf("$") != -1) {
+                if (value.indexOf("$") !== -1) {
                   tempValue = value
                 } else {
                   tempValue = parseInt(value);

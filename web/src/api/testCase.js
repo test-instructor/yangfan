@@ -1,7 +1,7 @@
 import service from '@/utils/request'
 
 const project = JSON.parse(window.localStorage.getItem('project')).ID
-const baseURL = '/apicase/' + project
+const baseStepURL = '/case/' + project + "/step"
 
 // @Tags TestCase
 // @Summary 创建TestCase
@@ -10,10 +10,10 @@ const baseURL = '/apicase/' + project
 // @Produce application/json
 // @Param data body model.TestCase true "创建TestCase"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
-// @Router /apicase/createTestCase [post]
+// @Router /case/createTestCase [post]
 export const createTestCase = (data, params) => {
     return service({
-        url: baseURL + '/createTestCase',
+        url: baseStepURL + '/createTestCase',
         method: 'post',
         data,
         params
@@ -22,7 +22,7 @@ export const createTestCase = (data, params) => {
 
 export const sortTestCase = (data) => {
     return service({
-        url: baseURL + '/sortTestCase',
+        url: baseStepURL + '/sortTestCase',
         method: 'post',
         data
     })
@@ -36,10 +36,10 @@ export const sortTestCase = (data) => {
 // @Produce application/json
 // @Param data body model.TestCase true "删除TestCase"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
-// @Router /apicase/deleteTestCase [delete]
+// @Router /case/deleteTestCase [delete]
 export const deleteTestCase = (data) => {
     return service({
-        url: baseURL + '/deleteTestCase',
+        url: baseStepURL + '/deleteTestCase',
         method: 'delete',
         data
     })
@@ -52,10 +52,10 @@ export const deleteTestCase = (data) => {
 // @Produce application/json
 // @Param data body request.IdsReq true "批量删除TestCase"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
-// @Router /apicase/deleteTestCase [delete]
+// @Router /case/deleteTestCase [delete]
 export const deleteTestCaseByIds = (data) => {
     return service({
-        url: baseURL + '/deleteTestCaseByIds',
+        url: baseStepURL + '/deleteTestCaseByIds',
         method: 'delete',
         data
     })
@@ -68,10 +68,10 @@ export const deleteTestCaseByIds = (data) => {
 // @Produce application/json
 // @Param data body model.TestCase true "更新TestCase"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
-// @Router /apicase/updateTestCase [put]
+// @Router /case/updateTestCase [put]
 export const updateTestCase = (data, params) => {
     return service({
-        url: baseURL + '/updateTestCase',
+        url: baseStepURL + '/updateTestCase',
         method: 'put',
         data,
         params
@@ -85,10 +85,10 @@ export const updateTestCase = (data, params) => {
 // @Produce application/json
 // @Param data query model.TestCase true "用id查询TestCase"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
-// @Router /apicase/findTestCase [get]
+// @Router /case/findTestCase [get]
 export const findTestCase = (params) => {
     return service({
-        url: baseURL + '/findTestCase',
+        url: baseStepURL + '/findTestCase',
         method: 'get',
         params
     })
@@ -96,7 +96,7 @@ export const findTestCase = (params) => {
 
 export const addTestCase = (data) => {
     return service({
-        url: baseURL + '/addTestCase',
+        url: baseStepURL + '/addTestCase',
         method: 'post',
         data
     })
@@ -104,7 +104,7 @@ export const addTestCase = (data) => {
 
 export const delTestCase = (data) => {
     return service({
-        url: baseURL + '/delTestCase',
+        url: baseStepURL + '/delTestCase',
         method: 'delete',
         data
     })
@@ -118,10 +118,10 @@ export const delTestCase = (data) => {
 // @Produce application/json
 // @Param data query request.PageInfo true "分页获取TestCase列表"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
-// @Router /apicase/getTestCaseList [get]
+// @Router /case/getTestCaseList [get]
 export const getTestCaseList = (params) => {
     return service({
-        url: baseURL + '/getTestCaseList',
+        url: baseStepURL + '/getTestCaseList',
         method: 'get',
         params
     })

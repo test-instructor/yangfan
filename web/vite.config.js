@@ -72,7 +72,10 @@ export default ({
       manifest: false, // 是否产出manifest.json
       sourcemap: false, // 是否产出sourcemap.json
       outDir: 'dist', // 产出目录
-      rollupOptions,
+      rollupOptions:{
+        // external:['codemirror']
+      },
+
     },
     esbuild,
     optimizeDeps,

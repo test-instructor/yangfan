@@ -2,11 +2,11 @@
   <div style="display: flex;">
     <div>
       <div class="left">
-        <interfaceTree
+        <InterfaceTree
             menutype=2
             @getTreeID="setTreeID"
             eventType="0"
-        ></interfaceTree>
+        ></InterfaceTree>
       </div>
     </div>
     <div>
@@ -96,7 +96,7 @@
 
 <script  setup>
 import draggable from "vuedraggable";
-import interfaceTree from '@/view/interface/interfaceComponents/interfaceTree.vue'
+import InterfaceTree from '@/view/interface/interfaceComponents/interfaceTree.vue'
 import {
   getInterfaceTemplateList
 } from '@/api/interfaceTemplate'
@@ -108,9 +108,9 @@ import {
   addTestCase, sortTestCase, getTestCaseList
 } from "@/api/testCase";
 import {
-  findTaskTestCase,
-  addTaskTestCase,
-} from "@/api/timerTask";
+  findApiTestCase,
+  addApiTestCase,
+} from "@/api/apiCase";
 import {ElMessage} from "element-plus";
 const isRouterActive = ref(true)
 
@@ -139,7 +139,7 @@ const props = defineProps({
 
 
 const getTestCaseDetailFunc = async(testCaseID) => {
-  const res = await findTaskTestCase({ ID: testCaseID })
+  const res = await findApiTestCase({ ID: testCaseID })
   if (res.code === 0) {
     caseData.value = res.data.reapicase
   }
@@ -186,7 +186,7 @@ const leftDragHandler = async(dom, target) => {
           TStep: []
         })
         let currRow = caseLeftData.value[oldIndex]
-        const res = await addTaskTestCase({ apiID: currRow.ID, caseID: Number(caseId) })
+        const res = await addApiTestCase({ apiID: currRow.ID, caseID: Number(caseId) })
         if (res.code === 0) {
           ElMessage({
             type: 'success',
@@ -259,14 +259,6 @@ const getTableData = async() => {
   height: 750px;
   overflow: auto;
 }
-.custom-tree-node {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 14px;
-  padding-right: 8px;
-}
 
 //.parent {
 //  width: 85%;
@@ -278,7 +270,7 @@ const getTableData = async() => {
   width: 300px;
   height: 98%;
   padding:8px;
-
+  background: #ffffff;
 }
 
 </style>

@@ -2,19 +2,21 @@
 
   <div>
     <div class="gva-search-box">
-
       <el-form :inline="true" class="demo-form-inline">
-        <el-form-item label="任务名称">
-          <el-input v-model="caseName" placeholder="任务名称" />
+        <el-form-item>
+          <div class="block" :class="`block_head`" style="height: 30px">
+                  <span class="block-method block_method_color"
+                        :class="`block_method_head`">
+                    {{ "CASE" }}
+                  </span>
+            <div class="block">
+            </div>
+            <span class="block-method block_url">{{ taskName }}</span>
+          </div>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="addApiCaseFunc" round>添加测试用例</el-button>
         </el-form-item>
-
-        <!--        <el-form-item>-->
-        <!--          <el-button size="mini" type="primary" icon="search" @click="onSubmit">查询</el-button>-->
-        <!--          <el-button size="mini" icon="refresh" @click="onReset">重置</el-button>-->
-        <!--        </el-form-item>-->
       </el-form>
     </div>
     <div class="gva-table-box">
@@ -60,7 +62,7 @@
         width="1380px"
         top="30px"
     >
-      <interfaceTempleForm
+      <InterfaceTempleForm
           @close="closeDialog"
           v-if="interfaceTempleFormVisible"
           :heights="heightDiv"
@@ -68,7 +70,7 @@
           :apiType="apiTypes"
           :formData="formDatas"
           ref="menuRole">
-      </interfaceTempleForm>
+      </InterfaceTempleForm>
 
     </el-dialog>
 
@@ -82,12 +84,12 @@
         width="1250px"
         top="30px"
     >
-      <taskCaseAdd
+      <TaskCaseAdd
           @close="closeDialogAddCase"
           v-if="taskCaseVisible"
           @caseID="addTeseCase"
           ref="menuRole">
-      </taskCaseAdd>
+      </TaskCaseAdd>
       <template #footer>
         <div class="dialog-footer">
           <el-button size="small" @click="closeDialog">取 消</el-button>
@@ -123,8 +125,8 @@ import {
 import {useRoute} from "vue-router";
 import {reactive, ref, onMounted, watch} from "vue";
 
-import interfaceTempleForm from '@/view/interface/interfaceTemplate/interfaceTemplateForm.vue'
-import taskCaseAdd from "@/view/interface/timerTask/taskAddCase.vue"
+import InterfaceTempleForm from '@/view/interface/interfaceTemplate/interfaceTemplateForm.vue'
+import TaskCaseAdd from "@/view/interface/timerTask/taskAddCase.vue"
 import {findInterfaceTemplate} from "@/api/interfaceTemplate";
 import {ElMessage, ElMessageBox} from "element-plus";
 import Sortable from 'sortablejs'
@@ -138,7 +140,7 @@ const taskCaseVisible = ref(false)
 const dialogTitle = ref(false)
 const type = ref('')
 const heightDiv = ref()
-const caseName = ref()
+const taskName = ref()
 let caseID = []
 let sortIdList = ""
 heightDiv.value =  window.screen.height - 480
@@ -159,6 +161,7 @@ const getTaskCaseDetailFunc = async(task_id) => {
   const res = await findTaskTestCase({ ID: task_id })
   if (res.code === 0) {
     tableData.value = res.data.reapicase.test_case
+    taskName.value = res.data.reapicase.name
   }
 }
 init()

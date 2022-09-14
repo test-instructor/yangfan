@@ -7,8 +7,8 @@ import (
 	"github.com/test-instructor/cheetah/server/model/common/response"
 	"github.com/test-instructor/cheetah/server/model/interfacecase"
 	interfacecaseReq "github.com/test-instructor/cheetah/server/model/interfacecase/request"
-	"github.com/test-instructor/cheetah/server/model/system"
 	"github.com/test-instructor/cheetah/server/service"
+	"github.com/test-instructor/cheetah/server/utils"
 	"go.uber.org/zap"
 )
 
@@ -29,8 +29,8 @@ var acService = service.ServiceGroupApp.InterfacecaseServiceGroup.ApiConfigServi
 func (acApi *ApiConfigApi) CreateApiConfig(c *gin.Context) {
 	var ac interfacecase.ApiConfig
 	_ = c.ShouldBindJSON(&ac)
-	projectsss, _ := c.Get("project")
-	ac.Project = projectsss.(system.Project)
+	ac.CreatedByID = utils.GetUserID(c)
+	ac.ProjectID = utils.GetUserProject(c)
 	if err := acService.CreateApiConfig(ac); err != nil {
 		global.GVA_LOG.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
@@ -52,8 +52,8 @@ func (acApi *ApiConfigApi) CreateApiConfig(c *gin.Context) {
 func (acApi *ApiConfigApi) DeleteApiConfig(c *gin.Context) {
 	var ac interfacecase.ApiConfig
 	_ = c.ShouldBindJSON(&ac)
-	project, _ := c.Get("project")
-	ac.Project = project.(system.Project)
+	ac.ProjectID = utils.GetUserProject(c)
+	ac.DeleteByID = utils.GetUserID(c)
 	if err := acService.DeleteApiConfig(ac); err != nil {
 		global.GVA_LOG.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
@@ -94,8 +94,11 @@ func (acApi *ApiConfigApi) DeleteApiConfigByIds(c *gin.Context) {
 func (acApi *ApiConfigApi) UpdateApiConfig(c *gin.Context) {
 	var ac interfacecase.ApiConfig
 	_ = c.ShouldBindJSON(&ac)
-	projectsss, _ := c.Get("project")
-	ac.Project = projectsss.(system.Project)
+	ac.ProjectID = utils.GetUserProject(c)
+	ac.UpdateByID = utils.GetUserID(c)
+	if ac.SetupCaseID == nil {
+		ac.SetupCase = nil
+	}
 	if err := acService.UpdateApiConfig(ac); err != nil {
 		global.GVA_LOG.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
@@ -116,8 +119,7 @@ func (acApi *ApiConfigApi) UpdateApiConfig(c *gin.Context) {
 func (acApi *ApiConfigApi) FindApiConfig(c *gin.Context) {
 	var ac interfacecase.ApiConfig
 	_ = c.ShouldBindQuery(&ac)
-	projectsss, _ := c.Get("project")
-	ac.Project = projectsss.(system.Project)
+	ac.ProjectID = utils.GetUserProject(c)
 	if err, reac := acService.GetApiConfig(ac.ID); err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
@@ -138,8 +140,7 @@ func (acApi *ApiConfigApi) FindApiConfig(c *gin.Context) {
 func (acApi *ApiConfigApi) GetApiConfigList(c *gin.Context) {
 	var pageInfo interfacecaseReq.ApiConfigSearch
 	_ = c.ShouldBindQuery(&pageInfo)
-	project, _ := c.Get("project")
-	pageInfo.Project = project.(system.Project)
+	pageInfo.ProjectID = utils.GetUserProject(c)
 	if err, list, total := acService.GetApiConfigInfoList(pageInfo); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)

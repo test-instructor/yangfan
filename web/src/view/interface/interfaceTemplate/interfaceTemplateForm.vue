@@ -170,6 +170,7 @@
 
     </div>
     <br/>
+    <el-button type="primary" @click="saveRun">保存并调试</el-button>
     <el-button type="primary" @click="saves">保存</el-button>
     <el-button type="info" @click="closeDialog">取消</el-button>
   </div>
@@ -188,6 +189,11 @@ import Extract from '@/view/interface/interfaceComponents/Extract.vue'
 import Validate from '@/view/interface/interfaceComponents/Validate.vue'
 import Variables from '@/view/interface/interfaceComponents/Variables.vue'
 import Hooks from '@/view/interface/interfaceComponents/Hooks.vue'
+import {
+  runApi,
+} from '@/api/runTestCase'
+import {useRouter} from "vue-router";
+const router = useRouter()
 
 import {
   createInterfaceTemplate,
@@ -199,6 +205,7 @@ import {getDict} from "@/utils/dictionary";
 
 const emit = defineEmits(["close"]);
 const props = defineProps({
+  cid:ref(),
   heights: ref(),
   eventType: ref(),
   apiType: ref(),
@@ -225,9 +232,10 @@ const props = defineProps({
 const heightDiv = ref(false)
 const eventType = ref('')
 const formData = reactive({})
+let configId
 heightDiv.value = props.heights
 eventType.value = props.eventType
-
+configId = props.cid
 let type = ref()
 const formLabelAlign = reactive({
   name: '',
@@ -270,7 +278,6 @@ let requestValidateData = []
 let requestVariablesData = []
 let activeTag = 'Header'
 const eventMsg = ref()
-
 const handleRequest = (id) => {
   if (id > 0) {
     requestId.push(id)
@@ -346,7 +353,22 @@ const typeTransformation = (data) => {
   return dataJson
 }
 
-const saves = () => {
+const reportDetailFunc = (ID) => {
+  if (ID) {
+    router.push({
+      name: 'reportDetail', params: {
+        id: ID
+      }
+    })
+  } else {
+    router.push({name: 'reportDetail'})
+  }
+}
+
+const saveRun = async () => {
+  let res
+  let res1
+  setReqData()
   if (formLabelAlign.name === "") {
     ElMessage({
       type: 'error',
@@ -361,6 +383,32 @@ const saves = () => {
     })
     return
   }
+  res = await createInterface(false)
+  if (res.code === 0){
+    res1 = await runInterfaceTemplateFunc(res.data.id)
+    if (res1.code === 0){
+      reportDetailFunc(res1.data.id)
+    }
+  }
+
+
+}
+
+const runInterfaceTemplateFunc = async (id) => {
+  if (configId === 0) {
+    ElMessage({
+      type: 'error',
+      message: '请选择配置后再运行'
+    })
+    return
+  }
+  const res = await runApi({caseID: id, configID: configId, run_type: 5})
+  if (res.code === 0) {
+    reportDetailFunc(res.data.id)
+  }
+}
+
+const setReqData = () => {
   reqData.type = props.apiType
   reqData.request.http2 = formLabelAlign.http2
   reqData.request.verify = formLabelAlign.verify
@@ -386,10 +434,28 @@ const saves = () => {
   params.menu = window.localStorage.getItem('menu')
   reqData.export_header = export_header
   reqData.export_parameter = export_parameter
-  createInterface()
 }
 
-const createInterface = async () => {
+const saves = () => {
+  setReqData()
+  createInterface(true)
+}
+
+const createInterface = async (close) => {
+  if (formLabelAlign.name === "") {
+    ElMessage({
+      type: 'error',
+      message: '接口名称不能为空'
+    })
+    return
+  }
+  if (formLabelAlign.method === "") {
+    ElMessage({
+      type: 'error',
+      message: '请求方法不能为空'
+    })
+    return
+  }
   let res
   switch (eventType.value) {
     case 'create':
@@ -410,7 +476,11 @@ const createInterface = async () => {
       type: 'success',
       message: eventMsg.value + '成功'
     })
-    emit("close")
+    if (close){
+      emit("close")
+    }
+    return res
+
   }
 }
 

@@ -44,7 +44,7 @@
           <template #default="scope">{{ formatDate(scope.row.nextRunTime) }}</template>
         </el-table-column>
         <el-table-column align="left" label="运行次数" prop="runNumber" width="120"/>
-        <el-table-column align="left" label="运行配置" prop="runConfig.name" width="180"/>
+        <el-table-column align="left" label="运行配置" prop="config.name" width="180"/>
 <!--        <el-table-column align="left" label="测试用例集" min-width="80">-->
 <!--          <template #default="scope">-->
 <!--            <el-cascader-->
@@ -60,8 +60,10 @@
 <!--          </template>-->
 <!--        </el-table-column>-->
         <el-table-column align="left" label="备注" prop="describe" width="120"/>
-        <el-table-column align="left" label="状态" prop="status" width="120">
-          <template #default="scope">{{ scope.row.status ? '启用' : '禁用' }}</template>
+        <el-table-column align="left" label="定时执行" prop="status" width="120">
+          <template #default="scope">
+            <el-tag :type="scope.row.status ? 'success' : 'info'">{{ scope.row.status ? '启用' : '禁用' }}</el-tag>
+          </template>
         </el-table-column>
         <el-table-column align="left" label="按钮组" width="360">
           <template #default="scope">
@@ -116,7 +118,7 @@
             />
           </el-popover>
         </el-form-item>
-        <el-form-item label="状态:">
+        <el-form-item label="定时执行:">
           <el-switch v-model="formData.status" active-color="#13ce66" active-text="启用" clearable
                      inactive-color="#ff4949" inactive-text="禁用"></el-switch>
         </el-form-item>
@@ -172,7 +174,6 @@ import {ref, watch, nextTick} from 'vue'
 
 import timerTaskCron from '@/view/interface/timerTask/timerTaskCron.vue'
 import {getApiConfigList} from "@/api/apiConfig";
-import {getTestCaseList} from "@/api/testCase";
 import {runTimerTask} from "@/api/runTestCase";
 import {useRouter} from "vue-router";
 
@@ -186,8 +187,8 @@ const formData = ref({
   status: false,
   describe: '',
   runNumber: 0,
-  case: [],
-  runConfig: {
+  TestCase: [],
+  config: {
     ID: 0
   },
 })
@@ -205,7 +206,7 @@ const closeRunTimeCron = (isClose) => {
 }
 const configID = ref()
 const configChange = (key) => {
-  formData.value.runConfig.ID = key
+  formData.value.config.ID = key
 }
 
 // =========== 表格控制部分 ===========
@@ -261,23 +262,10 @@ const getTableData = async () => {
 }
 
 
-const caseOptions = ref([])
-const setOptionsCase = (caseData) => {
-  caseOptions.value = []
-  caseData &&
-  caseData.forEach(item => {
-    const option = {
-      caseId: item.ID,
-      caseName: item.name,
-    }
-    caseOptions.value.push(option)
-  })
-}
+
 
 const initPage = async () => {
   await getTableData()
-  const res1 = await getTestCaseList({page: 1, pageSize: 999})
-  setOptionsCase(res1.data.list)
 }
 initPage()
 
@@ -287,7 +275,7 @@ watch(tableData, () => {
 
 const setCaseIds = () => {
   tableData.value && tableData.value.forEach((testCase) => {
-    const caseIds = testCase.case && testCase.case.map(i => {
+    const caseIds = testCase.TestCase && testCase.TestCase.map(i => {
       return i.ID
     })
     testCase.caseIds = caseIds
@@ -383,7 +371,7 @@ const detailTaskCaseFunc = (row) => {
 }
 
 const runCase = async (row) => {
-  let data = {ID: Number(row.ID)}
+  let data = {taskID: Number(row.ID)}
   const res = await runTimerTask(data)
   if (res.code === 0) {
     ElMessage({
@@ -401,11 +389,11 @@ const updateTimerTaskFunc = async (row) => {
   const res = await findTimerTask({ID: row.ID})
   getConfigData()
   creatCron.value = true
-  // configID.value = configData.value.runConfig.ID
+  // configID.value = configData.value.config.ID
   type.value = 'update'
   if (res.code === 0) {
     formData.value = res.data.retask
-    configID.value = formData.value.runConfig.ID
+    configID.value = formData.value.config.ID
     dialogFormVisible.value = true
   }
 }
@@ -447,7 +435,7 @@ const closeDialog = () => {
     status: false,
     describe: '',
     runNumber: 0,
-    runConfig: {ID: 0},
+    config: {ID: 0},
   }
   creatCron.value = false
 }
@@ -456,11 +444,11 @@ const enterDialog = async () => {
   if (formData.value.name===''){
     ElMessage({
       type: 'error',
-      message: '配置名称不能为空'
+      message: '任务名称不能为空'
     })
     return
   }
-  if (formData.value.runConfig.ID===0){
+  if (formData.value.config.ID===0){
     ElMessage({
       type: 'error',
       message: '请选择运行配置'
@@ -475,7 +463,7 @@ const enterDialog = async () => {
     return
   }
   let res
-  formData.value.case = []
+  formData.value.TestCase = []
   switch (type.value) {
     case 'create':
       res = await createTimerTask(formData.value)

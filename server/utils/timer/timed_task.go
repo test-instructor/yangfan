@@ -101,6 +101,6 @@ func (t *timer) Close() {
 	}
 }
 
-func NewTimerTask() Timer {
+func NewApiCase() Timer {
 	return &timer{taskList: make(map[string]*cron.Cron)}
 }

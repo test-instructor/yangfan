@@ -38,7 +38,7 @@ func RunWindowsServer() {
 	fmt.Printf(`
 	欢迎使用 cheetah
 	当前版本:v1.0.0
-    加群方式:微信号：taylorter QQ群：873175584
+    加群方式:微信号：test-instructor QQ群：873175584
 `, address)
 	global.GVA_LOG.Error(s.ListenAndServe().Error())
 }

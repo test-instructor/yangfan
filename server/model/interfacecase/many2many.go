@@ -2,19 +2,29 @@ package interfacecase
 
 import "github.com/test-instructor/cheetah/server/global"
 
-type ApiCaseRelationship struct {
-	ID            uint
+type ApiCaseStepRelationship struct {
+	global.GVA_MODEL
 	ApiStep       ApiStep
 	ApiStepId     uint
-	ApiTestCase   ApiTestCase
-	ApiTestCaseId uint
+	ApiCaseStep   ApiCaseStep
+	ApiCaseStepId uint
+	Sort          uint
 }
 
-type TimerTaskRelationship struct {
+type ApiCaseRelationship struct {
 	global.GVA_MODEL
-	ApiTestCase   ApiTestCase
-	ApiTestCaseId uint
-	TimerTask     TimerTask
-	TimerTaskId   uint
+	ApiCaseStep   ApiCaseStep
+	ApiCaseStepId uint
+	ApiCase       ApiCase
+	ApiCaseId     uint
 	Sort          uint
+}
+
+type ApiTimerTaskRelationship struct {
+	global.GVA_MODEL
+	ApiTimerTask   ApiTimerTask
+	ApiTimerTaskId uint
+	ApiCase        ApiCase
+	ApiCaseId      uint
+	Sort           uint
 }

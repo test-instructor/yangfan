@@ -11,12 +11,15 @@ type CaseType int
 type RunType int
 
 var (
-	CaseTypeApi    CaseType = 1 // api 运行
-	CaseTypeCases  CaseType = 2 // 用例运行
-	CaseTypeTask   CaseType = 3 // 定时任务运行
-	RunTypeDebug   RunType  = 1 // 调试模式
-	RunTypeRuning  RunType  = 2 // 立即运行
-	RunTypeRunBack RunType  = 3 // 后台运行
+	CaseTypeApi     CaseType = 1 // api 运行
+	CaseTypeStep    CaseType = 2 // 套件运行
+	CaseTypeCases   CaseType = 3 // 用例运行
+	CaseTypeTask    CaseType = 4 // 定时任务运行
+	RunTypeDebug    RunType  = 1 // 调试模式
+	RunTypeRuning   RunType  = 2 // 立即运行
+	RunTypeRunBack  RunType  = 3 // 后台运行
+	RunTypeRunTimer RunType  = 4 // 定时执行
+	RunTypeRunSave  RunType  = 5 // 调试并保存
 )
 
 type ApiReport struct {
@@ -87,6 +90,7 @@ type ApiReportDetailsRecords struct {
 	Success            bool                            `json:"success"`
 	ElapsedMs          int                             `json:"elapsed_ms"`
 	HttpStat           ApiReportDetailsRecordsHttpstat `json:"httpstat"`
+	ValidateNumber     uint                            `json:"validate_number" form:"validate_number"`
 	HttpStatID         uint                            `json:"-"`
 	Data               datatypes.JSON                  `json:"data"`
 	ExportVars         datatypes.JSON                  `json:"export_vars"`

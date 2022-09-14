@@ -4,7 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 	"github.com/test-instructor/cheetah/server/global"
+	"github.com/test-instructor/cheetah/server/model/system"
 	systemReq "github.com/test-instructor/cheetah/server/model/system/request"
+	"strconv"
 )
 
 func GetClaims(c *gin.Context) (*systemReq.CustomClaims, error) {
@@ -29,6 +31,16 @@ func GetUserID(c *gin.Context) uint {
 		waitUse := claims.(*systemReq.CustomClaims)
 		return waitUse.ID
 	}
+}
+
+// GetProjectID 从Gin的Context中获取从jwt解析出来的用户ID
+func GetUserProject(c *gin.Context) uint {
+	var userProject system.Project
+	project, _ := strconv.ParseInt(c.Param("project"), 10, 64)
+	userProject.ID = uint(project)
+	db := global.GVA_DB
+	db.Model(system.Project{}).First(&userProject)
+	return uint(project)
 }
 
 // GetUserUuid 从Gin的Context中获取从jwt解析出来的用户UUID

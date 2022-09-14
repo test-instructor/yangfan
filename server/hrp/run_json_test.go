@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestJsonRunner(t *testing.T) {
+/*func TestJsonRunner(t *testing.T) {
 	jsonString := `{
     "config": {
         "name": "demo with complex mechanisms",
@@ -192,4 +192,247 @@ func TestJsonRunner(t *testing.T) {
 	if err != nil {
 		t.Fatalf("run testcase error: %v", err)
 	}
+}*/
+
+func TestJsonRunnerCase(t *testing.T) {
+	jsonString := `{
+	"Config": {
+		"ID": 1,
+		"CreatedAt": "2022-08-22T19:40:06.294+08:00",
+		"UpdatedAt": "2022-08-22T19:49:54.502+08:00",
+		"name": "httpbin 配置",
+		"base_url": "http://httpbin.org",
+		"variables": {},
+		"headers": {},
+		"parameters": {},
+		"variables_json": [],
+		"headers_json": [],
+		"weight": 0,
+		"default": true,
+		"verify": false,
+		"setup_case": null,
+		"setup_case_id": null
+	},
+	"TestSteps": [
+		{
+			"ID": 0,
+			"CreatedAt": "0001-01-01T00:00:00Z",
+			"UpdatedAt": "0001-01-01T00:00:00Z",
+			"name": "headers",
+			"type": 0,
+			"request": {
+				"ID": 0,
+				"CreatedAt": "0001-01-01T00:00:00Z",
+				"UpdatedAt": "0001-01-01T00:00:00Z",
+				"agreement": "",
+				"method": "",
+				"url": "",
+				"params": null,
+				"headers": null,
+				"data": null,
+				"params_json": null,
+				"headers_json": null,
+				"data_json": null,
+				"json": null,
+				"verify": false
+			},
+			"variables": null,
+			"extract": null,
+			"validate": null,
+			"validate_number": 0,
+			"validate_json": null,
+			"extract_json": null,
+			"variables_json": null,
+			"hooks": "",
+			"testCase": null,
+			"sort": 0,
+			"export_header": null,
+			"export_parameter": null,
+			"TestCase": {
+				"Config": {
+					"ID": 1,
+					"CreatedAt": "2022-08-22T19:40:06.294+08:00",
+					"UpdatedAt": "2022-08-22T19:49:54.502+08:00",
+					"name": "httpbin 配置",
+					"base_url": "http://httpbin.org",
+					"variables": {},
+					"headers": {},
+					"parameters": {},
+					"variables_json": [],
+					"headers_json": [],
+					"weight": 0,
+					"default": true,
+					"verify": false,
+					"setup_case": null,
+					"setup_case_id": null
+				},
+				"TestSteps": [
+					{
+						"ID": 4,
+						"CreatedAt": "2022-08-22T19:44:50.753+08:00",
+						"UpdatedAt": "2022-08-22T19:44:50.753+08:00",
+						"name": "headers",
+						"type": 1,
+						"request": {
+							"ID": 4,
+							"CreatedAt": "2022-08-22T19:44:50.71+08:00",
+							"UpdatedAt": "2022-08-22T19:44:50.71+08:00",
+							"agreement": "",
+							"method": "GET",
+							"url": "/headers",
+							"params": {},
+							"headers": {},
+							"data": {},
+							"params_json": [],
+							"headers_json": [],
+							"data_json": [],
+							"json": {},
+							"verify": false
+						},
+						"variables": {},
+						"extract": {},
+						"validate": [
+							{
+								"assert": "equals",
+								"check": "status_code",
+								"expect": 200,
+								"expectTemp": "200",
+								"msg": "check status code",
+								"type": 2
+							}
+						],
+						"validate_number": 1,
+						"validate_json": null,
+						"extract_json": [],
+						"variables_json": [],
+						"hooks": "",
+						"testCase": null,
+						"sort": 0,
+						"export_header": [],
+						"export_parameter": [],
+						"TestCase": null
+					}
+				]
+			}
+		},{
+			"ID": 0,
+			"CreatedAt": "0001-01-01T00:00:00Z",
+			"UpdatedAt": "0001-01-01T00:00:00Z",
+			"name": "headers11111111111",
+			"type": 0,
+			"request": {
+				"ID": 0,
+				"CreatedAt": "0001-01-01T00:00:00Z",
+				"UpdatedAt": "0001-01-01T00:00:00Z",
+				"agreement": "",
+				"method": "",
+				"url": "",
+				"params": null,
+				"headers": null,
+				"data": null,
+				"params_json": null,
+				"headers_json": null,
+				"data_json": null,
+				"json": null,
+				"verify": false
+			},
+			"variables": null,
+			"extract": null,
+			"validate": null,
+			"validate_number": 0,
+			"validate_json": null,
+			"extract_json": null,
+			"variables_json": null,
+			"hooks": "",
+			"testCase": null,
+			"sort": 0,
+			"export_header": null,
+			"export_parameter": null,
+			"TestCase": {
+				"Config": {
+					"ID": 1,
+					"CreatedAt": "2022-08-22T19:40:06.294+08:00",
+					"UpdatedAt": "2022-08-22T19:49:54.502+08:00",
+					"name": "httpbin 配置",
+					"base_url": "http://httpbin.org",
+					"variables": {},
+					"headers": {},
+					"parameters": {},
+					"variables_json": [],
+					"headers_json": [],
+					"weight": 0,
+					"default": true,
+					"verify": false,
+					"setup_case": null,
+					"setup_case_id": null
+				},
+				"TestSteps": [
+					{
+						"ID": 4,
+						"CreatedAt": "2022-08-22T19:44:50.753+08:00",
+						"UpdatedAt": "2022-08-22T19:44:50.753+08:00",
+						"name": "headers222222",
+						"type": 1,
+						"request": {
+							"ID": 4,
+							"CreatedAt": "2022-08-22T19:44:50.71+08:00",
+							"UpdatedAt": "2022-08-22T19:44:50.71+08:00",
+							"agreement": "",
+							"method": "GET",
+							"url": "/headers",
+							"params": {},
+							"headers": {},
+							"data": {},
+							"params_json": [],
+							"headers_json": [],
+							"data_json": [],
+							"json": {},
+							"verify": false
+						},
+						"variables": {},
+						"extract": {},
+						"validate": [
+							{
+								"assert": "equals",
+								"check": "status_code",
+								"expect": 200,
+								"expectTemp": "200",
+								"msg": "check status code",
+								"type": 2
+							}
+						],
+						"validate_number": 1,
+						"validate_json": null,
+						"extract_json": [],
+						"variables_json": [],
+						"hooks": "",
+						"testCase": null,
+						"sort": 0,
+						"export_header": [],
+						"export_parameter": [],
+						"TestCase": null
+					}
+				]
+			}
+		}
+	]
+}`
+	//BuildHashicorpPyPlugin([]byte{}, "")
+	//defer RemoveHashicorpPyPlugin("")
+	testcase3 := &TestCaseJson{
+		JsonString:        jsonString,
+		ID:                1,
+		DebugTalkFilePath: "",
+	}
+	//NewRunner(t).SetHTTPStatOn().GenHTMLReport().SetFailfast(false).RunJsons(r.tcm.Case...)
+	testCase, _ := testcase3.ToTestCase()
+	r := NewRunner(t)
+	r.GenHTMLReport()
+
+	r.RunJsons(testCase)
+	//	if err != nil {
+	//		t.Fatalf("run testcase error: %v", err)
+	//	}
+	//	reportStr, _ := json.Marshal(report)
+	//	fmt.Println(string(reportStr))
 }

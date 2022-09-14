@@ -2,10 +2,10 @@
   <div>
     <div style="display: flex;">
       <div>
-        <span>前置用例: </span>
+        <span>前置套件: </span>
         <el-select v-model="reqData.setup_case_id"
                    class="m-2"
-                   placeholder="请选择前置用例"
+                   placeholder="请选择前置套件"
                    size="large"
                    clearable>
           <el-option
@@ -92,17 +92,6 @@
           >
           </jsons>
         </el-tab-pane>
-
-<!--        <el-tab-pane label="Hooks" name="Hooks">
-          <hooks
-              :heights="heightDiv"
-              @teardownHooksData="teardownHooks"
-              @setupHooksData="setupHooks"
-              :setupHooks="reqData ? reqData.setup_hooks : []"
-              :teardownHooks="reqData ? reqData.teardown_hooks : []"
-          >
-          </hooks>
-        </el-tab-pane>-->
       </el-tabs>
     </div>
     <br/>
@@ -121,7 +110,7 @@ export default {
 import Headers from '@/view/interface/interfaceComponents/Headers.vue'
 import Variables from '@/view/interface/interfaceComponents/Variables.vue'
 import Jsons from '@/view/interface/interfaceComponents/Jsons.vue'
-import {getTestCaseList} from "../../../api/testCase";
+import {getTestCaseList} from "@/api/testCase";
 
 import {
   createApiConfig,
@@ -196,7 +185,7 @@ let reqData = reactive({
   ID: 0,
   parameters: [],
   name: '',
-  setup_case_id:null,
+  setup_case_id:0,
   base_url: '',
   headers: [],
   variables: '',
@@ -251,7 +240,7 @@ let headers = []
 let validate = []
 let requestId = []
 let requestFormData = []
-let requestParamsData = []
+let requestParamsData = {}
 let requestJsonData = {}
 let requestExtractData = []
 let requestValidateData = []

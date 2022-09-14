@@ -1,6 +1,6 @@
 <template>
   <div>
-    <codeEditor
+    <MonacoEditor
         :debugTalkType="debugTalk"
     />
   </div>
@@ -13,7 +13,7 @@ export default {
 </script>
 
 <script setup>
-import codeEditor from '@/view/interface/debugtalk/debugtalk/codeEditor.vue'
+import MonacoEditor from '@/view/interface/debugtalk/debugtalk/MonacoEditor.vue'
 import {ref} from "vue";
 const debugTalk = ref(1)
 

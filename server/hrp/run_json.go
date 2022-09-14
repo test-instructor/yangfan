@@ -66,6 +66,9 @@ func (r *HRPRunner) RunJsons(testcases ...ITestCase) (interfacecase.ApiReport, e
 			}
 			caseSummary := sessionRunner.GetSummary()
 			caseSummary.CaseID = testcase.ID
+			for k, _ := range caseSummary.Records {
+				caseSummary.Records[k].ValidatorsNumber = testcase.TestSteps[k].Struct().ValidatorsNumber
+			}
 			caseSummary.Name = testcase.Name
 			s.appendCaseSummary(caseSummary)
 		}
@@ -177,27 +180,7 @@ func (testCaseJson *TestCaseJson) ToTestCase() (*TestCase, error) {
 	for _, step := range tc.TestSteps {
 		step.ParntID = step.ID
 		step.ID = 0
-		if step.API != nil {
-			apiPath, ok := step.API.(string)
-			if !ok {
-				return nil, fmt.Errorf("referenced api path should be string, got %v", step.API)
-			}
-			path := filepath.Join(projectRootDir, apiPath)
-			if !builtin.IsFilePathExists(path) {
-				return nil, errors.New("referenced api file not found: " + path)
-			}
-
-			refAPI := APIPath(path)
-			apiContent, err := refAPI.ToAPI()
-			if err != nil {
-				return nil, err
-			}
-			step.API = apiContent
-
-			testCase.TestSteps = append(testCase.TestSteps, &StepAPIWithOptionalArgs{
-				step: step,
-			})
-		} else if step.TestCase != nil {
+		if step.TestCase != nil {
 			casePath, ok := step.TestCase.(string)
 			if !ok {
 				return nil, fmt.Errorf("referenced testcase path should be string, got %v", step.TestCase)
@@ -249,4 +232,106 @@ func loadFromString(jsonString string) (*TCase, error) {
 	decoder.UseNumber()
 	err := decoder.Decode(tc)
 	return tc, err
+}
+
+type JsonToCase struct {
+	JsonString        string
+	ID                uint
+	DebugTalkFilePath string
+	Name              string
+}
+
+func (testCaseJson *JsonToCase) GetPath() string {
+	return testCaseJson.DebugTalkFilePath
+}
+
+func (testCaseJson *JsonToCase) ToTestCase() (ITestCase, error) {
+	tc := &TCase{}
+	var err error
+	casePath := testCaseJson.JsonString
+	tc, err = loadFromString(casePath)
+	if err != nil {
+		return nil, err
+	}
+
+	err = tc.MakeCompat()
+	if err != nil {
+		return nil, err
+	}
+
+	tc.Config.Path = testCaseJson.GetPath()
+	testCase := &TestCase{
+		ID:     testCaseJson.ID,
+		Name:   testCaseJson.Name,
+		Config: tc.Config,
+	}
+
+	projectRootDir, err := GetProjectRootDirPath(testCaseJson.GetPath())
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get project root dir")
+	}
+
+	// load .env file
+	dotEnvPath := filepath.Join(projectRootDir, ".env")
+	if builtin.IsFilePathExists(dotEnvPath) {
+		envVars := make(map[string]string)
+		err = builtin.LoadFile(dotEnvPath, envVars)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to load .env file")
+		}
+
+		// override testcase config env with variables loaded from .env file
+		// priority: .env file > testcase config env
+		if testCase.Config.Environs == nil {
+			testCase.Config.Environs = make(map[string]string)
+		}
+		for key, value := range envVars {
+			testCase.Config.Environs[key] = value
+		}
+	}
+
+	for _, step := range tc.TestSteps {
+		step.ParntID = step.ID
+		step.ID = 0
+		if step.TestCase != nil {
+			caseStr, _ := json.Marshal(step.TestCase)
+			jtc := &JsonToCase{
+				JsonString: string(caseStr),
+				ID:         testCase.ID,
+				Name:       testCase.Name,
+			}
+
+			tc, err := jtc.ToTestCase()
+			if err != nil {
+				return nil, err
+			}
+			step.TestCase = tc
+			testCase.TestSteps = append(testCase.TestSteps, &StepTestCaseWithOptionalArgs{
+				step: step,
+			})
+		} else if step.ThinkTime != nil {
+			testCase.TestSteps = append(testCase.TestSteps, &StepThinkTime{
+				step: step,
+			})
+		} else if step.Request != nil {
+			testCase.TestSteps = append(testCase.TestSteps, &StepRequestWithOptionalArgs{
+				step: step,
+			})
+		} else if step.Transaction != nil {
+			testCase.TestSteps = append(testCase.TestSteps, &StepTransaction{
+				step: step,
+			})
+		} else if step.Rendezvous != nil {
+			testCase.TestSteps = append(testCase.TestSteps, &StepRendezvous{
+				step: step,
+			})
+		} else if step.WebSocket != nil {
+			testCase.TestSteps = append(testCase.TestSteps, &StepWebSocket{
+				step: step,
+			})
+		} else {
+			log.Warn().Interface("step", step).Msg("[convertTestCase] unexpected step")
+		}
+	}
+	return testCase, nil
 }

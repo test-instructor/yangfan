@@ -76,7 +76,7 @@
 
       </template>
     </el-table-column>
-    <el-table-column>
+    <el-table-column width="300">
       <template #default="scope">
         <el-row>
           <el-button
@@ -206,7 +206,7 @@ export default {
                 tempValue = JSON.parse(value);
               } catch (err) {
                 // 包含$是引用类型,可以任意类型
-                if (value.indexOf("$") != -1) {
+                if (value.indexOf("$") !== -1) {
                   tempValue = value
                 } else {
                   tempValue = false
@@ -217,7 +217,7 @@ export default {
               // None 转 null
               if (value === 'None') {
                 tempValue = null
-              } else if (value.indexOf("$") != -1) {
+              } else if (value.indexOf("$") !== -1) {
                 tempValue = value
               } else {
                 // this.$notify.error({

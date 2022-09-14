@@ -6,8 +6,8 @@ import (
 	"github.com/test-instructor/cheetah/server/model/common/request"
 	"github.com/test-instructor/cheetah/server/model/common/response"
 	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	"github.com/test-instructor/cheetah/server/model/system"
 	"github.com/test-instructor/cheetah/server/service"
+	"github.com/test-instructor/cheetah/server/utils"
 	"go.uber.org/zap"
 )
 
@@ -26,9 +26,8 @@ var apicaseService = service.ServiceGroupApp.InterfacecaseServiceGroup.ApiMenuSe
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /apicase/createApiMenu [post]
 func getMenuList(c *gin.Context) {
-	project, _ := c.Get("project")
 	menuType := c.Request.FormValue("menutype")
-	if treeList, err := apicaseService.GetMenu(0, menuType, project.(system.Project)); err != nil {
+	if treeList, err := apicaseService.GetMenu(0, menuType, utils.GetUserProject(c)); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {
@@ -38,12 +37,12 @@ func getMenuList(c *gin.Context) {
 	}
 }
 
-func (apicaseApi *ApiMenuApi) CreateApiMenu(c *gin.Context) {
+func (apiCaseApi *ApiMenuApi) CreateApiMenu(c *gin.Context) {
 	var apicase interfacecase.ApiMenu
 	_ = c.ShouldBindJSON(&apicase)
 	apicase.MenuType = c.Request.FormValue("menutype")
-	project, _ := c.Get("project")
-	apicase.Project = project.(system.Project)
+	apicase.ProjectID = utils.GetUserProject(c)
+	apicase.CreatedByID = utils.GetUserID(c)
 	if err := apicaseService.CreateApiMenu(apicase); err != nil {
 		global.GVA_LOG.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
@@ -61,12 +60,10 @@ func (apicaseApi *ApiMenuApi) CreateApiMenu(c *gin.Context) {
 // @Param data body interfacecase.ApiMenu true "删除ApiMenu"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
 // @Router /apicase/deleteApiMenu [delete]
-func (apicaseApi *ApiMenuApi) DeleteApiMenu(c *gin.Context) {
+func (apiCaseApi *ApiMenuApi) DeleteApiMenu(c *gin.Context) {
 	var apicase interfacecase.ApiMenu
 	_ = c.ShouldBindJSON(&apicase)
-	project, _ := c.Get("project")
-	apicase.Project = project.(system.Project)
-
+	apicase.ProjectID = utils.GetUserProject(c)
 	if err := apicaseService.GetApiMenuInterface(apicase); err != nil {
 		global.GVA_LOG.Error("该目录下有api，无法进行删除!", zap.Error(err))
 		response.FailWithMessage("该目录下有api，无法进行删除!", c)
@@ -87,7 +84,7 @@ func (apicaseApi *ApiMenuApi) DeleteApiMenu(c *gin.Context) {
 // @Param data body request.IdsReq true "批量删除ApiMenu"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"批量删除成功"}"
 // @Router /apicase/deleteApiMenuByIds [delete]
-func (apicaseApi *ApiMenuApi) DeleteApiMenuByIds(c *gin.Context) {
+func (apiCaseApi *ApiMenuApi) DeleteApiMenuByIds(c *gin.Context) {
 	var IDS request.IdsReq
 	_ = c.ShouldBindJSON(&IDS)
 	if err := apicaseService.DeleteApiMenuByIds(IDS); err != nil {
@@ -107,11 +104,10 @@ func (apicaseApi *ApiMenuApi) DeleteApiMenuByIds(c *gin.Context) {
 // @Param data body interfacecase.ApiMenu true "更新ApiMenu"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
 // @Router /apicase/updateApiMenu [put]
-func (apicaseApi *ApiMenuApi) UpdateApiMenu(c *gin.Context) {
+func (apiCaseApi *ApiMenuApi) UpdateApiMenu(c *gin.Context) {
 	var apicase interfacecase.ApiMenu
 	_ = c.ShouldBindJSON(&apicase)
-	project, _ := c.Get("project")
-	apicase.Project = project.(system.Project)
+	apicase.ProjectID = utils.GetUserProject(c)
 	if err := apicaseService.UpdateApiMenu(apicase); err != nil {
 		global.GVA_LOG.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
@@ -129,11 +125,10 @@ func (apicaseApi *ApiMenuApi) UpdateApiMenu(c *gin.Context) {
 // @Param data query interfacecase.ApiMenu true "用id查询ApiMenu"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
 // @Router /apicase/findApiMenu [get]
-func (apicaseApi *ApiMenuApi) FindApiMenu(c *gin.Context) {
+func (apiCaseApi *ApiMenuApi) FindApiMenu(c *gin.Context) {
 	var apicase interfacecase.ApiMenu
 	_ = c.ShouldBindQuery(&apicase)
-	project, _ := c.Get("project")
-	apicase.Project = project.(system.Project)
+	apicase.ProjectID = utils.GetUserProject(c)
 	if err, reapicase := apicaseService.GetApiMenu(apicase.ID); err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
@@ -150,7 +145,7 @@ func (apicaseApi *ApiMenuApi) FindApiMenu(c *gin.Context) {
 // @Produce application/json
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /apicase/getApiMenuList [get]
-func (apicaseApi *ApiMenuApi) GetApiMenuList(c *gin.Context) {
+func (apiCaseApi *ApiMenuApi) GetApiMenuList(c *gin.Context) {
 
 	/*var interfaceTemp InterfaceTemplate
 	interfaceTemp = InterfaceTemplate{

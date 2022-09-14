@@ -19,6 +19,7 @@ type InterfaceTemplateService struct {
 // CreateInterfaceTemplate 创建InterfaceTemplate记录
 
 func (apicaseService *InterfaceTemplateService) CreateInterfaceTemplate(apicase interfacecase.ApiStep) (err error) {
+	apicase.ValidateNumber = uint(len(apicase.Validate))
 	err = global.GVA_DB.Create(&apicase).Error
 	return err
 }
@@ -39,12 +40,15 @@ func (apicaseService *InterfaceTemplateService) DeleteInterfaceTemplateByIds(ids
 
 // UpdateInterfaceTemplate 更新InterfaceTemplate记录
 
-func (apicaseService *InterfaceTemplateService) UpdateInterfaceTemplate(apicase interfacecase.ApiStep) (err error) {
+func (apicaseService *InterfaceTemplateService) UpdateInterfaceTemplate(apicase interfacecase.ApiStep) (id uint, err error) {
+	var oId getOperationId
+	global.GVA_DB.Model(interfacecase.ApiStep{}).Where("id = ?", apicase.ID).First(&oId)
+	apicase.CreatedByID = oId.CreatedByID
+	apicase.ValidateNumber = uint(len(apicase.Validate))
 	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
-		err = tx.
-			Where(&interfacecase.ApiStep{
-				GVA_MODEL: global.GVA_MODEL{ID: apicase.ID},
-			}).
+		err = tx.Where(&interfacecase.ApiStep{
+			GVA_MODEL: global.GVA_MODEL{ID: apicase.ID},
+		}).
 			Save(&apicase).Error
 		if err != nil {
 			return err
@@ -54,7 +58,7 @@ func (apicaseService *InterfaceTemplateService) UpdateInterfaceTemplate(apicase 
 		return err
 	})
 
-	return err
+	return apicase.ID, err
 }
 
 // GetInterfaceTemplate 根据id获取InterfaceTemplate记录
@@ -77,9 +81,10 @@ func (apicaseService *InterfaceTemplateService) GetInterfaceTemplateInfoList(inf
 	db := global.GVA_DB.
 		Model(&interfacecase.ApiStep{}).
 		Preload("Request").Preload("ApiMenu").
-		Preload("Project").Joins("Project").Where("Project.ID = ?", info.Project.ID).
-		Preload("ApiMenu").Joins("ApiMenu").Where("ApiMenu.ID = ?", info.ApiMenuID)
-
+		Preload("Project").Joins("Project").Where("Project.ID = ?", info.ProjectID)
+	if info.ApiMenuID > 0 {
+		db.Preload("ApiMenu").Joins("ApiMenu").Where("ApiMenu.ID = ?", info.ApiMenuID)
+	}
 	var apicases []interfacecase.ApiStep
 
 	//查询对应的类型
@@ -89,6 +94,7 @@ func (apicaseService *InterfaceTemplateService) GetInterfaceTemplateInfoList(inf
 	if info.Name != "" {
 		db = db.Where("name LIKE ?", "%"+info.Name+"%")
 	}
+
 	err = db.Limit(limit).Offset(offset).Find(&apicases).Error
 	return err, apicases, total
 }

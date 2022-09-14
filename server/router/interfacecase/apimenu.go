@@ -13,15 +13,15 @@ type ApiMenuRouter struct {
 func (s *ApiMenuRouter) InitApiMenuRouter(Router *gin.RouterGroup) {
 	apiMenuRouter := Router.Group("").Use(middleware.OperationRecord())
 	apiMenuRouterWithoutRecord := Router.Group("")
-	var apicaseApi = v1.ApiGroupApp.InterfaceCaseApiGroup.ApiMenuApi
+	var apiCaseApi = v1.ApiGroupApp.InterfaceCaseApiGroup.ApiMenuApi
 	{
-		apiMenuRouter.POST("createApiMenu", apicaseApi.CreateApiMenu)             // 新建ApiMenu
-		apiMenuRouter.DELETE("deleteApiMenu", apicaseApi.DeleteApiMenu)           // 删除ApiMenu
-		apiMenuRouter.DELETE("deleteApiMenuByIds", apicaseApi.DeleteApiMenuByIds) // 批量删除ApiMenu
-		apiMenuRouter.PUT("updateApiMenu", apicaseApi.UpdateApiMenu)              // 更新ApiMenu
+		apiMenuRouter.POST("createApiMenu", apiCaseApi.CreateApiMenu)             // 新建ApiMenu
+		apiMenuRouter.DELETE("deleteApiMenu", apiCaseApi.DeleteApiMenu)           // 删除ApiMenu
+		apiMenuRouter.DELETE("deleteApiMenuByIds", apiCaseApi.DeleteApiMenuByIds) // 批量删除ApiMenu
+		apiMenuRouter.PUT("updateApiMenu", apiCaseApi.UpdateApiMenu)              // 更新ApiMenu
 	}
 	{
-		apiMenuRouterWithoutRecord.GET("findApiMenu", apicaseApi.FindApiMenu)       // 根据ID获取ApiMenu
-		apiMenuRouterWithoutRecord.GET("getApiMenuList", apicaseApi.GetApiMenuList) // 获取ApiMenu列表
+		apiMenuRouterWithoutRecord.GET("findApiMenu", apiCaseApi.FindApiMenu)       // 根据ID获取ApiMenu
+		apiMenuRouterWithoutRecord.GET("getApiMenuList", apiCaseApi.GetApiMenuList) // 获取ApiMenu列表
 	}
 }

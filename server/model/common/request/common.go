@@ -33,6 +33,9 @@ type ApiCaseIdReq struct {
 }
 
 type RunCaseReq struct {
+	ApiID    uint `json:"apiID" form:"apiID"`
 	ConfigID uint `json:"configID" form:"configID"`
 	CaseID   uint `json:"caseID" form:"caseID"`
+	RunType  uint `json:"run_type" form:"run_type"`
+	TaskID   uint `json:"taskID" form:"taskID"`
 }
