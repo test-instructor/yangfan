@@ -123,14 +123,14 @@ func (apiCase *ApiCaseApi) SortApisCase(c *gin.Context) {
 }
 
 type addApisCaseReq struct {
-	testCaseID uint   `json:"testCase_id"`
+	TestCaseID uint   `json:"testCase_id"`
 	CaseID     []uint `json:"case_id"`
 }
 
 func (apiCase *ApiCaseApi) AddApisCase(c *gin.Context) {
 	var testCase addApisCaseReq
 	_ = c.ShouldBindJSON(&testCase)
-	if err := apiCaseService.AddApisCase(testCase.testCaseID, testCase.CaseID); err != nil {
+	if err := apiCaseService.AddApisCase(testCase.TestCaseID, testCase.CaseID); err != nil {
 		global.GVA_LOG.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
 	} else {

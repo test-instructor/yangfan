@@ -11,7 +11,7 @@
     </div>
     <div>
       <div class="container">
-        <div class="left-table" id="left">
+        <div class="left-table" id="left-table">
           <el-table
               border
               style="width: 620px"
@@ -164,7 +164,7 @@ const init = () => {
 init()
 
 onMounted(()=>{
-  const leftTable = document.getElementById("left").querySelector('tbody')
+  const leftTable = document.getElementById("left-table").querySelector('tbody')
   const rightTable = document.getElementById("right").querySelector('tbody')
   leftDragHandler(leftTable)
   rightDragHandler(rightTable)
@@ -177,8 +177,6 @@ const setTreeID = (val) => {
 
 
 const leftDragHandler = async(dom, target) => {
-
-
 
   Sortable.create(dom, {
 
@@ -271,7 +269,6 @@ const getTableData = async() => {
   height: 750px;
   overflow: auto;
 }
-
 
 //.parent {
 //  width: 85%;

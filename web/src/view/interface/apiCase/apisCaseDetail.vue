@@ -135,7 +135,7 @@ import {ElMessage, ElMessageBox} from "element-plus";
 import Sortable from 'sortablejs'
 
 const route = useRoute()
-const task_id = ref()
+const testCase_id = ref()
 const tableData = ref([])
 const apiTypes = 2
 const interfaceTempleFormVisible = ref(false)
@@ -152,16 +152,16 @@ const sortData = ref([])
 
 const  init = () => {
   if (route.params.id>0){
-    task_id.value = Number(route.params.id)
+    testCase_id.value = Number(route.params.id)
   }else {
-    task_id.value = 1
+    testCase_id.value = 1
   }
-  if (task_id.value) {
-    getApisCaseDetailFunc(task_id.value)
+  if (testCase_id.value) {
+    getApisCaseDetailFunc(testCase_id.value)
   }
 }
-const getApisCaseDetailFunc = async(task_id) => {
-  const res = await findApiTestCase({ ID: task_id })
+const getApisCaseDetailFunc = async(testCase_id) => {
+  const res = await findApiTestCase({ ID: testCase_id })
   if (res.code === 0) {
     tableData.value = res.data.reapicase.test_case
     caseName.value = res.data.reapicase.name
@@ -193,7 +193,7 @@ const deleteRow = (row) => {
   }).then(async () => {
     const res = await delApisCase({ID: row.id})
     if (res.code === 0) {
-      await getApisCaseDetailFunc(task_id.value)
+      await getApisCaseDetailFunc(testCase_id.value)
       ElMessage({
         type: 'success',
         message: '用例删除成功'
@@ -207,7 +207,7 @@ onMounted(()=>{
 
 //行拖拽
 const rowDrop= async() => {
-  sortData.value.ID = Number(task_id.value)
+  sortData.value.ID = Number(testCase_id.value)
   const tbody = document.querySelector('.el-table__body-wrapper tbody')
   let ApisCases = []
 
@@ -224,7 +224,7 @@ const rowDrop= async() => {
       const res = await sortApisCase(ApisCases)
       if (res.code === 0) {
         ApisCases = []
-        await getApisCaseDetailFunc(task_id.value)
+        await getApisCaseDetailFunc(testCase_id.value)
         ElMessage({
           type: 'success',
           message: '已完成排序'
@@ -238,11 +238,11 @@ const rowDrop= async() => {
 // 关闭弹窗
 const closeDialog =  () => {
   ApisCaseVisible.value = false
-  getApisCaseDetailFunc(task_id.value)
+  getApisCaseDetailFunc(testCase_id.value)
 }
 
 const addApisCases = async () => {
-  const res = await addApisCase({task_id: task_id.value, case_id: caseID})
+  const res = await addApisCase({testCase_id: testCase_id.value, case_id: caseID})
   if (res.code === 0) {
     closeDialogAddCase()
     ElMessage({
@@ -255,7 +255,7 @@ const addApisCases = async () => {
 
 const closeDialogAddCase = () => {
   ApisCaseVisible.value = false
-  getApisCaseDetailFunc(task_id.value)
+  getApisCaseDetailFunc(testCase_id.value)
 }
 
 const addTeseCase = (caseIDs) => {
