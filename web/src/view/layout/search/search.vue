@@ -4,7 +4,7 @@
         v-if="btnShow"
         class="user-box"
     >
-      <a href="https://github.com/test-instructor/cheetah" target="_blank"><img style="width: 25px;height: 25px" src="@/assets/github.png" alt></a>
+      <a href="https://github.com/test-instructor/cheetah" target="_blank"><img style="width: 20px;height: 20px" src="@/assets/github.png" alt></a>
     </div>
     <transition name="el-fade-in-linear">
       <div v-show="show" class="transition-box" style="display: inline-block;">
@@ -43,7 +43,16 @@
     >
       <Screenfull class="search-icon" :style="{cursor:'pointer'}" />
     </div>
-    <selectProject/>
+
+    <div
+        v-if="btnShow"
+        class="user-box"
+    >
+      <SelectProject/>
+    </div>
+
+
+
   </div>
 </template>
 
@@ -55,7 +64,7 @@ export default {
 
 <script setup>
 import Screenfull from '@/view/layout/screenfull/index.vue'
-import selectProject from '@/view/layout/ProjectSelect/index.vue'
+import SelectProject from '@/view/layout/ProjectSelect/index.vue'
 import { emitter } from '@/utils/bus.js'
 import { ref, nextTick } from 'vue'
 import { useRouter } from 'vue-router'

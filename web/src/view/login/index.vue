@@ -14,6 +14,7 @@
           :model="loginFormData"
           :rules="rules"
           @keyup.enter="submitForm"
+          :validate-on-rule-change="false"
         >
           <el-form-item prop="username">
             <el-input
@@ -138,8 +139,8 @@ const changeLock = () => {
 const loginForm = ref(null)
 const picPath = ref('')
 const loginFormData = reactive({
-  username: 'admin',
-  password: '123456',
+  username: '',
+  password: '',
   captcha: '',
   captchaId: '',
 })

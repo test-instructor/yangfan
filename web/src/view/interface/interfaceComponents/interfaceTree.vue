@@ -176,7 +176,9 @@ export default {
       // 获取树结构数据
       this.listLoading = true
       getTree(this.params).then((response) => {
-        this.trees = response.data.list
+        if (response.code === 0){
+          this.trees = response.data.list
+        }
         setTimeout(() => {
           const dom = document.querySelector('.el-tree .el-tree-node__content');
           dom && dom.click();
@@ -192,7 +194,9 @@ export default {
       // 添加树节点
       var trees = {'id': editChild.id, 'name': editChild.label, 'parent': editChild.parent, 'project': project_id}
       editTree(trees, this.params).then((response) => {
-        this.trees = response.data.list
+        if (response.code === 0){
+          this.trees = response.data.list
+        }
         setTimeout(() => {
           this.listLoading = false
         }, 1.5 * 1000)
@@ -203,7 +207,9 @@ export default {
       // 添加树节点
       var trees = delChild
       delTree(trees, this.params).then((response) => {
-        this.trees = response.data.list
+        if (response.code === 0){
+          this.trees = response.data.list
+        }
         setTimeout(() => {
           this.listLoading = false
         }, 1.5 * 1000)
@@ -214,7 +220,9 @@ export default {
       // 添加树节点
       var trees = newChild
       addTree(trees, this.params).then((response) => {
-        this.trees = response.data.list
+        if (response.code === 0){
+          this.trees = response.data.list
+        }
         setTimeout(() => {
           this.listLoading = false
         }, 1.5 * 1000)
@@ -226,7 +234,7 @@ export default {
       if (!data.children) {
         data.children = []
       }
-      data.children.push(newChild)
+      // data.children.push(newChild)
       this.addTrees(newChild)
     },
 
