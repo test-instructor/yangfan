@@ -42,7 +42,7 @@
         </el-table-column>
         <el-table-column property="name" label="用例名称" width="320">
           <template #default="scope">
-            <el-tag type="danger" v-if="setupCaseShow(scope.row)">{{ '前置套件' }}</el-tag>
+            <el-tag type="danger" v-if="setupCaseShow(scope.row)">{{ '前置用例' }}</el-tag>
             {{ scope.row.name }}
           </template>
         </el-table-column>
@@ -66,44 +66,75 @@
             width="1">
           <template #default="scope">
             <el-table
-                style="width: 960px;padding-left: 20px"
-                ref="apiTableData"
-                id="apiTableData"
-                :data="scope.row.records"
-                :show-header="false"
-            >
-              <el-table-column
-                  width="100"
+                  :show-header="false"
+                  id="apiTableData"
+                  :data="scope.row.records"
+                  :default-expand-all="true"
+                  style="padding-left: 15px"
               >
+
+                <el-table-column width="900" label="name">
                 <template #default="scope">
-                  <el-tag :type="scope.row.success?'success':'danger'" effect="dark">{{ scope.row.success ? '成功' : '失败' }}</el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column
-                  min-width="550"
-                  align="center"
-              >
-                <template #default="scope">
-                  <div class="block" :class="`block_${dataMethod(scope.row)[0]}`">
-                <span class="block-method block_method_color"
-                      :class="`block_method_${dataMethod(scope.row)[0]}`">
-                  {{ dataMethod(scope.row)[1] }}
-                </span>
-                    <span class="block-method block_url">{{ scope.row.data?scope.row.data.req_resps.request.url:"" }}</span>
-                    <span class="block-summary-description">{{ scope.row.name }}</span>
+                  <div class="block" :class="`block_patch`" >
+                      <span class="block-method block_method_color"
+                            :class="`block_method_patch`">
+                        {{ "STEP" }}
+                      </span>
+                    <div class="block">
+                    </div>
+                    <span class="block-method block_url">{{ scope.row.name }}</span>
                   </div>
                 </template>
               </el-table-column>
-              <el-table-column min-width="60">
-                <template #default="scope">
-                  <el-button type="text" @click="openDrawer(scope.row)">
-                    <span>
-                      详情
-                    </span>
-                  </el-button>
-                </template>
-              </el-table-column>
-            </el-table>
+                <el-table-column
+                    type="expand"
+                    :default-expand-all="true"
+                    :resizable="false"
+                >
+                  <template #default="scope">
+                    <el-table
+                        style="width: 960px;padding-left: 20px"
+                        ref="apiTableData"
+                        id="apiTableData"
+                        :data="scope.row.records"
+                        :show-header="false"
+                    >
+                      <el-table-column
+                          width="100"
+                      >
+                        <template #default="scope">
+                          <el-tag :type="scope.row.success?'success':'danger'" effect="dark">{{ scope.row.success ? '成功' : '失败' }}</el-tag>
+                        </template>
+                      </el-table-column>
+                      <el-table-column
+                          min-width="550"
+                          align="center"
+                      >
+                        <template #default="scope">
+                          <div class="block" :class="`block_${dataMethod(scope.row)[0]}`">
+                      <span class="block-method block_method_color"
+                            :class="`block_method_${dataMethod(scope.row)[0]}`">
+                        {{ dataMethod(scope.row)[1] }}
+                      </span>
+                            <span class="block-method block_url">{{ scope.row.data?scope.row.data.req_resps.request.url:"" }}</span>
+                            <span class="block-summary-description">{{ scope.row.name }}</span>
+                          </div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column min-width="60">
+                        <template #default="scope">
+                          <el-button type="text" @click="openDrawer(scope.row)">
+                          <span>
+                            详情
+                          </span>
+                          </el-button>
+                        </template>
+                      </el-table-column>
+                    </el-table>
+                  </template>
+                </el-table-column>
+              </el-table>
+
           </template>
         </el-table-column>
       </el-table>
@@ -328,6 +359,7 @@ import { useRoute } from "vue-router";
 import {getCurrentInstance} from "vue";
 import {ElMessageBox} from "element-plus";
 import {formatDate} from "@/utils/format";
+import {Discount} from "@element-plus/icons-vue";
 
 const route = useRoute()
 echarts.use([
@@ -518,7 +550,7 @@ const openDrawer = (row) => {
     }, 50)
   }else {
     ElMessageBox.alert(
-        '当前用例执行错误，无法查看相信信息，请检查用例配置是否正确',
+        '当前用例执行错误，错误详情：'+row.attachment,
         '用例执行出错',
         {
           type: 'error',
@@ -527,13 +559,34 @@ const openDrawer = (row) => {
   }
 }
 
-
 const getTestCaseDetailFunc = async (testCaseID) => {
-  const res = await findReport({ID: testCaseID})
-  if (res.code === 0) {
-    reportData.value = res.data.reapicase
-    return true
-  }
+    const res = await findReport({ID: testCaseID})
+    if (res.code === 0) {
+
+        let reapicase = JSON.parse(JSON.stringify(res.data.reapicase))
+        res.data.reapicase.details.forEach((item, index, arr) => {
+
+            let tempName = ""
+            let record = {name:tempName,records:[]}
+            reapicase.details[index].records = []
+            item.records.forEach((items, indexs, arrs) => {
+                let names = res.data.reapicase.details[index].records[indexs].name.split(' - ')
+                if (names[0] !== tempName){
+                    if (tempName!==""){
+                        reapicase.details[index].records.push(record)
+                    }
+                    tempName = names[0]
+                    record = {name:tempName,records:[]}
+                }
+                res.data.reapicase.details[index].records[indexs].name = names[1]
+                record.records.push(res.data.reapicase.details[index].records[indexs])
+            })
+            reapicase.details[index].records.push(record)
+            console.log("=========***",reapicase.details[index].records)
+        })
+        reportData.value = reapicase
+        return true
+    }
 }
 
 
@@ -698,6 +751,30 @@ const toggleExpand = (row) => {
   height: 100px;
   margin-top: 20px;
   margin-bottom: 20px;
+}
+
+.el-table__body-wrapper {
+  &::-webkit-scrollbar { // 整个滚动条
+    width: 0; // 纵向滚动条的宽度
+    background: rgba(213,215,220,0.3);
+    border: none;
+  }
+  &::-webkit-scrollbar-track { // 滚动条轨道
+    border: none;
+  }
+}
+
+.el-table th.gutter{
+  display: none;
+  width:0
+}
+.el-table colgroup col[name='gutter']{
+  display: none;
+  width: 0;
+}
+
+.el-table__body{
+  width: 100% !important;
 }
 
 </style>

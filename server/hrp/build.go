@@ -229,7 +229,8 @@ func BuildPlugin(path string, output string) (err error) {
 	}
 	if err != nil {
 		log.Error().Err(err).Str("path", path).Msg("build plugin failed")
-		os.Exit(1)
+		//os.Exit(1)
+		panic("build plugin failed")
 	}
 	return nil
 }

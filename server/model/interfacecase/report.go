@@ -38,6 +38,7 @@ type ApiReport struct {
 	Project   system.Project     `json:"-"`
 	ProjectID uint               `json:"-"`
 	SetupCase bool               `json:"setup_case"`
+	Describe  string             `json:"describe" form:"describe" gorm:"column:describe;comment:;"`
 }
 
 type ApiReportTime struct {
@@ -91,6 +92,7 @@ type ApiReportDetailsRecords struct {
 	ElapsedMs          int                             `json:"elapsed_ms"`
 	HttpStat           ApiReportDetailsRecordsHttpstat `json:"httpstat"`
 	ValidateNumber     uint                            `json:"validate_number" form:"validate_number"`
+	Attachment         string                          `json:"attachment"`
 	HttpStatID         uint                            `json:"-"`
 	Data               datatypes.JSON                  `json:"data"`
 	ExportVars         datatypes.JSON                  `json:"export_vars"`

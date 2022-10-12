@@ -3,6 +3,7 @@ package hrp
 import (
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -22,6 +23,8 @@ func buildHashicorpGoPlugin() {
 func removeHashicorpGoPlugin() {
 	log.Info().Msg("[teardown] remove hashicorp go plugin")
 	os.Remove(tmpl("debugtalk.bin"))
+	pluginPath, _ := filepath.Abs(tmpl("debugtalk.bin"))
+	pluginMap.Delete(pluginPath)
 }
 
 func buildHashicorpPyPlugin() {
@@ -162,14 +165,6 @@ func TestRunCaseWithPluginJSON(t *testing.T) {
 
 	testCase := TestCasePath(demoTestCaseWithPluginJSONPath)
 	err := NewRunner(nil).Run(&testCase) // hrp.Run(testCase)
-	if err != nil {
-		t.Fatal()
-	}
-}
-
-func TestRunCaseWithPluginJSONTEST(t *testing.T) {
-	testCase := TestCasePath(demoTestCaseWithPluginJSONPathTest)
-	err := NewRunner(nil).SetFailfast(true).GenHTMLReport().Run(&testCase) // hrp.Run(testCase)
 	if err != nil {
 		t.Fatal()
 	}

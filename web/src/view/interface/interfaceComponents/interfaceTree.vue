@@ -13,27 +13,28 @@
     >添加一级节点
     </el-button>
 
-    <el-tree
-        :data="trees"
-        :render-after-expand="true"
-        node-key="id"
-        :default-expand-all="true"
-        :expand-on-click-node="false"
-        :filter-node-method="filterNode"
-        ref="tree"
-        @node-drag-start="handleDragStart"
-        @node-drag-enter="handleDragEnter"
-        @node-drag-leave="handleDragLeave"
-        @node-drag-over="handleDragOver"
-        @node-drag-end="handleDragEnd"
-        @node-drop="handleDrop"
-        @node-click="handleClick"
-    >
-
-      <template
-          #default="{ node, data }"
-          v-if="eventType==='1'"
+    <div style="overflow-y: auto; height:680px">
+      <el-tree
+          :data="trees"
+          :render-after-expand="true"
+          node-key="id"
+          :default-expand-all="true"
+          :expand-on-click-node="false"
+          :filter-node-method="filterNode"
+          ref="tree"
+          @node-drag-start="handleDragStart"
+          @node-drag-enter="handleDragEnter"
+          @node-drag-leave="handleDragLeave"
+          @node-drag-over="handleDragOver"
+          @node-drag-end="handleDragEnd"
+          @node-drop="handleDrop"
+          @node-click="handleClick"
       >
+
+        <template
+            #default="{ node, data }"
+            v-if="eventType==='1'"
+        >
           <span class="custom-tree-node">
             <span>{{ node.label }}</span>
             <span>
@@ -55,8 +56,9 @@
 
             </span>
           </span>
-      </template>
-    </el-tree>
+        </template>
+      </el-tree>
+    </div>
   </div>
 </template>
 
@@ -317,7 +319,6 @@ export default {
 .left {
   width: 300px;
   height: 90%;
-  overflow-y: auto;
 }
 
 /*高亮当前选中的树节点*/

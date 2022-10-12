@@ -39,7 +39,6 @@ type Summary struct {
 	Time     *TestCaseTime      `json:"time" yaml:"time"`
 	Platform *Platform          `json:"platform" yaml:"platform"`
 	Details  []*TestCaseSummary `json:"details" yaml:"details"`
-	CaseID   uint               `json:"caseID"`
 	rootDir  string
 }
 
@@ -146,9 +145,9 @@ type Platform struct {
 
 // TestCaseSummary stores tests summary for one testcase
 type TestCaseSummary struct {
+	CaseID  uint
 	Name    string         `json:"name" yaml:"name"`
 	Success bool           `json:"success" yaml:"success"`
-	CaseID  uint           `json:"caseID,omitempty" yaml:"caseID,omitempty"`   // TODO
 	CaseId  string         `json:"case_id,omitempty" yaml:"case_id,omitempty"` // TODO
 	Stat    *TestStepStat  `json:"stat" yaml:"stat"`
 	Time    *TestCaseTime  `json:"time" yaml:"time"`

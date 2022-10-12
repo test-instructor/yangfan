@@ -17,13 +17,16 @@ require (
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/getsentry/sentry-go v0.13.0
 	github.com/gin-gonic/gin v1.7.7
+	github.com/go-errors/errors v1.0.1
 	github.com/go-openapi/jsonreference v0.19.6 // indirect
 	github.com/go-openapi/spec v0.20.3
 	github.com/go-openapi/swag v0.19.15 // indirect
+	github.com/go-ping/ping v1.1.0
 	github.com/go-redis/redis/v8 v8.11.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang-jwt/jwt/v4 v4.3.0
-	github.com/google/uuid v1.1.2
+	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
+	github.com/google/uuid v1.2.0
 	github.com/gookit/color v1.3.1
 	github.com/gorilla/websocket v1.4.2
 	github.com/httprunner/funplugin v0.5.0
@@ -36,7 +39,8 @@ require (
 	github.com/lestrrat-go/strftime v1.0.6 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/maja42/goval v1.2.1
-	github.com/mitchellh/mapstructure v1.2.2 // indirect
+	github.com/miekg/dns v1.0.14
+	github.com/mitchellh/mapstructure v1.2.2
 	github.com/mojocn/base64Captcha v1.3.1
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/otiai10/copy v1.7.0
@@ -47,6 +51,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.26.1
 	github.com/satori/go.uuid v1.2.0
+	github.com/shirou/gopsutil v3.20.11+incompatible
 	github.com/shirou/gopsutil/v3 v3.22.5
 	github.com/songzhibin97/gkit v1.1.1
 	github.com/spf13/afero v1.2.2 // indirect
@@ -63,8 +68,11 @@ require (
 	go.uber.org/zap v1.16.0
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
+	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/text v0.3.7
+	google.golang.org/grpc v1.45.0
+	google.golang.org/protobuf v1.27.1
 	gopkg.in/ini.v1 v1.55.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	gorm.io/datatypes v1.0.7

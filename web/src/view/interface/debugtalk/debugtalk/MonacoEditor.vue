@@ -29,7 +29,7 @@ import { ref, toRaw } from 'vue'
 import $ from 'jquery'
 import {getDebugTalk, updateDebugTalk} from "@/api/interfaceTemplate";
 import {ElMessage} from "element-plus";
-import { language as pythonLanguage } from 'monaco-editor/esm/vs/basic-languages/python/python.js';
+import { language as pythonLanguage } from '@/view/interface/debugtalk/debugtalk/python.js';
 const editor = ref(null)
 const editorTheme = ref("vs-dark")
 const language = ref("python")
@@ -58,7 +58,6 @@ const initEditor = () => {
     autoIndent: true, //自动布局
     quickSuggestionsDelay: 100, //代码提示延时
   });
-
   // 监听值的变化
   // editor.value.onDidChangeModelContent((val) => {
   //   console.log("--------------",val.changes[0].text)

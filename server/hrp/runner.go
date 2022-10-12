@@ -7,6 +7,7 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -16,6 +17,8 @@ import (
 	"github.com/rs/zerolog/log"
 	"golang.org/x/net/http2"
 
+	"github.com/httprunner/funplugin"
+	"github.com/test-instructor/cheetah/server/hrp/internal/builtin"
 	"github.com/test-instructor/cheetah/server/hrp/internal/sdk"
 )
 
@@ -184,6 +187,16 @@ func (r *HRPRunner) Run(testcases ...ITestCase) error {
 		return err
 	}
 
+	// quit all plugins
+	defer func() {
+		pluginMap.Range(func(key, value interface{}) bool {
+			if plugin, ok := value.(funplugin.IPlugin); ok {
+				plugin.Quit()
+			}
+			return true
+		})
+	}()
+
 	var runErr error
 	// run testcase one by one
 	for _, testcase := range testCases {
@@ -192,11 +205,6 @@ func (r *HRPRunner) Run(testcases ...ITestCase) error {
 			log.Error().Err(err).Msg("[Run] init session runner failed")
 			return err
 		}
-		defer func() {
-			if sessionRunner.parser.plugin != nil {
-				sessionRunner.parser.plugin.Quit()
-			}
-		}()
 
 		for it := sessionRunner.parametersIterator; it.HasNext(); {
 			err = sessionRunner.Start(it.Next())
@@ -267,10 +275,30 @@ func (r *HRPRunner) newCaseRunner(testcase *TestCase) (*testCaseRunner, error) {
 		return nil, errors.Wrap(err, "parse testcase config failed")
 	}
 
+	// init websocket params
+	initWebSocket(testcase)
+
 	// set testcase timeout in seconds
 	if runner.testCase.Config.Timeout != 0 {
 		timeout := time.Duration(runner.testCase.Config.Timeout*1000) * time.Millisecond
 		runner.hrpRunner.SetTimeout(timeout)
+	}
+
+	// load plugin info to testcase config
+	if plugin != nil {
+		pluginPath, _ := locatePlugin(testcase.Config.Path)
+		if runner.parsedConfig.PluginSetting == nil {
+			pluginContent, err := builtin.ReadFile(pluginPath)
+			if err != nil {
+				return nil, err
+			}
+			tp := strings.Split(plugin.Path(), ".")
+			runner.parsedConfig.PluginSetting = &PluginConfig{
+				Path:    pluginPath,
+				Content: pluginContent,
+				Type:    tp[len(tp)-1],
+			}
+		}
 	}
 
 	return runner, nil

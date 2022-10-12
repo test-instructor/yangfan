@@ -49,7 +49,7 @@
     <!--          <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>-->
     <!--        </el-table-column>-->
             <el-table-column align="left" label="用例名称" prop="name" width="120"/>
-            <el-table-column align="left" label="运行配置" prop="runConfig.name" width="180"/>
+            <el-table-column align="left" label="运行配置" prop="runConfig.name" width="240"/>
             <!--        <el-table-column align="left" label="测试用例集" min-width="80">-->
     <!--          <template #default="scope">-->
     <!--            <el-cascader-->
@@ -126,6 +126,9 @@
         <el-form-item label="备注:">
           <el-input v-model="formData.describe" clearable placeholder="请输入"/>
         </el-form-item>
+        <el-form-item label="前置用例:">
+          <el-switch v-model="formData.front_case" />
+        </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -179,6 +182,7 @@ const formData = ref({
   runConfig: {
     ID: 0
   },
+  front_case:false
 })
 const cronVisible = ref(false)
 const cronFun = () => {
@@ -240,6 +244,7 @@ const configData = ref([])
 const getConfigData = async () => {
   const config = await getApiConfigList({page: 1, pageSize: 99999})
   if (config.code === 0) {
+    console.log("===========",config.data.list)
     configData.value = config.data.list
   }
 }
@@ -436,7 +441,6 @@ const enterDialog = async () => {
     })
     return
   }
-  // params.menu = treeID
   if (formData.value.runConfig.ID===0){
     ElMessage({
       type: 'error',

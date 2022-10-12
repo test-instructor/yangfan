@@ -19,7 +19,6 @@
               <el-button size="mini" icon="refresh" @click="onReset">重置</el-button>
             </el-form-item>
           </el-form>
-          <envConfig @configId="configIdFun"></envConfig>
         </div>
         <div class="gva-table-box">
           <div class="gva-btn-list">
@@ -50,6 +49,7 @@
               <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
             </el-table-column>
             <el-table-column align="left" label="套件名称" prop="name" width="240"/>
+            <el-table-column align="left" label="运行配置" prop="runConfig.name" width="240"/>
             <el-table-column align="left" label="按钮组" width="500">
               <template #default="scope">
                 <el-button type="text" icon="detail" size="small" class="table-button" @click="runCase(scope.row, 1)">调试运行
@@ -85,7 +85,21 @@
         <el-form-item label="套件名称:">
           <el-input v-model="formData.name" clearable placeholder="请输入" />
         </el-form-item>
-        <el-form-item label="前置套件:">
+        <el-form-item label="运行配置:">
+          <el-select
+              v-model="configID"
+              placeholder="请选择"
+              @change="configChange"
+          >
+            <el-option
+                v-for="item in configData"
+                :key="item.ID"
+                :label="item.name"
+                :value="item.ID"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="前置用例:">
           <el-switch v-model="formData.front_case" />
         </el-form-item>
       </el-form>
@@ -132,6 +146,10 @@ const router = useRouter()
 const formData = ref({
   name: '',
   front_case: false,
+  runConfig: {
+    ID: 0
+  },
+  RunConfigID:0,
 })
 
 // =========== 表格控制部分 ===========
@@ -140,6 +158,12 @@ const total = ref(0)
 const pageSize = ref(10)
 const tableData = ref([])
 const searchInfo = ref({})
+const configID = ref()
+const configChange = (key) => {
+  console.log("==================1", key)
+  formData.value.RunConfigID = key
+  console.log("==================2", formData.value)
+}
 const params = reactive({
   menu: '',
 })
@@ -148,10 +172,6 @@ const params = reactive({
 const value = ref('')
 let treeID = 0
 
-let configId = 0
-const configIdFun = (id) => {
-  configId = id
-}
 
 
 const setTreeID = (val) => {
@@ -194,6 +214,14 @@ const getTableData = async () => {
     pageSize.value = table.data.pageSize
   }
 }
+const configData = ref([])
+const getConfigData = async () => {
+  const config = await getApiConfigList({page: 1, pageSize: 777777})
+  if (config.code === 0) {
+    configData.value = config.data.list
+  }
+}
+
 
 
 // ============== 表格控制部分结束 ===============
@@ -261,10 +289,12 @@ const type = ref('')
 
 // 更新行
 const updateTestCaseFunc = async (row) => {
+  await getConfigData()
   const res = await findTestCase({ID: row.ID})
   type.value = 'update'
   if (res.code === 0) {
     formData.value = res.data.reapicase
+    configID.value = formData.value.RunConfigID
     dialogFormVisible.value = true
   }
 }
@@ -294,14 +324,7 @@ const reportDetailFunc = (ID) => {
 }
 
 const runCase = async (row,runType) => {
-  if (configId === 0) {
-    ElMessage({
-      type: 'error',
-      message: '请选择配置后再运行'
-    })
-    return
-  }
-  let data = {caseID: Number(row.ID), configID: configId, run_type: runType}
+  let data = {caseID: Number(row.ID), run_type: runType}
   const res = await runTestCaseStep(data)
   if (res.code === 0) {
     if (runType === 1){
@@ -315,7 +338,6 @@ const runCase = async (row,runType) => {
 
   }
 }
-
 
 // 删除行
 const deleteTestCaseFunc = async (row) => {
@@ -337,15 +359,20 @@ const dialogFormVisible = ref(false)
 
 // 打开弹窗
 const openDialog = () => {
+  getConfigData()
   type.value = 'create'
   dialogFormVisible.value = true
 }
 
 // 关闭弹窗
 const closeDialog = () => {
+  configID.value = ''
   dialogFormVisible.value = false
   formData.value = {
     name: '',
+    runConfig: {
+      ID: 0
+    },
   }
 }
 // 弹窗确定
@@ -354,6 +381,13 @@ const enterDialog = async () => {
     ElMessage({
       type: 'error',
       message: '套件名称不能为空'
+    })
+    return
+  }
+  if (formData.value.RunConfigID===0){
+    ElMessage({
+      type: 'error',
+      message: '请选择运行配置'
     })
     return
   }

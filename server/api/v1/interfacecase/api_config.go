@@ -97,7 +97,7 @@ func (acApi *ApiConfigApi) UpdateApiConfig(c *gin.Context) {
 	ac.ProjectID = utils.GetUserProject(c)
 	ac.UpdateByID = utils.GetUserID(c)
 	if ac.SetupCaseID == nil {
-		ac.SetupCase = nil
+		ac.SetupCaseID = nil
 	}
 	if err := acService.UpdateApiConfig(ac); err != nil {
 		global.GVA_LOG.Error("更新失败!", zap.Error(err))

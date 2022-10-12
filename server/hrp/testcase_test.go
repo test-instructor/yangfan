@@ -19,13 +19,12 @@ func tmpl(relativePath string) string {
 }
 
 var (
-	demoTestCaseWithPluginJSONPath     = tmpl("testcases/demo_with_funplugin.json")
-	demoTestCaseWithPluginJSONPathTest = tmpl("testcases/test.json")
-	demoTestCaseWithPluginYAMLPath     = tmpl("testcases/demo_with_funplugin.yaml")
-	demoTestCaseWithoutPluginJSONPath  = tmpl("testcases/demo_without_funplugin.json")
-	demoTestCaseWithoutPluginYAMLPath  = tmpl("testcases/demo_without_funplugin.yaml")
-	demoTestCaseWithRefAPIPath         = tmpl("testcases/demo_ref_api.json")
-	demoAPIGETPath                     = tmpl("/api/get.yml")
+	demoTestCaseWithPluginJSONPath    = tmpl("testcases/demo_with_funplugin.json")
+	demoTestCaseWithPluginYAMLPath    = tmpl("testcases/demo_with_funplugin.yaml")
+	demoTestCaseWithoutPluginJSONPath = tmpl("testcases/demo_without_funplugin.json")
+	demoTestCaseWithoutPluginYAMLPath = tmpl("testcases/demo_without_funplugin.yaml")
+	demoTestCaseWithRefAPIPath        = tmpl("testcases/demo_ref_api.json")
+	demoAPIGETPath                    = tmpl("/api/get.yml")
 )
 
 var demoTestCaseWithThinkTimePath TestCasePath = hrpExamplesDir + "/think_time_test.json"

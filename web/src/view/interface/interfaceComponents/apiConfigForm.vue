@@ -2,10 +2,10 @@
   <div>
     <div style="display: flex;">
       <div>
-        <span>前置套件: </span>
+        <span>前置用例: </span>
         <el-select v-model="reqData.setup_case_id"
                    class="m-2"
-                   placeholder="请选择前置套件"
+                   placeholder="请选择前置用例"
                    size="large"
                    clearable>
           <el-option
@@ -123,6 +123,7 @@ import {getDictFunc} from '@/utils/format'
 import {useRoute, useRouter} from 'vue-router'
 import {ElMessage} from 'element-plus'
 import {ref, reactive} from 'vue'
+import {getApiCaseList} from "@/api/apiCase";
 
 const emit = defineEmits(["close"]);
 const route = useRoute()
@@ -160,7 +161,7 @@ heightDiv.value = props.heights
 eventType.value = props.eventType
 
 const getTableData = async() => {
-  const table = await getTestCaseList({ page: 1, pageSize: 99999, front_case:true})
+  const table = await getApiCaseList({ page: 1, pageSize: 99999, front_case:true})
   if (table.code === 0) {
     CaseOptions.value = table.data.list
     console.log("CaseOptions", CaseOptions.value)
@@ -185,7 +186,7 @@ let reqData = reactive({
   ID: 0,
   parameters: [],
   name: '',
-  setup_case_id:0,
+  case_id:0,
   base_url: '',
   headers: [],
   variables: '',
@@ -230,8 +231,8 @@ const save = async () => {
 
 if (eventType.value === "update") {
   reqData = props.formData.value
-  if (reqData.setup_case_id===0){
-    reqData.setup_case_id = null
+  if (reqData.case_id===0){
+    reqData.case_id = null
   }
   configLabel.base_url = reqData.base_url
   configLabel.name = reqData.name

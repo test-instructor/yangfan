@@ -55,7 +55,7 @@
         </el-table-column>
         <el-table-column align="left" label="状态" prop="default" width="120">
           <template #default="scope">
-            <el-tag :type="successType(scope.row.success)[0]" effect="dark">{{ successType(scope.row.success)[1] }}</el-tag>
+            <el-tag :type="successType(scope.row)[0]" effect="dark">{{ successType(scope.row)[1] }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column align="left" label="按钮组">
@@ -137,13 +137,20 @@ const onSubmit = () => {
   getTableData()
 }
 
-const successType = (type) => {
-  if (type===null){
+const successType = (row) => {
+  console.log("===========================", type)
+  if (row.status===0){
     return ['info', '运行中']
-  }else if (type === true){
-    return ['success', '成功']
-  }else {
-    return ['danger', '失败']
+  }
+  if (row.status === 1){
+    if (row.success){
+      return ['success', '成功']
+    }else {
+      return ['warning', '失败']
+    }
+  }
+  if (row.status===2){
+    return ['danger', '错误']
   }
 }
 
@@ -196,14 +203,21 @@ const runType = (t) => {
 }
 
 const reportDetailFunc = (row) => {
-  if (row) {
+  if (row.status===2) {
+    ElMessageBox.alert(
+        row.describe,
+        '运行错误',
+        {
+          type: 'error',
+        }
+    )
+    console.log("===============", row.describe)
+  } else {
     router.push({
       name: 'reportDetail', params: {
         id: row.ID
       }
     })
-  } else {
-    router.push({name: 'reportDetail'})
   }
 }
 

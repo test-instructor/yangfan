@@ -40,7 +40,7 @@
         </el-table-column>
         <el-table-column align="left" label="配置名称" prop="name" width="240"/>
         <el-table-column align="left" label="域名" prop="base_url" width="360"/>
-        <el-table-column align="left" label="前置套件" prop="setup_case.name" width="240"/>
+        <el-table-column align="left" label="前置用例" prop="setup_case.name" width="240"/>
         <el-table-column align="left" label="默认配置" prop="default" width="120">
           <template #default="scope">
             <el-tag :type="scope.row.default ? 'success' : 'info'" effect="dark">{{ formatBoolean(scope.row.default) }}</el-tag></template>

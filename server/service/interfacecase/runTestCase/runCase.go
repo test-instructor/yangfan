@@ -7,8 +7,7 @@ import (
 
 type ToTestCase struct {
 	Config    interfacecase.ApiConfig
-	TestSteps []interfacecase.ApiStep
-	TestCase  []interface{}
+	TestSteps []interfacecase.HrpCaseStep
 }
 
 func RunApi(runCaseReq request.RunCaseReq, runType interfacecase.RunType) (reports *interfacecase.ApiReport, err error) {

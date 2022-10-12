@@ -1,12 +1,10 @@
 package interfacecase
 
 import (
-	"github.com/robfig/cron/v3"
 	"github.com/test-instructor/cheetah/server/global"
 	"github.com/test-instructor/cheetah/server/model/common/request"
 	"github.com/test-instructor/cheetah/server/model/interfacecase"
 	interfacecaseReq "github.com/test-instructor/cheetah/server/model/interfacecase/request"
-	"github.com/test-instructor/cheetah/server/service/interfacecase/runTestCase"
 	"gorm.io/gorm"
 	"strconv"
 )
@@ -47,17 +45,17 @@ func (testCaseService *ApiCaseService) UpdateApiCase(testCase interfacecase.ApiC
 		return
 	}
 	global.GVA_Timer.Remove(strconv.Itoa(int(testCase.ID)), testCase.EntryID)
-	if *testCase.Status {
-		id, err := global.GVA_Timer.AddTaskByFunc(strconv.Itoa(int(testCase.ID)), testCase.RunTime, runTestCase.RunApiCaseBack(testCase.ID), cron.WithSeconds())
-		if err != nil {
-			return err
-		}
-		testCase.EntryID = int(id)
-		err = global.GVA_DB.Save(&testCase).Error
-		if err != nil {
-			return err
-		}
-	}
+	//if *testCase.Status {
+	//	id, err := global.GVA_Timer.AddTaskByFunc(strconv.Itoa(int(testCase.ID)), testCase.RunTime, runTestCase.RunApiCaseBack(testCase.ID), cron.WithSeconds())
+	//	if err != nil {
+	//		return err
+	//	}
+	//	testCase.EntryID = int(id)
+	//	err = global.GVA_DB.Save(&testCase).Error
+	//	if err != nil {
+	//		return err
+	//	}
+	//}
 	return err
 }
 
@@ -190,6 +188,9 @@ func (testCaseService *ApiCaseService) GetApiCaseInfoList(info interfacecaseReq.
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.Name != "" {
 		db = db.Where("name LIKE ?", "%"+info.Name+"%")
+	}
+	if info.FrontCase {
+		db.Where("front_case = ?", 1)
 	}
 	err = db.Count(&total).Error
 	if err != nil {

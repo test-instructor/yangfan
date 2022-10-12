@@ -68,7 +68,6 @@ func (acService *ApiConfigService) GetApiConfigInfoList(info interfacecaseReq.Ap
 	}
 	//configStruct2 := configStruct{}
 	err = db.Preload("Project").
-		Preload("SetupCase").
 		Model(&interfacecase.ApiConfig{}).
 		Limit(limit).Offset(offset).Find(&acs, projectDB(db, info.ProjectID)).
 		Select("api_configs.id", "api_configs.name").

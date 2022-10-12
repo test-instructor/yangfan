@@ -10,10 +10,48 @@ import (
 	"testing"
 )
 
-//type Report interface {
-//	Create()
-//	Update(reports *interfacecase.ApiReport)
-//}
+func getCaseStep(id uint) (apiCaseStep interfacecase.ApiCaseStep) {
+	global.GVA_DB.Model(&interfacecase.ApiCaseStep{}).
+		Preload("TStep", func(db2 *gorm.DB) *gorm.DB {
+			return db2.Order("Sort")
+		}).
+		Preload("TStep.Request").
+		First(&apiCaseStep, "id = ?", id)
+	return
+}
+
+func getCaseStepHrp(stepId uint) (*interfacecase.HrpCaseStep, error) {
+	setupCase := getCaseStep(stepId)
+
+	var hrpTestCase interfacecase.HrpTestCase
+	hrpTestCase.ID = setupCase.ID
+	hrpTestCase.Name = setupCase.Name
+
+	apiConfig, err := getConfig(setupCase.RunConfigID)
+	if err != nil {
+		return nil, errors.New("获取配置失败")
+	}
+
+	hrpTestCase.Confing = *apiConfig
+	hrpTestCase.TestSteps = setupCase.TStep
+	hrpCase := &interfacecase.HrpCaseStep{
+		ID:       setupCase.ID,
+		Name:     setupCase.Name,
+		TestCase: hrpTestCase,
+	}
+	return hrpCase, nil
+}
+
+func getConfig(id uint) (config *interfacecase.ApiConfig, err error) {
+	apiConfig := interfacecase.ApiConfig{GVA_MODEL: global.GVA_MODEL{ID: id}}
+	err = global.GVA_DB.Model(&interfacecase.ApiConfig{}).
+		Preload("Project").
+		First(&apiConfig).Error
+	if err != nil {
+		return nil, errors.New("获取配置失败")
+	}
+	return &apiConfig, nil
+}
 
 type TestCase interface {
 	LoadCase() (err error)
@@ -44,7 +82,7 @@ func NewRunApi(runCaseReq request.RunCaseReq, runType interfacecase.RunType) Tes
 }
 
 type runAPI struct {
-	reportOperation ReportOperation
+	reportOperation *ReportOperation
 	ApiID           uint
 	runCaseReq      request.RunCaseReq
 	runType         interfacecase.RunType
@@ -55,39 +93,52 @@ type runAPI struct {
 
 func (r *runAPI) LoadCase() (err error) {
 	var apiStep interfacecase.ApiStep
-	var testCaseList []interfacecase.ApiCaseStep
-	var apiCase interfacecase.ApiCaseStep
+	//var testCaseList []interfacecase.ApiCaseStep
+	//var apiCase interfacecase.ApiCaseStep
 	//获取运行配置
-	apiConfig := interfacecase.ApiConfig{GVA_MODEL: global.GVA_MODEL{ID: r.runCaseReq.ConfigID}}
-	err = global.GVA_DB.Model(&interfacecase.ApiConfig{}).
-		Preload("Project").
-		Preload("SetupCase").
-		Preload("SetupCase.TStep.Request").
-		First(&apiConfig).Error
+	var testCase interfacecase.HrpCase
+	var testCaseList []interfacecase.HrpCase
+
+	//获取运行配置
+	apiConfig, err := getConfig(r.runCaseReq.ConfigID)
 	if err != nil {
 		return errors.New("获取配置失败")
 	}
 
 	//设置前置套件
-	if apiConfig.SetupCase != nil {
-		r.tcm.SetupCase = true
-		testCaseList = append(testCaseList, *apiConfig.SetupCase)
+	if apiConfig.SetupCaseID != nil {
+		hrpCaseStep, err := getCaseStepHrp(*apiConfig.SetupCaseID)
+		if err != nil {
+			return err
+		}
+		testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
 	}
+	r.tcm.Config = *apiConfig
+
 	global.GVA_DB.Model(&interfacecase.ApiStep{}).
 		Preload("Request").
 		First(&apiStep, "id = ?", r.runCaseReq.CaseID)
-	apiCase.Name = apiStep.Name
-	apiCase.ProjectID = apiStep.ProjectID
-	apiCase.TStep = append(apiCase.TStep, apiStep)
-	testCaseList = append(testCaseList, apiCase)
+	testCase.Name = apiStep.Name
+	var hrpTestCase interfacecase.HrpTestCase
+	hrpTestCase.Name = apiStep.Name
+	hrpTestCase.ID = apiStep.ID
+	hrpTestCase.Confing = *apiConfig
+	hrpTestCase.TestSteps = append(hrpTestCase.TestSteps, apiStep)
+	hrpCase := &interfacecase.HrpCaseStep{
+		ID:       hrpTestCase.ID,
+		Name:     hrpTestCase.Name,
+		TestCase: hrpTestCase,
+	}
+	testCase.TestSteps = append(testCase.TestSteps, *hrpCase)
+	testCaseList = append(testCaseList, testCase)
 	r.d.ProjectID = apiConfig.ProjectID
 	r.d.ID = r.runCaseReq.ApiID
 	r.d.RunDebugTalkFile()
-	err = cheetahCaseToHrpCase(apiConfig, testCaseList, r.d.FilePath, &r.tcm)
+	err = cheetahTestCaseToHrpCase(testCaseList, r.d.FilePath, &r.tcm)
 	if err != nil {
 		return errors.New("用例转换失败")
 	}
-	r.reportOperation = ReportOperation{
+	r.reportOperation = &ReportOperation{
 		report: &interfacecase.ApiReport{
 			Name:      apiStep.Name,
 			CaseType:  r.caseType,
@@ -102,12 +153,13 @@ func (r *runAPI) LoadCase() (err error) {
 
 func (r *runAPI) RunCase() (err error) {
 	var t *testing.T
+	defer recoverHrp(r.reportOperation)
+	defer r.d.StopDebugTalkFile()
 	report, err := hrp.NewRunner(t).
 		SetHTTPStatOn().
 		SetFailfast(false).
 		RunJsons(r.tcm.Case...)
 	r.reportOperation.UpdateReport(&report)
-	r.d.StopDebugTalkFile()
 	if err != nil {
 		return err
 	}
@@ -141,28 +193,29 @@ type runStep struct {
 }
 
 func (r *runStep) LoadCase() (err error) {
-	var testCaseList []interfacecase.ApiCaseStep
+	var testCase interfacecase.HrpCase
+	var testCaseList []interfacecase.HrpCase
 	var apiCases interfacecase.ApiCaseStep
 	//var apiCases interfacecase.ApiCaseStep
 	//var tcm *ApisCaseModel
 
 	//获取运行配置
-	apiConfig := interfacecase.ApiConfig{GVA_MODEL: global.GVA_MODEL{ID: r.runCaseReq.ConfigID}}
-	err = global.GVA_DB.Model(&interfacecase.ApiConfig{}).
-		Preload("Project").
-		Preload("SetupCase").
-		Preload("SetupCase.TStep.Request").
-		First(&apiConfig).Error
+	apiConfig, err := getConfig(r.runCaseReq.ConfigID)
 	if err != nil {
 		return errors.New("获取配置失败")
 	}
 
 	//设置前置套件
-	if apiConfig.SetupCase != nil {
-		r.tcm.SetupCase = true
-		testCaseList = append(testCaseList, *apiConfig.SetupCase)
+	if apiConfig.SetupCaseID != nil {
+		//前置用例逻辑需要修改
+		//r.tcm.SetupCase = true
+		hrpCaseStep, err := getCaseStepHrp(*apiConfig.SetupCaseID)
+		if err != nil {
+			return err
+		}
+		testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
 	}
-	r.tcm.Config = apiConfig
+	r.tcm.Config = *apiConfig
 
 	//读取用例信息
 	global.GVA_DB.Model(&interfacecase.ApiCaseStep{}).
@@ -171,12 +224,25 @@ func (r *runStep) LoadCase() (err error) {
 		}).
 		Preload("TStep.Request").
 		First(&apiCases, "id = ?", r.runCaseReq.CaseID)
-	testCaseList = append(testCaseList, apiCases)
 
+	{
+		hrpCaseStep, err := getCaseStepHrp(r.runCaseReq.CaseID)
+		if err != nil {
+			return err
+		}
+		testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
+
+		testCase.ID = hrpCaseStep.ID
+		testCase.Name = hrpCaseStep.Name
+		testCase.Confing = *apiConfig
+	}
+	testCaseList = append(testCaseList, testCase)
+	//testcaseJson, _ := json.Marshal(testCase)
+	//fmt.Printf(string(testcaseJson))
 	r.d.ProjectID = apiConfig.ProjectID
 	r.d.ID = r.runCaseReq.ApiID
 	r.d.RunDebugTalkFile()
-	err = cheetahCaseToHrpCase(apiConfig, testCaseList, r.d.FilePath, &r.tcm)
+	err = cheetahTestCaseToHrpCase(testCaseList, r.d.FilePath, &r.tcm)
 	if err != nil {
 		return errors.New("用例转换失败")
 	}
@@ -195,12 +261,13 @@ func (r *runStep) LoadCase() (err error) {
 
 func (r *runStep) RunCase() (err error) {
 	var t *testing.T
+	defer recoverHrp(r.reportOperation)
+	defer r.d.StopDebugTalkFile()
 	report, err := hrp.NewRunner(t).
 		SetHTTPStatOn().
 		SetFailfast(false).
 		RunJsons(r.tcm.Case...)
 	r.reportOperation.UpdateReport(&report)
-	r.d.StopDebugTalkFile()
 	if err != nil {
 		return err
 	}
@@ -234,29 +301,28 @@ type runCase struct {
 }
 
 func (r *runCase) LoadCase() (err error) {
-	var testCaseList []interfacecase.ApiCaseStep
+	var testCase interfacecase.HrpCase
+	var testCaseList []interfacecase.HrpCase
 	var apiCase interfacecase.ApiCase
 	var apiCaseCase []interfacecase.ApiCaseRelationship
 	//var apiCases interfacecase.ApiCaseStep
 	//var tcm *ApisCaseModel
 
 	//获取运行配置
-	apiConfig := interfacecase.ApiConfig{GVA_MODEL: global.GVA_MODEL{ID: r.runCaseReq.ConfigID}}
-	err = global.GVA_DB.Model(&interfacecase.ApiConfig{}).
-		Preload("Project").
-		Preload("SetupCase").
-		Preload("SetupCase.TStep.Request").
-		First(&apiConfig).Error
+	apiConfig, err := getConfig(r.runCaseReq.ConfigID)
 	if err != nil {
 		return errors.New("获取配置失败")
 	}
 
 	//设置前置套件
-	if apiConfig.SetupCase != nil {
-		r.tcm.SetupCase = true
-		testCaseList = append(testCaseList, *apiConfig.SetupCase)
+	if apiConfig.SetupCaseID != nil {
+		hrpCaseStep, err := getCaseStepHrp(*apiConfig.SetupCaseID)
+		if err != nil {
+			return err
+		}
+		testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
 	}
-	r.tcm.Config = apiConfig
+	r.tcm.Config = *apiConfig
 
 	//读取用例信息
 	apiCase.ID = r.runCaseReq.CaseID
@@ -271,13 +337,19 @@ func (r *runCase) LoadCase() (err error) {
 		Order("Sort")
 	caseDB.Find(&apiCaseCase)
 	for _, v := range apiCaseCase {
-		testCaseList = append(testCaseList, v.ApiCaseStep)
-	}
+		//testCaseList = append(testCaseList, v.ApiCaseStep)
 
+		hrpCaseStep, err := getCaseStepHrp(v.ApiCaseStepId)
+		if err != nil {
+			return err
+		}
+		testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
+	}
+	testCaseList = append(testCaseList, testCase)
 	r.d.ProjectID = apiConfig.ProjectID
 	r.d.ID = r.runCaseReq.ApiID
 	r.d.RunDebugTalkFile()
-	err = cheetahCaseToHrpCase(apiConfig, testCaseList, r.d.FilePath, &r.tcm)
+	err = cheetahTestCaseToHrpCase(testCaseList, r.d.FilePath, &r.tcm)
 	if err != nil {
 		return errors.New("用例转换失败")
 	}
@@ -296,12 +368,13 @@ func (r *runCase) LoadCase() (err error) {
 
 func (r *runCase) RunCase() (err error) {
 	var t *testing.T
+	defer recoverHrp(r.reportOperation)
+	defer r.d.StopDebugTalkFile()
 	report, err := hrp.NewRunner(t).
 		SetHTTPStatOn().
 		SetFailfast(false).
 		RunJsons(r.tcm.Case...)
 	r.reportOperation.UpdateReport(&report)
-	r.d.StopDebugTalkFile()
 	if err != nil {
 		return err
 	}
@@ -335,62 +408,49 @@ type runTask struct {
 }
 
 func (r *runTask) LoadCase() (err error) {
-	var testCaseList []ApiCaseStep
+	var testCaseList []interfacecase.HrpCase
 	//var apiCases interfacecase.ApiCaseStep
 	//var tcm *ApisCaseModel
 	var reportName string
 	taskCase := taskSort(r.runCaseReq.TaskID)
 
 	for _, c := range taskCase {
+		var testCase interfacecase.HrpCase
 		reportName = c.ApiTimerTask.Name
 		r.d.ProjectID = c.ApiCase.ProjectID
 		r.d.ID = c.ApiTimerTaskId
 		cases := caseSort(c.ApiCaseId)
-		apiConfig := interfacecase.ApiConfig{GVA_MODEL: global.GVA_MODEL{ID: r.runCaseReq.ConfigID}}
-		err = global.GVA_DB.Model(&interfacecase.ApiConfig{}).
-			Preload("Project").
-			Preload("SetupCase").
-			Preload("SetupCase.TStep", func(db2 *gorm.DB) *gorm.DB {
-				return db2.Order("Sort")
-			}).
-			Preload("SetupCase.TStep.Request").
-			First(&apiConfig).Error
+		apiConfig, err := getConfig(r.runCaseReq.ConfigID)
 		if err != nil {
 			return errors.New("获取配置失败")
 		}
 
 		//设置前置套件
-		if apiConfig.SetupCase != nil {
+		if apiConfig.SetupCaseID != nil {
 			//r.tcm.SetupCase = true
-			var apiCaseStep ApiCaseStep
-			apiCaseStep.ID = *apiConfig.SetupCaseID
-			apiCaseStep.Name = apiConfig.SetupCase.Name
-			apiCaseStep.TStep = apiConfig.SetupCase.TStep
-			apiCaseStep.ApiCase = apiConfig.SetupCase.ApiCase
-			apiCaseStep.ProjectID = apiConfig.SetupCase.ProjectID
-			apiCaseStep.Config = &apiConfig
-			testCaseList = append(testCaseList, apiCaseStep)
+			hrpCaseStep, err := getCaseStepHrp(*apiConfig.SetupCaseID)
+			if err != nil {
+				return err
+			}
+			testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
 		}
-		r.tcm.Config = apiConfig
-
+		r.tcm.Config = *apiConfig
+		testCase.Name = c.ApiCase.Name
+		testCase.ID = c.ApiCase.ID
 		for _, s := range cases {
-			//for j, _ := range s.ApiCaseStep.TStep {
-			//	cases[i].ApiCaseStep.TStep[j].Name = cases[i].ApiCaseStep.Name + " - " + cases[i].ApiCaseStep.TStep[j].Name
-			//}
-			var apiCaseStep ApiCaseStep
-			apiCaseStep.ID = s.ApiCaseStep.ID
-			apiCaseStep.Name = s.ApiCase.Name + " - " + s.ApiCaseStep.Name
-			apiCaseStep.TStep = s.ApiCaseStep.TStep
-			apiCaseStep.ApiCase = s.ApiCaseStep.ApiCase
-			apiCaseStep.ProjectID = s.ApiCaseStep.ProjectID
-			apiCaseStep.Config = &apiConfig
-			testCaseList = append(testCaseList, apiCaseStep)
+			hrpCaseStep, err := getCaseStepHrp(s.ApiCaseStepId)
+			if err != nil {
+				return err
+			}
+
+			testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
 		}
+		testCaseList = append(testCaseList, testCase)
 	}
 
 	r.d.ID = r.runCaseReq.ApiID
 	r.d.RunDebugTalkFile()
-	err = cheetahTaskToHrpCase(testCaseList, r.d.FilePath, &r.tcm)
+	err = cheetahTestCaseToHrpCase(testCaseList, r.d.FilePath, &r.tcm)
 	if err != nil {
 		return errors.New("用例转换失败")
 	}
@@ -409,12 +469,13 @@ func (r *runTask) LoadCase() (err error) {
 
 func (r *runTask) RunCase() (err error) {
 	var t *testing.T
+	defer recoverHrp(r.reportOperation)
+	defer r.d.StopDebugTalkFile()
 	report, err := hrp.NewRunner(t).
 		SetHTTPStatOn().
 		SetFailfast(false).
 		RunJsons(r.tcm.Case...)
 	r.reportOperation.UpdateReport(&report)
-	r.d.StopDebugTalkFile()
 	if err != nil {
 		return err
 	}

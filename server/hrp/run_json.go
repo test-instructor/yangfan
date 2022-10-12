@@ -66,9 +66,9 @@ func (r *HRPRunner) RunJsons(testcases ...ITestCase) (interfacecase.ApiReport, e
 			}
 			caseSummary := sessionRunner.GetSummary()
 			caseSummary.CaseID = testcase.ID
-			for k, _ := range caseSummary.Records {
-				caseSummary.Records[k].ValidatorsNumber = testcase.TestSteps[k].Struct().ValidatorsNumber
-			}
+			//for k, _ := range caseSummary.Records {
+			//	caseSummary.Records[k].ValidatorsNumber = testcase.TestSteps[k].Struct().ValidatorsNumber
+			//}
 			caseSummary.Name = testcase.Name
 			s.appendCaseSummary(caseSummary)
 		}
@@ -134,6 +134,7 @@ func (testCaseJson *TestCaseJson) GetPath() string {
 func (testCaseJson *TestCaseJson) ToTestCase() (*TestCase, error) {
 	tc := &TCase{}
 	var err error
+	//将用例转换成TCase
 	casePath := testCaseJson.JsonString
 	tc, err = loadFromString(casePath)
 	if err != nil {
@@ -147,6 +148,8 @@ func (testCaseJson *TestCaseJson) ToTestCase() (*TestCase, error) {
 
 	tc.Config.Path = testCaseJson.GetPath()
 	testCaseJson.Config.Path = testCaseJson.GetPath()
+
+	//将用例转成成TestCase
 	testCase := &TestCase{
 		ID:     testCaseJson.ID,
 		Name:   testCaseJson.Name,
@@ -181,21 +184,24 @@ func (testCaseJson *TestCaseJson) ToTestCase() (*TestCase, error) {
 		step.ParntID = step.ID
 		step.ID = 0
 		if step.TestCase != nil {
-			casePath, ok := step.TestCase.(string)
-			if !ok {
-				return nil, fmt.Errorf("referenced testcase path should be string, got %v", step.TestCase)
+			testcaseCheetahStr, _ := json.Marshal(step.TestCase)
+			apiConfig_json, _ := json.Marshal(step.TestCase.(map[string]interface{})["Config"])
+			var tConfig TConfig
+			json.Unmarshal(apiConfig_json, &tConfig)
+			tcj := &TestCaseJson{
+				JsonString:        string(testcaseCheetahStr),
+				ID:                step.ID,
+				DebugTalkFilePath: testCaseJson.GetPath(),
+				Config:            &tConfig,
+				Name:              testCase.Name,
 			}
-			path := filepath.Join(projectRootDir, casePath)
-			if !builtin.IsFilePathExists(path) {
-				return nil, errors.New("referenced testcase file not found: " + path)
-			}
-
-			refTestCase := TestCasePath(path)
-			tc, err := refTestCase.ToTestCase()
-			if err != nil {
-				return nil, err
-			}
+			tc, _ := tcj.ToTestCase()
 			step.TestCase = tc
+
+			_, ok := step.TestCase.(*TestCase)
+			if !ok {
+				return nil, fmt.Errorf("failed to handle referenced testcase, got %v", step.TestCase)
+			}
 			testCase.TestSteps = append(testCase.TestSteps, &StepTestCaseWithOptionalArgs{
 				step: step,
 			})

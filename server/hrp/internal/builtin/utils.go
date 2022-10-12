@@ -1,10 +1,13 @@
 package builtin
 
 import (
+	"bufio"
 	"bytes"
+	"encoding/binary"
 	"encoding/csv"
 	builtinJSON "encoding/json"
 	"fmt"
+	"math"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -450,8 +453,114 @@ func ReadFile(path string) ([]byte, error) {
 	return file, nil
 }
 
+func ReadCmdLines(path string) ([]string, error) {
+	var err error
+	path, err = filepath.Abs(path)
+	if err != nil {
+		log.Error().Err(err).Str("path", path).Msg("convert absolute path failed")
+		return nil, err
+	}
+	file, err := os.Open(path)
+	if err != nil {
+		log.Error().Err(err).Str("path", path).Msg("open file failed")
+		return nil, err
+	}
+	defer file.Close()
+
+	var line string
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	// FIXME: resize scanner's capacity for lines over 64K
+	for scanner.Scan() {
+		text := strings.TrimSpace(scanner.Text())
+		if text == "" || text == "\n" {
+			continue
+		}
+		if strings.HasSuffix(text, "\\") {
+			line = line + strings.Trim(text, "\\")
+			continue
+		}
+		line = line + text
+		lines = append(lines, line)
+		line = ""
+	}
+	return lines, scanner.Err()
+}
+
 func GetFileNameWithoutExtension(path string) string {
 	base := filepath.Base(path)
 	ext := filepath.Ext(base)
 	return base[0 : len(base)-len(ext)]
+}
+
+func Bytes2File(data []byte, filename string) error {
+	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
+	defer file.Close()
+	if err != nil {
+		log.Error().Err(err).Msg("failed to generate file")
+	}
+	count, err := file.Write(data)
+	if err != nil {
+		return err
+	}
+	log.Info().Msg(fmt.Sprintf("write file %s len: %d \n", filename, count))
+	return nil
+}
+
+func Float32ToByte(v float32) []byte {
+	bits := math.Float32bits(v)
+	bytes := make([]byte, 4)
+	binary.LittleEndian.PutUint32(bytes, bits)
+	return bytes
+}
+
+func ByteToFloat32(v []byte) float32 {
+	bits := binary.LittleEndian.Uint32(v)
+	return math.Float32frombits(bits)
+}
+
+func Float64ToByte(v float64) []byte {
+	bits := math.Float64bits(v)
+	bts := make([]byte, 8)
+	binary.LittleEndian.PutUint64(bts, bits)
+	return bts
+}
+
+func ByteToFloat64(v []byte) float64 {
+	bits := binary.LittleEndian.Uint64(v)
+	return math.Float64frombits(bits)
+}
+
+func Int64ToBytes(n int64) []byte {
+	bytesBuf := bytes.NewBuffer([]byte{})
+	_ = binary.Write(bytesBuf, binary.BigEndian, n)
+	return bytesBuf.Bytes()
+}
+
+func BytesToInt64(bys []byte) (data int64) {
+	byteBuff := bytes.NewBuffer(bys)
+	_ = binary.Read(byteBuff, binary.BigEndian, &data)
+	return
+}
+
+func SplitInteger(m, n int) (ints []int) {
+	quotient := m / n
+	remainder := m % n
+	if remainder >= 0 {
+		for i := 0; i < n-remainder; i++ {
+			ints = append(ints, quotient)
+		}
+		for i := 0; i < remainder; i++ {
+			ints = append(ints, quotient+1)
+		}
+		return
+	} else if remainder < 0 {
+		for i := 0; i < -remainder; i++ {
+			ints = append(ints, quotient-1)
+		}
+		for i := 0; i < n+remainder; i++ {
+			ints = append(ints, quotient)
+		}
+	}
+	return
 }

@@ -6,6 +6,7 @@ import (
 	"os"
 	"sort"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -116,19 +117,7 @@ func (o *ConsoleOutput) OnEvent(data map[string]interface{}) {
 		return
 	}
 
-	var state string
-	switch output.State {
-	case stateInit:
-		state = "initializing"
-	case stateSpawning:
-		state = "spawning"
-	case stateRunning:
-		state = "running"
-	case stateQuitting:
-		state = "quitting"
-	case stateStopped:
-		state = "stopped"
-	}
+	state := getStateName(output.State)
 
 	currentTime := time.Now()
 	println(fmt.Sprintf("Current time: %s, Users: %d, State: %s, Total RPS: %.1f, Total Average Response Time: %.1fms, Total Fail Ratio: %.1f%%",
@@ -169,7 +158,7 @@ type statsEntryOutput struct {
 }
 
 type dataOutput struct {
-	UserCount            int32                             `json:"user_count"`
+	UserCount            int64                             `json:"user_count"`
 	State                int32                             `json:"state"`
 	TotalStats           *statsEntryOutput                 `json:"stats_total"`
 	TransactionsPassed   int64                             `json:"transactions_passed"`
@@ -186,7 +175,7 @@ type dataOutput struct {
 }
 
 func convertData(data map[string]interface{}) (output *dataOutput, err error) {
-	userCount, ok := data["user_count"].(int32)
+	userCount, ok := data["user_count"].(int64)
 	if !ok {
 		return nil, fmt.Errorf("user_count is not int32")
 	}
@@ -404,7 +393,7 @@ var (
 	gaugeState = prometheus.NewGauge(
 		prometheus.GaugeOpts{
 			Name: "state",
-			Help: "The current runner state, 1=initializing, 2=spawning, 3=running, 4=quitting, 5=stopped",
+			Help: "The current runner state, 1=initializing, 2=spawning, 3=running, 4=stopping, 5=stopped, 6=quitting, 7=missing",
 		},
 	)
 	gaugeDuration = prometheus.NewGauge(
@@ -466,8 +455,8 @@ var (
 )
 
 var (
-	minResponseTimeMap = map[string]float64{}
-	maxResponseTimeMap = map[string]float64{}
+	minResponseTimeMap = sync.Map{}
+	maxResponseTimeMap = sync.Map{}
 )
 
 // NewPrometheusPusherOutput returns a PrometheusPusherOutput.
@@ -487,6 +476,8 @@ type PrometheusPusherOutput struct {
 
 // OnStart will register all prometheus metric collectors
 func (o *PrometheusPusherOutput) OnStart() {
+	// reset all prometheus metrics
+	resetPrometheusMetrics()
 	log.Info().Msg("register prometheus metric collectors")
 	registry := prometheus.NewRegistry()
 	registry.MustRegister(
@@ -525,7 +516,7 @@ func (o *PrometheusPusherOutput) OnStart() {
 // OnStop of PrometheusPusherOutput has nothing to do.
 func (o *PrometheusPusherOutput) OnStop() {
 	// update runner state: stopped
-	gaugeState.Set(float64(stateStopped))
+	gaugeState.Set(float64(StateStopped))
 	if err := o.pusher.Push(); err != nil {
 		log.Error().Err(err).Msg("push to Pushgateway failed")
 	}
@@ -587,19 +578,19 @@ func (o *PrometheusPusherOutput) OnEvent(data map[string]interface{}) {
 		}
 		// every stat in total
 		key := fmt.Sprintf("%v_%v", method, name)
-		if _, ok := minResponseTimeMap[key]; !ok {
-			minResponseTimeMap[key] = float64(stat.MinResponseTime)
-		} else {
-			minResponseTimeMap[key] = math.Min(float64(stat.MinResponseTime), minResponseTimeMap[key])
+		minResponseTime, loaded := minResponseTimeMap.LoadOrStore(key, float64(stat.MinResponseTime))
+		if loaded {
+			minResponseTime = math.Min(minResponseTime.(float64), float64(stat.MinResponseTime))
+			minResponseTimeMap.Store(key, minResponseTime)
 		}
-		gaugeTotalMinResponseTime.WithLabelValues(method, name).Set(minResponseTimeMap[key])
+		gaugeTotalMinResponseTime.WithLabelValues(method, name).Set(minResponseTime.(float64))
 
-		if _, ok := maxResponseTimeMap[key]; !ok {
-			maxResponseTimeMap[key] = float64(stat.MaxResponseTime)
-		} else {
-			maxResponseTimeMap[key] = math.Max(float64(stat.MaxResponseTime), maxResponseTimeMap[key])
+		maxResponseTime, loaded := maxResponseTimeMap.LoadOrStore(key, float64(stat.MaxResponseTime))
+		if loaded {
+			maxResponseTime = math.Max(maxResponseTime.(float64), float64(stat.MaxResponseTime))
+			maxResponseTimeMap.Store(key, maxResponseTime)
 		}
-		gaugeTotalMaxResponseTime.WithLabelValues(method, name).Set(maxResponseTimeMap[key])
+		gaugeTotalMaxResponseTime.WithLabelValues(method, name).Set(maxResponseTime.(float64))
 
 		counterTotalNumRequests.WithLabelValues(method, name).Add(float64(stat.NumRequests))
 		counterTotalNumFailures.WithLabelValues(method, name).Add(float64(stat.NumFailures))
@@ -617,4 +608,39 @@ func (o *PrometheusPusherOutput) OnEvent(data map[string]interface{}) {
 	if err := o.pusher.Push(); err != nil {
 		log.Error().Err(err).Msg("push to Pushgateway failed")
 	}
+}
+
+// resetPrometheusMetrics will reset all metrics
+func resetPrometheusMetrics() {
+	log.Info().Msg("reset all prometheus metrics")
+	gaugeNumRequests.Reset()
+	gaugeNumFailures.Reset()
+	gaugeMedianResponseTime.Reset()
+	gaugeAverageResponseTime.Reset()
+	gaugeMinResponseTime.Reset()
+	gaugeMaxResponseTime.Reset()
+	gaugeAverageContentLength.Reset()
+	gaugeCurrentRPS.Reset()
+	gaugeCurrentFailPerSec.Reset()
+	// counter for total
+	counterErrors.Reset()
+	counterTotalNumRequests.Reset()
+	counterTotalNumFailures.Reset()
+	// summary for total
+	summaryResponseTime.Reset()
+	// gauges for total
+	gaugeUsers.Set(0)
+	gaugeState.Set(1)
+	gaugeDuration.Set(0)
+	gaugeTotalAverageResponseTime.Set(0)
+	gaugeTotalMinResponseTime.Reset()
+	gaugeTotalMaxResponseTime.Reset()
+	gaugeTotalRPS.Set(0)
+	gaugeTotalFailRatio.Set(0)
+	gaugeTotalFailPerSec.Set(0)
+	gaugeTransactionsPassed.Set(0)
+	gaugeTransactionsFailed.Set(0)
+
+	minResponseTimeMap = sync.Map{}
+	maxResponseTimeMap = sync.Map{}
 }
