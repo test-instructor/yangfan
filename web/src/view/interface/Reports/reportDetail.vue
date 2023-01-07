@@ -6,34 +6,49 @@
             border
             :data="testCaseSimple"
             :cell-style="{ textAlign: 'center' }"
-            :show-header="false">
+            :show-header="false"
+        >
           <el-table-column property="label" label="label" width="120"/>
 
-          <el-table-column
-              width="278"
-              align="center"
-              label="value"
-          >
+          <el-table-column>
             <template  #default="scope">
-              <span>
-                {{ scope.row.label==="运行状态"? (
-                  scope.row.name?"成功":"失败"
-              ):scope.row.name }}
-              </span>
+                <a-table
+                    :columns="columns"
+                    v-if="scope.row.str==='case'"
+                    :data="scope.row.name"
+                    column-resizable
+                    :bordered="{cell:true}"
+                    :pagination="false"
+                    :show-header="false"
+                    :cell="true"
+                >
+                  <template #columns>
+                    <a-table-column title="label" data-index="label" align="center"></a-table-column>
+                    <a-table-column title="name" align="center">
+                      <template #cell="{ record }">
+                        <el-tag v-if="record.str==='fail'" type="danger" :effect="record.name===0?'':'dark'">{{ record.name }}</el-tag>
+                        <el-tag v-if="record.str==='success'" type="success" >{{ record.name }}</el-tag>
+                        <el-tag v-if="record.str==='total'">{{ record.name }}</el-tag>
+                      </template>
+                    </a-table-column>
+
+                  </template>
+                </a-table>
+
+                <el-tag v-if="scope.row.label==='运行状态'" :type="scope.row.name?'success':'danger'" effect="dark">{{ scope.row.name ? '成功' : '失败' }}</el-tag>
+                {{ scope.row.str==="str"?scope.row.name:"" }}
+
             </template>
           </el-table-column>
         </el-table>
       </div>
-      <div id="testcases">
-      </div>
-      <div id="testSteps">
-      </div>
+
     </div>
     <div style="width:960px;margin-left:20px;">
       <el-table
           ref="reportDataId"
           :data="reportData.details"
-          height="98%"
+          height="780px"
       >
         <el-table-column label="运行状态" width="80">
           <template #default="scope">
@@ -42,12 +57,12 @@
         </el-table-column>
         <el-table-column property="name" label="用例名称" width="320">
           <template #default="scope">
-            <el-tag type="danger" v-if="setupCaseShow(scope.row)">{{ '前置用例' }}</el-tag>
+            <el-tag type="danger" v-if="setupCaseShow(scope.row)">{{ '前置套件' }}</el-tag>
             {{ scope.row.name }}
           </template>
         </el-table-column>
-        <el-table-column label="运行时间" :formatter="runTime" width="160"></el-table-column>
-        <el-table-column label="运行时长/秒" width="120">
+        <el-table-column label="运行时间" :formatter="runTime" width="165"></el-table-column>
+        <el-table-column label="运行时长/秒" width="115">
           <template #default="scope">
             {{ Number(scope.row.time.duration).toFixed(3) }}
           </template>
@@ -96,8 +111,9 @@
                         style="width: 960px;padding-left: 20px"
                         ref="apiTableData"
                         id="apiTableData"
-                        :data="scope.row.records"
+                        :data="scope.row.data"
                         :show-header="false"
+                        v-if="shouStep(scope.row.data)"
                     >
                       <el-table-column
                           width="100"
@@ -112,10 +128,10 @@
                       >
                         <template #default="scope">
                           <div class="block" :class="`block_${dataMethod(scope.row)[0]}`">
-                      <span class="block-method block_method_color"
-                            :class="`block_method_${dataMethod(scope.row)[0]}`">
-                        {{ dataMethod(scope.row)[1] }}
-                      </span>
+                            <span class="block-method block_method_color"
+                                  :class="`block_method_${dataMethod(scope.row)[0]}`">
+                              {{ dataMethod(scope.row)[1] }}
+                            </span>
                             <span class="block-method block_url">{{ scope.row.data?scope.row.data.req_resps.request.url:"" }}</span>
                             <span class="block-summary-description">{{ scope.row.name }}</span>
                           </div>
@@ -139,8 +155,14 @@
         </el-table-column>
       </el-table>
     </div>
+    <div>
+      <div id="testcases">
+      </div>
+      <div id="testSteps">
+      </div>
+    </div>
 
-    <el-drawer v-show="drawer" v-model="drawer" :with-header="false" size="45%" title="请求详情">
+    <el-drawer v-if="drawer" v-model="drawer" :with-header="false" size="45%" title="请求详情">
       <div id="requestTimeEl"></div>
 
       <div
@@ -341,7 +363,7 @@ import {
 } from '@/api/report'
 
 name = "ReportDetail"
-import {onBeforeMount, onMounted, onUpdated, ref, watch} from 'vue'
+import {onBeforeMount, onMounted, onUpdated, reactive, ref, watch} from 'vue'
 import 'echarts/theme/macarons'
 // import * as echarts from 'echarts';
 import * as echarts from 'echarts/core';
@@ -449,6 +471,10 @@ const setupCaseShow = (row) => {
   return !!(reportData.value.setup_case && row.ID === reportData.value.details[0].ID);
 }
 
+const shouStep = (data) => {
+  return data.length > 0;
+}
+
 const openDrawer = (row) => {
   if (row.data){
     drawer.value = true
@@ -550,7 +576,7 @@ const openDrawer = (row) => {
     }, 50)
   }else {
     ElMessageBox.alert(
-        '当前用例执行错误，错误详情：'+row.attachment,
+        '当前用例执行错误，错误详情：'+row.attachments,
         '用例执行出错',
         {
           type: 'error',
@@ -562,31 +588,21 @@ const openDrawer = (row) => {
 const getTestCaseDetailFunc = async (testCaseID) => {
     const res = await findReport({ID: testCaseID})
     if (res.code === 0) {
-
         let reapicase = JSON.parse(JSON.stringify(res.data.reapicase))
         res.data.reapicase.details.forEach((item, index, arr) => {
-
-            let tempName = ""
-            let record = {name:tempName,records:[]}
-            reapicase.details[index].records = []
-            item.records.forEach((items, indexs, arrs) => {
-                let names = res.data.reapicase.details[index].records[indexs].name.split(' - ')
-                if (names[0] !== tempName){
-                    if (tempName!==""){
-                        reapicase.details[index].records.push(record)
-                    }
-                    tempName = names[0]
-                    record = {name:tempName,records:[]}
-                }
-                res.data.reapicase.details[index].records[indexs].name = names[1]
-                record.records.push(res.data.reapicase.details[index].records[indexs])
+          item.records.forEach((items, indexs, arrs) => {
+            let stepName = res.data.reapicase.details[index].records[indexs].name + ' - '
+            res.data.reapicase.details[index].records[indexs].data.forEach((item2, index2) =>{
+              let casename = res.data.reapicase.details[index].records[indexs].data[index2].name
+              res.data.reapicase.details[index].records[indexs].data[index2].name = casename.substring(stepName.length)
             })
-            reapicase.details[index].records.push(record)
-            console.log("=========***",reapicase.details[index].records)
+          })
+
+          reportData.value = reapicase
+          return true
         })
-        reportData.value = reapicase
-        return true
     }
+  reportData.value = res.data.reapicase
 }
 
 
@@ -605,9 +621,10 @@ const initData = async () => {
   }
   tableDdata.value = reportData.value.details
   await getTestCaseDetailFunc(reportID)
+  testCaseSimple.value.push({label: '报告名称', name: reportData.value.name, key: 'name', str:"str"})
   testCaseSimple.value.push({label: '运行状态', name: reportData.value.success, key: 'success'})
-  testCaseSimple.value.push({label: '开始时间', name: formatDate(reportData.value.time.start_at), key: 'start_at'})
-  testCaseSimple.value.push({label: '运行时长', name: reportData.value.time.duration.toFixed(2).toString() + "(秒)", key: 'duration'})
+  testCaseSimple.value.push({label: '开始时间', name: formatDate(reportData.value.time.start_at), key: 'start_at', str:"str"})
+  testCaseSimple.value.push({label: '运行时长', name: reportData.value.time.duration.toFixed(2).toString() + "(秒)", key: 'duration', str:"str"})
   testCasesData.value = [
     {value: reportData.value.stat.testcases['success'], name: '成功'},
     {value: reportData.value.stat.testcases['fail'], name: '失败'}
@@ -616,10 +633,37 @@ const initData = async () => {
     {value: reportData.value.stat.teststeps['successes'], name: '成功'},
     {value: reportData.value.stat.teststeps['failures'], name: '失败'}
   ]
-  testCaseSimple.value.push({label: '用例数', name: reportData.value.stat.testcases['total'], key: 'caseTotal'})
-  testCaseSimple.value.push({label: '接口数', name: reportData.value.stat.teststeps['total'], key: 'stepTotal'})
+  const tesecase = ref([])
+  const apicase = ref([])
+
+  // testCaseSimple.value.push({label: '执行用例数', name: reportData.value.stat.testcases['total'], key: 'caseTotal', str:"total"})
+  // testCaseSimple.value.push({label: '成功用例数', name: reportData.value.stat.testcases['success'], key: 'caseTotal', str:"success"})
+  // testCaseSimple.value.push({label: '失败用例数', name: reportData.value.stat.testcases['fail'], key: 'caseTotal', str:"fail"})
+  apicase.value.push({label: '执行接口数', name: reportData.value.stat.teststeps['total'], key: 'stepTotal', str:"total"})
+  apicase.value.push({label: '成功接口数', name: reportData.value.stat.teststeps['successes'], key: 'stepTotal', str:"success"})
+  apicase.value.push({label: '失败接口数', name: reportData.value.stat.teststeps['failures'], key: 'stepTotal', str:"fail"})
+
+
+  tesecase.value.push({label: '执行用例数', name: reportData.value.stat.testcases['total'], key: 'caseTotal', str:"total"})
+  tesecase.value.push({label: '成功用例数', name: reportData.value.stat.testcases['success'], key: 'caseTotal', str:"success"})
+  tesecase.value.push({label: '失败用例数', name: reportData.value.stat.testcases['fail'], key: 'caseTotal', str:"fail"})
+
+  testCaseSimple.value.push({label: '用例状态', name: tesecase, key: 'stepTotal', str:"case"})
+  testCaseSimple.value.push({label: '接口状态', name: apicase, key: 'stepTotal', str:"case"})
 
 }
+
+const columns = reactive([
+  {
+    title: 'label',
+    dataIndex: 'label',
+  },
+  {
+    title: 'name',
+    dataIndex: 'name',
+  }
+]);
+
 initData()
 watch(() => route.params.id, () => {
   if (route.params.id){
@@ -629,19 +673,23 @@ watch(() => route.params.id, () => {
 
 
 pieOption = {
+  title: {
+    text: '用例运行情况',
+    left: '8%'
+  },
   tooltip: {
     trigger: 'item'
   },
   legend: {
     top: '0%',
-    left: 'center'
+    right:'8%'
   },
   color: ['#91cc75', '#ee6666', 'yellow', 'blue', 'purple'],
   series: [
     {
       name: '用例运行情况',
       type: 'pie',
-      radius: ['40%', '70%'],
+      radius: ['50%', '75%'],
       avoidLabelOverlap: false,
       label: {
         show: false,
@@ -677,6 +725,7 @@ onMounted(async () => {
 
   pieOption.series[0].data = testStepsData.value
   pieOption.series[0].name = '接口运行情况'
+  pieOption.title.text = '接口运行情况'
   const testStepDom = document.getElementById('testSteps');
   testStepChart = echarts.init(testStepDom, null, {
     renderer: 'canvas',
@@ -734,8 +783,8 @@ const toggleExpand = (row) => {
 }
 
 #testcases, #testSteps {
-  height: 270px;
-  width: 270px;
+  height: 300px;
+  width: 300px;
 }
 
 .tableDetail {

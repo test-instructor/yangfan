@@ -70,7 +70,7 @@
               </template>
             </el-table-column>
 
-            <el-table-column label="按钮组" width="240">
+            <el-table-column label="按钮组" min-width="240">
               <template #default="scope">
                 <el-button type="text" icon="debug" size="small" class="table-button"
                            @click="runInterfaceTemplateFunc(scope.row)">调试

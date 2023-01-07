@@ -48,7 +48,7 @@
     <!--        <el-table-column align="left" label="日期" width="180">-->
     <!--          <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>-->
     <!--        </el-table-column>-->
-            <el-table-column align="left" label="用例名称" prop="name" width="120"/>
+            <el-table-column align="left" label="用例名称" prop="name" width="240"/>
             <el-table-column align="left" label="运行配置" prop="runConfig.name" width="240"/>
             <!--        <el-table-column align="left" label="测试用例集" min-width="80">-->
     <!--          <template #default="scope">-->
@@ -70,7 +70,7 @@
     <!--            <el-tag :type="scope.row.status ? 'success' : 'info'">{{ scope.row.status ? '启用' : '禁用' }}</el-tag>-->
     <!--          </template>-->
     <!--        </el-table-column>-->
-            <el-table-column align="left" label="按钮组" width="360">
+            <el-table-column align="left" label="按钮组" min-width="360">
               <template #default="scope">
                 <el-button class="table-button" icon="detail" size="small" type="text" @click="detailApisCaseFunc(scope.row)">用例详情</el-button>
                 <el-button class="table-button" icon="detail" size="small" type="text" @click="runCase(scope.row)">后台运行</el-button>
@@ -101,7 +101,7 @@
         :close-on-click-modal="false"
         :close-on-press-escape="false"
         title="弹窗操作">
-      <el-form :model="formData" label-position="right" label-width="80px">
+      <el-form :model="formData" label-position="right" label-width="120px">
         <el-form-item label="用例名称:">
           <el-input v-model="formData.name" clearable placeholder="请输入"/>
         </el-form-item>
@@ -126,9 +126,9 @@
         <el-form-item label="备注:">
           <el-input v-model="formData.describe" clearable placeholder="请输入"/>
         </el-form-item>
-        <el-form-item label="前置用例:">
-          <el-switch v-model="formData.front_case" />
-        </el-form-item>
+<!--        <el-form-item label="前置套件:">-->
+<!--          <el-switch v-model="formData.front_case" />-->
+<!--        </el-form-item>-->
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -244,7 +244,6 @@ const configData = ref([])
 const getConfigData = async () => {
   const config = await getApiConfigList({page: 1, pageSize: 99999})
   if (config.code === 0) {
-    console.log("===========",config.data.list)
     configData.value = config.data.list
   }
 }

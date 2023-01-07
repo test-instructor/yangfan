@@ -12,7 +12,7 @@
             :key="item.ID"
             :label="item.name"
             :value="item.ID"
-            @click.native="getConfigID(item.ID)"
+            @click.native="getConfigID(item)"
         />
       </el-select>
     </el-form-item>
@@ -33,8 +33,8 @@ const configId = ref()
 import {getApiConfigList} from "@/api/apiConfig";
 const emit = defineEmits(["configId"]);
 
-const getConfigID = (id) => {
-  configId.value = id
+const getConfigID = (item) => {
+  configId.value = item.ID
   emit("configId", configId.value)
 }
 

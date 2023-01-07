@@ -2,7 +2,7 @@
   <div>
     <div style="display: flex;">
       <div>
-        <span>前置用例: </span>
+        <span>前置套件: </span>
         <el-select v-model="reqData.setup_case_id"
                    class="m-2"
                    placeholder="请选择前置用例"
@@ -12,6 +12,7 @@
               v-for="item in CaseOptions"
               :label="item.name"
               :value="item.ID"
+              :key="item.ID"
           />
         </el-select>
       </div>
@@ -161,10 +162,9 @@ heightDiv.value = props.heights
 eventType.value = props.eventType
 
 const getTableData = async() => {
-  const table = await getApiCaseList({ page: 1, pageSize: 99999, front_case:true})
+  const table = await getTestCaseList({ page: 1, pageSize: 99999, front_case:true,type:2})
   if (table.code === 0) {
     CaseOptions.value = table.data.list
-    console.log("CaseOptions", CaseOptions.value)
 
   }
 }
@@ -183,8 +183,8 @@ const init = async () => {
   }
 }
 let reqData = reactive({
-  ID: 0,
-  parameters: [],
+  ID: null,
+  parameters: {},
   name: '',
   case_id:0,
   base_url: '',
@@ -231,8 +231,8 @@ const save = async () => {
 
 if (eventType.value === "update") {
   reqData = props.formData.value
-  if (reqData.case_id===0){
-    reqData.case_id = null
+  if (reqData.setup_case_id===0){
+    reqData.setup_case_id = null
   }
   configLabel.base_url = reqData.base_url
   configLabel.name = reqData.name
@@ -321,6 +321,7 @@ const createInterface = async () => {
       eventMsg.value = "创建"
       break
     case 'update':
+      reqData.setup_case = null
       res = await updateApiConfig(reqData)
       eventMsg.value = "修改"
       break

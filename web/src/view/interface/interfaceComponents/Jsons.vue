@@ -75,6 +75,7 @@ export default {
       json = this.jsons
     }
     this.codeEditor = new jsoneditor(codeEditorElement, codeOptions, json);
+    this.jsonDatas()
   },
   created() {
     window.addEventListener('resize', this.getHeight);

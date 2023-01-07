@@ -23,7 +23,7 @@
 - [ ] go 函数驱动
 - [ ] 支持更多协议，`HTTP/2`、`WebSocket`、`TCP`、`RPC`等
 - [ ] 支持用例导入，`json`、`postman`、`swagger`等
-- [ ] 性能测试
+- [x] 性能测试
 - [ ] web UI 自动化测试
 
 # 在线demo

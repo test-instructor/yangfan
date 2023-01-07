@@ -1,5 +1,6 @@
 <template>
   <div class="search-component">
+    <PreferentialServer/>
     <div
         v-if="btnShow"
         class="user-box"
@@ -64,6 +65,7 @@ export default {
 
 <script setup>
 import Screenfull from '@/view/layout/screenfull/index.vue'
+import PreferentialServer from '@/view/layout/preferentialserver/index.vue'
 import SelectProject from '@/view/layout/ProjectSelect/index.vue'
 import { emitter } from '@/utils/bus.js'
 import { ref, nextTick } from 'vue'

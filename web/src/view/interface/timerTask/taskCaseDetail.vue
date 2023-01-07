@@ -45,7 +45,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column align="right" label="按钮组" width="150px">
+        <el-table-column align="right" label="按钮组" min-width="150px">
           <template #default="scope">
             <el-button type="text" icon="delete" size="mini" @click="deleteRow(scope.row)">删除</el-button>
           </template>

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <div style="display: flex;">
+<!--      <div style="display: flex;">
         <div style="width: 120px; margin-top: 5px; display: table; margin-left:20px; ">
           <span>verify: </span>
           <el-switch
@@ -29,7 +29,6 @@
               name="http2"
           />
         </div>
-
         <div>
           <span style="margin-right:5px;">超时时间:  </span>
           <el-input-number
@@ -43,7 +42,7 @@
           />
         </div>
 
-      </div>
+      </div>-->
     </div>
     <div style="width: 800px; margin-top: 10px">
       <el-input

@@ -60,7 +60,6 @@ const initEditor = () => {
   });
   // 监听值的变化
   // editor.value.onDidChangeModelContent((val) => {
-  //   console.log("--------------",val.changes[0].text)
   // })
 
   // 创建代码提醒
@@ -83,7 +82,6 @@ const initEditor = () => {
 
 
 const handleCode = async () => {
-  // console.log("==========", toRaw(editor.value).getValue())
   let updateData = {file_type: props.debugTalkType, content: toRaw(editor.value).getValue()}
   const res = await updateDebugTalk(updateData)
   if (res.code === 0) {

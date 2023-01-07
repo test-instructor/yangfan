@@ -2,7 +2,7 @@
   <div>
     <div class="gva-search-box">
       <el-form :inline="true" :model="searchInfo" class="demo-form-inline">
-        <el-form-item label="配置名称">
+        <el-form-item label="报告名称">
           <el-input v-model="searchInfo.name" placeholder="搜索条件"/>
         </el-form-item>
         <el-form-item>
@@ -50,7 +50,8 @@
         <el-table-column align="left" label="报告名称" prop="name" width="200"/>
         <el-table-column align="left" label="运行时长/秒" width="120">
           <template #default="scope">
-            {{ Number(scope.row.time.duration).toFixed(2) }}
+<!--            {{ scope.row.time.duration?Number(scope.row.time.duration).toFixed(2):0 }}-->
+            {{ durations(scope.row) }}
           </template>
         </el-table-column>
         <el-table-column align="left" label="状态" prop="default" width="120">
@@ -60,7 +61,6 @@
         </el-table-column>
         <el-table-column align="left" label="按钮组">
           <template #default="scope">
-            <!--            <el-button type="text" icon="edit" size="small" class="table-button" @click="updateApiConfigFunc(scope.row)">详情</el-button>-->
             <el-button type="text" size="small" class="table-button" @click="reportDetailFunc(scope.row)">详情</el-button>
             <el-button type="text" icon="delete" size="mini" @click="deleteRow(scope.row)">删除</el-button>
           </template>
@@ -84,18 +84,18 @@
 
 <script>
 export default {
-  name: 'ApiConfig'
+  name: 'ApiReport'
 }
 </script>
 
 <script setup>
 import {
-  deleteApiConfig,
   deleteApiConfigByIds,
   findApiConfig,
 } from '@/api/apiConfig'
 
 import {
+  delReport,
   getReportList
 } from '@/api/report'
 import ReportDetail from '@/view/interface/Reports/reportDetail.vue'
@@ -138,7 +138,6 @@ const onSubmit = () => {
 }
 
 const successType = (row) => {
-  console.log("===========================", type)
   if (row.status===0){
     return ['info', '运行中']
   }
@@ -179,6 +178,9 @@ const caseType = (t) => {
   if (t===4){
     return ["定时任务", "orange"]
   }
+  if (t===5){
+    return ["性能测试", "pinkpurple"]
+  }
   return ["定时任务"]
 }
 
@@ -202,6 +204,14 @@ const runType = (t) => {
 
 }
 
+const durations = (row) => {
+  const t = ref(0)
+  if (row.time && row.time.duration){
+    t.value = Number(Number(row.time.duration).toFixed(2))
+  }
+  return t
+}
+
 const reportDetailFunc = (row) => {
   if (row.status===2) {
     ElMessageBox.alert(
@@ -211,7 +221,6 @@ const reportDetailFunc = (row) => {
           type: 'error',
         }
     )
-    console.log("===============", row.describe)
   } else {
     router.push({
       name: 'reportDetail', params: {
@@ -269,7 +278,7 @@ const deleteRow = (row) => {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(() => {
-    deleteApiConfigFunc(row)
+    deleteReportFunc(row)
   })
 }
 
@@ -322,8 +331,8 @@ const updateApiConfigFunc = async (row) => {
 
 
 // 删除行
-const deleteApiConfigFunc = async (row) => {
-  const res = await deleteApiConfig({ID: row.ID})
+const deleteReportFunc = async (row) => {
+  const res = await delReport({ID: row.ID})
   if (res.code === 0) {
     ElMessage({
       type: 'success',

@@ -81,7 +81,6 @@ const treeData = computed(() => {
   return searchData(searchKey.value);
 })
 const getTreeID = (nodeData) => {
-  console.log("=============================",nodeData)
 }
 const nodeType = ref(1)
 const searchData = (keyword) => {
@@ -111,7 +110,6 @@ const getMatchIndex = (title) => {
 }
 
 onBeforeMount(() => {
-  console.log('Component is mounted!')
   // 调接口
 })
 
@@ -131,7 +129,6 @@ const addNode = (nodeData) => {
 }
 
 const updateNode = (nodeData) => {
-  console.log(nodeData)
   nodeType.value = 2
   title.value = `修改节点【${nodeData.label}】名称`
   node.id = nodeData.key
@@ -176,11 +173,8 @@ const getTrees = () => {
     if (response.data.list && response.data.list.length>0){
 
       if (defaultKeys.value === "0"){
-        console.log("============================1111111111111")
         defaultKeys.value = "1"
-        console.log("==========",defaultKeys.value)
       }
-      console.log("==========",defaultKeys.value)
       originTreeData.value = response.data.list
       // dom && dom.click();
     }

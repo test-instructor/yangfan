@@ -1,5 +1,4 @@
 <template>
-
   <div>
     <div class="gva-search-box">
 
@@ -16,7 +15,7 @@
           </div>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="addApiCaseFunc" round>添加测试用例</el-button>
+          <el-button type="primary" @click="addApiCaseFunc" round>添加测试套件</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -48,7 +47,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column align="right" label="按钮组" width="150px">
+        <el-table-column align="right" label="按钮组" min-width="150px">
           <template #default="scope">
             <el-button type="text" icon="delete" size="mini" @click="deleteRow(scope.row)">删除</el-button>
           </template>
@@ -83,7 +82,7 @@
         :visible.sync="ApisCaseVisible"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
-        title="添加测试用例"
+        title="添加测试套件"
         width="1250px"
         top="30px"
     >
@@ -91,6 +90,7 @@
           @close="closeDialogAddCase"
           v-if="ApisCaseVisible"
           @caseID="addTeseCase"
+          :types="taskTypes"
           ref="menuRole">
       </ApisCaseAdd>
       <template #footer>
@@ -149,6 +149,7 @@ let sortIdList = ""
 heightDiv.value =  window.screen.height - 480
 const formDatas = reactive({})
 const sortData = ref([])
+let taskTypes = 1
 
 const  init = () => {
   if (route.params.id>0){
@@ -174,11 +175,11 @@ watch(() => route.params.id, () => {
   }
 })
 
-watch(() => route.params.id, () => {
-  if (route.params.id){
-    init()
-  }
-})
+// watch(() => route.params.id, () => {
+//   if (route.params.id){
+//     init()
+//   }
+// })
 
 const addApiCaseFunc = async() => {
   ApisCaseVisible.value = true
@@ -232,7 +233,6 @@ const rowDrop= async() => {
       }
     }
   })
-
 }
 
 // 关闭弹窗

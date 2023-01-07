@@ -38,37 +38,22 @@
 <!--        <el-table-column align="left" label="日期" width="180">-->
 <!--          <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>-->
 <!--        </el-table-column>-->
-        <el-table-column align="left" label="任务名称" prop="name" width="120"/>
+        <el-table-column align="left" label="任务名称" prop="name" width="240"/>
         <el-table-column align="left" label="时间配置" prop="runTime" width="120"/>
         <el-table-column align="left" label="下次执行时间" width="180">
           <template #default="scope">{{ formatDate(scope.row.nextRunTime) }}</template>
         </el-table-column>
         <el-table-column align="left" label="运行次数" prop="runNumber" width="120"/>
-        <el-table-column align="left" label="运行配置" prop="config.name" width="180"/>
-<!--        <el-table-column align="left" label="测试用例集" min-width="80">-->
-<!--          <template #default="scope">-->
-<!--            <el-cascader-->
-<!--                v-model="scope.row.caseIds"-->
-<!--                :clearable="false"-->
-<!--                :options="caseOptions"-->
-<!--                :props="{ multiple:true,checkStrictly: true, label:'caseName',value:'caseId', disabled:'disabled', emitPath:false}"-->
-<!--                :show-all-levels="false"-->
-<!--                collapse-tags-->
-<!--                @visible-change="(flag)=>{changeCase(scope.row,flag)}"-->
-<!--                @remove-tag="()=>{changeCase(scope.row,false)}"-->
-<!--            />-->
-<!--          </template>-->
-<!--        </el-table-column>-->
-        <el-table-column align="left" label="备注" prop="describe" width="120"/>
+        <el-table-column align="left" label="备注" prop="describe" width="240"/>
         <el-table-column align="left" label="定时执行" prop="status" width="120">
           <template #default="scope">
             <el-tag :type="scope.row.status ? 'success' : 'info'">{{ scope.row.status ? '启用' : '禁用' }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column align="left" label="按钮组" width="360">
+        <el-table-column align="left" label="按钮组" min-width="360">
           <template #default="scope">
             <el-button class="table-button" icon="detail" size="small" type="text" @click="detailTaskCaseFunc(scope.row)">任务详情</el-button>
-            <el-button class="table-button" icon="detail" size="small" type="text" @click="runCase(scope.row)">运行</el-button>
+            <el-button class="table-button" icon="detail" size="small" type="text" @click="runCase(scope.row)">后台运行</el-button>
             <el-button class="table-button" icon="edit" size="small" type="text"
                        @click="updateTimerTaskFunc(scope.row)">变更
             </el-button>
@@ -93,7 +78,7 @@
         :before-close="closeDialog"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
-        title="弹窗操作">
+        :title="(type==='create')?'新增定时任务':'编辑定时任务'">
       <el-form :model="formData" label-position="right" label-width="80px">
         <el-form-item label="任务名称:">
           <el-input v-model="formData.name" clearable placeholder="请输入"/>
@@ -121,20 +106,6 @@
         <el-form-item label="定时执行:">
           <el-switch v-model="formData.status" active-color="#13ce66" active-text="启用" clearable
                      inactive-color="#ff4949" inactive-text="禁用"></el-switch>
-        </el-form-item>
-        <el-form-item label="运行配置:">
-          <el-select
-              v-model="configID"
-              placeholder="请选择"
-              @change="configChange"
-          >
-            <el-option
-                v-for="item in configData"
-                :key="item.ID"
-                :label="item.name"
-                :value="item.ID"
-            />
-          </el-select>
         </el-form-item>
         <el-form-item label="备注:">
           <el-input v-model="formData.describe" clearable placeholder="请输入"/>
@@ -409,7 +380,7 @@ const deleteTimerTaskFunc = async (row) => {
     if (tableData.value.length === 1 && page.value > 1) {
       page.value--
     }
-    getTableData()
+    await getTableData()
   }
 }
 
@@ -445,13 +416,6 @@ const enterDialog = async () => {
     ElMessage({
       type: 'error',
       message: '任务名称不能为空'
-    })
-    return
-  }
-  if (formData.value.config.ID===0){
-    ElMessage({
-      type: 'error',
-      message: '请选择运行配置'
     })
     return
   }

@@ -61,7 +61,7 @@
               <template #default="scope">
                 <el-button @click="addCase(scope.row)">
                   <span>
-                    添加到测试用例
+                    {{addCaseText()[0]}}
                   </span>
                 </el-button>
               </template>
@@ -101,7 +101,9 @@ import {getTestCaseList} from "@/api/testCase";
 const isRouterActive = ref(true)
 const emit = defineEmits(["close"]);
 
-
+const props = defineProps({
+  types: ref(""),
+})
 
 let caseList = []
 const listTypes = ref("")
@@ -116,15 +118,21 @@ let tagKey = 0
 
 
 listTypes.value = "api"
-// listTypes.value = "case"
 apiIds.value = 1
 caseIds.value = 1
 caseIds.menuIds = 47
-const apiTypes = 1
+const apiTypes = 2
 
-
-
-
+const addCaseText = () => {
+  let t = []
+  if (props.types === 1){
+    t.push("添加到测试用例")
+  }
+  if (props.types === 2){
+    t.push("添加到性能任务")
+  }
+  return t
+}
 
 const setTreeID = (val) => {
   treeID = val
@@ -162,7 +170,6 @@ const handleClose = (itemOld) => {
 
 const log = (evt) => {
   // evt.added.element.id = 99
-  window.console.log(evt.added.element.id);
 }
 
 // 查询

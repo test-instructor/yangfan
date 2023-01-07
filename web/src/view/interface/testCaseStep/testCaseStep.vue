@@ -49,8 +49,8 @@
               <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
             </el-table-column>
             <el-table-column align="left" label="套件名称" prop="name" width="240"/>
-            <el-table-column align="left" label="运行配置" prop="runConfig.name" width="240"/>
-            <el-table-column align="left" label="按钮组" width="500">
+            <el-table-column align="left" label="调试运行配置" prop="RunConfigName" width="240"/>
+            <el-table-column align="left" label="按钮组" min-width="500">
               <template #default="scope">
                 <el-button type="text" icon="detail" size="small" class="table-button" @click="runCase(scope.row, 1)">调试运行
                 </el-button>
@@ -81,11 +81,11 @@
       </div>
     </div>
     <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" title="弹窗操作">
-      <el-form :model="formData" label-position="right" label-width="80px">
+      <el-form :model="formData" label-position="right" label-width="120px">
         <el-form-item label="套件名称:">
           <el-input v-model="formData.name" clearable placeholder="请输入" />
         </el-form-item>
-        <el-form-item label="运行配置:">
+        <el-form-item label="调试运行配置:">
           <el-select
               v-model="configID"
               placeholder="请选择"
@@ -99,7 +99,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="前置用例:">
+        <el-form-item label="前置套件:">
           <el-switch v-model="formData.front_case" />
         </el-form-item>
       </el-form>
@@ -145,10 +145,8 @@ const router = useRouter()
 // 自动化生成的字典（可能为空）以及字段
 const formData = ref({
   name: '',
+  type: 2,
   front_case: false,
-  runConfig: {
-    ID: 0
-  },
   RunConfigID:0,
 })
 
@@ -160,9 +158,7 @@ const tableData = ref([])
 const searchInfo = ref({})
 const configID = ref()
 const configChange = (key) => {
-  console.log("==================1", key)
   formData.value.RunConfigID = key
-  console.log("==================2", formData.value)
 }
 const params = reactive({
   menu: '',
@@ -206,7 +202,7 @@ const handleCurrentChange = (val) => {
 // 查询
 const getTableData = async () => {
   let menu = treeID
-  const table = await getTestCaseList({menu, page: page.value, pageSize: pageSize.value, ...searchInfo.value})
+  const table = await getTestCaseList({menu, page: page.value, pageSize: pageSize.value,type:2, ...searchInfo.value})
   if (table.code === 0) {
     tableData.value = table.data.list
     total.value = table.data.total
@@ -335,7 +331,6 @@ const runCase = async (row,runType) => {
         message: '运行成功'
       })
     }
-
   }
 }
 
@@ -370,9 +365,13 @@ const closeDialog = () => {
   dialogFormVisible.value = false
   formData.value = {
     name: '',
+    type: 2,
+    front_case: false,
+    RunConfigID:0,
     runConfig: {
       ID: 0
     },
+
   }
 }
 // 弹窗确定
@@ -387,12 +386,17 @@ const enterDialog = async () => {
   if (formData.value.RunConfigID===0){
     ElMessage({
       type: 'error',
-      message: '请选择运行配置'
+      message: '请选择调试运行配置'
     })
     return
   }
   params.menu = treeID
   let res
+  configData.value.forEach((item, index, arr) => {
+    if (item.ID === formData.value.RunConfigID){
+      formData.value.RunConfigName = item.name
+    }
+  })
   switch (type.value) {
     case 'create':
       res = await createTestCase(formData.value, params)

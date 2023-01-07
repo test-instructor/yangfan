@@ -59,7 +59,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column align="right" label="按钮组" width="150px">
+        <el-table-column align="right" label="按钮组" min-width="150px">
           <template #default="scope">
             <el-button type="text" icon="edit" size="small" class="table-button" @click="updateInterfaceTemplateFunc(scope.row)">变更</el-button>
             <el-button type="text" icon="delete" size="mini" @click="deleteRow(scope.row)">删除</el-button>
@@ -190,17 +190,12 @@ const getTestCaseDetailFunc = async(testCaseID) => {
   }
 }
 init()
-watch(() => route.params.id, () => {
-  if (route.params.id){
-    init()
-  }
-})
+// watch(() => route.params.id, () => {
+//   if (route.params.id){
+//     init()
+//   }
+// })
 
-watch(() => route.params.id, () => {
-  if (route.params.id){
-    init()
-  }
-})
 
 const addApiCaseFunc = async() => {
   apiCaseVisible.value = true

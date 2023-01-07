@@ -117,8 +117,7 @@ export default {
     }
   },
   created() {
-
-    if (this.setupHooks&&this.setupHooks.length>1){
+    if (this.setupHooks&&this.setupHooks.length>0){
       let setups = []
       for (let content of this.setupHooks) {
         let setup = {setup: content}

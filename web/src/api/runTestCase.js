@@ -11,6 +11,22 @@ export const runTestCaseStep = (data) => {
     })
 }
 
+export const runBoomer = (data) => {
+    return service({
+        url: baseURL + '/runBoomer',
+        method: 'post',
+        data
+    })
+}
+
+export const runBoomerDebug = (data) => {
+    return service({
+        url: baseURL + '/runBoomerDebug',
+        method: 'post',
+        data
+    })
+}
+
 export const runApiCase = (data) => {
     return service({
         url: baseURL + '/runApiCase',

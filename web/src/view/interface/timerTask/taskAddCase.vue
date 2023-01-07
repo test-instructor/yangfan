@@ -164,7 +164,6 @@ const handleClose = (itemOld) => {
 
 const log = (evt) => {
   // evt.added.element.id = 99
-  window.console.log(evt.added.element.id);
 }
 
 // 查询
