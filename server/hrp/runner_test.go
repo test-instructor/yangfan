@@ -1,6 +1,7 @@
 package hrp
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
+	"github.com/test-instructor/cheetah/server/hrp/internal/code"
 )
 
 func buildHashicorpGoPlugin() {
@@ -16,7 +18,7 @@ func buildHashicorpGoPlugin() {
 	err := BuildPlugin(tmpl("plugin/debugtalk.go"), tmpl("debugtalk.bin"))
 	if err != nil {
 		log.Error().Err(err).Msg("build hashicorp go plugin failed")
-		os.Exit(1)
+		os.Exit(code.GetErrorCode(err))
 	}
 }
 
@@ -33,7 +35,7 @@ func buildHashicorpPyPlugin() {
 	err := ioutil.WriteFile(tmpl("debugtalk.py"), src, 0o644)
 	if err != nil {
 		log.Error().Err(err).Msg("copy hashicorp python plugin failed")
-		os.Exit(1)
+		os.Exit(code.GetErrorCode(err))
 	}
 }
 
@@ -171,8 +173,8 @@ func TestRunCaseWithPluginJSON(t *testing.T) {
 }
 
 func TestRunCaseWithPluginYAML(t *testing.T) {
-	buildHashicorpGoPlugin()
-	defer removeHashicorpGoPlugin()
+	buildHashicorpPyPlugin()
+	defer removeHashicorpPyPlugin()
 
 	testCase := TestCasePath(demoTestCaseWithPluginYAMLPath)
 	err := NewRunner(nil).Run(&testCase) // hrp.Run(testCase)
@@ -249,4 +251,22 @@ func TestLoadTestCases(t *testing.T) {
 	if !assert.Equal(t, len(testCases), 1) {
 		t.Fatal()
 	}
+}
+
+func TestRunner(t *testing.T) {
+	buildHashicorpPyPlugin()
+	defer removeHashicorpPyPlugin()
+	tc := TestCasePath(demoTestCaseWithPluginJSONPath)
+	testCases, err := LoadTestCases(&tc)
+	if !assert.Nil(t, err) {
+		t.Fatal()
+	}
+	fmt.Println(testCases)
+	r := NewRunner(t)
+	//r.SetPluginLogOn()
+	////iTestCases ...ITestCase
+	////TestCase
+	////testcases ...ITestCase
+	r.Run(&tc)
+
 }

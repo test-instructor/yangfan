@@ -38,7 +38,7 @@ func (taskService *TimerTaskService) DeleteTimerTaskByIds(ids request.IdsReq) (e
 // UpdateTimerTask 更新TimerTask记录
 
 func (taskService *TimerTaskService) UpdateTimerTask(task interfacecase.ApiTimerTask) (err error) {
-	var oId getOperationId
+	var oId interfacecase.Operator
 	global.GVA_DB.Model(interfacecase.ApiTimerTask{}).Where("id = ?", task.ID).First(&oId)
 	task.CreatedByID = oId.CreatedByID
 	task.TestCase = []*interfacecase.ApiCase{}
@@ -100,8 +100,8 @@ func (taskService *TimerTaskService) SortTaskCase(task []interfacecase.ApiTimerT
 }
 
 func (taskService *TimerTaskService) FindTaskTestCase(id uint) (err error, apiTimerTaskRelationship []interfacecase.ApiTimerTaskRelationship) {
-	timerTask := interfacecase.ApiTimerTask{GVA_MODEL: global.GVA_MODEL{ID: id}}
-	global.GVA_DB.First(&timerTask)
+	//timerTask := interfacecase.ApiTimerTask{GVA_MODEL: global.GVA_MODEL{ID: id}}
+	//global.GVA_DB.First(&timerTask)
 	global.GVA_DB.Model(interfacecase.ApiTimerTaskRelationship{}).
 		Where("api_timer_task_id = ?", id).
 		Preload("ApiCase").

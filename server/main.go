@@ -1,11 +1,13 @@
 package main
 
 import (
+	//_ "github.com/mkevac/debugcharts"
 	"github.com/test-instructor/cheetah/server/core"
 	"github.com/test-instructor/cheetah/server/global"
 	"github.com/test-instructor/cheetah/server/initialize"
 	"go.uber.org/zap"
 	"math/rand"
+	//_ "net/http/pprof"
 	"sync"
 	"time"
 )
@@ -38,5 +40,11 @@ func main() {
 		db, _ := global.GVA_DB.DB()
 		defer db.Close()
 	}
+	//go func() {
+	//	err := http.ListenAndServe("0.0.0.0:18090", nil)
+	//	if err != nil {
+	//		return
+	//	}
+	//}()
 	core.RunWindowsServer()
 }

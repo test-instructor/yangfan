@@ -3,6 +3,7 @@ package runTestCase
 import (
 	"encoding/json"
 	"github.com/test-instructor/cheetah/server/global"
+	"github.com/test-instructor/cheetah/server/hrp"
 	"github.com/test-instructor/cheetah/server/model/interfacecase"
 )
 
@@ -21,28 +22,50 @@ type Stat struct {
 }
 
 func resetReport(reports *interfacecase.ApiReport) {
-	successNum := 0
-	failNum := 0
 
+	//修正测试报告
+	var statTestcases interfacecase.ApiReportStatTestcases
+	var statTeststeps interfacecase.ApiReportStatTeststeps
+	testcaseStatus := true
 	for k, v := range reports.Details {
-		//stat := v.Stat.(map[string]uint)
-		var stat Stat
-		json.Unmarshal(v.Stat, &stat)
-		if stat.Total != stat.Successes {
-			//v.Success = false
-			reports.Details[k].Success = false
-			failNum++
-		} else {
-			successNum++
+		var statStep hrp.TestStepStat
+		stepStatus := true
+		for _, v2 := range v.Records {
+			apiSuccess := 0
+			apiFail := 0
+			for _, v2 := range v2.Data {
+				if v2.Success == true {
+					apiSuccess++
+				} else {
+					apiFail++
+					stepStatus = false
+				}
+			}
+			statStep.Successes += apiSuccess
+			statStep.Failures += apiFail
+			statStep.Total = apiSuccess + apiFail
 		}
+		statString, _ := json.Marshal(statStep)
+		reports.Details[k].Success = stepStatus
+		reports.Details[k].Stat = statString
+		if stepStatus == true {
+			statTestcases.Success++
+		} else {
+			statTestcases.Fail++
+			testcaseStatus = false
+		}
+		statTeststeps.Successes += statStep.Successes
+		statTeststeps.Failures += statStep.Failures
+		statTeststeps.Total = statTeststeps.Successes + statTeststeps.Failures
+		statTestcases.Total = statTestcases.Success + statTestcases.Fail
 	}
-	success := failNum == 0
-	reports.Success = &success
-	reports.Stat.TestCases.Fail = failNum
-	reports.Stat.TestCases.Success = successNum
+	*reports.Success = testcaseStatus
+	reports.Stat.TestSteps = statTeststeps
+	reports.Stat.TestCases = statTestcases
 }
 
 func (r *ReportOperation) UpdateReport(reports *interfacecase.ApiReport) {
+	//修正测试报告，hrp的测试报告数据不兼容
 	resetReport(reports)
 	reports.Name = r.report.Name
 	reports.ID = r.report.ID

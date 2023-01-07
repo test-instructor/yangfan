@@ -16,8 +16,21 @@ func (apicaseService *RunCaseService) RunTestCaseStep(runCase request.RunCaseReq
 	return
 }
 
-func (apicaseService *RunCaseService) RunApiCase(runCase request.RunCaseReq, runType interfacecase.RunType) {
-	runTestCase.RunCase(runCase, runType)
+func (apicaseService *RunCaseService) RunApiCase(runCase request.RunCaseReq, runType interfacecase.RunType) (report *interfacecase.ApiReport, err error) {
+	report, err = runTestCase.RunCase(runCase, runType)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (apicaseService *RunCaseService) RunBoomerDebug(runCase request.RunCaseReq, runType interfacecase.RunType) (report *interfacecase.ApiReport, err error) {
+	report, err = runTestCase.RunBoomerDebug(runCase, runType)
+	return
+}
+
+func (apicaseService *RunCaseService) RunBoomer(runCase request.RunCaseReq, runType interfacecase.RunType) (report *interfacecase.ApiReport, err error) {
+	report, err = runTestCase.RunBoomer(runCase, runType)
 	return
 }
 

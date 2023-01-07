@@ -9,8 +9,11 @@ import (
 
 	"github.com/httprunner/funplugin"
 	"github.com/httprunner/funplugin/fungo"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
-	"github.com/test-instructor/cheetah/server/hrp/internal/builtin"
+
+	"github.com/test-instructor/cheetah/server/hrp/internal/code"
+	"github.com/test-instructor/cheetah/server/hrp/internal/myexec"
 	"github.com/test-instructor/cheetah/server/hrp/internal/sdk"
 )
 
@@ -34,6 +37,7 @@ func initPlugin(path, venv string, logOn bool) (plugin funplugin.IPlugin, err er
 	}
 	pluginPath, err := locatePlugin(path)
 	if err != nil {
+		log.Warn().Str("path", path).Msg("locate plugin failed")
 		return nil, nil
 	}
 
@@ -50,14 +54,14 @@ func initPlugin(path, venv string, logOn bool) (plugin funplugin.IPlugin, err er
 		err = BuildPlugin(pluginPath, genPyPluginPath)
 		if err != nil {
 			log.Error().Err(err).Str("path", pluginPath).Msg("build plugin failed")
-			return nil, nil
+			return nil, err
 		}
 		pluginPath = genPyPluginPath
 
 		packages := []string{
 			fmt.Sprintf("funppy==%s", fungo.Version),
 		}
-		python3, err := builtin.EnsurePython3Venv(venv, packages...)
+		python3, err := myexec.EnsurePython3Venv(venv, packages...)
 		if err != nil {
 			log.Error().Err(err).
 				Interface("packages", packages).
@@ -71,6 +75,7 @@ func initPlugin(path, venv string, logOn bool) (plugin funplugin.IPlugin, err er
 	plugin, err = funplugin.Init(pluginPath, pluginOptions...)
 	if err != nil {
 		log.Error().Err(err).Msgf("init plugin failed: %s", pluginPath)
+		err = errors.Wrap(code.InitPluginFailed, err.Error())
 		return
 	}
 
@@ -109,7 +114,6 @@ func locatePlugin(path string) (pluginPath string, err error) {
 		return
 	}
 
-	log.Warn().Err(err).Str("path", path).Msg("plugin file not found")
 	return "", fmt.Errorf("plugin file not found")
 }
 

@@ -8,9 +8,9 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 
-	"server/hrp"
-	"server/hrp/internal/boomer"
-	"server/hrp/internal/convert"
+	"github.com/test-instructor/cheetah/server/hrp"
+	"github.com/test-instructor/cheetah/server/hrp/pkg/boomer"
+	"github.com/test-instructor/cheetah/server/hrp/pkg/convert"
 )
 
 var runCurlCmd = &cobra.Command{
@@ -21,11 +21,9 @@ var runCurlCmd = &cobra.Command{
 	PreRun: func(cmd *cobra.Command, args []string) {
 		setLogLevel(logLevel)
 	},
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		runner := makeHRPRunner()
-		if runner.Run(makeCurlTestCase(args)) != nil {
-			os.Exit(1)
-		}
+		return runner.Run(makeCurlTestCase(args))
 	},
 }
 
@@ -41,9 +39,13 @@ var boomCurlCmd = &cobra.Command{
 		}
 		setLogLevel(logLevel)
 	},
-	Run: func(cmd *cobra.Command, args []string) {
-		boomer := makeHRPBoomer()
+	RunE: func(cmd *cobra.Command, args []string) error {
+		boomer, err := makeHRPBoomer()
+		if err != nil {
+			return err
+		}
 		boomer.Run(makeCurlTestCase(args))
+		return nil
 	},
 }
 

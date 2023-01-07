@@ -11,65 +11,61 @@ import (
 type ApiType int
 
 const (
-	ApiTypeTemplate ApiType = 1 // 接口模板
-	ApiTypeCase     ApiType = 2 // 测试用例
+	ApiTypeTemplate        ApiType = 1 // 接口模板
+	ApiTypeCase            ApiType = 2 // 接口测试用例
+	ApiTypeCasePerformance ApiType = 3 // 性能测试用例
 )
 
-type transactionType string
+type TransactionType string
 
 const (
-	transactionStart transactionType = "start"
-	transactionEnd   transactionType = "end"
+	TransactionStart TransactionType = "start"
+	TransactionEnd   TransactionType = "end"
 )
 
 // ApiStep 结构体
 // 如果含有time.Time 请自行import time包
 type ApiStep struct {
 	global.GVA_MODEL
-	Name          string              `json:"name" form:"name" gorm:"column:name;comment:接口名称"`
-	ApiType       ApiType             `json:"type" form:"type" gorm:"column:api_type;comment:接口名称"`
-	RequestID     uint                `json:"-"`
-	Request       *ApiRequest         `json:"request" form:"request"`
-	TestCase      interface{}         `json:"testcase,omitempty" yaml:"testcase,omitempty" gorm:"-"` // *TestCasePath or *TestCase
-	Transaction   *ApiStepTransaction `json:"transaction,omitempty" yaml:"transaction,omitempty"`
-	Rendezvous    *ApiStepRendezvous  `json:"rendezvous,omitempty" yaml:"rendezvous,omitempty"`
-	ThinkTime     *ApiStepThinkTime   `json:"think_time,omitempty" yaml:"think_time,omitempty"`
-	ThinkTimeID   uint
-	TransactionID uint
-	RendezvousID  uint
+	Operator
+	Name        string              `json:"name" form:"name" gorm:"column:name;comment:接口名称"`
+	ApiType     ApiType             `json:"type" form:"type" gorm:"column:api_type;comment:接口类型"`
+	Request     *ApiRequest         `json:"request" form:"request;comment:http接口"`
+	Transaction *ApiStepTransaction `json:"transaction,omitempty" yaml:"transaction,omitempty;comment:事务"`
+	Rendezvous  *ApiStepRendezvous  `json:"rendezvous,omitempty" yaml:"rendezvous,omitempty;comment:集合点"`
+	ThinkTime   *ApiStepThinkTime   `json:"think_time,omitempty" yaml:"think_time,omitempty;comment:思考时间"`
 
-	Variables       datatypes.JSONMap      `json:"variables" form:"variables" gorm:"column:variables;comment:;type:text"`
-	Extract         datatypes.JSONMap      `json:"extract" form:"extract" gorm:"column:extract;comment:;type:text"`
-	Validate        customType.TypeArgsMap `json:"validate" form:"validate" gorm:"column:validate;comment:;type:text"`
-	ValidateNumber  uint                   `json:"validate_number" form:"validate_number"`
-	ValidateJson    datatypes.JSON         `json:"validate_json" form:"validate_json" `
-	ExtractJson     datatypes.JSON         `json:"extract_json" form:"extract_json"`
-	VariablesJson   datatypes.JSON         `json:"variables_json" form:"variables_json"`
+	ThinkTimeID   uint `gorm:"comment:思考时间"`
+	TransactionID uint `gorm:"comment:事务"`
+	RendezvousID  uint `gorm:"comment:集合点"`
+	RequestID     uint `gorm:"comment:http请求"`
+
+	Variables       datatypes.JSONMap      `json:"variables" form:"variables" gorm:"column:variables;comment:变量;type:text"`
+	Extract         datatypes.JSONMap      `json:"extract" form:"extract" gorm:"column:extract;comment:导出参数;type:text"`
+	Validate        customType.TypeArgsMap `json:"validate" form:"validate" gorm:"column:validate;comment:断言;type:text"`
+	ValidateNumber  uint                   `json:"validate_number" form:"validate_number;comment:断言数量"`
+	ValidateJson    datatypes.JSON         `json:"validate_json" form:"validate_json;comment:变量json格式" `
+	ExtractJson     datatypes.JSON         `json:"extract_json" form:"extract_json;comment:导出参数json格式"`
+	VariablesJson   datatypes.JSON         `json:"variables_json" form:"variables_json;comment:断言json类型"`
 	Hooks           string                 `json:"hooks" form:"hooks" gorm:"column:hooks;"`
 	SetupHooks      customType.TypeArgs    `json:"setup_hooks,omitempty" form:"setup_hooks,omitempty" gorm:"column:setup_hooks;type:text"`
 	TeardownHooks   customType.TypeArgs    `json:"teardown_hooks,omitempty" form:"teardown_hooks,omitempty" gorm:"column:teardown_hooks;type:text"`
 	ProjectID       uint                   `json:"-"`
 	TTestCase       []ApiCaseStep          `json:"testCase" form:"testCase" gorm:"many2many:ApiCaseStepRelationship;"`
 	Sort            uint                   `json:"sort" form:"sort" gorm:"column:sort;"`
-	ExportHeader    datatypes.JSON         `json:"export_header" gorm:"column:export_header;comment:;type:text"`
-	ExportParameter datatypes.JSON         `json:"export_parameter" gorm:"column:export_parameter;comment:;type:text"`
+	ExportHeader    datatypes.JSON         `json:"export_header" gorm:"column:export_header;comment:导出请求头到全局config;type:text"`
+	ExportParameter datatypes.JSON         `json:"export_parameter" gorm:"column:export_parameter;comment:导出参数到全局config;type:text"`
 
-	Parent      uint           `json:"-"`
-	Project     system.Project `json:"-"`
-	ApiMenuID   uint           `json:"-"`
-	ApiMenu     ApiMenu        `json:"-"`
-	CreatedBy   system.SysUser `json:"-"`
-	CreatedByID uint           `json:"-"`
-	UpdateBy    system.SysUser `json:"-"`
-	UpdateByID  uint           `json:"-"`
-	DeleteBy    system.SysUser `json:"-"`
-	DeleteByID  uint           `json:"-"`
+	Parent    uint           `json:"-"`
+	Project   system.Project `json:"-"`
+	ApiMenuID uint           `json:"-"`
+	ApiMenu   ApiMenu        `json:"-"`
 }
 
 type ApiStepTransaction struct {
 	global.GVA_MODEL
 	Name string          `json:"name" yaml:"name"`
-	Type transactionType `json:"type" yaml:"type"`
+	Type TransactionType `json:"type" yaml:"type"`
 }
 
 type ApiStepRendezvous struct {

@@ -119,6 +119,13 @@ func Routers() *gin.Engine {
 		timerTaskRouter.InitTimerTaskRouter(timerTaskGroup)
 	}
 
+	performanceRouter := router.RouterGroupApp.Performance
+	performanceGroup := Router.Group("performance/:project")
+	performanceGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler())
+	{
+		performanceRouter.InitPerformanceRouter(performanceGroup)
+	}
+
 	InstallPlugin(
 		Router,
 		InterfaceGroup,
@@ -127,6 +134,7 @@ func Routers() *gin.Engine {
 		reportGroup,
 		apiCaseGroup,
 		timerTaskGroup,
+		performanceGroup,
 	) // 安装插件
 
 	global.GVA_LOG.Info("router register success")

@@ -11,6 +11,17 @@ type ReportSearch struct {
 	ApiType int `json:"type" form:"type"`
 }
 
+type PReportSearch struct {
+	interfacecase.PerformanceReport
+	request.PageInfo
+	ApiType int `json:"type" form:"type"`
+}
+
+type PReportDetail struct {
+	ID       uint `json:"ID"`
+	DetailID uint `json:"DetailID"`
+}
+
 //type InterfaceTemplateApi struct {
 //	Name   string
 //	Method string

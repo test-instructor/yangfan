@@ -1,7 +1,6 @@
 package interfacecase
 
 import (
-	"fmt"
 	"github.com/test-instructor/cheetah/server/global"
 	"github.com/test-instructor/cheetah/server/model/interfacecase"
 	interfacecaseReq "github.com/test-instructor/cheetah/server/model/interfacecase/request"
@@ -24,13 +23,11 @@ func (reportService *ReportService) GetReportList(info interfacecaseReq.ReportSe
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.Name != "" {
 		db = db.Where("name LIKE ?", "%"+info.Name+"%")
-
 	}
 	err = db.Count(&total).Error
 	if err != nil {
 		return
 	}
-	fmt.Println(info.ProjectID)
 	err = db.Limit(limit).Offset(offset).Order("ID desc").Find(&apiReport).Error
 
 	return err, apiReport, total
@@ -46,9 +43,15 @@ func (reportService *ReportService) FindReport(apiReport interfacecase.ApiReport
 		Preload("Stat.TestSteps").
 		Preload("Details").
 		Preload("Details.Records").
-		Preload("Details.Records.HttpStat")
+		Preload("Details.Records.Data").
+		Preload("Details.Records.Data.HttpStat")
 
 	err = db.Find(&apiReport).Error
 
 	return err, apiReport
+}
+
+func (reportService *ReportService) DelReport(report interfacecase.ApiReport) (err error) {
+	err = global.GVA_DB.Delete(&report).Error
+	return err
 }

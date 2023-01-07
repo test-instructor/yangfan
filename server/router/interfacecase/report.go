@@ -17,5 +17,6 @@ func (s *ReportRouter) InitReportRouter(Router *gin.RouterGroup) {
 	{
 		reportRouter.GET("getReportList", reportApi.GetReportList)
 		reportRouter.GET("findReport", reportApi.FindReport)
+		reportRouter.DELETE("delReport", reportApi.DelReport)
 	}
 }

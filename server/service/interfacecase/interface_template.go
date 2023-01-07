@@ -41,7 +41,7 @@ func (apicaseService *InterfaceTemplateService) DeleteInterfaceTemplateByIds(ids
 // UpdateInterfaceTemplate 更新InterfaceTemplate记录
 
 func (apicaseService *InterfaceTemplateService) UpdateInterfaceTemplate(apicase interfacecase.ApiStep) (id uint, err error) {
-	var oId getOperationId
+	var oId interfacecase.Operator
 	global.GVA_DB.Model(interfacecase.ApiStep{}).Where("id = ?", apicase.ID).First(&oId)
 	apicase.CreatedByID = oId.CreatedByID
 	apicase.ValidateNumber = uint(len(apicase.Validate))

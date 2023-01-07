@@ -25,6 +25,7 @@ func InstallPlugin(
 	reportGroup *gin.RouterGroup,
 	apiCaseGroup *gin.RouterGroup,
 	timerTaskGroup *gin.RouterGroup,
+	performanceGroup *gin.RouterGroup,
 ) {
 	PublicGroup := Router.Group("")
 	fmt.Println("无鉴权插件安装==》", PublicGroup)
@@ -92,6 +93,16 @@ func InstallPlugin(
 	))
 
 	PluginInit(timerTaskGroup, email.CreateEmailPlug(
+		global.GVA_CONFIG.Email.To,
+		global.GVA_CONFIG.Email.From,
+		global.GVA_CONFIG.Email.Host,
+		global.GVA_CONFIG.Email.Secret,
+		global.GVA_CONFIG.Email.Nickname,
+		global.GVA_CONFIG.Email.Port,
+		global.GVA_CONFIG.Email.IsSSL,
+	))
+
+	PluginInit(performanceGroup, email.CreateEmailPlug(
 		global.GVA_CONFIG.Email.To,
 		global.GVA_CONFIG.Email.From,
 		global.GVA_CONFIG.Email.Host,

@@ -70,7 +70,7 @@ func (apicaseService *ApiMenuService) DeleteApiMenuByIds(ids request.IdsReq) (er
 
 func (apicaseService *ApiMenuService) UpdateApiMenu(apicase interfacecase.ApiMenu) (err error) {
 	var apicaseTemp interfacecase.ApiMenu
-	var oId getOperationId
+	var oId interfacecase.Operator
 	global.GVA_DB.Model(interfacecase.ApiMenu{}).Where("id = ?", apicase.ID).First(&oId)
 	apicaseTemp.CreatedByID = oId.CreatedByID
 	apicaseTemp.UpdateByID = apicase.UpdateByID

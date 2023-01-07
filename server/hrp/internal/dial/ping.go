@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
-	"server/hrp/internal/builtin"
+	"github.com/test-instructor/cheetah/server/hrp/internal/builtin"
 )
 
 type PingOptions struct {

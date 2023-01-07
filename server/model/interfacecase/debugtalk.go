@@ -16,10 +16,9 @@ const (
 
 type ApiDebugTalk struct {
 	global.GVA_MODEL
-	FileType    FileType `json:"file_type"`
-	Content     string   `json:"content" form:"content" gorm:"column:content;type:text"`
-	CreatedBy   system.SysUser
-	CreatedByID uint
-	ProjectID   uint           `json:"-"`
-	Project     system.Project `json:"-"`
+	Operator
+	FileType  FileType       `json:"file_type" gorm:"comment:文件类型"`
+	Content   string         `json:"content" form:"content" gorm:"column:content;type:text;comment:文件内容"`
+	ProjectID uint           `json:"-" gorm:"comment:所属项目"`
+	Project   system.Project `json:"-"`
 }

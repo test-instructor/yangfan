@@ -21,8 +21,9 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/test-instructor/cheetah/server/hrp/internal/builtin"
-	"github.com/test-instructor/cheetah/server/hrp/internal/httpstat"
+	"github.com/test-instructor/cheetah/server/hrp/internal/code"
 	"github.com/test-instructor/cheetah/server/hrp/internal/json"
+	"github.com/test-instructor/cheetah/server/hrp/pkg/httpstat"
 )
 
 type HTTPMethod string
@@ -292,37 +293,28 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 		ContentSize: 0,
 	}
 
-	defer func() {
-		// update testcase summary
-		if err != nil {
-			stepResult.Attachment = err.Error()
-		}
-		// update summary
-		r.summary.Records = append(r.summary.Records, stepResult)
-		r.summary.Stat.Total += 1
-		if stepResult.Success {
-			r.summary.Stat.Successes += 1
-		} else {
-			r.summary.Stat.Failures += 1
-			// update summary result to failed
-			r.summary.Success = false
-		}
-	}()
-
-	// override step variables
-	stepVariables, err := r.MergeStepVariables(step.Variables)
+	// merge step variables with session variables
+	stepVariables, err := r.ParseStepVariables(step.Variables)
 	if err != nil {
+		err = errors.Wrap(err, "parse step variables failed")
 		return
 	}
 
-	err = prepareUpload(r.parser, step, stepVariables)
+	defer func() {
+		// update testcase summary
+		if err != nil {
+			stepResult.Attachments = err.Error()
+		}
+	}()
+
+	err = prepareUpload(r.caseRunner.parser, step, stepVariables)
 	if err != nil {
 		return
 	}
 
 	sessionData := newSessionData()
-	parser := r.GetParser()
-	config := r.GetConfig()
+	parser := r.caseRunner.parser
+	config := r.caseRunner.parsedConfig
 
 	rb := newRequestBuilder(parser, config, step.Request)
 	rb.req.Method = string(step.Request.Method)
@@ -345,17 +337,38 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 	// add request object to step variables, could be used in setup hooks
 	stepVariables["hrp_step_name"] = step.Name
 	stepVariables["hrp_step_request"] = rb.requestMap
-
+	stepVariables["request"] = rb.requestMap
 	// deal with setup hooks
 	for _, setupHook := range step.SetupHooks {
-		_, err = parser.Parse(setupHook, stepVariables)
+		req, err := parser.Parse(setupHook, stepVariables)
 		if err != nil {
 			return stepResult, errors.Wrap(err, "run setup hooks failed")
 		}
+		reqMap, ok := req.(map[string]interface{})
+		if ok && reqMap != nil {
+			rb.requestMap = reqMap
+			stepVariables["request"] = reqMap
+		}
+	}
+	if len(step.SetupHooks) > 0 {
+		requestBody, ok := rb.requestMap["body"].(map[string]interface{})
+		if ok {
+			body, err := json.Marshal(requestBody)
+			if err == nil {
+				rb.req.Body = io.NopCloser(bytes.NewReader(body))
+				rb.req.ContentLength = int64(len(body))
+			}
+		}
+	}
+
+	{
+		// 修改测试报告显示的url
+		rb.requestMap["url"] = rb.req.URL.Scheme + "://" + rb.req.URL.Host + rb.req.URL.Path
+
 	}
 
 	// log & print request
-	if r.LogOn() {
+	if r.caseRunner.hrpRunner.requestsLogOn {
 		if err := printRequest(rb.req); err != nil {
 			return stepResult, err
 		}
@@ -363,7 +376,7 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 
 	// stat HTTP request
 	var httpStat httpstat.Stat
-	if r.HTTPStatOn() {
+	if r.caseRunner.hrpRunner.httpStatOn {
 		ctx := httpstat.WithHTTPStat(rb.req, &httpStat)
 		rb.req = rb.req.WithContext(ctx)
 	}
@@ -371,9 +384,9 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 	// select HTTP client
 	var client *http.Client
 	if step.Request.HTTP2 {
-		client = r.hrpRunner.http2Client
+		client = r.caseRunner.hrpRunner.http2Client
 	} else {
-		client = r.hrpRunner.httpClient
+		client = r.caseRunner.hrpRunner.httpClient
 	}
 
 	// set step timeout
@@ -399,21 +412,21 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 	defer resp.Body.Close()
 
 	// log & print response
-	if r.LogOn() {
+	if r.caseRunner.hrpRunner.requestsLogOn {
 		if err := printResponse(resp); err != nil {
 			return stepResult, err
 		}
 	}
 
 	// new response object
-	respObj, err := newHttpResponseObject(r.hrpRunner.t, parser, resp)
+	respObj, err := newHttpResponseObject(r.caseRunner.hrpRunner.t, parser, resp)
 	if err != nil {
 		err = errors.Wrap(err, "init ResponseObject error")
 		return
 	}
 
 	stepResult.Elapsed = time.Since(start).Milliseconds()
-	if r.HTTPStatOn() {
+	if r.caseRunner.hrpRunner.httpStatOn {
 		// resp.Body has been ReadAll
 		httpStat.Finish()
 		stepResult.HttpStat = httpStat.Durations()
@@ -422,12 +435,18 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 
 	// add response object to step variables, could be used in teardown hooks
 	stepVariables["hrp_step_response"] = respObj.respObjMeta
+	stepVariables["response"] = respObj.respObjMeta
 
 	// deal with teardown hooks
 	for _, teardownHook := range step.TeardownHooks {
-		_, err = parser.Parse(teardownHook, stepVariables)
+		res, err := parser.Parse(teardownHook, stepVariables)
 		if err != nil {
 			return stepResult, errors.Wrap(err, "run teardown hooks failed")
+		}
+		resMpa, ok := res.(map[string]interface{})
+		if ok {
+			stepVariables["response"] = resMpa
+			respObj.respObjMeta = resMpa
 		}
 	}
 
@@ -692,7 +711,7 @@ func (s *StepRequest) CallRefCase(tc ITestCase) *StepTestCaseWithOptionalArgs {
 	s.step.TestCase, err = tc.ToTestCase()
 	if err != nil {
 		log.Error().Err(err).Msg("failed to load testcase")
-		os.Exit(1)
+		os.Exit(code.GetErrorCode(err))
 	}
 	return &StepTestCaseWithOptionalArgs{
 		step: s.step,
@@ -705,7 +724,7 @@ func (s *StepRequest) CallRefAPI(api IAPI) *StepAPIWithOptionalArgs {
 	s.step.API, err = api.ToAPI()
 	if err != nil {
 		log.Error().Err(err).Msg("failed to load api")
-		os.Exit(1)
+		os.Exit(code.GetErrorCode(err))
 	}
 	return &StepAPIWithOptionalArgs{
 		step: s.step,
@@ -758,6 +777,22 @@ func (s *StepRequest) SetRendezvous(name string) *StepRendezvous {
 func (s *StepRequest) WebSocket() *StepWebSocket {
 	s.step.WebSocket = &WebSocketAction{}
 	return &StepWebSocket{
+		step: s.step,
+	}
+}
+
+// Android creates a new android action
+func (s *StepRequest) Android() *StepMobile {
+	s.step.Android = &MobileStep{}
+	return &StepMobile{
+		step: s.step,
+	}
+}
+
+// IOS creates a new ios action
+func (s *StepRequest) IOS() *StepMobile {
+	s.step.IOS = &MobileStep{}
+	return &StepMobile{
 		step: s.step,
 	}
 }

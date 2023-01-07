@@ -69,8 +69,9 @@ func (d *debugTalkOperation) RunDebugTalkFile() {
 	d.FilePath = d.CreateDebugTalk(fmt.Sprintf("TdebugTalk_%d_%d/", d.ID, rand.Int31n(99999999)))
 	global.DebugTalkFileLock.Lock()
 	fmt.Println("RunDebugTalkFile:", d.FilePath)
+	global.GVA_LOG.Debug("RunDebugTalkFile:" + d.FilePath)
 	if global.DebugTalkLock[d.FilePath] == nil {
-		fmt.Println("RunDebugTalkFile:创建锁")
+		global.GVA_LOG.Debug("RunDebugTalkFile:创建锁")
 		global.DebugTalkLock[d.FilePath] = &sync.Mutex{}
 	}
 	global.DebugTalkLock[d.FilePath].Lock()

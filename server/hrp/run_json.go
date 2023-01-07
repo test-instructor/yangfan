@@ -8,8 +8,10 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/test-instructor/cheetah/server/global"
 	"github.com/test-instructor/cheetah/server/hrp/internal/builtin"
+	"github.com/test-instructor/cheetah/server/hrp/internal/code"
 	"github.com/test-instructor/cheetah/server/hrp/internal/sdk"
 	"github.com/test-instructor/cheetah/server/model/interfacecase"
+	"go.uber.org/zap"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -22,19 +24,9 @@ func (r *HRPRunner) RunJsons(testcases ...ITestCase) (interfacecase.ApiReport, e
 		Action:   "hrp run",
 	}
 	// report start event
-	go func() {
-		err := sdk.SendEvent(event)
-		if err != nil {
-
-		}
-	}()
+	go sdk.SendEvent(event)
 	// report execution timing event
-	defer func(e sdk.IEvent) {
-		err := sdk.SendEvent(e)
-		if err != nil {
-
-		}
-	}(event.StartTiming("execution"))
+	defer sdk.SendEvent(event.StartTiming("execution"))
 	// record execution data to summary
 	s := newOutSummary()
 
@@ -45,32 +37,48 @@ func (r *HRPRunner) RunJsons(testcases ...ITestCase) (interfacecase.ApiReport, e
 		return interfacecase.ApiReport{}, err
 	}
 
+	var runErr error
 	// run testcase one by one
 	for _, testcase := range testCases {
-		sessionRunner, err := r.NewSessionRunner(testcase)
-
+		// each testcase has its own case runner
+		caseRunner, err := r.NewCaseRunner(testcase)
 		if err != nil {
-			log.Error().Err(err).Msg("[Run] init session runner failed")
+			log.Error().Err(err).Msg("[Run] init case runner failed")
 			return interfacecase.ApiReport{}, err
 		}
+
+		// release UI driver session
 		defer func() {
-			if sessionRunner.parser.plugin != nil {
-				sessionRunner.parser.plugin.Quit()
+			for _, client := range r.uiClients {
+				client.Driver.DeleteSession()
 			}
 		}()
 
-		for it := sessionRunner.parametersIterator; it.HasNext(); {
-			if err = sessionRunner.Start(it.Next()); err != nil {
-				log.Error().Err(err).Msg("[Run] run testcase failed")
-				return interfacecase.ApiReport{}, err
+		for it := caseRunner.parametersIterator; it.HasNext(); {
+			sessionRunner := caseRunner.NewSession()
+			err1 := sessionRunner.Start(it.Next())
+			if err1 != nil {
+				log.Error().Err(err1).Msg("[Run] run testcase failed")
+				runErr = err1
 			}
-			caseSummary := sessionRunner.GetSummary()
+			caseSummary, err2 := sessionRunner.GetSummary()
 			caseSummary.CaseID = testcase.ID
 			//for k, _ := range caseSummary.Records {
 			//	caseSummary.Records[k].ValidatorsNumber = testcase.TestSteps[k].Struct().ValidatorsNumber
 			//}
+
+			//把header、Extract导出到上一级配置（caseRunner.testCase.Config）中
+			//caseRunner.testCase.Config
 			caseSummary.Name = testcase.Name
 			s.appendCaseSummary(caseSummary)
+			if err2 != nil {
+				log.Error().Err(err2).Msg("[Run] get summary failed")
+				if err1 != nil {
+					runErr = errors.Wrap(err1, err2.Error())
+				} else {
+					runErr = err2
+				}
+			}
 		}
 	}
 	s.Time.Duration = time.Since(s.Time.StartAt).Seconds()
@@ -95,7 +103,7 @@ func (r *HRPRunner) RunJsons(testcases ...ITestCase) (interfacecase.ApiReport, e
 	global.GVA_LOG.Debug("\n" + string(sj))
 	var reportsStruct interfacecase.ApiReport
 	err = json.Unmarshal(sj, &reportsStruct)
-	return reportsStruct, nil
+	return reportsStruct, runErr
 }
 
 func tmpls(relativePath, debugTalkFileName string) string {
@@ -104,19 +112,19 @@ func tmpls(relativePath, debugTalkFileName string) string {
 
 func BuildHashicorpPyPlugin(debugTalkByte []byte, debugTalkFilePath string) {
 	log.Info().Msg("[init] prepare hashicorp python plugin")
-	//src, _ := ioutil.ReadFile(tmpls("plugin/debugtalk.py"))
 	err := ioutil.WriteFile(tmpls("debugtalk.py", debugTalkFilePath), debugTalkByte, 0o644)
 	if err != nil {
 		log.Error().Err(err).Msg("copy hashicorp python plugin failed")
-		os.Exit(1)
+		os.Exit(code.GetErrorCode(err))
 	}
 }
 
 func RemoveHashicorpPyPlugin(debugTalkFilePath string) {
 	log.Info().Msg("[teardown] remove hashicorp python plugin")
-	// on v4.1^, running case will generate .debugtalk_gen.py used by python plugin
-	os.Remove(tmpls(PluginPySourceFile, debugTalkFilePath))
-	os.Remove(tmpls(PluginPySourceGenFile, debugTalkFilePath))
+	err := os.RemoveAll(debugTalkFilePath)
+	if err != nil {
+		global.GVA_LOG.Error("删除debugTalkFilePath文件夹失败", zap.Error(err))
+	}
 }
 
 type TestCaseJson struct {
@@ -185,14 +193,14 @@ func (testCaseJson *TestCaseJson) ToTestCase() (*TestCase, error) {
 		step.ID = 0
 		if step.TestCase != nil {
 			testcaseCheetahStr, _ := json.Marshal(step.TestCase)
-			apiConfig_json, _ := json.Marshal(step.TestCase.(map[string]interface{})["Config"])
-			var tConfig TConfig
-			json.Unmarshal(apiConfig_json, &tConfig)
+			//apiConfig_json, _ := json.Marshal(step.TestCase.(map[string]interface{})["Config"])
+			//var tConfig TConfig
+			//json.Unmarshal(apiConfig_json, &tConfig)
 			tcj := &TestCaseJson{
 				JsonString:        string(testcaseCheetahStr),
 				ID:                step.ID,
 				DebugTalkFilePath: testCaseJson.GetPath(),
-				Config:            &tConfig,
+				Config:            testCaseJson.Config,
 				Name:              testCase.Name,
 			}
 			tc, _ := tcj.ToTestCase()
@@ -245,6 +253,7 @@ type JsonToCase struct {
 	ID                uint
 	DebugTalkFilePath string
 	Name              string
+	Config            *TConfig
 }
 
 func (testCaseJson *JsonToCase) GetPath() string {
@@ -269,7 +278,7 @@ func (testCaseJson *JsonToCase) ToTestCase() (ITestCase, error) {
 	testCase := &TestCase{
 		ID:     testCaseJson.ID,
 		Name:   testCaseJson.Name,
-		Config: tc.Config,
+		Config: testCaseJson.Config,
 	}
 
 	projectRootDir, err := GetProjectRootDirPath(testCaseJson.GetPath())
@@ -302,9 +311,11 @@ func (testCaseJson *JsonToCase) ToTestCase() (ITestCase, error) {
 		if step.TestCase != nil {
 			caseStr, _ := json.Marshal(step.TestCase)
 			jtc := &JsonToCase{
-				JsonString: string(caseStr),
-				ID:         testCase.ID,
-				Name:       testCase.Name,
+				JsonString:        string(caseStr),
+				ID:                testCase.ID,
+				Name:              testCase.Name,
+				DebugTalkFilePath: testCaseJson.GetPath(),
+				Config:            testCaseJson.Config,
 			}
 
 			tc, err := jtc.ToTestCase()

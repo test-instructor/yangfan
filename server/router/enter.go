@@ -15,6 +15,7 @@ type RouterGroup struct {
 	Report        interfacecase.ReportRouter
 	ApiCase       interfacecase.ApiCaseGroup
 	TimerTask     interfacecase.TimerTaskGroup
+	Performance   interfacecase.PerformanceRouterGroup
 }
 
 var RouterGroupApp = new(RouterGroup)

@@ -32,10 +32,25 @@ type ApiCaseIdReq struct {
 	CaseID uint `json:"caseID" form:"caseID"`
 }
 
+type RunningType int
+
+var (
+	RunningTypeRun       RunningType = 1
+	RunningTypeRebalance RunningType = 2
+	RunningTypeStop      RunningType = 3
+)
+
+type Operation struct {
+	Running    RunningType `json:"running"`
+	SpawnCount int64       `json:"spawnCount"`
+	SpawnRate  float64     `json:"spawnRate"`
+}
+
 type RunCaseReq struct {
-	ApiID    uint `json:"apiID" form:"apiID"`
-	ConfigID uint `json:"configID" form:"configID"`
-	CaseID   uint `json:"caseID" form:"caseID"`
-	RunType  uint `json:"run_type" form:"run_type"`
-	TaskID   uint `json:"taskID" form:"taskID"`
+	ApiID     uint      `json:"apiID" form:"apiID"`
+	ConfigID  uint      `json:"configID" form:"configID"`
+	CaseID    uint      `json:"caseID" form:"caseID"`
+	RunType   uint      `json:"run_type" form:"run_type"`
+	TaskID    uint      `json:"taskID" form:"taskID"`
+	Operation Operation `json:"operation"`
 }

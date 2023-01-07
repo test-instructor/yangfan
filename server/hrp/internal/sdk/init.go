@@ -2,13 +2,13 @@ package sdk
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/denisbrodbeck/machineid"
 	"github.com/getsentry/sentry-go"
-	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
+	uuid "github.com/satori/go.uuid"
 
+	"github.com/test-instructor/cheetah/server/hrp/internal/env"
 	"github.com/test-instructor/cheetah/server/hrp/internal/version"
 )
 
@@ -23,13 +23,12 @@ func init() {
 	// init GA client
 	clientID, err := machineid.ProtectedID("hrp")
 	if err != nil {
-		nodeUUID, _ := uuid.NewUUID()
-		clientID = nodeUUID.String()
+		clientID = uuid.NewV1().String()
 	}
 	gaClient = NewGAClient(trackingID, clientID)
 
 	// init sentry sdk
-	if os.Getenv("DISABLE_SENTRY") == "true" {
+	if env.DISABLE_SENTRY == "true" {
 		return
 	}
 	err = sentry.Init(sentry.ClientOptions{
@@ -50,7 +49,7 @@ func init() {
 }
 
 func SendEvent(e IEvent) error {
-	if os.Getenv("DISABLE_GA") == "true" {
+	if env.DISABLE_GA == "true" {
 		// do not send GA events in CI environment
 		return nil
 	}

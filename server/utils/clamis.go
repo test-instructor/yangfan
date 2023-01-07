@@ -33,6 +33,21 @@ func GetUserID(c *gin.Context) uint {
 	}
 }
 
+// GetUserIDAddress 从Gin的Context中获取从jwt解析出来的用户ID并返回地址
+func GetUserIDAddress(c *gin.Context) *uint {
+	var id uint
+	if claims, exists := c.Get("claims"); !exists {
+		if cl, err := GetClaims(c); err != nil {
+			return &id
+		} else {
+			return &cl.ID
+		}
+	} else {
+		waitUse := claims.(*systemReq.CustomClaims)
+		return &waitUse.ID
+	}
+}
+
 // GetProjectID 从Gin的Context中获取从jwt解析出来的用户ID
 func GetUserProject(c *gin.Context) uint {
 	var userProject system.Project

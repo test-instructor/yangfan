@@ -66,6 +66,13 @@ func RegisterTables(db *gorm.DB) {
 		interfacecase.ApiCase{},
 		interfacecase.ApiCaseRelationship{},
 
+		// 性能测试模块
+		interfacecase.Performance{},
+		interfacecase.PerformanceReport{},
+		interfacecase.PerformanceReportDetail{},
+		interfacecase.PerformanceRelationship{},
+		interfacecase.PerformanceReportTotalStats{},
+
 		//测试报告模块
 		interfacecase.ApiReport{},
 		interfacecase.ApiReportStat{},
@@ -74,7 +81,8 @@ func RegisterTables(db *gorm.DB) {
 		interfacecase.ApiReportStatTeststeps{},
 		interfacecase.ApiReportDetails{},
 		interfacecase.ApiReportDetailsRecords{},
-		interfacecase.ApiReportDetailsRecordsHttpstat{},
+		interfacecase.ApiReportDetailsRecordsData{},
+		interfacecase.ApiReportDetailsRecordsDataHttpstat{},
 
 		//定时任务
 		interfacecase.ApiTimerTask{},

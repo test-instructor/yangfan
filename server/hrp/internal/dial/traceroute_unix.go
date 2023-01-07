@@ -1,5 +1,4 @@
 //go:build darwin || linux
-// +build darwin linux
 
 package dial
 
@@ -8,7 +7,6 @@ import (
 	"fmt"
 	"net/url"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -18,7 +16,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
-	"server/hrp/internal/builtin"
+	"github.com/test-instructor/cheetah/server/hrp/internal/builtin"
+	"github.com/test-instructor/cheetah/server/hrp/internal/myexec"
 )
 
 var (
@@ -52,7 +51,7 @@ func DoTraceRoute(traceRouteOptions *TraceRouteOptions, args []string) (err erro
 		traceRouteTarget = strings.Split(parsedURL.Host, ":")[0]
 	}
 
-	cmd := exec.Command("traceroute", "-m", strconv.Itoa(traceRouteOptions.MaxTTL),
+	cmd := myexec.Command("traceroute", "-m", strconv.Itoa(traceRouteOptions.MaxTTL),
 		"-q", strconv.Itoa(traceRouteOptions.Queries), traceRouteTarget)
 	stdout, _ := cmd.StdoutPipe()
 

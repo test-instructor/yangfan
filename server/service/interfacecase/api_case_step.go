@@ -35,7 +35,7 @@ func (apicaseService *TestCaseService) DeleteTestCaseStepByIds(ids request.IdsRe
 // UpdateTestCase 更新TestCase记录
 
 func (apicaseService *TestCaseService) UpdateTestCaseStep(apicase interfacecase.ApiCaseStep) (err error) {
-	var oId getOperationId
+	var oId interfacecase.Operator
 	global.GVA_DB.Model(interfacecase.ApiCaseStep{}).Where("id = ?", apicase.ID).First(&oId)
 	apicase.CreatedByID = oId.CreatedByID
 	apicase.TStep = []interfacecase.ApiStep{}
@@ -134,7 +134,7 @@ func (apicaseService *TestCaseService) GetTestCaseStepInfoList(info interfacecas
 	if info.ApiMenuID > 0 {
 		db.Preload("ApiMenu").Joins("ApiMenu").Where("ApiMenu.ID = ?", info.ApiMenuID)
 	}
-
+	db.Where("type = ?", info.ApiType)
 	var apicases []interfacecase.ApiCaseStep
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.Name != "" {

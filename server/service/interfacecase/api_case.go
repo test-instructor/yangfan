@@ -36,7 +36,7 @@ func (testCaseService *ApiCaseService) DeleteApiCaseByIds(ids request.IdsReq) (e
 // UpdateApiCase 更新ApiCase记录
 
 func (testCaseService *ApiCaseService) UpdateApiCase(testCase interfacecase.ApiCase) (err error) {
-	var oId getOperationId
+	var oId interfacecase.Operator
 	global.GVA_DB.Model(interfacecase.ApiCase{}).Where("id = ?", testCase.ID).First(&oId)
 	testCase.CreatedByID = oId.CreatedByID
 	testCase.ApiCaseStep = []interfacecase.ApiCaseStep{}
@@ -97,9 +97,10 @@ func (testCaseService *ApiCaseService) SortApisCase(testCase []interfacecase.Api
 	return err
 }
 
-func (testCaseService *ApiCaseService) FindApiTestCase(id uint) (err error, apiCaseRelationship []interfacecase.ApiCaseRelationship) {
+func (testCaseService *ApiCaseService) FindApiTestCase(id uint) (err error, apiCaseRelationship []interfacecase.ApiCaseRelationship, name string) {
 	apiCase := interfacecase.ApiCase{GVA_MODEL: global.GVA_MODEL{ID: id}}
 	global.GVA_DB.First(&apiCase)
+	name = apiCase.Name
 	global.GVA_DB.Model(interfacecase.ApiCaseRelationship{}).
 		Where("api_case_id = ?", id).
 		Preload("ApiCaseStep").

@@ -7,7 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 
-	"server/hrp/internal/dial"
+	"github.com/test-instructor/cheetah/server/hrp/internal/dial"
 )
 
 var (

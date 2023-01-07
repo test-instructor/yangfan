@@ -6,32 +6,43 @@ import (
 	"github.com/test-instructor/cheetah/server/model/system"
 )
 
+type ApiStepType string
+
+var (
+	ApiStepTypeTransaction      ApiStepType = "Transaction"
+	ApiStepTypeTransactionStart ApiStepType = "TransactionStart"
+	ApiStepTypeTransactionEnd   ApiStepType = "TransactionEnd"
+	ApiStepTypeRendezvous       ApiStepType = "Rendezvous"
+)
+
 // ApiCaseStep 结构体
 // 如果含有time.Time 请自行import time包
 type ApiCaseStep struct {
 	global.GVA_MODEL
-	Name      string    `json:"name" form:"name" gorm:"column:name;comment:;"`
-	FrontCase *bool     `json:"front_case" orm:"front_case"`
+	Operator
+	Name      string    `json:"name" form:"name" gorm:"column:name;comment:套件名称;"`
+	FrontCase *bool     `json:"front_case" form:"front_case" gorm:"comment:允许设置为前置用例;"`
 	TStep     []ApiStep `json:"TStep" form:"TStep" gorm:"many2many:ApiCaseStepRelationship;"`
-	ApiCase   []ApiCase `json:"case" form:"case" gorm:"many2many:ApiCaseRelationship;"`
+	//Performance []Performance `json:"performance" form:"performance" gorm:"many2many:PerformanceRelationship;"`
+	ApiCase []ApiCase `json:"case" form:"case" gorm:"many2many:ApiCaseRelationship;"`
 	//RunConfig   *ApiConfig     `json:"runConfig" form:"runConfig"`
-	RunConfigID uint           `json:"RunConfigID" form:"RunConfigID"`
-	ProjectID   uint           `json:"-"`
-	Project     system.Project `json:"-"`
-	ApiMenu     ApiMenu        `json:"-"`
-	ApiMenuID   uint           `json:"-"`
-	CreatedBy   system.SysUser `json:"-"`
-	CreatedByID uint           `json:"-"`
-	UpdateBy    system.SysUser `json:"-"`
-	UpdateByID  uint           `json:"-"`
-	DeleteBy    system.SysUser `json:"-"`
-	DeleteByID  uint           `json:"-"`
+	RunConfigID   uint           `json:"RunConfigID" form:"RunConfigID" gorm:"comment:运行配置;"`
+	RunConfigName *string        `json:"RunConfigName" form:"RunConfigName" gorm:"comment:运行配置名称;"`
+	ProjectID     uint           `json:"-" gorm:"comment:所属项目;"`
+	Project       system.Project `json:"-"`
+	ApiMenu       ApiMenu        `json:"-"`
+	ApiMenuID     uint           `json:"-" gorm:"comment:所属菜单;"`
+	Type          ApiType        `json:"type" form:"type" gorm:"column:type;comment:接口类型"`
+	ApiStepType   *ApiStepType   `json:"api_step_type" gorm:"column:api_step_type;comment:性能测试step类型"`
 }
 
 type HrpCaseStep struct {
-	ID       uint
-	Name     string
-	TestCase HrpTestCase `json:"testcase,omitempty" yaml:"testcase,omitempty"`
+	ID          uint
+	Name        string
+	TestCase    interface{}         `json:"testcase,omitempty" yaml:"testcase,omitempty"`
+	Transaction *ApiStepTransaction `json:"transaction,omitempty" yaml:"transaction,omitempty;comment:事务"`
+	Rendezvous  *ApiStepRendezvous  `json:"rendezvous,omitempty" yaml:"rendezvous,omitempty;comment:集合点"`
+	ThinkTime   *ApiStepThinkTime   `json:"think_time,omitempty" yaml:"think_time,omitempty;comment:思考时间"`
 }
 
 type HrpTestCase struct {
@@ -45,5 +56,5 @@ type HrpCase struct {
 	ID        uint
 	Name      string
 	Confing   ApiConfig     `json:"config" form:"config"`
-	TestSteps []HrpCaseStep `json:"teststeps,omitempty" yaml:"teststeps,omitempty"`
+	TestSteps []interface{} `json:"teststeps,omitempty" yaml:"teststeps,omitempty"`
 }
