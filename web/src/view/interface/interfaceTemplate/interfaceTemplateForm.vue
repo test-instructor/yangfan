@@ -250,12 +250,12 @@ const formLabelAlign = reactive({
 // eslint-disable-next-line no-unused-vars
 // const httpOptions = await getDict('method')
 
-const httpOptions = []
+const httpOptions = ref([])
 
 const httpOption = async () => {
   const res = await getDict('method')
   res && res.forEach(item => {
-    httpOptions.push(item)
+    httpOptions.value.push(item)
   })
 }
 httpOption()
