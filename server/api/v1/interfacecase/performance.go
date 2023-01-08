@@ -1,0 +1,199 @@
+package interfacecase
+
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/test-instructor/cheetah/server/global"
+	"github.com/test-instructor/cheetah/server/model/common/response"
+	"github.com/test-instructor/cheetah/server/model/interfacecase"
+	"github.com/test-instructor/cheetah/server/model/interfacecase/request"
+	interfacecaseReq "github.com/test-instructor/cheetah/server/model/interfacecase/request"
+	"github.com/test-instructor/cheetah/server/service"
+	"github.com/test-instructor/cheetah/server/utils"
+	"go.uber.org/zap"
+)
+
+type PerformanceApi struct {
+}
+
+var performanceService = service.ServiceGroupApp.InterfacecaseServiceGroup.PerformanceService
+
+func (apiCase *PerformanceApi) CreatePerformance(c *gin.Context) {
+	var testCase interfacecase.Performance
+	_ = c.ShouldBindJSON(&testCase)
+	testCase.ProjectID = utils.GetUserProject(c)
+	testCase.CreatedByID = utils.GetUserIDAddress(c)
+	if err := performanceService.CreatePerformance(testCase); err != nil {
+		global.GVA_LOG.Error("创建失败!", zap.Error(err))
+		response.FailWithMessage("创建失败", c)
+	} else {
+		response.OkWithMessage("创建成功", c)
+	}
+}
+
+func (apiCase *PerformanceApi) GetPerformanceList(c *gin.Context) {
+	var pageInfo request.PerformancekSearch
+	_ = c.ShouldBindQuery(&pageInfo)
+	pageInfo.ProjectID = utils.GetUserProject(c)
+
+	if err, list, total := performanceService.GetPerformanceList(pageInfo); err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithDetailed(response.PageResult{
+			List:     list,
+			Total:    total,
+			Page:     pageInfo.Page,
+			PageSize: pageInfo.PageSize,
+		}, "获取成功", c)
+	}
+}
+
+func (apiCase *PerformanceApi) DeletePerformance(c *gin.Context) {
+	var testCase interfacecase.Performance
+	_ = c.ShouldBindJSON(&testCase)
+	testCase.ProjectID = utils.GetUserProject(c)
+	testCase.DeleteByID = utils.GetUserIDAddress(c)
+	if err := performanceService.DeletePerformance(testCase); err != nil {
+		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		response.FailWithMessage("删除失败", c)
+	} else {
+		response.OkWithMessage("删除成功", c)
+	}
+}
+
+func (apiCase *PerformanceApi) UpdatePerformance(c *gin.Context) {
+	var testCase interfacecase.Performance
+	_ = c.ShouldBindJSON(&testCase)
+	testCase.ProjectID = utils.GetUserProject(c)
+	testCase.UpdateByID = utils.GetUserIDAddress(c)
+	if err := performanceService.UpdatePerformance(testCase); err != nil {
+		global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		response.FailWithMessage("更新失败", c)
+	} else {
+		response.OkWithMessage("更新成功", c)
+	}
+}
+
+func (apiCase *PerformanceApi) SortPerformanceCase(c *gin.Context) {
+	var testCase []interfacecase.PerformanceRelationship
+	_ = c.ShouldBindJSON(&testCase)
+	if err := performanceService.SortPerformanceCase(testCase); err != nil {
+		global.GVA_LOG.Error("排序失败!", zap.Error(err))
+		response.FailWithMessage("排序失败", c)
+	} else {
+		response.OkWithMessage("排序成功", c)
+	}
+}
+
+type addPerformanceReq struct {
+	PerformanceID uint   `json:"task_id"`
+	CaseID        []uint `json:"case_id"`
+}
+
+func (apiCase *PerformanceApi) AddPerformanceCase(c *gin.Context) {
+	var testCase addPerformanceReq
+	_ = c.ShouldBindJSON(&testCase)
+	if err := performanceService.AddPerformanceCase(testCase.PerformanceID, testCase.CaseID); err != nil {
+		global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		response.FailWithMessage("更新失败", c)
+	} else {
+		response.OkWithMessage("更新成功", c)
+	}
+}
+
+type Operation struct {
+	ApiStep interfacecase.ApiStep `json:"api_step"`
+	Pid     uint                  `json:"pid"`
+}
+
+func (apiCase *PerformanceApi) AddOperation(c *gin.Context) {
+	var testCase Operation
+	_ = c.ShouldBindJSON(&testCase)
+	testCase.ApiStep.ProjectID = utils.GetUserProject(c)
+	testCase.ApiStep.UpdateByID = utils.GetUserIDAddress(c)
+	if err := performanceService.AddOperation(testCase.ApiStep, testCase.Pid); err != nil {
+		global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		response.FailWithMessage("更新失败", c)
+	} else {
+		response.OkWithMessage("更新成功", c)
+	}
+}
+
+func (apiCase *PerformanceApi) DelPerformanceCase(c *gin.Context) {
+	var testCase interfacecase.PerformanceRelationship
+	_ = c.ShouldBindJSON(&testCase)
+	if err := performanceService.DelPerformanceCase(testCase); err != nil {
+		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		response.FailWithMessage("删除失败", c)
+	} else {
+		response.OkWithMessage("删除成功", c)
+	}
+}
+
+func (apiCase *PerformanceApi) FindPerformance(c *gin.Context) {
+	var testCase interfacecase.Performance
+	_ = c.ShouldBindQuery(&testCase)
+	testCase.ProjectID = utils.GetUserProject(c)
+	testCase.CreatedByID = utils.GetUserIDAddress(c)
+	if err, reapicase := performanceService.FindPerformance(testCase.ID); err != nil {
+		global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		response.FailWithMessage("查询失败", c)
+	} else {
+		response.OkWithData(gin.H{"reapicase": reapicase}, c)
+	}
+}
+
+func (apiCase *PerformanceApi) FindPerformanceCase(c *gin.Context) {
+	var testCase interfacecase.Performance
+	_ = c.ShouldBindQuery(&testCase)
+	testCase.ProjectID = utils.GetUserProject(c)
+	testCase.CreatedByID = utils.GetUserIDAddress(c)
+	if err, reapicase, name := performanceService.FindPerformanceCase(testCase.ID); err != nil {
+		global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		response.FailWithMessage("查询失败", c)
+	} else {
+		response.OkWithData(gin.H{"reapicase": reapicase, "name": name}, c)
+	}
+}
+
+func (apiCase *PerformanceApi) FindPerformanceStep(c *gin.Context) {
+	var testCase interfacecase.ApiCaseStep
+	_ = c.ShouldBindQuery(&testCase)
+	testCase.ProjectID = utils.GetUserProject(c)
+	testCase.CreatedByID = utils.GetUserIDAddress(c)
+	if err, reapicase := performanceService.FindPerformanceStep(testCase.ID); err != nil {
+		global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		response.FailWithMessage("查询失败", c)
+	} else {
+		response.OkWithData(gin.H{"reapicase": reapicase}, c)
+	}
+}
+
+func (apiCase *PerformanceApi) GetReportList(c *gin.Context) {
+	var pageInfo interfacecaseReq.PReportSearch
+	_ = c.ShouldBindQuery(&pageInfo)
+	pageInfo.ProjectID = utils.GetUserProject(c)
+	if err, list, total := performanceService.GetReportList(pageInfo); err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithDetailed(response.PageResult{
+			List:     list,
+			Total:    total,
+			Page:     pageInfo.Page,
+			PageSize: pageInfo.PageSize,
+		}, "获取成功", c)
+	}
+}
+
+func (acApi *PerformanceApi) FindReport(c *gin.Context) {
+	var pReport interfacecaseReq.PReportDetail
+	_ = c.ShouldBindQuery(&pReport)
+
+	if err, reapicase := performanceService.FindReport(pReport); err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithData(gin.H{"reapicase": reapicase}, c)
+	}
+}
