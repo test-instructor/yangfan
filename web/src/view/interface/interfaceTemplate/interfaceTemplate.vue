@@ -348,7 +348,7 @@ const deleteInterfaceTemplateFunc = async (row) => {
 const interfaceTempleFormVisible = ref(false)
 const dialogTitle = ref("")
 const heightDiv = ref()
-heightDiv.value = window.screen.height - 480
+heightDiv.value = (window.screen.height - 480) > 600?600:window.screen.height - 480
 
 // 打开弹窗
 const openDialog = () => {

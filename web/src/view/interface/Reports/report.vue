@@ -47,7 +47,22 @@
             <a-tag :key="runType(scope.row.type)[1]" :color="runType(scope.row.type)[1]" effect="plain">{{ runType(scope.row.type)[0] }}</a-tag>
           </template>
         </el-table-column>
-        <el-table-column align="left" label="报告名称" prop="name" width="200"/>
+        <el-table-column align="left" label="报告名称" prop="name" width="260"/>
+        <el-table-column align="left" label="用例总数" width="100">
+          <template #default="scope">
+            <el-tag>{{ scope.row.stat?scope.row.stat.testcases.total:"-" }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column align="left" label="成功用例" width="100">
+          <template #default="scope">
+            <el-tag  type="success" >{{ scope.row.stat?scope.row.stat.testcases.success:"-" }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column align="left" label="失败用例" width="100">
+          <template #default="scope">
+            <el-tag  type="danger" >{{ scope.row.stat?scope.row.stat.testcases.fail:"-" }}</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column align="left" label="运行时长/秒" width="120">
           <template #default="scope">
 <!--            {{ scope.row.time.duration?Number(scope.row.time.duration).toFixed(2):0 }}-->
@@ -180,6 +195,9 @@ const caseType = (t) => {
   }
   if (t===5){
     return ["性能测试", "pinkpurple"]
+  }
+  if (t===7){
+    return ["任务标签", "gold"]
   }
   return ["定时任务"]
 }

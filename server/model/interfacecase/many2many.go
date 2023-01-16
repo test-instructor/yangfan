@@ -36,7 +36,7 @@ type PerformanceRelationship struct {
 type ApiTimerTaskRelationship struct {
 	global.GVA_MODEL
 	ApiTimerTask   ApiTimerTask
-	ApiTimerTaskId uint `gorm:"comment:性能任务"`
+	ApiTimerTaskId uint `gorm:"comment:定时任务"`
 	ApiCase        ApiCase
 	ApiCaseId      uint `gorm:"comment:测试用例"`
 	Sort           uint `gorm:"comment:排序"`

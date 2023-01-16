@@ -35,10 +35,38 @@ func (taskService *TimerTaskService) DeleteTimerTaskByIds(ids request.IdsReq) (e
 	return err
 }
 
+func (taskService *TimerTaskService) setTaskTag(ids []uint, taskID uint) (err error) {
+	if len(ids) == 0 {
+		return nil
+	}
+	return global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+		err = tx.Delete(&[]interfacecase.ApiTimerTaskTagRelationship{},
+			"api_timer_task_id=?", taskID).Error
+		if err != nil {
+			return err
+		}
+		var taskTags []interfacecase.ApiTimerTaskTagRelationship
+		for _, v := range ids {
+			tags := interfacecase.ApiTimerTaskTagRelationship{
+				ApiTimerTaskId:    taskID,
+				ApiTimerTaskTagId: v,
+			}
+			taskTags = append(taskTags, tags)
+		}
+		err = tx.Create(&taskTags).Error
+		return err
+	})
+}
+
 // UpdateTimerTask 更新TimerTask记录
 
 func (taskService *TimerTaskService) UpdateTimerTask(task interfacecase.ApiTimerTask) (err error) {
+
 	var oId interfacecase.Operator
+	err = taskService.setTaskTag(task.TagIds, task.ID)
+	if err != nil {
+		return
+	}
 	global.GVA_DB.Model(interfacecase.ApiTimerTask{}).Where("id = ?", task.ID).First(&oId)
 	task.CreatedByID = oId.CreatedByID
 	task.TestCase = []*interfacecase.ApiCase{}
@@ -171,7 +199,7 @@ func (taskService *TimerTaskService) SetTaskCase(id uint, caseIds []uint) (err e
 func (taskService *TimerTaskService) GetTimerTask(id uint) (err error, task interfacecase.ApiTimerTask) {
 	err = global.GVA_DB.Preload("Project").
 		Preload("RunConfig").
-		Preload("TestCase").
+		Preload("ApiTimerTaskTag").
 		Where("id = ?", id).
 		First(&task).Error
 	return
@@ -198,4 +226,39 @@ func (taskService *TimerTaskService) GetTimerTaskInfoList(info interfacecaseReq.
 	}
 	err = db.Find(&tasks, projectDB(db, info.ProjectID)).Error
 	return err, tasks, total
+}
+
+func (taskService *TimerTaskService) CreateTaskTag(taskTag interfacecase.ApiTimerTaskTag) (taskTags []interfacecase.ApiTimerTaskTag, err error) {
+	err = global.GVA_DB.Save(&taskTag).Error
+	if err != nil {
+		return nil, err
+	}
+	db := global.GVA_DB.Model(&interfacecase.ApiTimerTaskTag{})
+	err = db.Find(&taskTags, projectDB(db, taskTag.ProjectID)).Error
+	if err != nil {
+		return nil, err
+	}
+	return
+}
+
+func (taskService *TimerTaskService) GetTimerTaskTagInfoList(info interfacecaseReq.TimerTaskTagSearch) (err error, list interface{}, total int64) {
+	// 创建db
+	db := global.GVA_DB.Model(&interfacecase.ApiTimerTaskTag{})
+	db.Preload("Project")
+	var tasks []interfacecase.ApiTimerTaskTag
+	// 如果有条件搜索 下方会自动创建搜索语句
+	if info.Name != "" {
+		db = db.Where("name LIKE ?", "%"+info.Name+"%")
+	}
+	err = db.Count(&total).Error
+	if err != nil {
+		return
+	}
+	err = db.Find(&tasks, projectDB(db, info.ProjectID)).Error
+	return err, tasks, total
+}
+
+func (taskService *TimerTaskService) DeleteTimerTaskTag(task interfacecase.ApiTimerTaskTag) (err error) {
+	err = global.GVA_DB.Delete(&task).Error
+	return err
 }

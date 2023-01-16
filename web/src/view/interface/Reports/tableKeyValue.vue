@@ -1,18 +1,26 @@
 <template>
-  <div>
+  <div style="padding: 2px">
     <el-table
         border
         v-show="isTable"
         :data="tableDatas"
-        style="padding: 5px"
-        :row-style="{height:'10px'}"
     >
       <el-table-column
-          width="148"
+          width="180"
           align="center"
           prop="key"
           label="key"
       >
+      </el-table-column>
+      <el-table-column
+          width="80"
+          align="center"
+          prop="key"
+          label="操作"
+      >
+        <template v-slot="scope">
+          <el-button type="text" @click="copy(scope.row)">复制</el-button>
+        </template>
       </el-table-column>
       <el-table-column
           align="center"
@@ -56,6 +64,12 @@ const tableKeyToValue = async (data) => {
 const initData = () => {
   tableKeyToValue(props.tableData)
 }
+
+const copy = (row) => {
+  let last=JSON.stringify(row)
+  navigator.clipboard.writeText(last);
+}
+
 initData()
 
 </script>

@@ -25,6 +25,8 @@
             </el-button>
           </template>
         </el-popover>
+        <el-button icon="plus" size="mini" type="primary" @click="openDialogTag">标签管理</el-button>
+        <el-button icon="plus" size="mini" type="primary" @click="openDialogTagRun">运行标签</el-button>
       </div>
       <el-table
           ref="multipleTable"
@@ -35,9 +37,6 @@
           @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55"/>
-<!--        <el-table-column align="left" label="日期" width="180">-->
-<!--          <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>-->
-<!--        </el-table-column>-->
         <el-table-column align="left" label="任务名称" prop="name" width="240"/>
         <el-table-column align="left" label="时间配置" prop="runTime" width="120"/>
         <el-table-column align="left" label="下次执行时间" width="180">
@@ -107,6 +106,17 @@
           <el-switch v-model="formData.status" active-color="#13ce66" active-text="启用" clearable
                      inactive-color="#ff4949" inactive-text="禁用"></el-switch>
         </el-form-item>
+        <el-form-item label="运行标签" prop="tagId">
+          <el-cascader
+              v-if="dialogFormVisible"
+              v-model="tagIds"
+              :clearable="false"
+              :options="tagTableOption"
+              :props="{ multiple:true,checkStrictly: true,label:'name',value:'ID',disabled:'disabled',emitPath:false}"
+              :show-all-levels="false"
+              style="width:100%"
+          />
+        </el-form-item>
         <el-form-item label="备注:">
           <el-input v-model="formData.describe" clearable placeholder="请输入"/>
         </el-form-item>
@@ -115,6 +125,52 @@
         <div class="dialog-footer">
           <el-button size="small" @click="closeDialog">取 消</el-button>
           <el-button size="small" type="primary" @click="enterDialog">确 定</el-button>
+        </div>
+      </template>
+    </el-dialog>
+    <el-dialog
+        v-model="tagDialog"
+        :before-close="closeDialogTag"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        title="标签管理"
+    >
+      <timer-task-tag></timer-task-tag>
+    </el-dialog>
+    <el-dialog
+        width="350px"
+        v-model="tagDialogRun"
+        :before-close="closeDialogTagRung"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        title="标签管理"
+        center
+    >
+      <template #footer>
+        <el-form label-position="right" label-width="80px">
+          <el-form-item label="运行标签:">
+            <el-select v-model="runTagId" class="m-2" placeholder="请选择运行标签" size="large">
+              <el-option
+                  v-for="item in tagTableOption"
+                  :key="item.ID"
+                  :label="item.name"
+                  :value="item.ID"
+              />
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <div class="dialog-footer">
+          <el-button size="small" @click="closeDialogTagRung">取 消</el-button>
+          <el-popconfirm
+              confirm-button-text="确认运行"
+              cancel-button-text="取消运行"
+              title="是否进入后台运行？"
+              @confirm="runDialog"
+          >
+            <template #reference>
+              <el-button type="primary">后台运行</el-button>
+            </template>
+          </el-popconfirm>
         </div>
       </template>
     </el-dialog>
@@ -135,7 +191,8 @@ import {
   updateTimerTask,
   findTimerTask,
   getTimerTaskList,
-  setTaskCase
+  setTaskCase,
+  getTimerTaskTagList,
 } from '@/api/timerTask'
 
 // 全量引入格式化工具 请按需保留
@@ -147,6 +204,7 @@ import timerTaskCron from '@/view/interface/timerTask/timerTaskCron.vue'
 import {getApiConfigList} from "@/api/apiConfig";
 import {runTimerTask} from "@/api/runTestCase";
 import {useRouter} from "vue-router";
+import TimerTaskTag from "@/view/interface/timerTask/timerTaskTag.vue";
 
 const router = useRouter()
 
@@ -354,11 +412,16 @@ const runCase = async (row) => {
 
 // 行为控制标记（弹窗内部需要增还是改）
 const type = ref('')
-
+const tagDialog = ref(false)
+const tagDialogRun = ref(false)
+const tagIds = ref([])
+const runTagId = ref()
 // 更新行
 const updateTimerTaskFunc = async (row) => {
+  tagIds.value = []
   const res = await findTimerTask({ID: row.ID})
-  getConfigData()
+  await getConfigData()
+  await getTagData()
   creatCron.value = true
   // configID.value = configData.value.config.ID
   type.value = 'update'
@@ -366,6 +429,14 @@ const updateTimerTaskFunc = async (row) => {
     formData.value = res.data.retask
     configID.value = formData.value.config.ID
     dialogFormVisible.value = true
+    console.log("res.data.retask", res.data.retask)
+    res.data.retask.apiTimerTaskTag.forEach((item)=>{
+      console.log("tag", item)
+      tagIds.value.push(item.ID)
+    })
+    console.log("tagIds", tagIds.value)
+    formData.value.apiTimerTaskTag = []
+    formData.value.tagIds = tagIds.value
   }
 }
 
@@ -390,9 +461,48 @@ const dialogFormVisible = ref(false)
 // 打开弹窗
 const openDialog = () => {
   getConfigData()
+  getTagData()
   type.value = 'create'
   creatCron.value = true
   dialogFormVisible.value = true
+}
+
+const tagTableOption = ref([])
+const tagTableData = ref([])
+const getTagData = async () => {
+  tagTableOption.value = []
+  const tables = await getTimerTaskTagList()
+  tagTableData.value = tables.data.list
+  tagTableData.value &&
+  tagTableData.value.forEach(item => {
+    const option = {
+      ID: item.ID,
+      name: item.name,
+    }
+    tagTableOption.value.push(option)
+  })
+  console.log("tagTableOption", tagTableOption)
+}
+
+const openDialogTag = () => {
+  tagDialog.value = true
+}
+
+const openDialogTagRun = async () => {
+  tagDialogRun.value = true
+
+  console.log("tagTableOption")
+  await getTagData()
+  console.log("tagTableOption", tagTableOption.value)
+}
+
+const closeDialogTag = () => {
+  tagDialog.value = false
+}
+
+const closeDialogTagRung = () => {
+  tagDialogRun.value = false
+  runTagId.value = ""
 }
 
 // 关闭弹窗
@@ -411,6 +521,18 @@ const closeDialog = () => {
   creatCron.value = false
 }
 // 弹窗确定
+const runDialog = async () => {
+  console.log("runTagId", runTagId.value)
+  let data = {tagID: runTagId.value}
+  const res = await runTimerTask(data)
+  if (res.code === 0) {
+    ElMessage({
+      type: 'success',
+      message: '运行成功'
+    })
+  }
+}
+
 const enterDialog = async () => {
   if (formData.value.name===''){
     ElMessage({
@@ -428,6 +550,7 @@ const enterDialog = async () => {
   }
   let res
   formData.value.TestCase = []
+  formData.value.tagIds = tagIds
   switch (type.value) {
     case 'create':
       res = await createTimerTask(formData.value)

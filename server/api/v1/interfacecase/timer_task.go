@@ -246,3 +246,45 @@ func (taskApi *TimerTaskApi) GetTimerTaskList(c *gin.Context) {
 		}, "获取成功", c)
 	}
 }
+
+func (taskApi *TimerTaskApi) CreateTaskTag(c *gin.Context) {
+	var taskTag interfacecase.ApiTimerTaskTag
+	_ = c.ShouldBindJSON(&taskTag)
+	taskTag.ProjectID = utils.GetUserProject(c)
+	taskTag.CreatedByID = utils.GetUserIDAddress(c)
+	caseApiDetail, err := taskService.CreateTaskTag(taskTag)
+	if err != nil {
+		global.GVA_LOG.Error("标签添加失败!", zap.Error(err))
+		response.FailWithMessage("标签添加失败", c)
+	} else {
+		response.OkWithDetailed(caseApiDetail, "标签添加成功", c)
+	}
+}
+
+func (taskApi *TimerTaskApi) DeleteTimerTaskTag(c *gin.Context) {
+	var taskTag interfacecase.ApiTimerTaskTag
+	_ = c.ShouldBindJSON(&taskTag)
+	taskTag.ProjectID = utils.GetUserProject(c)
+	taskTag.DeleteByID = utils.GetUserIDAddress(c)
+	if err := taskService.DeleteTimerTaskTag(taskTag); err != nil {
+		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		response.FailWithMessage("删除失败", c)
+	} else {
+		response.OkWithMessage("删除成功", c)
+	}
+}
+
+func (taskApi *TimerTaskApi) GetTimerTaskTagsList(c *gin.Context) {
+	var pageInfo interfacecaseReq.TimerTaskTagSearch
+	_ = c.ShouldBindQuery(&pageInfo)
+	pageInfo.ProjectID = utils.GetUserProject(c)
+	if err, list, total := taskService.GetTimerTaskTagInfoList(pageInfo); err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithDetailed(response.PageResult{
+			List:  list,
+			Total: total,
+		}, "获取成功", c)
+	}
+}

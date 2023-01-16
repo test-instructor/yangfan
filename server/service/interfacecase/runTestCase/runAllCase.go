@@ -50,6 +50,12 @@ func RunTimerTask(runCaseReq request.RunCaseReq, runType interfacecase.RunType) 
 	return report, nil
 }
 
+func RunTimerTag(runCaseReq request.RunCaseReq, runType interfacecase.RunType) (reports *interfacecase.ApiReport, err error) {
+	api := NewRunTag(runCaseReq, runType)
+	report, err := RunTestCase(api)
+	return report, nil
+}
+
 func RunTimerTaskBack(taskID uint) func() {
 	return func() {
 		var runCaseReq request.RunCaseReq

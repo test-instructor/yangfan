@@ -8,9 +8,9 @@
             :cell-style="{ textAlign: 'center' }"
             :show-header="false"
         >
-          <el-table-column property="label" label="label" width="120"/>
+          <el-table-column property="label" label="label" width="100"/>
 
-          <el-table-column>
+          <el-table-column width="230">
             <template  #default="scope">
                 <a-table
                     :columns="columns"
@@ -23,8 +23,8 @@
                     :cell="true"
                 >
                   <template #columns>
-                    <a-table-column title="label" data-index="label" align="center"></a-table-column>
-                    <a-table-column title="name" align="center">
+                    <a-table-column title="label" data-index="label" align="center" width="120"></a-table-column>
+                    <a-table-column title="name" align="center" width="80">
                       <template #cell="{ record }">
                         <el-tag v-if="record.str==='fail'" type="danger" :effect="record.name===0?'':'dark'">{{ record.name }}</el-tag>
                         <el-tag v-if="record.str==='success'" type="success" >{{ record.name }}</el-tag>
@@ -44,7 +44,7 @@
       </div>
 
     </div>
-    <div style="width:960px;margin-left:20px;">
+    <div style="width:1010px;margin-left:20px;">
       <el-table
           ref="reportDataId"
           :data="reportData.details"
@@ -55,7 +55,7 @@
             <el-tag :type="scope.row.success?'success':'danger'" effect="dark">{{ scope.row.success ? '成功' : '失败' }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column property="name" label="用例名称" width="320">
+        <el-table-column property="name" label="用例名称" width="390">
           <template #default="scope">
             <el-tag type="danger" v-if="setupCaseShow(scope.row)">{{ '前置套件' }}</el-tag>
             {{ scope.row.name }}
@@ -88,7 +88,7 @@
                   style="padding-left: 15px"
               >
 
-                <el-table-column width="900" label="name">
+                <el-table-column width="950" label="name">
                 <template #default="scope">
                   <div class="block" :class="`block_patch`" >
                       <span class="block-method block_method_color"
@@ -108,7 +108,6 @@
                 >
                   <template #default="scope">
                     <el-table
-                        style="width: 960px;padding-left: 20px"
                         ref="apiTableData"
                         id="apiTableData"
                         :data="scope.row.data"
@@ -116,14 +115,14 @@
                         v-if="shouStep(scope.row.data)"
                     >
                       <el-table-column
-                          width="100"
+                          width="70"
                       >
                         <template #default="scope">
                           <el-tag :type="scope.row.success?'success':'danger'" effect="dark">{{ scope.row.success ? '成功' : '失败' }}</el-tag>
                         </template>
                       </el-table-column>
                       <el-table-column
-                          min-width="550"
+                          min-width="600"
                           align="center"
                       >
                         <template #default="scope">
@@ -137,7 +136,7 @@
                           </div>
                         </template>
                       </el-table-column>
-                      <el-table-column min-width="60">
+                      <el-table-column min-width="40">
                         <template #default="scope">
                           <el-button type="text" @click="openDrawer(scope.row)">
                           <span>
@@ -162,7 +161,14 @@
       </div>
     </div>
 
-    <el-drawer v-if="drawer" v-model="drawer" :with-header="false" size="45%" title="请求详情">
+    <el-drawer
+        v-if="drawer"
+        v-model="drawer"
+        :with-header="false"
+        size="70%"
+        title="请求详情"
+        :tabindex=-1
+    >
       <div id="requestTimeEl"></div>
 
       <div
@@ -183,6 +189,7 @@
               :data="activeRow.requestData"
               v-show="requestTable"
               class="tableDetail"
+              :row-style="{height:'20px'}"
           >
             <el-table-column
                 width="120"
@@ -190,6 +197,16 @@
                 prop="key"
                 label="key"
             >
+            </el-table-column>
+            <el-table-column
+                width="80"
+                align="center"
+                prop="key"
+                label="操作"
+            >
+              <template v-slot="scope">
+                <el-button type="text" @click="copy(scope.row)">复制</el-button>
+              </template>
             </el-table-column>
             <el-table-column
                 align="center"
@@ -221,6 +238,7 @@
               border
               :data="activeRow.responseData"
               v-show="responseTable"
+              :row-style="{height:'20px'}"
           >
             <el-table-column
                 width="120"
@@ -228,6 +246,16 @@
                 prop="key"
                 label="key"
             >
+            </el-table-column>
+            <el-table-column
+                width="80"
+                align="center"
+                prop="key"
+                label="操作"
+            >
+              <template v-slot="scope">
+                <el-button type="text" @click="copy(scope.row)">复制</el-button>
+              </template>
             </el-table-column>
             <el-table-column
                 align="center"
@@ -264,6 +292,7 @@
               border
               :data="activeRow.validators"
               v-show="validatorsTable"
+              :row-style="{height:'20px'}"
           >
             <el-table-column
                 align="center"
@@ -329,6 +358,7 @@
               border
               :data="activeRow.exportVars"
               v-show="exportTable"
+              :row-style="{height:'20px'}"
           >
             <el-table-column
                 width="148"
@@ -419,6 +449,11 @@ const exportFunc = () => {
   exportTable.value = !exportTable.value
 }
 
+const copy = (row) => {
+  let last=JSON.stringify(row)
+  navigator.clipboard.writeText(last);
+}
+
 let currentInstance
 const currentIndex = ref(0);
 
@@ -428,9 +463,15 @@ let requestTimeOption;
 requestTimeOption = {
   tooltip: {
     trigger: 'axis',
+    position: function (point, params, dom, rect, size) {
+      let point0 = point[0] + 10
+      if (point[0] > 300){
+        point0 = point[0] - 175
+      }
+      return [point0, '10%']
+    },
     axisPointer: {
-      // Use axis to trigger tooltip
-      type: 'shadow' // 'shadow' as default; can also be 'line' or 'shadow'
+      type: 'shadow'
     }
   },
   legend: {},
@@ -793,13 +834,13 @@ const toggleExpand = (row) => {
 
 
 #caseDetail {
-  width: 400px;
+  width: 330px;
 }
 
 #requestTimeEl {
   height: 100px;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 40px;
+  margin-bottom: 40px;
 }
 
 .el-table__body-wrapper {

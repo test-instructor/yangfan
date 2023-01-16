@@ -10,6 +10,10 @@ type TimerTaskSearch struct {
 	request.PageInfo
 }
 
+type TimerTaskTagSearch struct {
+	interfacecase.ApiTimerTaskTag
+}
+
 type SetTimerCares struct {
 	ID      uint
 	CaseIds []uint `json:"caseIds"` // 角色ID

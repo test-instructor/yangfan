@@ -60,8 +60,8 @@ func resetReport(reports *interfacecase.ApiReport) {
 		statTestcases.Total = statTestcases.Success + statTestcases.Fail
 	}
 	*reports.Success = testcaseStatus
-	reports.Stat.TestSteps = statTeststeps
-	reports.Stat.TestCases = statTestcases
+	reports.Stat.TestSteps = &statTeststeps
+	reports.Stat.TestCases = &statTestcases
 }
 
 func (r *ReportOperation) UpdateReport(reports *interfacecase.ApiReport) {

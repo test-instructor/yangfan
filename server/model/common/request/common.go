@@ -53,4 +53,6 @@ type RunCaseReq struct {
 	RunType   uint      `json:"run_type" form:"run_type"`
 	TaskID    uint      `json:"taskID" form:"taskID"`
 	Operation Operation `json:"operation"`
+	TagID     uint      `json:"tagID" form:"TagID"`
+	ProjectID uint      `json:"-"`
 }

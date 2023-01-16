@@ -19,6 +19,7 @@
         "echarts": "5.3.2",
         "element-plus": "2.2.2",
         "highlight.js": "^10.6.0",
+        "http-server": "^14.1.1",
         "jquery": "^3.6.0",
         "jshint": "^2.13.5",
         "jsoneditor": "^9.7.4",

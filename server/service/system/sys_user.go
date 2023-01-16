@@ -174,11 +174,6 @@ func (userService *UserService) SetUserProjects(id uint, projectIds []string) (e
 		if TxErr != nil {
 			return TxErr
 		}
-		//TxErr = tx.Where("id = ?", id).First(&system.SysUser{}).Update("project_id", projectIds[0]).Error
-		//if TxErr != nil {
-		//	return TxErr
-		//}
-		// 返回 nil 提交事务
 		return nil
 	})
 }

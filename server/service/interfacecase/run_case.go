@@ -35,7 +35,14 @@ func (apicaseService *RunCaseService) RunBoomer(runCase request.RunCaseReq, runT
 }
 
 func (apicaseService *RunCaseService) RunTimerTask(runCase request.RunCaseReq, runType interfacecase.RunType) {
-	runTestCase.RunTimerTask(runCase, runType)
+	if runCase.TaskID > 0 {
+		runTestCase.RunTimerTask(runCase, runType)
+		return
+	}
+	if runCase.TagID > 0 {
+		runTestCase.RunTimerTag(runCase, runType)
+		return
+	}
 	return
 }
 

@@ -15,6 +15,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 )
 
@@ -39,48 +40,59 @@ func (r *HRPRunner) RunJsons(testcases ...ITestCase) (interfacecase.ApiReport, e
 
 	var runErr error
 	// run testcase one by one
-	for _, testcase := range testCases {
+	var wg sync.WaitGroup
+	intChan := make(chan int, 5)
+	wg.Add(len(testcases))
+	for _, testTase := range testCases {
 		// each testcase has its own case runner
-		caseRunner, err := r.NewCaseRunner(testcase)
-		if err != nil {
-			log.Error().Err(err).Msg("[Run] init case runner failed")
-			return interfacecase.ApiReport{}, err
-		}
-
-		// release UI driver session
-		defer func() {
-			for _, client := range r.uiClients {
-				client.Driver.DeleteSession()
+		go func(testcase *TestCase) {
+			defer wg.Done()
+			intChan <- 1
+			defer func() {
+				<-intChan
+			}()
+			caseRunner, err := r.NewCaseRunner(testcase)
+			if err != nil {
+				log.Error().Err(err).Msg("[Run] init case runner failed")
+				return
 			}
-		}()
 
-		for it := caseRunner.parametersIterator; it.HasNext(); {
-			sessionRunner := caseRunner.NewSession()
-			err1 := sessionRunner.Start(it.Next())
-			if err1 != nil {
-				log.Error().Err(err1).Msg("[Run] run testcase failed")
-				runErr = err1
-			}
-			caseSummary, err2 := sessionRunner.GetSummary()
-			caseSummary.CaseID = testcase.ID
-			//for k, _ := range caseSummary.Records {
-			//	caseSummary.Records[k].ValidatorsNumber = testcase.TestSteps[k].Struct().ValidatorsNumber
-			//}
+			// release UI driver session
+			defer func() {
+				for _, client := range r.uiClients {
+					client.Driver.DeleteSession()
+				}
+			}()
 
-			//把header、Extract导出到上一级配置（caseRunner.testCase.Config）中
-			//caseRunner.testCase.Config
-			caseSummary.Name = testcase.Name
-			s.appendCaseSummary(caseSummary)
-			if err2 != nil {
-				log.Error().Err(err2).Msg("[Run] get summary failed")
+			for it := caseRunner.parametersIterator; it.HasNext(); {
+				sessionRunner := caseRunner.NewSession()
+				err1 := sessionRunner.Start(it.Next())
 				if err1 != nil {
-					runErr = errors.Wrap(err1, err2.Error())
-				} else {
-					runErr = err2
+					log.Error().Err(err1).Msg("[Run] run testcase failed")
+					runErr = err1
+				}
+				caseSummary, err2 := sessionRunner.GetSummary()
+				caseSummary.CaseID = testcase.ID
+				//for k, _ := range caseSummary.Records {
+				//	caseSummary.Records[k].ValidatorsNumber = testcase.TestSteps[k].Struct().ValidatorsNumber
+				//}
+
+				//把header、Extract导出到上一级配置（caseRunner.testCase.Config）中
+				//caseRunner.testCase.Config
+				caseSummary.Name = testcase.Name
+				s.appendCaseSummary(caseSummary)
+				if err2 != nil {
+					log.Error().Err(err2).Msg("[Run] get summary failed")
+					if err1 != nil {
+						runErr = errors.Wrap(err1, err2.Error())
+					} else {
+						runErr = err2
+					}
 				}
 			}
-		}
+		}(testTase)
 	}
+	wg.Wait()
 	s.Time.Duration = time.Since(s.Time.StartAt).Seconds()
 
 	// save summary

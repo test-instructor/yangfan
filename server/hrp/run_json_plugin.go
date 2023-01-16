@@ -6,20 +6,23 @@ import (
 	"sync"
 )
 
-var cheetahPlugin = make(map[string]*funplugin.IPlugin)
-var mutex sync.Mutex
+var pluginMapRW = make(map[string]*funplugin.IPlugin)
+var pluginMutex sync.RWMutex
 
 func cheetahInitPlugin(path, venv string, logOn bool) (plugin funplugin.IPlugin, err error) {
-	plugins := cheetahPlugin[path]
+	pluginMutex.RLock()
+	plugins := pluginMapRW[path]
+	pluginMutex.RUnlock()
 	if plugins == nil {
-		mutex.Lock()
-		defer mutex.Unlock()
+		pluginMutex.Lock()
+		defer pluginMutex.Unlock()
+		plugins = pluginMapRW[path]
 		if plugins == nil {
 			plugin, err = initPlugin(path, venv, logOn)
 			if err != nil {
 				return nil, errors.Wrap(err, "init plugin failed")
 			}
-			cheetahPlugin[path] = &plugin
+			pluginMapRW[path] = &plugin
 			plugins = &plugin
 		}
 	}

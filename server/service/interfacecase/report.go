@@ -15,6 +15,7 @@ func (reportService *ReportService) GetReportList(info interfacecaseReq.ReportSe
 	// 创建db
 	db := global.GVA_DB.
 		Model(&interfacecase.ApiReport{}).
+		Preload("Stat.TestCases").
 		Preload("Time").
 		Preload("Project").Joins("Project").Where("Project.ID = ?", info.ProjectID)
 

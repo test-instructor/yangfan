@@ -17,6 +17,9 @@
 - [x] 网络性能采集：在场景化接口测试的基础上，可额外采集网络链路性能指标（DNS 解析、TCP 连接、SSL 握手、网络传输等）
 - [x] 数据驱动`parameterize`
 - [x] python 函数驱动
+- [x] python 函数驱动
+- [x] 通过标签运行定时任务(可用户发版时做全量回归)
+- [x] 定时任务并发执行，定时任务可以根据用户设置并发数，节省等待时间
 - [ ] 支持sql操作
 - [ ] 可视化数据报表
 - [ ] 数据驱动`parameterize`,页面操作
@@ -58,7 +61,7 @@
 ### nginx 配置
 ```nginx
 server {
-    listen  80;
+    listen  8080;
     server_name localhost;
 
     #charset koi8-r;

@@ -7,6 +7,7 @@ import (
 	"github.com/test-instructor/cheetah/server/model/common/response"
 	"github.com/test-instructor/cheetah/server/model/interfacecase"
 	"github.com/test-instructor/cheetah/server/service"
+	"github.com/test-instructor/cheetah/server/utils"
 	"go.uber.org/zap"
 )
 
@@ -70,6 +71,7 @@ func (runCaseApi *RunCaseApi) RunBoomer(c *gin.Context) {
 func (runCaseApi *RunCaseApi) RunTimerTask(c *gin.Context) {
 	var runApiCase request.RunCaseReq
 	_ = c.ShouldBindJSON(&runApiCase)
+	runApiCase.ProjectID = utils.GetUserProject(c)
 	go runCaseService.RunTimerTask(runApiCase, interfacecase.RunTypeRunBack)
 	response.OkWithData("运行成功", c)
 }

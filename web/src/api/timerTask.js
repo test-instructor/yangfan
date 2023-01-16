@@ -149,3 +149,27 @@ export const getTimerTaskList = (params) => {
         params
     })
 }
+
+export const getTimerTaskTagList = (params) => {
+    return service({
+        url: baseURL + '/getTimerTaskTagList',
+        method: 'get',
+        params
+    })
+}
+
+export const createTimerTaskTag = (data) => {
+    return service({
+        url: baseURL + '/createTimerTaskTag',
+        method: 'post',
+        data
+    })
+}
+
+export const deleteTimerTaskTag = (data) => {
+    return service({
+        url: baseURL + '/deleteTimerTaskTag',
+        method: 'delete',
+        data
+    })
+}

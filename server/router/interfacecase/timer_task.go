@@ -25,9 +25,13 @@ func (s *TimerTaskRouter) InitTimerTaskRouter(Router *gin.RouterGroup) {
 		taskRouter.GET("findTaskTestCase", taskApi.FindTaskTestCase)
 		taskRouter.POST("addTaskTestCase", taskApi.AddTaskTestCase)
 		taskRouter.POST("setTaskCase", taskApi.SetTaskCase)
+
+		taskRouter.POST("createTimerTaskTag", taskApi.CreateTaskTag)
+		taskRouter.DELETE("deleteTimerTaskTag", taskApi.DeleteTimerTaskTag)
 	}
 	{
-		taskRouterWithoutRecord.GET("findTimerTask", taskApi.FindTimerTask)       // 根据ID获取TimerTask
-		taskRouterWithoutRecord.GET("getTimerTaskList", taskApi.GetTimerTaskList) // 获取TimerTask列表
+		taskRouterWithoutRecord.GET("findTimerTask", taskApi.FindTimerTask)              // 根据ID获取TimerTask
+		taskRouterWithoutRecord.GET("getTimerTaskList", taskApi.GetTimerTaskList)        // 获取TimerTask列表
+		taskRouterWithoutRecord.GET("getTimerTaskTagList", taskApi.GetTimerTaskTagsList) // 获取TimerTaskTag列表
 	}
 }

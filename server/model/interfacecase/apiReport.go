@@ -17,6 +17,7 @@ var (
 	CaseTypeTask        CaseType = 4 // 定时任务运行
 	CaseTypeBoomerDebug CaseType = 5 // 性能任务调试
 	CaseTypeBoomer      CaseType = 6 // 性能任务运行
+	CaseTypeTag         CaseType = 7 // 性能任务运行
 	RunTypeDebug        RunType  = 1 // 调试模式
 	RunTypeRuning       RunType  = 2 // 立即运行
 	RunTypeRunBack      RunType  = 3 // 后台运行
@@ -52,10 +53,10 @@ type ApiReportTime struct {
 
 type ApiReportStat struct {
 	global.GVA_MODEL
-	TestCases   ApiReportStatTestcases `json:"testcases"`
-	TestCasesID uint                   `json:"-"`
-	TestSteps   ApiReportStatTeststeps `json:"teststeps"`
-	TestStepsID uint                   `json:"-"`
+	TestCases   *ApiReportStatTestcases `json:"testcases"`
+	TestCasesID uint                    `json:"-"`
+	TestSteps   *ApiReportStatTeststeps `json:"teststeps"`
+	TestStepsID uint                    `json:"-"`
 }
 
 type ApiReportStatTestcases struct {

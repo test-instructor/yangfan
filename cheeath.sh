@@ -1,5 +1,5 @@
 go version
-export WORKSPACEPATH=$PWD
+export WORKSPACEPATH=$(cd $(dirname $0);pwd)
 export CHEETAHPATH=/home/cheeath
 export SERVERPATH=$WORKSPACEPATH/server
 export WEBPATH=$WORKSPACEPATH/web
@@ -20,16 +20,29 @@ go build -o cheetah main.go
   echo '没有cheetah进程'
 }
 
-rm -rf $CHEETAHPATH
-mkdir $CHEETAHPATH
-mkdir $CHEETAHPATH/resource
+{
+  rm -rf $CHEETAHPATH/cheetah
+}||{
+  echo 'cheetah可执行文件不存在'
+}
+
+{
+  mkdir $CHEETAHPATH
+} || {
+  echo '$CHEETAHPATH 已存在'
+}
+
+{
+  mkdir $CHEETAHPATH/resource
+} || {
+  echo '$CHEETAHPATH/resource 已存在'
+}
 cp $SERVERPATH/cheetah $CHEETAHPATH/cheetah
 cp $WORKSPACEPATH/config.production.yaml $CHEETAHPATH/config.yaml
 cp -r $SERVERPATH/resource/* $CHEETAHPATH/resource/
 cd $CHEETAHPATH
 # nohup ./cheetah &
-BUILD_ID=dontKillMe
-chmod 777 cheetah
+chmod u+x cheetah
 nohup ./cheetah > cheetah.log 2>&1 &
 sleep 10
 

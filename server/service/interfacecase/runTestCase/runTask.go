@@ -29,8 +29,6 @@ type runTask struct {
 
 func (r *runTask) LoadCase() (err error) {
 	var testCaseList []interfacecase.HrpCase
-	//var apiCases interfacecase.ApiCaseStep
-	//var tcm *ApisCaseModel
 	var reportName string
 	taskCase := taskSort(r.runCaseReq.TaskID)
 
