@@ -16,6 +16,7 @@ type RouterGroup struct {
 	ApiCase       interfacecase.ApiCaseGroup
 	TimerTask     interfacecase.TimerTaskGroup
 	Performance   interfacecase.PerformanceRouterGroup
+	PyPkg         interfacecase.PyPkgRouter
 }
 
 var RouterGroupApp = new(RouterGroup)
