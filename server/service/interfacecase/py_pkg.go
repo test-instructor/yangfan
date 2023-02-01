@@ -16,8 +16,8 @@ type PyPkgService struct {
 }
 
 const (
-	PyEnvPath  = "/root/.hrp/venv/bin/python"
-	PipEnvPath = "/root/.hrp/venv/bin/pip"
+	PyEnvPath  = "$HOME/.hrp/bin/python"
+	PipEnvPath = "$HOME/.hrp/bin/pip"
 )
 
 // todo 后续考虑使用事物，避免出现安装成功，但是数据库未更新的情况
