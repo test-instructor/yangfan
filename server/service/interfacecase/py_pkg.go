@@ -16,8 +16,8 @@ type PyPkgService struct {
 }
 
 const (
-	PyEnvPath  = "/root/.hrp/venv/bin/python"
-	PipEnvPath = "/root/.hrp/venv/bin/pip"
+	PyEnvPath  = "/root/.hrp/bin/python"
+	PipEnvPath = "/root/.hrp/bin/pip"
 )
 
 // todo 后续考虑使用事物，避免出现安装成功，但是数据库未更新的情况
@@ -49,6 +49,7 @@ func (p *PyPkgService) PyPkgInstallService(pyPkg request.HrpPyPkgRequest, localP
 	// 未指定版本号时，安装最新版本
 	if len(pyPkg.Version) == 0 {
 		output, _ := exec.Command(PipEnvPath, "install", pyPkg.Name).Output()
+		global.GVA_LOG.Info("安装Python包", zap.String("output", string(output)))
 		if strings.Contains(string(output), "Successfully installed") {
 			pyPkgInfo, err := p.FindPyPkg(pyPkg.Name)
 			if err != nil {
