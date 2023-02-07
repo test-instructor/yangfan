@@ -67,22 +67,6 @@ export const updateHrpPyPkg = (data) => {
     })
 }
 
-// @Tags HrpPyPkg
-// @Summary 用id查询HrpPyPkg
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data query model.HrpPyPkg true "用id查询HrpPyPkg"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
-// @Router /PyPkg/searchHrpPyPkg [post]
-export const searchHrpPyPkg = (data,params) => {
-    return service({
-        url: baseURL + '/pyPkg/searchPyPkg',
-        method: 'post',
-        params,
-        data
-    })
-}
 
 // @Tags HrpPyPkg
 // @Summary 分页获取HrpPyPkg列表
@@ -97,5 +81,14 @@ export const getHrpPyPkgList = (params) => {
         url: baseURL + '/pyPkg/pyPkgList',
         method: 'get',
         params
+    })
+}
+
+
+export const getPyPkgVersions = (data) => {
+    return service({
+        url: baseURL + '/pyPkg/getPkgVersionList',
+        method: 'post',
+        data
     })
 }

@@ -1,21 +1,19 @@
 <template>
   <div>
-    <!--
     <div class="gva-search-box">
+      <el-form :inline="true" :model="searchInfo" class="demo-form-inline">
+        <el-form-item label="Python包名称:" style="width: 25%;">
+          <el-input v-model="searchInfo.name" :clearable="true" placeholder="请输入"/>
+        </el-form-item>
         <el-form-item>
-          <el-form-item label="包名称:" prop="name" style="margin-right: 10px;">
-            <el-input v-model="search.name" :clearable="true" placeholder="请输入"/>
-          </el-form-item>
-          <el-form-item >
-          <el-button size="small" type="primary" icon="search" @click="onSubmit" >查询</el-button>
-          <el-button size="small" icon="refresh" @click="onReset">重置</el-button>
+          <el-button icon="search" size="mini" type="primary" @click="onSubmit">搜索</el-button>
+          <el-button icon="refresh" size="mini" @click="onReset">重置</el-button>
         </el-form-item>
-        </el-form-item>
+      </el-form>
     </div>
-    -->
     <div class="gva-table-box">
       <div class="gva-btn-list" style="float:right;">
-        <el-button size="small" type="primary" icon="plus" @click="openDialog" style="margin-right: 100px;">安装
+        <el-button size="small" type="primary" icon="plus" @click="openDialog">安装
         </el-button>
         <el-popover v-model:visible="deleteVisible" placement="top" width="160">
           <p>确定要卸载吗？</p>
@@ -62,17 +60,27 @@
         />
       </div>
     </div>
-    <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" title="版本更新">
+    <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" title="安装Python包">
       <el-form :model="formData" label-position="right" ref="elFormRef" :rules="rule" label-width="80px">
         <el-form-item label="包名称:" prop="name">
-          <el-input v-model="formData.name" :clearable="true" placeholder="请输入"/>
+          <el-input v-model="formData.name" :clearable="true" placeholder="请输入" style="width:50%"/>
+          <el-button size="small" type="primary" icon="search" @click="getVersionList" style="margin-left:10px;">查询
+          </el-button>
         </el-form-item>
+        <!--下拉选择版本-->
         <el-form-item label="包版本:" prop="version">
-          <el-input v-model="formData.version" :clearable="true" placeholder="请输入"/>
+          <el-select placeholder="请选择" v-model="formData.version">
+            <el-option
+                v-for="(item,index) in versionS.versionList"
+                :key="index"
+                :label="item"
+                :value="item">
+            </el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="是否可以卸载:" prop="isUninstall" label-width="120px">
-<!--      formData.isUninstall为否则入参0    -->
 
+        <el-form-item label="是否可以卸载:" prop="isUninstall" label-width="120px">
+          <!--      formData.isUninstall为否则入参0    -->
           <el-switch v-model="formData.isUninstall" active-color="#13ce66" inactive-color="#ff4949" active-text="是"
                      inactive-text="否" clearable></el-switch>
         </el-form-item>
@@ -99,14 +107,15 @@ import {
   uninstallHrpPyPkg,
   uninstallHrpPyPkgByIds,
   updateHrpPyPkg,
-  searchHrpPyPkg,
-  getHrpPyPkgList
+  getHrpPyPkgList,
+  getPyPkgVersions
 } from '@/api/py_pkg'
 
 // 全量引入格式化工具 请按需保留
 import {getDictFunc, formatDate, formatBoolean, filterDict} from '@/utils/format'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import {ref, reactive} from 'vue'
+import params from "@/view/interface/interfaceComponents/Params.vue";
 
 // 自动化生成的字典（可能为空）以及字段
 const formData = ref({
@@ -115,10 +124,15 @@ const formData = ref({
   isUninstall: true,
 })
 
+const onReset = () => {
+  searchInfo.value = {}
+  getTableData()
+}
 
-const search = ref({
-  name: '',
+const versionS = ref({
+  versionList: [], // Python包版本列表
 })
+
 
 // 验证规则
 const rule = reactive({
@@ -143,15 +157,12 @@ const searchInfo = ref({})
 
 // 搜索
 const onSubmit = async () => {
-  const table = await searchHrpPyPkg({page: page.value, pageSize: pageSize.value, search})
-  if (table.code === 0) {
-    tableData.value = table.data.list
-    total.value = table.data.total
-    page.value = table.data.page
-    pageSize.value = table.data.pageSize
+  page.value = 1
+  pageSize.value = 10
+  if (searchInfo.value.version === "") {
+    searchInfo.value.version = null
   }
-  getTableData()
-
+  await getTableData()
 }
 
 // 分页
@@ -177,7 +188,18 @@ const getTableData = async () => {
   }
 }
 
-getTableData()
+const init = () => {
+  getTableData()
+}
+init()
+
+const getVersionList = async () => {
+  const versions = await getPyPkgVersions({name: formData.value.name})
+  console.log("getVersionList:", versions.data)
+  if (versions.code === 0) {
+    versionS.value.versionList = versions.data.version
+  }
+}
 
 // ============== 表格控制部分结束 ===============
 

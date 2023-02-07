@@ -8,46 +8,51 @@ import (
 	"github.com/test-instructor/cheetah/server/model/interfacecase/request"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
+	"os"
 	"os/exec"
 	"strings"
 )
 
 type PyPkgService struct {
 }
+type PyPkgVersionList struct {
+	Version []string `json:"version"`
+}
 
-const (
-	PyEnvPath  = "/root/.hrp/bin/python"
-	PipEnvPath = "/root/.hrp/bin/pip"
-)
+func (p *PyPkgService) PythonEnv() (PyEnvPath string, PipEnvPath string) {
+	hostname, _ := os.UserHomeDir()
+	PyEnvPath = hostname + "/.hrp/bin/python3"
+	PipEnvPath = hostname + "/.hrp/bin/pip3"
+	return
+}
 
 // todo 后续考虑使用事物，避免出现安装成功，但是数据库未更新的情况
 
 // PyPkgListService 获取Python包列表
-func (p *PyPkgService) PyPkgListService(info request.HrpPyPkgRequest) (list []request.HrpPyPkgRequest, total int64, err error) {
+func (p *PyPkgService) PyPkgListService(info request.HrpPyPkgRequest) (list interface{}, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := global.GVA_DB.Model(&request.HrpPyPkgRequest{})
-	var pyPkgLists []request.HrpPyPkgRequest
+	db := global.GVA_DB.Model(&interfacecase.HrpPyPkg{})
+	var pyPkgLists []interfacecase.HrpPyPkg
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.Name != "" {
-		db = db.Where("name = ? ", info.Name)
+		db = db.Where("name like ? ", "%"+info.Name+"%")
 	}
-	err = db.Count(&total).Error
-	if err != nil {
+	if err = db.Count(&total).Error; err != nil {
 		return
 	}
 	err = db.Limit(limit).Offset(offset).Find(&pyPkgLists).Error
 	return pyPkgLists, total, err
-
 }
 
 // PyPkgInstallService 安装Python包
 func (p *PyPkgService) PyPkgInstallService(pyPkg request.HrpPyPkgRequest, localPkg ...string) (err error) {
 	// todo 需要查询一下数据库中是否有改包，避免垃圾数据
 	var hrpPyPkg interfacecase.HrpPyPkg
+	_, PipEnvPath := p.PythonEnv()
 	// 未指定版本号时，安装最新版本
-	if len(pyPkg.Version) == 0 {
+	if pyPkg.Version == "" {
 		output, _ := exec.Command(PipEnvPath, "install", pyPkg.Name).Output()
 		global.GVA_LOG.Info("安装Python包", zap.String("output", string(output)))
 		if strings.Contains(string(output), "Successfully installed") {
@@ -104,7 +109,8 @@ func (p *PyPkgService) PyPkgInstallService(pyPkg request.HrpPyPkgRequest, localP
 
 // UnInstallService 卸载Python包
 func (p *PyPkgService) UnInstallService(pkg request.HrpPyPkgRequest) (err error) {
-	output, _ := exec.Command(PipEnvPath, "uninstall", pkg.Name, "-y").Output()
+	_, pipEnvPath := p.PythonEnv()
+	output, _ := exec.Command(pipEnvPath, "uninstall", pkg.Name, "-y").Output()
 	if strings.Contains(string(output), "Successfully uninstalled") {
 		err = global.GVA_DB.Where("name = ?", pkg.Name).First(&pkg).Error
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -120,10 +126,11 @@ func (p *PyPkgService) UnInstallService(pkg request.HrpPyPkgRequest) (err error)
 	return nil
 }
 
-// UpdateService 更新Python包
-func (p *PyPkgService) UpdateService(PyPkg request.HrpPyPkgRequest) (err error) {
+// UpdatePyPkgService 更新Python包
+func (p *PyPkgService) UpdatePyPkgService(PyPkg request.HrpPyPkgRequest) (err error) {
+	_, pipEnvPath := p.PythonEnv()
 	var hrpPyPkg interfacecase.HrpPyPkg
-	pkgInfo, _ := exec.Command(PipEnvPath, "install", PyPkg.Name, "--upgrade").Output()
+	pkgInfo, _ := exec.Command(pipEnvPath, "install", PyPkg.Name, "--upgrade").Output()
 	if strings.Contains(string(pkgInfo), "Successfully installed") {
 		PyPkgInfo, err := p.FindPyPkg(PyPkg.Name)
 		global.GVA_LOG.Info("更新Python包成功!", zap.String("PyPkgInfo.name", PyPkg.Name),
@@ -152,8 +159,9 @@ func (p *PyPkgService) UpdateService(PyPkg request.HrpPyPkgRequest) (err error) 
 
 // SearchPyPkg 查询Python包--接口
 func (p *PyPkgService) SearchPyPkg(pkg request.HrpPyPkgRequest) (pkgInfo request.HrpPyPkgRequest, err error) {
+	_, pipEnvPath := p.PythonEnv()
 	var pkgList []request.HrpPyPkgRequest
-	output, err := exec.Command(PipEnvPath, "list", "--format=json").Output()
+	output, err := exec.Command(pipEnvPath, "list", "--format=json").Output()
 	if err != nil {
 		return request.HrpPyPkgRequest{}, err
 	}
@@ -172,6 +180,7 @@ func (p *PyPkgService) SearchPyPkg(pkg request.HrpPyPkgRequest) (pkgInfo request
 
 // FindPyPkg 查询Python包信息
 func (p *PyPkgService) FindPyPkg(name string) (pkgInfo interfacecase.HrpPyPkg, err error) {
+	_, PipEnvPath := p.PythonEnv()
 	var pkgList []interfacecase.HrpPyPkg
 	PyPkgByte, _ := exec.Command(PipEnvPath, "list", "--format=json").Output()
 	_ = json.Unmarshal(PyPkgByte, &pkgList)
@@ -192,4 +201,29 @@ func (p *PyPkgService) SelectPyPkg(name string) bool {
 		return false
 	}
 	return true
+}
+
+// PyPkgVersionService 查询Python包版本
+func (p *PyPkgService) PyPkgVersionService(pkgInfo request.HrpPyPkgRequest) (err error, list PyPkgVersionList) {
+	_, pipEnvPath := p.PythonEnv()
+	pkgInfoByte, err := exec.Command(pipEnvPath, "index", "versions", pkgInfo.Name).Output()
+	if err != nil {
+		return err, list
+	}
+	if len(pkgInfoByte) == 0 {
+		return errors.New("未找到该Python包"), list
+	} else {
+		split := strings.Split(string(pkgInfoByte), "\n")
+		OutVersion := strings.Replace(split[1], "Available versions: ", "", -1)
+		pkgVersions := strings.Split(OutVersion, ", ")
+		pkgVersions = append(pkgVersions, "")
+		copy(pkgVersions[1:], pkgVersions[0:])
+		pkgVersions[0] = ""
+		// 去除第一个和最后一个空元素
+		pkgVersions = pkgVersions[1 : len(pkgVersions)-1]
+		list = PyPkgVersionList{
+			Version: pkgVersions,
+		}
+		return nil, list
+	}
 }
