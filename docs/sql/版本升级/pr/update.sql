@@ -30,7 +30,7 @@ INSERT INTO hrp.api_py_pkg (created_at,updated_at,deleted_at,name,version,is_uni
 -- INSERT sys_base_menus
 -- ----------------------------
 INSERT INTO sys_base_menus (created_at,updated_at,deleted_at,menu_level,parent_id,`path`,name,hidden,component,sort,keep_alive,default_menu,title,icon,close_tab) VALUES
-	 ('2023-01-29 16:21:37.647','2023-01-29 16:21:37.647',NULL,0,'33','HrpPyPkg','HrpPyPkg',0,'view/py_pkg/py_pkg.vue',0,0,0,'Python包管理','menu',0);
+	 ('2023-01-29 16:21:37.647','2023-01-29 16:21:37.647',NULL,0,'33','HrpPyPkg','HrpPyPkg',0,'view/py_pkg/py_pkg.vue',0,0,0,'Python包管理','tools',0);
 
 -- ----------------------------
 -- INSERT sys_apis

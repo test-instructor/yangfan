@@ -11,6 +11,7 @@
         <el-form-item label="是否可以卸载:" prop="isUninstall" label-width="120px">
           <el-switch v-model="formData.isUninstall" active-color="#13ce66" inactive-color="#ff4949" active-text="是"
                      inactive-text="否" clearable></el-switch>
+        </el-form-item>
         <el-form-item>
           <el-button size="small" type="primary" @click="save">保存</el-button>
           <el-button size="small" type="primary" @click="back">返回</el-button>
@@ -28,9 +29,9 @@ export default {
 
 <script setup>
 import {
+  getHrpPyPkgList,
   installHrpPyPkg,
-  updateHrpPyPkg,
-  searchHrpPyPkg
+  updateHrpPyPkg
 } from '@/api/py_pkg'
 
 // 自动获取字典
@@ -57,7 +58,7 @@ const elFormRef = ref()
 const init = async () => {
   // 建议通过url传参获取目标数据ID 调用 find方法进行查询数据操作 从而决定本页面是create还是update 以下为id作为url参数示例
   if (route.query.name) {
-    const res = await searchHrpPyPkg({NAME: route.query.name})
+    const res = await getHrpPyPkgList({NAME: route.query.name})
     if (res.code === 0) {
       formData.value = res.data.rePyPkg
       type.value = 'update'
