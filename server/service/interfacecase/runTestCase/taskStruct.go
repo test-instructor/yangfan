@@ -1,6 +1,6 @@
 package runTestCase
 
-import "github.com/test-instructor/cheetah/server/model/interfacecase"
+import "github.com/test-instructor/yangfan/server/model/interfacecase"
 
 type TaskCaseHrp struct {
 	Name      string                  `json:"name"`

@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/test-instructor/cheetah/server/hrp"
+	"github.com/test-instructor/yangfan/server/hrp"
 )
 
 const (

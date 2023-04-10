@@ -2,7 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/plugin/fslogin/api"
+	"github.com/test-instructor/yangfan/server/plugin/fslogin/api"
 )
 
 type FsLoginRouter struct {

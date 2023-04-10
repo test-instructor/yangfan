@@ -1,15 +1,18 @@
 package main
 
 import (
-	//_ "github.com/mkevac/debugcharts"
-	"github.com/test-instructor/cheetah/server/core"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/initialize"
-	"go.uber.org/zap"
 	"math/rand"
 	//_ "net/http/pprof"
 	"sync"
 	"time"
+
+	"go.uber.org/zap"
+
+	//_ "github.com/mkevac/debugcharts"
+	"github.com/test-instructor/yangfan/server/core"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/initialize"
+	"github.com/test-instructor/yangfan/server/source/system"
 )
 
 //go:generate go env -w GO111MODULE=on
@@ -40,6 +43,8 @@ func main() {
 		db, _ := global.GVA_DB.DB()
 		defer db.Close()
 	}
+	go system.RegisterApis()
+	go system.RegisterMenus()
 	//go func() {
 	//	err := http.ListenAndServe("0.0.0.0:18090", nil)
 	//	if err != nil {

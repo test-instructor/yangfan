@@ -3,10 +3,11 @@ package system
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/mojocn/base64Captcha"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	systemRes "github.com/test-instructor/cheetah/server/model/system/response"
 	"go.uber.org/zap"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	systemRes "github.com/test-instructor/yangfan/server/model/system/response"
 )
 
 // 当开启多服务器部署时，替换下面的配置，使用redis共享存储验证码

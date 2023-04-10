@@ -1,7 +1,7 @@
 package system
 
 import (
-	"github.com/test-instructor/cheetah/server/config"
+	"github.com/test-instructor/yangfan/server/config"
 )
 
 // 配置文件结构体

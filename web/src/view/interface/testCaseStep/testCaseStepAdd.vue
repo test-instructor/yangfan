@@ -32,7 +32,7 @@
                 label="接口管理"
             >
               <template #default="scope">
-                <div class="block" :class="`block_${scope.row.request.method.toLowerCase()}`">
+                <div v-if="scope.row.request" class="block" :class="`block_${scope.row.request.method.toLowerCase()}`">
                   <span class="block-method block_method_color"
                         :class="`block_method_${scope.row.request.method.toLowerCase()}`">
                     {{ scope.row.request.method }}
@@ -45,6 +45,22 @@
                     </span>
                   </div>
                   <span class="block-method block_url">{{ scope.row.request.url }}</span>
+                  <span class="block-summary-description">{{ scope.row.name }}</span>
+                </div>
+                <div v-if="scope.row.gRPC" class="block" :class="`block_put`">
+                  <span class="block-method block_method_color"
+                        :class="`block_method_put`">
+                    {{ "gRPC" }}
+                  </span>
+                  <div class="block">
+                    <span class="block-method block_method_color block_method_options"
+                          v-if="scope.row.creator==='yapi'"
+                          :title="'从YAPI导入的接口'">
+                      YAPI
+                    </span>
+                  </div>
+
+                  <span class="block-method block_url">{{ scope.row.gRPC.url }}</span>
                   <span class="block-summary-description">{{ scope.row.name }}</span>
                 </div>
               </template>
@@ -72,7 +88,7 @@
                 label="测试套件用例详情"
             >
               <template #default="scope">
-                <div class="block" :class="`block_${scope.row.request.method.toLowerCase()}`">
+                <div v-if="scope.row.request" class="block" :class="`block_${scope.row.request.method.toLowerCase()}`">
                   <span class="block-method block_method_color"
                         :class="`block_method_${scope.row.request.method.toLowerCase()}`">
                     {{ scope.row.request.method }}
@@ -85,6 +101,22 @@
                     </span>
                   </div>
                   <span class="block-method block_url">{{ scope.row.request.url }}</span>
+                  <span class="block-summary-description">{{ scope.row.name }}</span>
+                </div>
+                <div v-if="scope.row.gRPC" class="block" :class="`block_put`">
+                  <span class="block-method block_method_color"
+                        :class="`block_method_put`">
+                    {{ "gRPC" }}
+                  </span>
+                  <div class="block">
+                    <span class="block-method block_method_color block_method_options"
+                          v-if="scope.row.creator==='yapi'"
+                          :title="'从YAPI导入的接口'">
+                      YAPI
+                    </span>
+                  </div>
+
+                  <span class="block-method block_url">{{ scope.row.gRPC.url }}</span>
                   <span class="block-summary-description">{{ scope.row.name }}</span>
                 </div>
               </template>

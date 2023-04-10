@@ -1,6 +1,6 @@
 package example
 
-import "github.com/test-instructor/cheetah/server/service"
+import "github.com/test-instructor/yangfan/server/service"
 
 type ApiGroup struct {
 	ExcelApi

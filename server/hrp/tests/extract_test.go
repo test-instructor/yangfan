@@ -3,7 +3,7 @@ package tests
 import (
 	"testing"
 
-	"github.com/test-instructor/cheetah/server/hrp"
+	"github.com/test-instructor/yangfan/server/hrp"
 )
 
 // reference extracted variables for validation in the same step

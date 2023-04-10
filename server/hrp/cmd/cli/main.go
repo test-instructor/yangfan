@@ -6,7 +6,7 @@ import (
 
 	"github.com/getsentry/sentry-go"
 
-	"github.com/test-instructor/cheetah/server/hrp/cmd"
+	"github.com/test-instructor/yangfan/server/hrp/cmd"
 )
 
 func main() {

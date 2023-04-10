@@ -1,7 +1,7 @@
 package runTestCase
 
 import (
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
 )
 
 type ApiCaseStep struct {

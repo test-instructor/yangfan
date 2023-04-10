@@ -5,7 +5,7 @@ import (
 
 	adapter "github.com/casbin/gorm-adapter/v3"
 	"github.com/pkg/errors"
-	"github.com/test-instructor/cheetah/server/service/system"
+	"github.com/test-instructor/yangfan/server/service/system"
 	"gorm.io/gorm"
 )
 

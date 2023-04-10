@@ -1,11 +1,11 @@
-# cheetah 自动化测试平台性能测试
+# yangfan 自动化测试平台性能测试
 
 得益于[httprunner v4](https://github.com/httprunner/httprunner)优秀开源项目，基于go语言的v4，集成了性能测试。目前测试平台已经完成`接口自动化`、`性能测试`两部分，后续将增加`UI自动化`、`gRPC`等功能
 
 ## 实现功能
 > * 在接口测试的基础上，使用请参考[测试平台接入 HttpRunner V4（三）详细功能介绍](https://testerhome.com/topics/35161)，引用接口测试的`测试套件`，并增加`事务`和`集合。
 > * 目前只完成单机版的压测部分，k8s 部署分布式压测正在开发中
-> * 压测报告：v4 压测需要`Prometheus` + `Grafana`，在部署过程会出现各种各样的问题，cheetah 将性能报告存储到数据库，并提供页面供用户查询，节省用户在环境上的使用问题
+> * 压测报告：v4 压测需要`Prometheus` + `Grafana`，在部署过程会出现各种各样的问题，yangfan 将性能报告存储到数据库，并提供页面供用户查询，节省用户在环境上的使用问题
 
 ## 功能介绍
 
@@ -19,7 +19,7 @@
 
 
 # 往期文档
-[cheetah 自动化测试平台](https://testerhome.com/opensource_projects/cheetah)
+[yangfan 自动化测试平台](https://testerhome.com/opensource_projects/yangfan)
 
 了解如何接入httprunner
 * [测试平台接入 HttpRunner V4（一）基本功能接入](https://testerhome.com/topics/35126)

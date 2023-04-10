@@ -9,9 +9,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
-	"github.com/test-instructor/cheetah/server/hrp"
-	"github.com/test-instructor/cheetah/server/hrp/internal/builtin"
-	"github.com/test-instructor/cheetah/server/hrp/internal/json"
+	"github.com/test-instructor/yangfan/server/hrp"
+	"github.com/test-instructor/yangfan/server/hrp/internal/builtin"
+	"github.com/test-instructor/yangfan/server/hrp/internal/json"
 )
 
 // ==================== model definition starts here ====================

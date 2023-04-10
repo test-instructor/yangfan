@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 	uuid "github.com/satori/go.uuid"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/system"
-	"github.com/test-instructor/cheetah/server/utils"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/system"
+	"github.com/test-instructor/yangfan/server/utils"
 	"gorm.io/gorm"
 )
 

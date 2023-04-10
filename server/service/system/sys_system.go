@@ -1,10 +1,10 @@
 package system
 
 import (
-	"github.com/test-instructor/cheetah/server/config"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/system"
-	"github.com/test-instructor/cheetah/server/utils"
+	"github.com/test-instructor/yangfan/server/config"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/system"
+	"github.com/test-instructor/yangfan/server/utils"
 	"go.uber.org/zap"
 )
 

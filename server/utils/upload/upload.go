@@ -3,7 +3,7 @@ package upload
 import (
 	"mime/multipart"
 
-	"github.com/test-instructor/cheetah/server/global"
+	"github.com/test-instructor/yangfan/server/global"
 )
 
 // OSS 对象存储接口

@@ -8,8 +8,8 @@ import (
 	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/env"
-	"github.com/test-instructor/cheetah/server/hrp/internal/version"
+	"github.com/test-instructor/yangfan/server/hrp/internal/env"
+	"github.com/test-instructor/yangfan/server/hrp/internal/version"
 )
 
 const (

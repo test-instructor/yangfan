@@ -24,9 +24,11 @@
       </el-table-column>
       <el-table-column
           align="center"
-          prop="value"
           label="value"
       >
+        <template  #default="scope">
+          <span>{{scope.row.value}}</span>
+        </template>
       </el-table-column>
     </el-table>
   </div>

@@ -2,11 +2,11 @@ package service
 
 import (
 	"errors"
-	global2 "github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/system"
-	"github.com/test-instructor/cheetah/server/plugin/fslogin/global"
-	"github.com/test-instructor/cheetah/server/plugin/fslogin/model"
-	"github.com/test-instructor/cheetah/server/service"
+	global2 "github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/system"
+	"github.com/test-instructor/yangfan/server/plugin/fslogin/global"
+	"github.com/test-instructor/yangfan/server/plugin/fslogin/model"
+	"github.com/test-instructor/yangfan/server/service"
 	"gorm.io/gorm"
 )
 

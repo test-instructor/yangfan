@@ -7,8 +7,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/builtin"
-	"github.com/test-instructor/cheetah/server/hrp/internal/code"
+	"github.com/test-instructor/yangfan/server/hrp/internal/builtin"
+	"github.com/test-instructor/yangfan/server/hrp/internal/code"
 )
 
 func assertRelative(p float64) bool {

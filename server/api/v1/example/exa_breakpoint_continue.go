@@ -6,14 +6,15 @@ import (
 	"mime/multipart"
 	"strconv"
 
-	"github.com/test-instructor/cheetah/server/model/example"
+	"github.com/test-instructor/yangfan/server/model/example"
 
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	exampleRes "github.com/test-instructor/cheetah/server/model/example/response"
-	"github.com/test-instructor/cheetah/server/utils"
 	"go.uber.org/zap"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	exampleRes "github.com/test-instructor/yangfan/server/model/example/response"
+	"github.com/test-instructor/yangfan/server/utils"
 )
 
 // @Tags ExaFileUploadAndDownload

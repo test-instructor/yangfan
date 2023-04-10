@@ -2,10 +2,11 @@ package interfacecase
 
 import (
 	"errors"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	interfacecaseReq "github.com/test-instructor/cheetah/server/model/interfacecase/request"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	interfacecaseReq "github.com/test-instructor/yangfan/server/model/interfacecase/request"
 )
 
 /*
@@ -20,15 +21,18 @@ type TreeList struct {
 	Children []*TreeList `json:"children"`
 }
 
-func (apicaseService *ApiMenuService) GetMenu(pid uint, menuType string, project uint) ([]*TreeList, error) {
+type ApiMenuService struct {
+}
+
+func (a *ApiMenuService) GetMenu(pid uint, menuType string, project uint) ([]*TreeList, error) {
 	var menu []interfacecase.ApiMenu
 
 	db := global.GVA_DB.Model(&interfacecase.ApiMenu{})
 
 	db.Where("Parent = ?", pid).Where("menu_type = ?", menuType).Find(&menu, projectDB(db, project))
-	treeList := []*TreeList{}
+	var treeList []*TreeList
 	for _, v := range menu {
-		child, _ := apicaseService.GetMenu(v.ID, v.MenuType, project)
+		child, _ := a.GetMenu(v.ID, v.MenuType, project)
 		node := &TreeList{
 			Id:     v.ID,
 			Key:    v.ID,
@@ -42,38 +46,35 @@ func (apicaseService *ApiMenuService) GetMenu(pid uint, menuType string, project
 	return treeList, nil
 }
 
-type ApiMenuService struct {
-}
-
 // CreateApiMenu 创建ApiMenu记录
 
-func (apicaseService *ApiMenuService) CreateApiMenu(apicase interfacecase.ApiMenu) (err error) {
+func (a *ApiMenuService) CreateApiMenu(apicase interfacecase.ApiMenu) (err error) {
 	err = global.GVA_DB.Create(&apicase).Error
 	return err
 }
 
 // DeleteApiMenu 删除ApiMenu记录
 
-func (apicaseService *ApiMenuService) DeleteApiMenu(apicase interfacecase.ApiMenu) (err error) {
+func (a *ApiMenuService) DeleteApiMenu(apicase interfacecase.ApiMenu) (err error) {
 	err = global.GVA_DB.Delete(&apicase).Error
 	return err
 }
 
 // DeleteApiMenuByIds 批量删除ApiMenu记录
 
-func (apicaseService *ApiMenuService) DeleteApiMenuByIds(ids request.IdsReq) (err error) {
+func (a *ApiMenuService) DeleteApiMenuByIds(ids request.IdsReq) (err error) {
 	err = global.GVA_DB.Delete(&[]interfacecase.ApiMenu{}, "id in ?", ids.Ids).Error
 	return err
 }
 
 // UpdateApiMenu 更新ApiMenu记录
 
-func (apicaseService *ApiMenuService) UpdateApiMenu(apicase interfacecase.ApiMenu) (err error) {
+func (a *ApiMenuService) UpdateApiMenu(apicase interfacecase.ApiMenu) (err error) {
 	var apicaseTemp interfacecase.ApiMenu
 	var oId interfacecase.Operator
 	global.GVA_DB.Model(interfacecase.ApiMenu{}).Where("id = ?", apicase.ID).First(&oId)
-	apicaseTemp.CreatedByID = oId.CreatedByID
-	apicaseTemp.UpdateByID = apicase.UpdateByID
+	apicaseTemp.CreatedBy = oId.CreatedBy
+	apicaseTemp.UpdateBy = apicase.UpdateBy
 
 	global.GVA_DB.Preload("Project").Where("id = ?", apicase.ID).First(&apicaseTemp)
 	apicaseTemp.Name = apicase.Name
@@ -83,14 +84,14 @@ func (apicaseService *ApiMenuService) UpdateApiMenu(apicase interfacecase.ApiMen
 
 // GetApiMenu 根据id获取ApiMenu记录
 
-func (apicaseService *ApiMenuService) GetApiMenu(id uint) (err error, apicase interfacecase.ApiMenu) {
+func (a *ApiMenuService) GetApiMenu(id uint) (err error, apicase interfacecase.ApiMenu) {
 	err = global.GVA_DB.Preload("Project").Where("id = ?", id).First(&apicase).Error
 	return
 }
 
 // GetApiMenuInfoList 分页获取ApiMenu记录
 
-func (apicaseService *ApiMenuService) GetApiMenuInfoList(info interfacecaseReq.ApiMenuSearch) (err error, list interface{}, total int64) {
+func (a *ApiMenuService) GetApiMenuInfoList(info interfacecaseReq.ApiMenuSearch) (err error, list interface{}, total int64) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
@@ -105,7 +106,7 @@ func (apicaseService *ApiMenuService) GetApiMenuInfoList(info interfacecaseReq.A
 	return err, apicases, total
 }
 
-func (apicaseService *ApiMenuService) GetApiMenuInterface(apicase interfacecase.ApiMenu) (err error) {
+func (a *ApiMenuService) GetApiMenuInterface(apicase interfacecase.ApiMenu) (err error) {
 
 	// 创建db
 	db := global.GVA_DB.Model(&interfacecase.ApiStep{})

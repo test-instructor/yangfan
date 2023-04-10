@@ -1,6 +1,6 @@
 package request
 
-import "github.com/test-instructor/cheetah/server/model/common/request"
+import "github.com/test-instructor/yangfan/server/model/common/request"
 
 type SysAutoHistory struct {
 	request.PageInfo

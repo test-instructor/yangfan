@@ -2,7 +2,7 @@ package runTestCase
 
 import (
 	"fmt"
-	"github.com/test-instructor/cheetah/server/global"
+	"github.com/test-instructor/yangfan/server/global"
 )
 
 func recoverHrp(reportOperation *ReportOperation) {

@@ -24,11 +24,11 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
-	"github.com/test-instructor/cheetah/server/resource/autocode_template/subcontract"
+	"github.com/test-instructor/yangfan/server/resource/autocode_template/subcontract"
 
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/system"
-	"github.com/test-instructor/cheetah/server/utils"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/system"
+	"github.com/test-instructor/yangfan/server/utils"
 
 	"gorm.io/gorm"
 )
@@ -95,7 +95,7 @@ func Init(Package string) {
 		packageServiceName: {
 			path: filepath.Join(global.GVA_CONFIG.AutoCode.Root,
 				global.GVA_CONFIG.AutoCode.Server, "service", "enter.go"),
-			importCodeF:  "github.com/test-instructor/cheetah/server/%s/%s",
+			importCodeF:  "github.com/test-instructor/yangfan/server/%s/%s",
 			packageNameF: "%s",
 			groupName:    "ServiceGroup",
 			structNameF:  "%sServiceGroup",
@@ -103,7 +103,7 @@ func Init(Package string) {
 		packageRouterName: {
 			path: filepath.Join(global.GVA_CONFIG.AutoCode.Root,
 				global.GVA_CONFIG.AutoCode.Server, "router", "enter.go"),
-			importCodeF:  "github.com/test-instructor/cheetah/server/%s/%s",
+			importCodeF:  "github.com/test-instructor/yangfan/server/%s/%s",
 			packageNameF: "%s",
 			groupName:    "RouterGroup",
 			structNameF:  "%s",
@@ -111,7 +111,7 @@ func Init(Package string) {
 		packageAPIName: {
 			path: filepath.Join(global.GVA_CONFIG.AutoCode.Root,
 				global.GVA_CONFIG.AutoCode.Server, "api/v1", "enter.go"),
-			importCodeF:  "github.com/test-instructor/cheetah/server/%s/%s",
+			importCodeF:  "github.com/test-instructor/yangfan/server/%s/%s",
 			packageNameF: "%s",
 			groupName:    "ApiGroup",
 			structNameF:  "%sApiGroup",
@@ -314,7 +314,7 @@ func (autoCodeService *AutoCodeService) CreateTemp(autoCode system.AutoCodeStruc
 			global.GVA_CONFIG.AutoCode.Server, global.GVA_CONFIG.AutoCode.SInitialize, "gorm.go")
 		var routePath = filepath.Join(global.GVA_CONFIG.AutoCode.Root,
 			global.GVA_CONFIG.AutoCode.Server, global.GVA_CONFIG.AutoCode.SInitialize, "router.go")
-		var imporStr = fmt.Sprintf("github.com/test-instructor/cheetah/server/model/%s", autoCode.Package)
+		var imporStr = fmt.Sprintf("github.com/test-instructor/yangfan/server/model/%s", autoCode.Package)
 		_ = ImportReference(routePath, "", "", autoCode.Package, "")
 		_ = ImportReference(gormPath, imporStr, "", "", "")
 

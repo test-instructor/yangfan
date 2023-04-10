@@ -1,8 +1,8 @@
 package system
 
 import (
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/system/response"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/system/response"
 )
 
 type Database interface {

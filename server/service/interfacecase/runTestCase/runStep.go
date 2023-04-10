@@ -2,12 +2,14 @@ package runTestCase
 
 import (
 	"errors"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/hrp"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	"gorm.io/gorm"
 	"testing"
+
+	"gorm.io/gorm"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/hrp"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
 )
 
 func NewRunStep(runCaseReq request.RunCaseReq, runType interfacecase.RunType) TestCase {
@@ -27,12 +29,14 @@ type runStep struct {
 	caseType        interfacecase.CaseType
 	tcm             ApisCaseModel
 	d               debugTalkOperation
+	envVars         map[string]string
 }
 
 func (r *runStep) LoadCase() (err error) {
 	var testCase interfacecase.HrpCase
 	var testCaseList []interfacecase.HrpCase
 	var apiCases interfacecase.ApiCaseStep
+	var envName string
 	//var apiCases interfacecase.ApiCaseStep
 	//var tcm *ApisCaseModel
 	//获取测试套件下对应的配置信息
@@ -43,13 +47,18 @@ func (r *runStep) LoadCase() (err error) {
 			return err
 		}
 		r.runCaseReq.ConfigID = testCaseStep.RunConfigID
+		r.runCaseReq.Env = testCaseStep.ApiEnvID
 	}
 	//获取运行配置
 	apiConfig, err := getConfig(r.runCaseReq.ConfigID)
 	if err != nil {
 		return errors.New("获取配置失败")
 	}
-
+	r.envVars, envName, err = GetEnvVar(apiConfig.ProjectID, r.runCaseReq.Env)
+	if err != nil {
+		return errors.New("获取环境变量失败")
+	}
+	apiConfig.Environs = r.envVars
 	//设置前置套件
 	if apiConfig.SetupCaseID != nil && *apiConfig.SetupCaseID != 0 {
 		//前置用例逻辑需要修改
@@ -58,7 +67,9 @@ func (r *runStep) LoadCase() (err error) {
 		if err != nil {
 			return err
 		}
-		testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
+		if hrpCaseStep != nil {
+			testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
+		}
 		testCase.Confing = *apiConfig
 		//if hrpCaseStep.TestCase != nil && hrpCaseStep.Transaction != nil && hrpCaseStep.Rendezvous != nil && hrpCaseStep.ThinkTime != nil {
 		//	testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
@@ -74,6 +85,7 @@ func (r *runStep) LoadCase() (err error) {
 			return db2.Order("Sort")
 		}).
 		Preload("TStep.Request").
+		Preload("TStep.Grpc").
 		First(&apiCases, "id = ?", r.runCaseReq.CaseID)
 
 	{
@@ -81,10 +93,14 @@ func (r *runStep) LoadCase() (err error) {
 		if err != nil {
 			return err
 		}
-		testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
-
-		testCase.ID = hrpCaseStep.ID
-		testCase.Name = hrpCaseStep.Name
+		if hrpCaseStep == nil {
+			return errors.New("运行失败，请添加用例后再运行")
+		}
+		if hrpCaseStep != nil {
+			testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
+			testCase.ID = hrpCaseStep.ID
+			testCase.Name = hrpCaseStep.Name
+		}
 		testCase.Confing = *apiConfig
 	}
 	testCaseList = append(testCaseList, testCase)
@@ -102,8 +118,12 @@ func (r *runStep) LoadCase() (err error) {
 			Name:      apiCases.Name,
 			CaseType:  r.caseType,
 			RunType:   r.runType,
-			ProjectID: apiConfig.ProjectID,
 			SetupCase: r.tcm.SetupCase,
+			Operator: interfacecase.Operator{
+				ProjectID: apiConfig.ProjectID,
+			},
+			ApiEnvName: envName,
+			ApiEnvID:   r.runCaseReq.Env,
 		},
 	}
 	r.reportOperation.CreateReport()

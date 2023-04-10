@@ -11,11 +11,11 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
-	"github.com/test-instructor/cheetah/server/hrp"
-	"github.com/test-instructor/cheetah/server/hrp/internal/builtin"
-	"github.com/test-instructor/cheetah/server/hrp/internal/myexec"
-	"github.com/test-instructor/cheetah/server/hrp/internal/sdk"
-	"github.com/test-instructor/cheetah/server/hrp/internal/version"
+	"github.com/test-instructor/yangfan/server/hrp"
+	"github.com/test-instructor/yangfan/server/hrp/internal/builtin"
+	"github.com/test-instructor/yangfan/server/hrp/internal/myexec"
+	"github.com/test-instructor/yangfan/server/hrp/internal/sdk"
+	"github.com/test-instructor/yangfan/server/hrp/internal/version"
 )
 
 type PluginType string

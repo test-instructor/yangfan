@@ -3,15 +3,17 @@ package system
 import (
 	"errors"
 	"fmt"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/system"
-	"github.com/test-instructor/cheetah/server/utils"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	"net/url"
 	"os"
 	"strings"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/system"
+	"github.com/test-instructor/yangfan/server/utils"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"

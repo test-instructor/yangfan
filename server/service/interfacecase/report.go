@@ -1,9 +1,9 @@
 package interfacecase
 
 import (
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	interfacecaseReq "github.com/test-instructor/cheetah/server/model/interfacecase/request"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	interfacecaseReq "github.com/test-instructor/yangfan/server/model/interfacecase/request"
 )
 
 type ReportService struct {

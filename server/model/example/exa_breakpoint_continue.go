@@ -1,7 +1,7 @@
 package example
 
 import (
-	"github.com/test-instructor/cheetah/server/global"
+	"github.com/test-instructor/yangfan/server/global"
 )
 
 // file struct, 文件结构体

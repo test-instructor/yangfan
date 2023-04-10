@@ -1,4 +1,4 @@
-cheetah 自动化测试平台[开源项目](https://testerhome.com/opensource_projects/cheetah)
+yangfan 自动化测试平台[开源项目](https://testerhome.com/opensource_projects/yangfan)
 了解如何接入httprunner
 [测试平台接入 HttpRunner V4（一）基本功能接入](https://testerhome.com/topics/35126)
 [测试平台接入 HttpRunner V4（二）使用 config 实现用例之间的参数传递](https://testerhome.com/topics/35125)
@@ -113,6 +113,31 @@ cheetah 自动化测试平台[开源项目](https://testerhome.com/opensource_pr
 )
 > 2. 运行后
 > ![api_resp_validate](https://testerhome.com/uploads/photo/2022/6eb1d2da-3972-4b5c-a2d1-2921e5450e2d.png)
+
+### hooks
+
+> hooks 分为 setup hooks 和 teardown hooks 
+> 可以用来对数据加解密或者初始化和清理数据的操作
+
+### 如何使用
+
+> ${setup_hook_encryption($request)}
+> ${setup_hook_decrypt($response)}
+
+1. 传参：setup hooks 使用request，teardown hooks 使用response
+2. setup hooks 函数返回为request对象，teardown hooks 函数返回为response对象
+
+```python
+def setup_hook_encryption(request):
+    request["body"]["setup_hook_encryption_request"] = "setup_hook_encryption_request"
+    return request
+
+
+def setup_hook_decrypt(response):
+    response["body"]["setup_hook_decrypt"] = "setup_hook_encryption_response"
+    return response
+```
+
 
 ## 测试套件（测试步骤）
 

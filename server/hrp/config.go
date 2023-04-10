@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/builtin"
-	"github.com/test-instructor/cheetah/server/hrp/pkg/uixt"
+	"github.com/test-instructor/yangfan/server/hrp/internal/builtin"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/uixt"
 )
 
 // NewConfig returns a new constructed testcase config with specified testcase name.

@@ -1,8 +1,8 @@
 package pytest
 
 import (
-	"github.com/test-instructor/cheetah/server/hrp/internal/myexec"
-	"github.com/test-instructor/cheetah/server/hrp/internal/sdk"
+	"github.com/test-instructor/yangfan/server/hrp/internal/myexec"
+	"github.com/test-instructor/yangfan/server/hrp/internal/sdk"
 )
 
 func RunPytest(args []string) error {

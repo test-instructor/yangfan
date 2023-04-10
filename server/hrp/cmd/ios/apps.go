@@ -6,7 +6,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/cobra"
 
-	"github.com/test-instructor/cheetah/server/hrp/pkg/gidevice"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/gidevice"
 )
 
 type Application struct {

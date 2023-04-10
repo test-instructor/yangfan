@@ -2,14 +2,15 @@ package interfacecase
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	interfacecaseReq "github.com/test-instructor/cheetah/server/model/interfacecase/request"
-	"github.com/test-instructor/cheetah/server/service"
-	"github.com/test-instructor/cheetah/server/utils"
 	"go.uber.org/zap"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	interfacecaseReq "github.com/test-instructor/yangfan/server/model/interfacecase/request"
+	"github.com/test-instructor/yangfan/server/service"
+	"github.com/test-instructor/yangfan/server/utils"
 )
 
 type ApiConfigApi struct {
@@ -33,7 +34,7 @@ func (acApi *ApiConfigApi) CreateApiConfig(c *gin.Context) {
 		global.GVA_LOG.Error("获取创建配置参数失败", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
 	}
-	ac.CreatedByID = utils.GetUserIDAddress(c)
+	ac.CreatedBy = utils.GetUserIDAddress(c)
 	ac.ProjectID = utils.GetUserProject(c)
 	if err := acService.CreateApiConfig(ac); err != nil {
 		global.GVA_LOG.Error("创建失败!", zap.Error(err))
@@ -57,7 +58,7 @@ func (acApi *ApiConfigApi) DeleteApiConfig(c *gin.Context) {
 	var ac interfacecase.ApiConfig
 	_ = c.ShouldBindJSON(&ac)
 	ac.ProjectID = utils.GetUserProject(c)
-	ac.DeleteByID = utils.GetUserIDAddress(c)
+	ac.DeleteBy = utils.GetUserIDAddress(c)
 	if err := acService.DeleteApiConfig(ac); err != nil {
 		global.GVA_LOG.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
@@ -99,7 +100,7 @@ func (acApi *ApiConfigApi) UpdateApiConfig(c *gin.Context) {
 	var ac interfacecase.ApiConfig
 	_ = c.ShouldBindJSON(&ac)
 	ac.ProjectID = utils.GetUserProject(c)
-	ac.UpdateByID = utils.GetUserIDAddress(c)
+	ac.UpdateBy = utils.GetUserIDAddress(c)
 	if ac.SetupCaseID == nil {
 		ac.SetupCaseID = nil
 	}

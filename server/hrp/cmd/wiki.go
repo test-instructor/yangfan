@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/wiki"
+	"github.com/test-instructor/yangfan/server/hrp/internal/wiki"
 )
 
 var wikiCmd = &cobra.Command{

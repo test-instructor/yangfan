@@ -2,10 +2,10 @@
 package interfacecase
 
 import (
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/interfacecase/customType"
-	"github.com/test-instructor/cheetah/server/model/system"
 	"gorm.io/datatypes"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/interfacecase/customType"
 )
 
 // ApiConfig 结构体
@@ -28,6 +28,5 @@ type ApiConfig struct {
 	Export         customType.TypeArgs `json:"export,omitempty" gorm:"column:export;comment:导出参数;"`
 	SetupCase      *ApiCaseStep        `json:"setup_case" `
 	SetupCaseID    *uint               `json:"setup_case_id" form:"setup_case_id" gorm:"comment:前置用例"`
-	ProjectID      uint                `json:"-" gorm:"comment:所属项目"`
-	Project        system.Project      `json:"-"`
+	Environs       map[string]string   `json:"environs,omitempty" yaml:"environs,omitempty" gorm:"-"` // environment variables
 }

@@ -1,8 +1,8 @@
 package hrp
 
 import (
-	"github.com/test-instructor/cheetah/server/hrp/pkg/gidevice"
-	"github.com/test-instructor/cheetah/server/hrp/pkg/uixt"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/gidevice"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/uixt"
 )
 
 type StepType string
@@ -17,6 +17,7 @@ const (
 	stepTypeWebSocket   StepType = "websocket"
 	stepTypeAndroid     StepType = "android"
 	stepTypeIOS         StepType = "ios"
+	stepTypeGRPC        StepType = "grpc"
 )
 
 var (
@@ -80,6 +81,7 @@ type TStep struct {
 	WebSocket        *WebSocketAction       `json:"websocket,omitempty" yaml:"websocket,omitempty"`
 	Android          *MobileStep            `json:"android,omitempty" yaml:"android,omitempty"`
 	IOS              *MobileStep            `json:"ios,omitempty" yaml:"ios,omitempty"`
+	GRPC             *Grpc                  `json:"gRPC,omitempty" yaml:"gRPC,omitempty"`
 	Variables        map[string]interface{} `json:"variables,omitempty" yaml:"variables,omitempty"`
 	SetupHooks       []string               `json:"setup_hooks,omitempty" yaml:"setup_hooks,omitempty"`
 	TeardownHooks    []string               `json:"teardown_hooks,omitempty" yaml:"teardown_hooks,omitempty"`

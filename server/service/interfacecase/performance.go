@@ -2,11 +2,13 @@ package interfacecase
 
 import (
 	"fmt"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	"github.com/test-instructor/cheetah/server/model/interfacecase/request"
-	interfacecaseReq "github.com/test-instructor/cheetah/server/model/interfacecase/request"
+
 	"gorm.io/gorm"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	"github.com/test-instructor/yangfan/server/model/interfacecase/request"
+	interfacecaseReq "github.com/test-instructor/yangfan/server/model/interfacecase/request"
 )
 
 type PerformanceService struct {
@@ -46,7 +48,7 @@ func (testCaseService *PerformanceService) DeletePerformance(testCase interfacec
 func (testCaseService *PerformanceService) UpdatePerformance(testCase interfacecase.Performance) (err error) {
 	var getCase interfacecase.Operator
 	global.GVA_DB.Model(&interfacecase.Performance{}).Where("id = ?", testCase.ID).First(&getCase)
-	testCase.CreatedByID = getCase.CreatedByID
+	testCase.CreatedBy = getCase.CreatedBy
 	err = global.GVA_DB.Save(&testCase).Error
 	return err
 }
@@ -93,7 +95,7 @@ func (testCaseService *PerformanceService) AddOperation(testcase interfacecase.A
 		var apiCaseStep interfacecase.ApiCaseStep
 		apiCaseStep.Name = testcase.Name
 		apiCaseStep.ProjectID = testcase.ProjectID
-		apiCaseStep.CreatedByID = testcase.CreatedByID
+		apiCaseStep.CreatedBy = testcase.CreatedBy
 		apiCaseStep.Type = interfacecase.ApiTypeCasePerformance
 		if testcase.Transaction != nil {
 			var transaction interfacecase.ApiStepType
@@ -103,10 +105,10 @@ func (testCaseService *PerformanceService) AddOperation(testcase interfacecase.A
 			if testcase.Transaction.Type == interfacecase.TransactionEnd {
 				transaction = interfacecase.ApiStepTypeTransactionEnd
 			}
-			apiCaseStep.ApiStepType = &transaction
+			apiCaseStep.ApiStepType = transaction
 		}
 		if testcase.Rendezvous != nil {
-			apiCaseStep.ApiStepType = &interfacecase.ApiStepTypeRendezvous
+			apiCaseStep.ApiStepType = interfacecase.ApiStepTypeRendezvous
 		}
 		err = tx.Model(&interfacecase.ApiCaseStep{}).Create(&apiCaseStep).Error
 		if err != nil {
@@ -146,7 +148,7 @@ func (testCaseService *PerformanceService) FindPerformanceCase(id uint) (err err
 	testCase := interfacecase.Performance{GVA_MODEL: global.GVA_MODEL{ID: id}}
 	err = global.GVA_DB.First(&testCase).Error
 	name = testCase.Name
-	global.GVA_DB.Debug().Model(&interfacecase.PerformanceRelationship{}).
+	global.GVA_DB.Model(&interfacecase.PerformanceRelationship{}).
 		Where("performance_id = ?", id).
 		Preload("ApiCaseStep").
 		Order("Sort").
@@ -187,13 +189,12 @@ func (testCaseService *PerformanceService) GetReportList(info interfacecaseReq.P
 	err = db.Limit(limit).Offset(offset).Order("ID desc").Find(&pReport).Error
 
 	return err, pReport, total
-	return
 }
 
 func (testCaseService *PerformanceService) FindReport(pReportReq interfacecaseReq.PReportDetail) (err error, report interface{}) {
 	var pReport interfacecase.PerformanceReport
 	// 创建db
-	db := global.GVA_DB.Debug().
+	db := global.GVA_DB.
 		Model(&interfacecase.PerformanceReport{})
 	db.Preload("PerformanceReportDetail.PerformanceReportTotalStats")
 

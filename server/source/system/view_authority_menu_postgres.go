@@ -3,13 +3,13 @@ package system
 import (
 	"context"
 	"fmt"
-	"github.com/test-instructor/cheetah/server/service/system"
+	"github.com/test-instructor/yangfan/server/service/system"
 	"gorm.io/gorm"
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/test-instructor/cheetah/server/global"
-	sysModel "github.com/test-instructor/cheetah/server/model/system"
+	"github.com/test-instructor/yangfan/server/global"
+	sysModel "github.com/test-instructor/yangfan/server/model/system"
 )
 
 const initOrderMenuViewPg = initOrderMenuAuthority + 1

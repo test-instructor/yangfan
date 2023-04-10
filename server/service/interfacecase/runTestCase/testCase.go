@@ -3,9 +3,12 @@ package runTestCase
 import (
 	"errors"
 	"fmt"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
+	"strconv"
+
 	"gorm.io/gorm"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
 )
 
 func getCaseStep(id uint) (apiCaseStep interfacecase.ApiCaseStep) {
@@ -14,6 +17,7 @@ func getCaseStep(id uint) (apiCaseStep interfacecase.ApiCaseStep) {
 			return db2.Order("Sort")
 		}).
 		Preload("TStep.Request").
+		Preload("TStep.Grpc").
 		Preload("TStep.Transaction").
 		Preload("TStep.Rendezvous").
 		First(&apiCaseStep, "id = ?", id)
@@ -55,7 +59,7 @@ func getCaseStepHrp(stepId uint) (*interfacecase.HrpCaseStep, error) {
 			}
 		}
 	}
-
+	//hrpCase.Len = len(setupCase.TStep)
 	global.GVA_LOG.Debug(fmt.Sprintf("hrpCase: %v", hrpCase))
 	return hrpCase, nil
 }
@@ -91,4 +95,32 @@ func RunTestCase(tc TestCase) (reports *interfacecase.ApiReport, err error) {
 	}
 	report, err := tc.Report()
 	return report, nil
+}
+
+func GetEnvVar(projectID uint, envID uint) (envVars map[string]string, envName string, err error) {
+	var env interfacecase.ApiEnv
+	err = global.GVA_DB.Model(&interfacecase.ApiEnv{}).Where("id = ? ", envID).First(&env).Error
+	if err == gorm.ErrRecordNotFound {
+		err = nil
+		return
+	}
+	if err != nil {
+		return
+	}
+	envName = env.Name
+	var envDetail []interfacecase.ApiEnvDetail
+	envVars = make(map[string]string)
+	err = global.GVA_DB.Model(&interfacecase.ApiEnvDetail{}).
+		Where("project_id = ? ", projectID).
+		Find(&envDetail).Error
+	if err != nil {
+		return
+	}
+	for k, _ := range envDetail {
+		value, ok := envDetail[k].Value[strconv.Itoa(int(envID))].(string)
+		if ok {
+			envVars[envDetail[k].Key] = value
+		}
+	}
+	return
 }

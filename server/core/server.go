@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/initialize"
-	"github.com/test-instructor/cheetah/server/service/system"
 	"go.uber.org/zap"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/initialize"
+	"github.com/test-instructor/yangfan/server/service/system"
 )
 
 type server interface {
@@ -36,7 +37,7 @@ func RunWindowsServer() {
 	global.GVA_LOG.Info("server run success on ", zap.String("address", address))
 
 	fmt.Printf(`
-	欢迎使用 cheetah
+	欢迎使用 yangfan
 	当前版本:v1.1.0
     加群方式:微信号：test-instructor QQ群：873175584
 `, address)

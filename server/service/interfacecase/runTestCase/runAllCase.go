@@ -1,8 +1,8 @@
 package runTestCase
 
 import (
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
 )
 
 type ToTestCase struct {
@@ -18,8 +18,8 @@ func RunApi(runCaseReq request.RunCaseReq, runType interfacecase.RunType) (repor
 
 func RunStep(runCaseReq request.RunCaseReq, runType interfacecase.RunType) (reports *interfacecase.ApiReport, err error) {
 	api := NewRunStep(runCaseReq, runType)
-	report, err := RunTestCase(api)
-	return report, nil
+	reports, err = RunTestCase(api)
+	return
 }
 
 func RunCase(runCaseReq request.RunCaseReq, runType interfacecase.RunType) (reports *interfacecase.ApiReport, err error) {

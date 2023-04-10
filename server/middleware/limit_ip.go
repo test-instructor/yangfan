@@ -9,8 +9,8 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/response"
 )
 
 type LimitConfig struct {

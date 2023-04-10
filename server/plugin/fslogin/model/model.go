@@ -1,6 +1,6 @@
 package model
 
-import model "github.com/test-instructor/cheetah/server/model/system"
+import model "github.com/test-instructor/yangfan/server/model/system"
 
 type AccessReq struct {
 	AccessToken      string `json:"access_token"`

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"os"
 
-	"github.com/test-instructor/cheetah/server/global"
+	"github.com/test-instructor/yangfan/server/global"
 	"go.uber.org/zap"
 )
 

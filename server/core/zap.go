@@ -2,12 +2,14 @@ package core
 
 import (
 	"fmt"
-	"github.com/test-instructor/cheetah/server/core/internal"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/utils"
+	"os"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"os"
+
+	"github.com/test-instructor/yangfan/server/core/internal"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/utils"
 )
 
 // Zap 获取 zap.Logger

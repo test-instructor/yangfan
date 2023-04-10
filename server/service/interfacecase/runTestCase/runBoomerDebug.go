@@ -3,12 +3,14 @@ package runTestCase
 import (
 	"errors"
 	"fmt"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/hrp"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	"gorm.io/gorm"
 	"testing"
+
+	"gorm.io/gorm"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/hrp"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
 )
 
 func NewBoomerDebug(runCaseReq request.RunCaseReq, runType interfacecase.RunType) TestCase {
@@ -101,8 +103,10 @@ func (r *runBoomerDebug) LoadCase() (err error) {
 			Name:      apiCase.Name,
 			CaseType:  r.caseType,
 			RunType:   r.runType,
-			ProjectID: apiConfig.ProjectID,
 			SetupCase: r.tcm.SetupCase,
+			Operator: interfacecase.Operator{
+				ProjectID: apiConfig.ProjectID,
+			},
 		},
 	}
 	r.reportOperation.CreateReport()

@@ -1,13 +1,13 @@
 package system
 
 import (
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/system"
-	systemReq "github.com/test-instructor/cheetah/server/model/system/request"
-	systemRes "github.com/test-instructor/cheetah/server/model/system/response"
-	"github.com/test-instructor/cheetah/server/utils"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/system"
+	systemReq "github.com/test-instructor/yangfan/server/model/system/request"
+	systemRes "github.com/test-instructor/yangfan/server/model/system/response"
+	"github.com/test-instructor/yangfan/server/utils"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -15,7 +15,7 @@ import (
 
 type AuthorityMenuApi struct{}
 
-// @Tags AuthorityMenu
+// GetMenu @Tags AuthorityMenu
 // @Summary 获取用户动态路由
 // @Security ApiKeyAuth
 // @Produce  application/json
@@ -34,7 +34,7 @@ func (a *AuthorityMenuApi) GetMenu(c *gin.Context) {
 	}
 }
 
-// @Tags AuthorityMenu
+// GetBaseMenuTree @Tags AuthorityMenu
 // @Summary 获取用户动态路由
 // @Security ApiKeyAuth
 // @Produce  application/json
@@ -50,7 +50,7 @@ func (a *AuthorityMenuApi) GetBaseMenuTree(c *gin.Context) {
 	}
 }
 
-// @Tags AuthorityMenu
+// AddMenuAuthority @Tags AuthorityMenu
 // @Summary 增加menu和角色关联关系
 // @Security ApiKeyAuth
 // @accept application/json
@@ -73,7 +73,7 @@ func (a *AuthorityMenuApi) AddMenuAuthority(c *gin.Context) {
 	}
 }
 
-// @Tags AuthorityMenu
+// GetMenuAuthority @Tags AuthorityMenu
 // @Summary 获取指定角色menu
 // @Security ApiKeyAuth
 // @accept application/json
@@ -96,7 +96,7 @@ func (a *AuthorityMenuApi) GetMenuAuthority(c *gin.Context) {
 	}
 }
 
-// @Tags Menu
+// AddBaseMenu @Tags Menu
 // @Summary 新增菜单
 // @Security ApiKeyAuth
 // @accept application/json
@@ -124,7 +124,7 @@ func (a *AuthorityMenuApi) AddBaseMenu(c *gin.Context) {
 	}
 }
 
-// @Tags Menu
+// DeleteBaseMenu @Tags Menu
 // @Summary 删除菜单
 // @Security ApiKeyAuth
 // @accept application/json
@@ -147,7 +147,7 @@ func (a *AuthorityMenuApi) DeleteBaseMenu(c *gin.Context) {
 	}
 }
 
-// @Tags Menu
+// UpdateBaseMenu @Tags Menu
 // @Summary 更新菜单
 // @Security ApiKeyAuth
 // @accept application/json
@@ -174,7 +174,7 @@ func (a *AuthorityMenuApi) UpdateBaseMenu(c *gin.Context) {
 	}
 }
 
-// @Tags Menu
+// GetBaseMenuById @Tags Menu
 // @Summary 根据id获取菜单
 // @Security ApiKeyAuth
 // @accept application/json
@@ -197,7 +197,7 @@ func (a *AuthorityMenuApi) GetBaseMenuById(c *gin.Context) {
 	}
 }
 
-// @Tags Menu
+// GetMenuList @Tags Menu
 // @Summary 分页获取基础menu列表
 // @Security ApiKeyAuth
 // @accept application/json

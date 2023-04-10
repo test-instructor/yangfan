@@ -2,12 +2,14 @@ package initialize
 
 import (
 	"fmt"
+
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/middleware"
-	"github.com/test-instructor/cheetah/server/plugin/email"
-	"github.com/test-instructor/cheetah/server/plugin/fslogin"
-	"github.com/test-instructor/cheetah/server/utils/plugin"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/middleware"
+	"github.com/test-instructor/yangfan/server/plugin/email"
+	"github.com/test-instructor/yangfan/server/plugin/fslogin"
+	"github.com/test-instructor/yangfan/server/utils/plugin"
 )
 
 func PluginInit(group *gin.RouterGroup, Plugin ...plugin.Plugin) {
@@ -26,6 +28,7 @@ func InstallPlugin(
 	apiCaseGroup *gin.RouterGroup,
 	timerTaskGroup *gin.RouterGroup,
 	performanceGroup *gin.RouterGroup,
+	environmentGroup *gin.RouterGroup,
 ) {
 	PublicGroup := Router.Group("")
 	fmt.Println("无鉴权插件安装==》", PublicGroup)
@@ -103,6 +106,16 @@ func InstallPlugin(
 	))
 
 	PluginInit(performanceGroup, email.CreateEmailPlug(
+		global.GVA_CONFIG.Email.To,
+		global.GVA_CONFIG.Email.From,
+		global.GVA_CONFIG.Email.Host,
+		global.GVA_CONFIG.Email.Secret,
+		global.GVA_CONFIG.Email.Nickname,
+		global.GVA_CONFIG.Email.Port,
+		global.GVA_CONFIG.Email.IsSSL,
+	))
+
+	PluginInit(environmentGroup, email.CreateEmailPlug(
 		global.GVA_CONFIG.Email.To,
 		global.GVA_CONFIG.Email.From,
 		global.GVA_CONFIG.Email.Host,

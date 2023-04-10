@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/version"
+	"github.com/test-instructor/yangfan/server/hrp/internal/version"
 )
 
 type IEvent interface {

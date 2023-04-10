@@ -2,13 +2,14 @@ package interfacecase
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	"github.com/test-instructor/cheetah/server/service"
-	"github.com/test-instructor/cheetah/server/utils"
 	"go.uber.org/zap"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	"github.com/test-instructor/yangfan/server/service"
+	"github.com/test-instructor/yangfan/server/utils"
 )
 
 type ApiMenuApi struct {
@@ -42,7 +43,7 @@ func (apiCaseApi *ApiMenuApi) CreateApiMenu(c *gin.Context) {
 	_ = c.ShouldBindJSON(&apicase)
 	apicase.MenuType = c.Request.FormValue("menutype")
 	apicase.ProjectID = utils.GetUserProject(c)
-	apicase.CreatedByID = utils.GetUserIDAddress(c)
+	apicase.CreatedBy = utils.GetUserIDAddress(c)
 	if err := apicaseService.CreateApiMenu(apicase); err != nil {
 		global.GVA_LOG.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)

@@ -14,8 +14,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/code"
-	"github.com/test-instructor/cheetah/server/hrp/pkg/gadb"
+	"github.com/test-instructor/yangfan/server/hrp/internal/code"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/gadb"
 )
 
 var errDriverNotImplemented = errors.New("driver method not implemented")

@@ -25,15 +25,15 @@
             name="verify"
         />
       </div>
-      <div style="width: 150px; margin-top: 5px; display: table; margin-left:20px; ">
-        <span style="margin-right:5px;">默认配置:  </span>
-        <el-switch
-            v-model="reqData.default"
-            class="mb-2"
-            size="large"
-            name="默认配置"
-        />
-      </div>
+<!--      <div style="width: 150px; margin-top: 5px; display: table; margin-left:20px; ">-->
+<!--        <span style="margin-right:5px;">默认配置:  </span>-->
+<!--        <el-switch-->
+<!--            v-model="reqData.default"-->
+<!--            class="mb-2"-->
+<!--            size="large"-->
+<!--            name="默认配置"-->
+<!--        />-->
+<!--      </div>-->
     </div>
     <div style="width: 1000px; margin-top: 10px; display: flex;">
       <el-input

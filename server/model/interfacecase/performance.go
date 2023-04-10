@@ -1,8 +1,7 @@
 package interfacecase
 
 import (
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/system"
+	"github.com/test-instructor/yangfan/server/global"
 )
 
 type Performance struct {
@@ -17,8 +16,6 @@ type Performance struct {
 	FrontCase           *bool              `json:"front_case" form:"front_case"`
 	EntryID             int                `json:"-"`
 	ApiMenuID           uint               `json:"-" gorm:"comment:所属菜单"`
-	ProjectID           uint               `json:"-" gorm:"comment:所属项目"`
-	Project             *system.Project    `json:"-"`
 	PerformanceReport   *PerformanceReport `json:"Report"`
 	PerformanceReportId uint               `json:"report_id"`
 }

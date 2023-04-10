@@ -1,13 +1,13 @@
 package system
 
 import (
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/system"
-	systemReq "github.com/test-instructor/cheetah/server/model/system/request"
-	systemRes "github.com/test-instructor/cheetah/server/model/system/response"
-	"github.com/test-instructor/cheetah/server/utils"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/system"
+	systemReq "github.com/test-instructor/yangfan/server/model/system/request"
+	systemRes "github.com/test-instructor/yangfan/server/model/system/response"
+	"github.com/test-instructor/yangfan/server/utils"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -15,7 +15,7 @@ import (
 
 type SystemApiApi struct{}
 
-// @Tags SysApi
+// CreateApi @Tags SysApi
 // @Summary 创建基础api
 // @Security ApiKeyAuth
 // @accept application/json
@@ -38,7 +38,7 @@ func (s *SystemApiApi) CreateApi(c *gin.Context) {
 	}
 }
 
-// @Tags SysApi
+// DeleteApi @Tags SysApi
 // @Summary 删除api
 // @Security ApiKeyAuth
 // @accept application/json
@@ -61,7 +61,7 @@ func (s *SystemApiApi) DeleteApi(c *gin.Context) {
 	}
 }
 
-// @Tags SysApi
+// GetApiList @Tags SysApi
 // @Summary 分页获取API列表
 // @Security ApiKeyAuth
 // @accept application/json
@@ -89,7 +89,7 @@ func (s *SystemApiApi) GetApiList(c *gin.Context) {
 	}
 }
 
-// @Tags SysApi
+// GetApiById @Tags SysApi
 // @Summary 根据id获取api
 // @Security ApiKeyAuth
 // @accept application/json
@@ -113,7 +113,7 @@ func (s *SystemApiApi) GetApiById(c *gin.Context) {
 	}
 }
 
-// @Tags SysApi
+// UpdateApi @Tags SysApi
 // @Summary 修改基础api
 // @Security ApiKeyAuth
 // @accept application/json
@@ -136,7 +136,7 @@ func (s *SystemApiApi) UpdateApi(c *gin.Context) {
 	}
 }
 
-// @Tags SysApi
+// GetAllApis @Tags SysApi
 // @Summary 获取所有的Api 不分页
 // @Security ApiKeyAuth
 // @accept application/json
@@ -152,7 +152,7 @@ func (s *SystemApiApi) GetAllApis(c *gin.Context) {
 	}
 }
 
-// @Tags SysApi
+// DeleteApisByIds @Tags SysApi
 // @Summary 删除选中Api
 // @Security ApiKeyAuth
 // @accept application/json
