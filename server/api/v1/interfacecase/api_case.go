@@ -1,16 +1,18 @@
 package interfacecase
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	interfacecaseReq "github.com/test-instructor/cheetah/server/model/interfacecase/request"
-	"github.com/test-instructor/cheetah/server/service"
-	"github.com/test-instructor/cheetah/server/utils"
-	"go.uber.org/zap"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	interfacecaseReq "github.com/test-instructor/yangfan/server/model/interfacecase/request"
+	"github.com/test-instructor/yangfan/server/service"
+	"github.com/test-instructor/yangfan/server/utils"
 )
 
 type ApiCaseApi struct {
@@ -56,7 +58,7 @@ func (apiCase *ApiCaseApi) DeleteApiCase(c *gin.Context) {
 	var testCase interfacecase.ApiCase
 	_ = c.ShouldBindJSON(&testCase)
 	testCase.ProjectID = utils.GetUserProject(c)
-	testCase.DeleteByID = utils.GetUserIDAddress(c)
+	testCase.DeleteBy = utils.GetUserIDAddress(c)
 	if err := apiCaseService.DeleteApiCase(testCase); err != nil {
 		global.GVA_LOG.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
@@ -98,7 +100,7 @@ func (apiCase *ApiCaseApi) UpdateApiCase(c *gin.Context) {
 	var testCase interfacecase.ApiCase
 	_ = c.ShouldBindJSON(&testCase)
 	testCase.ProjectID = utils.GetUserProject(c)
-	testCase.UpdateByID = utils.GetUserIDAddress(c)
+	testCase.UpdateBy = utils.GetUserIDAddress(c)
 	menuStr := c.Query("menu")
 	menuInt, _ := strconv.Atoi(menuStr)
 	menu := interfacecase.ApiMenu{GVA_MODEL: global.GVA_MODEL{ID: uint(menuInt)}}

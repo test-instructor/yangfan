@@ -3,8 +3,8 @@ package example
 import (
 	"errors"
 
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/example"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/example"
 	"gorm.io/gorm"
 )
 

@@ -2,15 +2,16 @@ package system
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/system"
 	"go.uber.org/zap"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/system"
 )
 
 type JwtApi struct{}
 
-// @Tags Jwt
+// JsonInBlacklist @Tags Jwt
 // @Summary jwt加入黑名单
 // @Security ApiKeyAuth
 // @accept application/json

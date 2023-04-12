@@ -16,6 +16,12 @@
           </div>
         </el-form-item>
         <el-form-item>
+<!--          <user-config-->
+<!--                  :api_config_name="api_config_name"-->
+<!--                  :api_env_name="api_env_name"-->
+<!--          ></user-config>-->
+        </el-form-item>
+        <el-form-item>
           <el-button type="primary" @click="addApiCaseFunc" round>添加步骤</el-button>
         </el-form-item>
 
@@ -41,7 +47,7 @@
             align="center"
         >
           <template #default="scope">
-            <div class="block" :class="`block_${scope.row.request.method.toLowerCase()}`">
+            <div v-if="scope.row.request" class="block" :class="`block_${scope.row.request.method.toLowerCase()}`">
                   <span class="block-method block_method_color"
                         :class="`block_method_${scope.row.request.method.toLowerCase()}`">
                     {{ scope.row.request.method }}
@@ -54,6 +60,22 @@
                     </span>
               </div>
               <span class="block-method block_url">{{ scope.row.request.url }}</span>
+              <span class="block-summary-description">{{ scope.row.name }}</span>
+            </div>
+            <div v-if="scope.row.gRPC" class="block" :class="`block_put`">
+                  <span class="block-method block_method_color"
+                        :class="`block_method_put`">
+                    {{ "gRPC" }}
+                  </span>
+              <div class="block">
+                    <span class="block-method block_method_color block_method_options"
+                          v-if="scope.row.creator==='yapi'"
+                          :title="'从YAPI导入的接口'">
+                      YAPI
+                    </span>
+              </div>
+
+              <span class="block-method block_url">{{ scope.row.gRPC.url }}</span>
               <span class="block-summary-description">{{ scope.row.name }}</span>
             </div>
           </template>
@@ -87,6 +109,26 @@
           ref="menuRole">
       </interfaceTempleForm>
 
+    </el-dialog>
+    <el-dialog
+        v-model="interfaceTempleFormVisibleGrpc"
+        :before-close="closeDialogGrpc"
+        :visible.sync="interfaceTempleFormVisibleGrpc"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :title="dialogTitle"
+        width="1380px"
+        top="30px"
+    >
+      <InterfaceTempleGrpcForm
+          @close="closeDialogGrpc"
+          v-if="interfaceTempleFormVisibleGrpc"
+          :heights="heightDiv"
+          eventType="update"
+          :apiType="apiTypes"
+          :formData="formDatasGrpc"
+          ref="menuRole">
+      </InterfaceTempleGrpcForm>
     </el-dialog>
 
     <el-dialog
@@ -126,23 +168,29 @@ import {
 } from '@/api/testCase'
 import {useRoute} from "vue-router";
 import {reactive, ref, onMounted, watch} from "vue";
-
+import InterfaceTempleGrpcForm from '@/view/interface/interfaceTemplate/interfaceTemplateGrpcForm.vue'
 import interfaceTempleForm from '@/view/interface/interfaceTemplate/interfaceTemplateForm.vue'
 import testCaseAdd from "@/view/interface/testCaseStep/testCaseStepAdd.vue"
 import {findInterfaceTemplate} from "@/api/interfaceTemplate";
 import {ElMessage, ElMessageBox} from "element-plus";
 import Sortable from 'sortablejs'
+import UserConfig from "@/view/interface/interfaceComponents/userConfig.vue";
 
 const route = useRoute()
 const testCaseID = ref()
 const tableData = ref([])
 const apiTypes = 2
 const interfaceTempleFormVisible = ref(false)
+const interfaceTempleFormVisibleGrpc = ref(false)
 const apiCaseVisible = ref(false)
 const dialogTitle = ref(false)
 const type = ref('')
 const heightDiv = ref()
 const caseName = ref()
+const api_config_name = ref()
+const api_env_name = ref()
+const user_config_show = ref(false)
+const typeGrpc = ref('')
 let sortIdList = ""
 heightDiv.value =  window.screen.height - 480
 const formDatas = reactive({
@@ -161,6 +209,21 @@ const formDatas = reactive({
   validate: '',
   hooks: '',
   apiMenuID:'',
+})
+const formDatasGrpc = reactive({
+  name: '',
+  gRPC: reactive({
+    Timeout: 0,
+    url: '',
+    headers: '',
+    body: '',
+    type: '',
+  }),
+  variables: '',
+  extract: '',
+  validate: '',
+  hooks: '',
+  apiMenuID: '',
 })
 const sortData = ref({
   ID: 0,
@@ -186,8 +249,13 @@ const getTestCaseDetailFunc = async(testCaseID) => {
   if (res.code === 0) {
     tableData.value = res.data.reapicase.TStep
     caseName.value = res.data.reapicase.name
+    api_config_name.value = res.data.reapicase.RunConfigName
+    api_env_name.value = res.data.reapicase.api_env_name
+    user_config_show.value = true
     // dialogFormVisible.value = true
   }
+  console.log("=================",api_config_name.value)
+  console.log("=================",api_env_name.value)
 }
 init()
 // watch(() => route.params.id, () => {
@@ -207,8 +275,17 @@ const updateInterfaceTemplateFunc = async(row) => {
   type.value = 'update'
   dialogTitle.value = '编辑套件'
   if (res.code === 0) {
-    formDatas.value = res.data.reapicase
-    interfaceTempleFormVisible.value = true
+
+    console.log("==============", res.data.reapicase )
+    if(res.data.reapicase.gRPC){
+      formDatasGrpc.value = res.data.reapicase
+      interfaceTempleFormVisibleGrpc.value = true
+    }
+    if(res.data.reapicase.request){
+      formDatas.value = res.data.reapicase
+      interfaceTempleFormVisible.value = true
+    }
+    // interfaceTempleFormVisible.value = true
   }
 }
 
@@ -288,6 +365,25 @@ const closeDialog = () => {
 const closeDialogAddCase = () => {
   apiCaseVisible.value = false
   getTestCaseDetailFunc(testCaseID.value)
+}
+
+const closeDialogGrpc = () => {
+  interfaceTempleFormVisibleGrpc.value = false
+  formDatasGrpc.value = reactive({
+    name: '',
+    gRPC: reactive({
+      Timeout: 0,
+      url: '',
+      headers: '',
+      body: '',
+      type: '',
+    }),
+    variables: '',
+    extract: '',
+    validate: '',
+    hooks: '',
+    apiMenuID: '',
+  })
 }
 
 </script>

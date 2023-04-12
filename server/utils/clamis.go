@@ -3,9 +3,9 @@ package utils
 import (
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/system"
-	systemReq "github.com/test-instructor/cheetah/server/model/system/request"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/system"
+	systemReq "github.com/test-instructor/yangfan/server/model/system/request"
 	"strconv"
 )
 

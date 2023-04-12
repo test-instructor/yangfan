@@ -9,10 +9,10 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 
-	"github.com/test-instructor/cheetah/server/hrp/cmd/adb"
-	"github.com/test-instructor/cheetah/server/hrp/cmd/ios"
-	"github.com/test-instructor/cheetah/server/hrp/internal/code"
-	"github.com/test-instructor/cheetah/server/hrp/internal/version"
+	"github.com/test-instructor/yangfan/server/hrp/cmd/adb"
+	"github.com/test-instructor/yangfan/server/hrp/cmd/ios"
+	"github.com/test-instructor/yangfan/server/hrp/internal/code"
+	"github.com/test-instructor/yangfan/server/hrp/internal/version"
 )
 
 // rootCmd represents the base command when called without any subcommands

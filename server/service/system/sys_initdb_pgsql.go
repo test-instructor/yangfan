@@ -7,13 +7,13 @@ import (
 	"path/filepath"
 
 	"github.com/gookit/color"
-	"github.com/test-instructor/cheetah/server/config"
+	"github.com/test-instructor/yangfan/server/config"
 
-	"github.com/test-instructor/cheetah/server/utils"
+	"github.com/test-instructor/yangfan/server/utils"
 
 	uuid "github.com/satori/go.uuid"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/system/request"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/system/request"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

@@ -48,9 +48,10 @@
             <el-table-column align="left" label="日期" width="180">
               <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
             </el-table-column>
-            <el-table-column align="left" label="套件名称" prop="name" width="240"/>
-            <el-table-column align="left" label="调试运行配置" prop="RunConfigName" width="240"/>
-            <el-table-column align="left" label="按钮组" min-width="500">
+            <el-table-column align="left" label="套件名称" prop="name" width="200"/>
+            <el-table-column align="left" label="调试运行配置" prop="RunConfigName" width="200"/>
+            <el-table-column align="left" label="运行环境" prop="api_env_name" width="200"/>
+            <el-table-column align="left" label="按钮组" min-width="300">
               <template #default="scope">
                 <el-button type="text" icon="detail" size="small" class="table-button" @click="runCase(scope.row, 1)">调试运行
                 </el-button>
@@ -99,6 +100,20 @@
             />
           </el-select>
         </el-form-item>
+        <el-form-item label="环境变量:">
+          <el-select
+              v-model="apiEnvID"
+              placeholder="请选择"
+              @change="envChange"
+          >
+            <el-option
+                v-for="item in apiEnvData"
+                :key="item.ID"
+                :label="item.name"
+                :value="item.ID"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="前置套件:">
           <el-switch v-model="formData.front_case" />
         </el-form-item>
@@ -138,6 +153,7 @@ import {getApiConfigList} from "@/api/apiConfig";
 import {runTestCaseStep} from "@/api/runTestCase";
 import InterfaceTree from '@/view/interface/interfaceComponents/interfaceTree.vue'
 import envConfig from '@/view/interface/interfaceComponents/envConfig.vue'
+import {getEnvList} from "@/api/env";
 
 
 const router = useRouter()
@@ -148,6 +164,7 @@ const formData = ref({
   type: 2,
   front_case: false,
   RunConfigID:0,
+  api_env_id:0,
 })
 
 // =========== 表格控制部分 ===========
@@ -157,8 +174,15 @@ const pageSize = ref(10)
 const tableData = ref([])
 const searchInfo = ref({})
 const configID = ref()
+const apiEnvID = ref()
 const configChange = (key) => {
   formData.value.RunConfigID = key
+}
+const envChange = (key) => {
+  formData.value.api_env_id = null
+  if (key && key>0) {
+    formData.value.api_env_id = key
+  }
 }
 const params = reactive({
   menu: '',
@@ -210,6 +234,7 @@ const getTableData = async () => {
     pageSize.value = table.data.pageSize
   }
 }
+getTableData()
 const configData = ref([])
 const getConfigData = async () => {
   const config = await getApiConfigList({page: 1, pageSize: 777777})
@@ -286,11 +311,15 @@ const type = ref('')
 // 更新行
 const updateTestCaseFunc = async (row) => {
   await getConfigData()
+  await getApiEnv()
   const res = await findTestCase({ID: row.ID})
   type.value = 'update'
   if (res.code === 0) {
     formData.value = res.data.reapicase
     configID.value = formData.value.RunConfigID
+    if (formData.value.api_env_id>0){
+      apiEnvID.value = formData.value.api_env_id
+    }
     dialogFormVisible.value = true
   }
 }
@@ -355,8 +384,10 @@ const dialogFormVisible = ref(false)
 // 打开弹窗
 const openDialog = () => {
   getConfigData()
+  getApiEnv()
   type.value = 'create'
   dialogFormVisible.value = true
+
 }
 
 // 关闭弹窗
@@ -397,6 +428,11 @@ const enterDialog = async () => {
       formData.value.RunConfigName = item.name
     }
   })
+  apiEnvData.value.forEach((item, index, arr) => {
+    if (item.ID === formData.value.api_env_id){
+      formData.value.api_env_name = item.name
+    }
+  })
   switch (type.value) {
     case 'create':
       res = await createTestCase(formData.value, params)
@@ -417,6 +453,16 @@ const enterDialog = async () => {
     await getTableData()
   }
 }
+
+const apiEnvData = ref([])
+const getApiEnv = async () => {
+  const res = await getEnvList()
+  if (res.code === 0) {
+    apiEnvData.value = res.data.list
+    console.log("==========",apiEnvData.value)
+  }
+}
+
 </script>
 
 <style>

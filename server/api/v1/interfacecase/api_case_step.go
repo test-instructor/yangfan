@@ -1,16 +1,18 @@
 package interfacecase
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	interfacecaseReq "github.com/test-instructor/cheetah/server/model/interfacecase/request"
-	"github.com/test-instructor/cheetah/server/service"
-	"github.com/test-instructor/cheetah/server/utils"
-	"go.uber.org/zap"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	interfacecaseReq "github.com/test-instructor/yangfan/server/model/interfacecase/request"
+	"github.com/test-instructor/yangfan/server/service"
+	"github.com/test-instructor/yangfan/server/utils"
 )
 
 type ApiCase struct {
@@ -32,7 +34,7 @@ func (apiCase *ApiCase) CreateTestCaseStep(c *gin.Context) {
 	var menu interfacecase.ApiMenu
 	_ = c.ShouldBindJSON(&apicase)
 	apicase.ProjectID = utils.GetUserProject(c)
-	apicase.CreatedByID = utils.GetUserIDAddress(c)
+	apicase.CreatedBy = utils.GetUserIDAddress(c)
 	menuStr := c.Query("menu")
 	menuInt, _ := strconv.Atoi(menuStr)
 	menu = interfacecase.ApiMenu{GVA_MODEL: global.GVA_MODEL{ID: uint(menuInt)}}
@@ -58,7 +60,7 @@ func (apiCase *ApiCase) DeleteTestCaseStep(c *gin.Context) {
 	var apicase interfacecase.ApiCaseStep
 	_ = c.ShouldBindJSON(&apicase)
 	apicase.ProjectID = utils.GetUserProject(c)
-	apicase.DeleteByID = utils.GetUserIDAddress(c)
+	apicase.DeleteBy = utils.GetUserIDAddress(c)
 	if err := testCaseService.DeleteTestCaseStep(apicase); err != nil {
 		global.GVA_LOG.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
@@ -100,7 +102,7 @@ func (apiCase *ApiCase) UpdateTestCaseStep(c *gin.Context) {
 	var apicase interfacecase.ApiCaseStep
 	_ = c.ShouldBindJSON(&apicase)
 	apicase.ProjectID = utils.GetUserProject(c)
-	apicase.UpdateByID = utils.GetUserIDAddress(c)
+	apicase.UpdateBy = utils.GetUserIDAddress(c)
 	menuStr := c.Query("menu")
 	menuInt, _ := strconv.Atoi(menuStr)
 	menu := interfacecase.ApiMenu{GVA_MODEL: global.GVA_MODEL{ID: uint(menuInt)}}

@@ -2,11 +2,12 @@ package system
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	systemReq "github.com/test-instructor/cheetah/server/model/system/request"
 	"go.uber.org/zap"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	systemReq "github.com/test-instructor/yangfan/server/model/system/request"
 )
 
 type AutoCodeHistoryApi struct{}

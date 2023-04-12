@@ -3,17 +3,17 @@ package system
 import (
 	"errors"
 	"fmt"
-	systemReq "github.com/test-instructor/cheetah/server/model/system/request"
+	systemReq "github.com/test-instructor/yangfan/server/model/system/request"
 	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/test-instructor/cheetah/server/model/system/response"
+	"github.com/test-instructor/yangfan/server/model/system/response"
 
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/system"
-	"github.com/test-instructor/cheetah/server/utils"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/system"
+	"github.com/test-instructor/yangfan/server/utils"
 
 	"go.uber.org/zap"
 )

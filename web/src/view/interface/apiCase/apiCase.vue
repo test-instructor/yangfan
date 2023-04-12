@@ -50,6 +50,7 @@
     <!--        </el-table-column>-->
             <el-table-column align="left" label="用例名称" prop="name" width="240"/>
             <el-table-column align="left" label="运行配置" prop="runConfig.name" width="240"/>
+            <el-table-column align="left" label="运行环境" prop="api_env_name" width="240"/>
             <!--        <el-table-column align="left" label="测试用例集" min-width="80">-->
     <!--          <template #default="scope">-->
     <!--            <el-cascader-->
@@ -123,6 +124,20 @@
             />
           </el-select>
         </el-form-item>
+        <el-form-item label="环境变量:">
+          <el-select
+              v-model="apiEnvID"
+              placeholder="请选择"
+              @change="envChange"
+          >
+            <el-option
+                v-for="item in apiEnvData"
+                :key="item.ID"
+                :label="item.name"
+                :value="item.ID"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="备注:">
           <el-input v-model="formData.describe" clearable placeholder="请输入"/>
         </el-form-item>
@@ -167,6 +182,7 @@ import InterfaceTree from '@/view/interface/interfaceComponents/interfaceTree.vu
 import {getApiConfigList} from "@/api/apiConfig";
 import {runApiCase} from "@/api/runTestCase";
 import {useRouter} from "vue-router";
+import {getEnvList} from "@/api/env";
 
 const router = useRouter()
 
@@ -182,7 +198,8 @@ const formData = ref({
   runConfig: {
     ID: 0
   },
-  front_case:false
+  front_case:false,
+  api_env_id:0,
 })
 const cronVisible = ref(false)
 const cronFun = () => {
@@ -197,8 +214,16 @@ const closeRunTimeCron = (isClose) => {
 
 }
 const configID = ref()
+const apiEnvID = ref()
 const configChange = (key) => {
   formData.value.runConfig.ID = key
+}
+
+const envChange = (key) => {
+  formData.value.api_env_id = null
+  if (key && key>0) {
+    formData.value.api_env_id = key
+  }
 }
 let treeID = 0
 
@@ -380,6 +405,7 @@ const type = ref('')
 const updateApiCaseFunc = async (row) => {
   const res = await findApiCase({ID: row.ID})
   await getConfigData()
+  await getApiEnv()
   creatCron.value = true
   // configID.value = configData.value.runConfig.ID
   type.value = 'update'
@@ -387,6 +413,9 @@ const updateApiCaseFunc = async (row) => {
     formData.value = res.data.retestCase
     configID.value = formData.value.runConfig.ID
     dialogFormVisible.value = true
+    if (formData.value.api_env_id>0){
+      apiEnvID.value = formData.value.api_env_id
+    }
   }
 }
 
@@ -411,6 +440,7 @@ const dialogFormVisible = ref(false)
 // 打开弹窗
 const openDialog = () => {
   getConfigData()
+  getApiEnv()
   type.value = 'create'
   creatCron.value = true
   dialogFormVisible.value = true
@@ -428,6 +458,7 @@ const closeDialog = () => {
     describe: '',
     runNumber: 0,
     runConfig: {ID: 0},
+    api_env_id:0,
   }
   creatCron.value = false
 }
@@ -456,6 +487,11 @@ const enterDialog = async () => {
   }
   let res
   let params = {menu: treeID}
+  apiEnvData.value.forEach((item, index, arr) => {
+    if (item.ID === formData.value.api_env_id){
+      formData.value.api_env_name = item.name
+    }
+  })
   formData.value.case = []
   switch (type.value) {
     case 'create':
@@ -478,6 +514,16 @@ const enterDialog = async () => {
     creatCron.value = false
   }
 }
+
+const apiEnvData = ref([])
+const getApiEnv = async () => {
+  const res = await getEnvList()
+  if (res.code === 0) {
+    apiEnvData.value = res.data.list
+    console.log("==========",apiEnvData.value)
+  }
+}
+
 </script>
 
 <style>

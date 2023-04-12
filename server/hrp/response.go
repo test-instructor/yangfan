@@ -14,9 +14,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/builtin"
-	"github.com/test-instructor/cheetah/server/hrp/internal/json"
-	"github.com/test-instructor/cheetah/server/hrp/pkg/uixt"
+	"github.com/test-instructor/yangfan/server/hrp/internal/builtin"
+	"github.com/test-instructor/yangfan/server/hrp/internal/json"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/uixt"
 )
 
 var fieldTags = []string{"proto", "status_code", "headers", "cookies", "body", textExtractorSubRegexp}

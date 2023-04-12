@@ -1,12 +1,13 @@
 package initialize
 
 import (
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
 	"os"
 
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/example"
-	"github.com/test-instructor/cheetah/server/model/system"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/example"
+	"github.com/test-instructor/yangfan/server/model/system"
 
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -58,6 +59,7 @@ func RegisterTables(db *gorm.DB) {
 		interfacecase.ApiStepRendezvous{},
 		interfacecase.ApiStepTransaction{},
 		interfacecase.ApiStep{},
+		interfacecase.ApiGrpc{},
 		interfacecase.ApiRequest{},
 		interfacecase.ApiConfig{},
 		interfacecase.ApiCaseStep{},
@@ -65,6 +67,11 @@ func RegisterTables(db *gorm.DB) {
 		interfacecase.ApiDebugTalk{},
 		interfacecase.ApiCase{},
 		interfacecase.ApiCaseRelationship{},
+		interfacecase.ApiUserConfig{},
+
+		//环境变量
+		interfacecase.ApiEnv{},
+		interfacecase.ApiEnvDetail{},
 
 		// 性能测试模块
 		interfacecase.Performance{},

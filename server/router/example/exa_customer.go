@@ -2,8 +2,8 @@ package example
 
 import (
 	"github.com/gin-gonic/gin"
-	v1 "github.com/test-instructor/cheetah/server/api/v1"
-	"github.com/test-instructor/cheetah/server/middleware"
+	v1 "github.com/test-instructor/yangfan/server/api/v1"
+	"github.com/test-instructor/yangfan/server/middleware"
 )
 
 type CustomerRouter struct{}

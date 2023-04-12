@@ -17,7 +17,8 @@
 - [x] 网络性能采集：在场景化接口测试的基础上，可额外采集网络链路性能指标（DNS 解析、TCP 连接、SSL 握手、网络传输等）
 - [x] 数据驱动`parameterize`
 - [x] python 函数驱动
-- [x] python 函数驱动
+- [x] 通过标签运行定时任务(可用户发版时做全量回归)
+- [x] 定时任务并发执行，定时任务可以根据用户设置并发数，节省等待时间
 - [x] 通过标签运行定时任务(可用户发版时做全量回归)
 - [x] 定时任务并发执行，定时任务可以根据用户设置并发数，节省等待时间
 - [ ] 支持sql操作
@@ -39,7 +40,7 @@
 
 
 > - [环境准备](https://www.gin-vue-admin.com/guide/start-quickly/env.html)
-> - 1、新建数据库，并导入docs/sql/cheetah.sql文件
+> - 1、新建数据库，并导入docs/sql/yangfan.sql文件
 > - 2、修改`server/config.yaml`文件中的数据库`mysql`、飞书登录`fs`相关配置
 > - 3、修改`web/.env.development`、 `web/.env.production`中的`VITE_FS_LOGIN`、`VITE_FS_APP_ID`
 

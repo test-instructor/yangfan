@@ -2,14 +2,15 @@ package interfacecase
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	"github.com/test-instructor/cheetah/server/model/interfacecase/request"
-	interfacecaseReq "github.com/test-instructor/cheetah/server/model/interfacecase/request"
-	"github.com/test-instructor/cheetah/server/service"
-	"github.com/test-instructor/cheetah/server/utils"
 	"go.uber.org/zap"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	"github.com/test-instructor/yangfan/server/model/interfacecase/request"
+	interfacecaseReq "github.com/test-instructor/yangfan/server/model/interfacecase/request"
+	"github.com/test-instructor/yangfan/server/service"
+	"github.com/test-instructor/yangfan/server/utils"
 )
 
 type PerformanceApi struct {
@@ -21,7 +22,7 @@ func (apiCase *PerformanceApi) CreatePerformance(c *gin.Context) {
 	var testCase interfacecase.Performance
 	_ = c.ShouldBindJSON(&testCase)
 	testCase.ProjectID = utils.GetUserProject(c)
-	testCase.CreatedByID = utils.GetUserIDAddress(c)
+	testCase.CreatedBy = utils.GetUserIDAddress(c)
 	if err := performanceService.CreatePerformance(testCase); err != nil {
 		global.GVA_LOG.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
@@ -52,7 +53,7 @@ func (apiCase *PerformanceApi) DeletePerformance(c *gin.Context) {
 	var testCase interfacecase.Performance
 	_ = c.ShouldBindJSON(&testCase)
 	testCase.ProjectID = utils.GetUserProject(c)
-	testCase.DeleteByID = utils.GetUserIDAddress(c)
+	testCase.DeleteBy = utils.GetUserIDAddress(c)
 	if err := performanceService.DeletePerformance(testCase); err != nil {
 		global.GVA_LOG.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
@@ -65,7 +66,7 @@ func (apiCase *PerformanceApi) UpdatePerformance(c *gin.Context) {
 	var testCase interfacecase.Performance
 	_ = c.ShouldBindJSON(&testCase)
 	testCase.ProjectID = utils.GetUserProject(c)
-	testCase.UpdateByID = utils.GetUserIDAddress(c)
+	testCase.UpdateBy = utils.GetUserIDAddress(c)
 	if err := performanceService.UpdatePerformance(testCase); err != nil {
 		global.GVA_LOG.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
@@ -110,7 +111,7 @@ func (apiCase *PerformanceApi) AddOperation(c *gin.Context) {
 	var testCase Operation
 	_ = c.ShouldBindJSON(&testCase)
 	testCase.ApiStep.ProjectID = utils.GetUserProject(c)
-	testCase.ApiStep.UpdateByID = utils.GetUserIDAddress(c)
+	testCase.ApiStep.UpdateBy = utils.GetUserIDAddress(c)
 	if err := performanceService.AddOperation(testCase.ApiStep, testCase.Pid); err != nil {
 		global.GVA_LOG.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
@@ -134,7 +135,7 @@ func (apiCase *PerformanceApi) FindPerformance(c *gin.Context) {
 	var testCase interfacecase.Performance
 	_ = c.ShouldBindQuery(&testCase)
 	testCase.ProjectID = utils.GetUserProject(c)
-	testCase.CreatedByID = utils.GetUserIDAddress(c)
+	testCase.CreatedBy = utils.GetUserIDAddress(c)
 	if err, reapicase := performanceService.FindPerformance(testCase.ID); err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
@@ -147,7 +148,7 @@ func (apiCase *PerformanceApi) FindPerformanceCase(c *gin.Context) {
 	var testCase interfacecase.Performance
 	_ = c.ShouldBindQuery(&testCase)
 	testCase.ProjectID = utils.GetUserProject(c)
-	testCase.CreatedByID = utils.GetUserIDAddress(c)
+	testCase.CreatedBy = utils.GetUserIDAddress(c)
 	if err, reapicase, name := performanceService.FindPerformanceCase(testCase.ID); err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
@@ -160,7 +161,7 @@ func (apiCase *PerformanceApi) FindPerformanceStep(c *gin.Context) {
 	var testCase interfacecase.ApiCaseStep
 	_ = c.ShouldBindQuery(&testCase)
 	testCase.ProjectID = utils.GetUserProject(c)
-	testCase.CreatedByID = utils.GetUserIDAddress(c)
+	testCase.CreatedBy = utils.GetUserIDAddress(c)
 	if err, reapicase := performanceService.FindPerformanceStep(testCase.ID); err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
@@ -186,7 +187,7 @@ func (apiCase *PerformanceApi) GetReportList(c *gin.Context) {
 	}
 }
 
-func (acApi *PerformanceApi) FindReport(c *gin.Context) {
+func (apiCase *PerformanceApi) FindReport(c *gin.Context) {
 	var pReport interfacecaseReq.PReportDetail
 	_ = c.ShouldBindQuery(&pReport)
 

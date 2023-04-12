@@ -1,11 +1,11 @@
 package system
 
 import (
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/system"
-	systemRes "github.com/test-instructor/cheetah/server/model/system/response"
-	"github.com/test-instructor/cheetah/server/utils"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/system"
+	systemRes "github.com/test-instructor/yangfan/server/model/system/response"
+	"github.com/test-instructor/yangfan/server/utils"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -13,7 +13,7 @@ import (
 
 type SystemApi struct{}
 
-// @Tags System
+// GetSystemConfig @Tags System
 // @Summary 获取配置文件内容
 // @Security ApiKeyAuth
 // @Produce  application/json
@@ -28,7 +28,7 @@ func (s *SystemApi) GetSystemConfig(c *gin.Context) {
 	}
 }
 
-// @Tags System
+// SetSystemConfig @Tags System
 // @Summary 设置配置文件内容
 // @Security ApiKeyAuth
 // @Produce  application/json
@@ -46,7 +46,7 @@ func (s *SystemApi) SetSystemConfig(c *gin.Context) {
 	}
 }
 
-// @Tags System
+// ReloadSystem @Tags System
 // @Summary 重启系统
 // @Security ApiKeyAuth
 // @Produce  application/json
@@ -62,7 +62,7 @@ func (s *SystemApi) ReloadSystem(c *gin.Context) {
 	}
 }
 
-// @Tags System
+// GetServerInfo @Tags System
 // @Summary 获取服务器信息
 // @Security ApiKeyAuth
 // @Produce  application/json

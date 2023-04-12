@@ -2,7 +2,7 @@ package system
 
 import (
 	"github.com/satori/go.uuid"
-	"github.com/test-instructor/cheetah/server/global"
+	"github.com/test-instructor/yangfan/server/global"
 )
 
 type SysUser struct {

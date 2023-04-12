@@ -2,10 +2,10 @@
 package interfacecase
 
 import (
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/interfacecase/customType"
-	"github.com/test-instructor/cheetah/server/model/system"
 	"gorm.io/datatypes"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/interfacecase/customType"
 )
 
 type ApiType int
@@ -15,6 +15,8 @@ const (
 	ApiTypeCase            ApiType = 2 // 接口测试用例
 	ApiTypeCasePerformance ApiType = 3 // 性能测试用例
 )
+
+var _ = []ApiType{ApiTypeTemplate, ApiTypeCase}
 
 type TransactionType string
 
@@ -28,9 +30,11 @@ const (
 type ApiStep struct {
 	global.GVA_MODEL
 	Operator
-	Name        string              `json:"name" form:"name" gorm:"column:name;comment:接口名称"`
-	ApiType     ApiType             `json:"type" form:"type" gorm:"column:api_type;comment:接口类型"`
-	Request     *ApiRequest         `json:"request" form:"request;comment:http接口"`
+	Name    string      `json:"name" form:"name" gorm:"column:name;comment:接口名称"`
+	ApiType ApiType     `json:"type" form:"type" gorm:"column:api_type;comment:接口类型"`
+	Request *ApiRequest `json:"request" form:"request;comment:http接口"`
+	Grpc    *ApiGrpc    `json:"gRPC,omitempty" yaml:"gRPC,omitempty"`
+
 	Transaction *ApiStepTransaction `json:"transaction,omitempty" yaml:"transaction,omitempty;comment:事务"`
 	Rendezvous  *ApiStepRendezvous  `json:"rendezvous,omitempty" yaml:"rendezvous,omitempty;comment:集合点"`
 	ThinkTime   *ApiStepThinkTime   `json:"think_time,omitempty" yaml:"think_time,omitempty;comment:思考时间"`
@@ -39,6 +43,7 @@ type ApiStep struct {
 	TransactionID uint `gorm:"comment:事务"`
 	RendezvousID  uint `gorm:"comment:集合点"`
 	RequestID     uint `gorm:"comment:http请求"`
+	GrpcID        uint `gorm:"comment:grpc请求"`
 
 	Variables       datatypes.JSONMap      `json:"variables" form:"variables" gorm:"column:variables;comment:变量;type:text"`
 	Extract         datatypes.JSONMap      `json:"extract" form:"extract" gorm:"column:extract;comment:导出参数;type:text"`
@@ -50,16 +55,14 @@ type ApiStep struct {
 	Hooks           string                 `json:"hooks" form:"hooks" gorm:"column:hooks;"`
 	SetupHooks      customType.TypeArgs    `json:"setup_hooks,omitempty" form:"setup_hooks,omitempty" gorm:"column:setup_hooks;type:text"`
 	TeardownHooks   customType.TypeArgs    `json:"teardown_hooks,omitempty" form:"teardown_hooks,omitempty" gorm:"column:teardown_hooks;type:text"`
-	ProjectID       uint                   `json:"-"`
 	TTestCase       []ApiCaseStep          `json:"testCase" form:"testCase" gorm:"many2many:ApiCaseStepRelationship;"`
 	Sort            uint                   `json:"sort" form:"sort" gorm:"column:sort;"`
 	ExportHeader    datatypes.JSON         `json:"export_header" gorm:"column:export_header;comment:导出请求头到全局config;type:text"`
 	ExportParameter datatypes.JSON         `json:"export_parameter" gorm:"column:export_parameter;comment:导出参数到全局config;type:text"`
 
-	Parent    uint           `json:"-"`
-	Project   system.Project `json:"-"`
-	ApiMenuID uint           `json:"-"`
-	ApiMenu   ApiMenu        `json:"-"`
+	Parent    uint    `json:"-"`
+	ApiMenuID uint    `json:"-"`
+	ApiMenu   ApiMenu `json:"-"`
 }
 
 type ApiStepTransaction struct {

@@ -1,13 +1,13 @@
 package system
 
 import (
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/system"
-	systemReq "github.com/test-instructor/cheetah/server/model/system/request"
-	systemRes "github.com/test-instructor/cheetah/server/model/system/response"
-	"github.com/test-instructor/cheetah/server/utils"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/system"
+	systemReq "github.com/test-instructor/yangfan/server/model/system/request"
+	systemRes "github.com/test-instructor/yangfan/server/model/system/response"
+	"github.com/test-instructor/yangfan/server/utils"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -15,7 +15,7 @@ import (
 
 type AuthorityApi struct{}
 
-// @Tags Authority
+// CreateAuthority @Tags Authority
 // @Summary 创建角色
 // @Security ApiKeyAuth
 // @accept application/json
@@ -40,7 +40,7 @@ func (a *AuthorityApi) CreateAuthority(c *gin.Context) {
 	}
 }
 
-// @Tags Authority
+// CopyAuthority @Tags Authority
 // @Summary 拷贝角色
 // @Security ApiKeyAuth
 // @accept application/json
@@ -67,7 +67,7 @@ func (a *AuthorityApi) CopyAuthority(c *gin.Context) {
 	}
 }
 
-// @Tags Authority
+// DeleteAuthority @Tags Authority
 // @Summary 删除角色
 // @Security ApiKeyAuth
 // @accept application/json
@@ -90,7 +90,7 @@ func (a *AuthorityApi) DeleteAuthority(c *gin.Context) {
 	}
 }
 
-// @Tags Authority
+// UpdateAuthority @Tags Authority
 // @Summary 更新角色信息
 // @Security ApiKeyAuth
 // @accept application/json
@@ -113,7 +113,7 @@ func (a *AuthorityApi) UpdateAuthority(c *gin.Context) {
 	}
 }
 
-// @Tags Authority
+// GetAuthorityList @Tags Authority
 // @Summary 分页获取角色列表
 // @Security ApiKeyAuth
 // @accept application/json
@@ -141,7 +141,7 @@ func (a *AuthorityApi) GetAuthorityList(c *gin.Context) {
 	}
 }
 
-// @Tags Authority
+// SetDataAuthority @Tags Authority
 // @Summary 设置角色资源权限
 // @Security ApiKeyAuth
 // @accept application/json

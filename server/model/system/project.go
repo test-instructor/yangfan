@@ -2,7 +2,7 @@
 package system
 
 import (
-	"github.com/test-instructor/cheetah/server/global"
+	"github.com/test-instructor/yangfan/server/global"
 )
 
 // Project 结构体

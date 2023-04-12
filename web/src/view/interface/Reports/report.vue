@@ -48,6 +48,7 @@
           </template>
         </el-table-column>
         <el-table-column align="left" label="报告名称" prop="name" width="260"/>
+        <el-table-column align="left" label="运行环境" prop="api_env_name" width="200"/>
         <el-table-column align="left" label="用例总数" width="100">
           <template #default="scope">
             <el-tag>{{ scope.row.stat?scope.row.stat.testcases.total:"-" }}</el-tag>

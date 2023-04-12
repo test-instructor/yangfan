@@ -1,11 +1,11 @@
 package system
 
 import (
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	"github.com/test-instructor/cheetah/server/model/system"
-	interfacecaseReq "github.com/test-instructor/cheetah/server/model/system/request"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	"github.com/test-instructor/yangfan/server/model/system"
+	interfacecaseReq "github.com/test-instructor/yangfan/server/model/system/request"
 	"gorm.io/gorm"
 )
 

@@ -19,11 +19,11 @@
               <el-button size="mini" icon="refresh" @click="onReset">重置</el-button>
             </el-form-item>
           </el-form>
-          <EnvConfig @configId="configIdFun"></EnvConfig>
         </div>
         <div class="gva-table-box">
           <div class="gva-btn-list">
-            <el-button size="mini" type="primary" icon="plus" @click="openDialog">新增</el-button>
+            <el-button size="mini" type="primary" icon="plus" @click="openDialog">新增(http)</el-button>
+            <el-button size="mini" type="primary" icon="plus" @click="openDialogGrpc">新增(grpc)</el-button>
             <el-popover v-model:visible="deleteVisible" placement="top" width="160">
               <p>确定要删除吗？</p>
               <div style="text-align: right; margin-top: 8px;">
@@ -36,6 +36,8 @@
                 </el-button>
               </template>
             </el-popover>
+            <el-button type="primary" @click="setUserConfig">调试配置</el-button>
+            <user-config />
           </div>
           <el-table
               ref="multipleTable"
@@ -52,7 +54,7 @@
                 align="center"
             >
               <template #default="scope">
-                <div class="block" :class="`block_${scope.row.request.method.toLowerCase()}`">
+                <div v-if="scope.row.request" class="block" :class="`block_${scope.row.request.method.toLowerCase()}`">
                   <span class="block-method block_method_color"
                         :class="`block_method_${scope.row.request.method.toLowerCase()}`">
                     {{ scope.row.request.method }}
@@ -64,7 +66,24 @@
                       YAPI
                     </span>
                   </div>
+
                   <span class="block-method block_url">{{ scope.row.request.url }}</span>
+                  <span class="block-summary-description">{{ scope.row.name }}</span>
+                </div>
+                <div v-if="scope.row.gRPC" class="block" :class="`block_put`">
+                  <span class="block-method block_method_color"
+                        :class="`block_method_put`">
+                    {{ "gRPC" }}
+                  </span>
+                  <div class="block">
+                    <span class="block-method block_method_color block_method_options"
+                          v-if="scope.row.creator==='yapi'"
+                          :title="'从YAPI导入的接口'">
+                      YAPI
+                    </span>
+                  </div>
+
+                  <span class="block-method block_url">{{ scope.row.gRPC.url }}</span>
                   <span class="block-summary-description">{{ scope.row.name }}</span>
                 </div>
               </template>
@@ -75,8 +94,11 @@
                 <el-button type="text" icon="debug" size="small" class="table-button"
                            @click="runInterfaceTemplateFunc(scope.row)">调试
                 </el-button>
-                <el-button type="text" icon="edit" size="small" class="table-button"
+                <el-button v-if="scope.row.request" type="text" icon="edit" size="small" class="table-button"
                            @click="updateInterfaceTemplateFunc(scope.row)">变更
+                </el-button>
+                <el-button v-if="scope.row.gRPC" type="text" icon="edit" size="small" class="table-button"
+                           @click="updateInterfaceTemplateFuncGrpc(scope.row)">变更
                 </el-button>
                 <el-button type="text" icon="delete" size="mini" @click="deleteRow(scope.row)">删除</el-button>
               </template>
@@ -116,7 +138,43 @@
           :formData="formDatas"
           ref="menuRole">
       </InterfaceTempleForm>
-
+    </el-dialog>
+    <el-dialog
+        v-model="interfaceTempleFormVisibleGrpc"
+        :before-close="closeDialogGrpc"
+        :visible.sync="interfaceTempleFormVisibleGrpc"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :title="dialogTitleGrpc"
+        width="1380px"
+        top="30px"
+    >
+      <InterfaceTempleGrpcForm
+          @close="closeDialogGrpc"
+          v-if="interfaceTempleFormVisibleGrpc"
+          :heights="heightDiv"
+          :eventType="typeGrpc"
+          :cid="configId"
+          :apiType="apiTypes"
+          :formData="formDatasGrpc"
+          ref="menuRole">
+      </InterfaceTempleGrpcForm>
+    </el-dialog>
+    <el-dialog
+        title="设置运行配置"
+        v-model="userConfigDialog"
+        :before-close="closeDialogUserConfig"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+    >
+      <el-form>
+        <EnvConfig
+            v-if="userConfigDialog"
+            @configId="configIdFun"
+            @envId="envIdFun"
+        ></EnvConfig>
+      </el-form>
+      <el-button type="primary" @click="saveUserConfig">保存</el-button>
     </el-dialog>
   </div>
 </template>
@@ -134,7 +192,9 @@ import {
   deleteInterfaceTemplateByIds,
   updateInterfaceTemplate,
   findInterfaceTemplate,
-  getInterfaceTemplateList
+  getInterfaceTemplateList,
+  createUserConfig,
+  getUserConfig
 } from '@/api/interfaceTemplate'
 
 import {
@@ -147,11 +207,14 @@ import {ElMessage, ElMessageBox} from 'element-plus'
 import {ref} from 'vue'
 import InterfaceTree from '@/view/interface/interfaceComponents/interfaceTree.vue'
 import InterfaceTempleForm from '@/view/interface/interfaceTemplate/interfaceTemplateForm.vue'
+import InterfaceTempleGrpcForm from '@/view/interface/interfaceTemplate/interfaceTemplateGrpcForm.vue'
 import EnvConfig from '@/view/interface/interfaceComponents/envConfig.vue'
 import {reactive} from "vue";
 import {useRouter} from "vue-router";
+import UserConfig from "@/view/interface/interfaceComponents/userConfig.vue";
 const router = useRouter()
 const configId = ref(0)
+const apiEnvId = ref(0)
 
 // 自动化生成的字典（可能为空）以及字段
 const formDatas = reactive({
@@ -171,6 +234,21 @@ const formDatas = reactive({
   hooks: '',
   apiMenuID: '',
 })
+const formDatasGrpc = reactive({
+  name: '',
+  gRPC: reactive({
+    Timeout: 0,
+    url: '',
+    headers: '',
+    body: '',
+    type: '',
+  }),
+  variables: '',
+  extract: '',
+  validate: '',
+  hooks: '',
+  apiMenuID: '',
+})
 
 // =========== 表格控制部分 ===========
 const page = ref(1)
@@ -181,6 +259,8 @@ const searchInfo = ref({})
 let treeID = 0
 // 行为控制标记（弹窗内部需要增还是改）
 const type = ref('')
+const typeGrpc = ref('')
+const requestTYpe = ref('http')
 const apiTypes = 1
 
 // 重置
@@ -299,6 +379,16 @@ const updateInterfaceTemplateFunc = async (row) => {
   }
 }
 
+const updateInterfaceTemplateFuncGrpc = async (row) => {
+  typeGrpc.value = 'update'
+  dialogTitleGrpc.value = '编辑接口grpc'
+  const res = await findInterfaceTemplate({ID: row.ID})
+  if (res.code === 0) {
+    formDatasGrpc.value = res.data.reapicase
+    interfaceTempleFormVisibleGrpc.value = true
+  }
+}
+
 const reportDetailFunc = (ID) => {
   if (ID) {
     router.push({
@@ -313,17 +403,28 @@ const reportDetailFunc = (ID) => {
 
 const configIdFun = (id) => {
   configId.value = id
+  console.log("============",configId.value)
+}
+
+const envIdFun = (id) => {
+  apiEnvId.value = id
+  console.log("============",apiEnvId.value)
 }
 
 const runInterfaceTemplateFunc = async (row) => {
-  if (configId.value === 0) {
+  if (!userConfigs.value ||  !userConfigs.value.api_config_id ||  userConfigs.value.api_config_id < 1) {
     ElMessage({
       type: 'error',
-      message: '请选择配置后再运行'
+      message: '请设置配置后再运行'
     })
     return
   }
-  const res = await runApi({caseID: row.ID, configID: configId.value, run_type: 1})
+  let data = {caseID: row.ID, configID: userConfigs.value.api_config_id, run_type: 5}
+  if (userConfigs.value &&  userConfigs.value.api_env_id &&  userConfigs.value.api_env_id >0 ){
+    console.log("============",userConfigs.value.api_env_id)
+    data["env"] = userConfigs.value.api_env_id
+  }
+  const res = await runApi(data)
   if (res.code === 0) {
     reportDetailFunc(res.data.id)
   }
@@ -346,16 +447,25 @@ const deleteInterfaceTemplateFunc = async (row) => {
 
 // 弹窗控制标记
 const interfaceTempleFormVisible = ref(false)
+const interfaceTempleFormVisibleGrpc = ref(false)
 const dialogTitle = ref("")
-const heightDiv = ref()
-heightDiv.value = (window.screen.height - 480) > 600?600:window.screen.height - 480
+const dialogTitleGrpc = ref("")
+const heightDiv = ref(0)
+heightDiv.value = (window.screen.height - 480) > 530?530:window.screen.height - 480
 
 // 打开弹窗
 const openDialog = () => {
   type.value = 'create'
   dialogTitle.value = '新增接口'
+  requestTYpe.value = 'http'
   interfaceTempleFormVisible.value = true
+}
 
+const openDialogGrpc = () => {
+  console.log("=======grpc")
+  typeGrpc.value = 'create'
+  dialogTitleGrpc.value = '新增接口Grpc'
+  interfaceTempleFormVisibleGrpc.value = true
 }
 
 // 关闭弹窗
@@ -379,6 +489,56 @@ const closeDialog = () => {
     apiMenuID: '',
   })
 }
+
+const closeDialogGrpc = () => {
+  interfaceTempleFormVisibleGrpc.value = false
+  formDatasGrpc.value = reactive({
+    name: '',
+    gRPC: reactive({
+      Timeout: 0,
+      url: '',
+      headers: '',
+      body: '',
+      type: '',
+    }),
+    variables: '',
+    extract: '',
+    validate: '',
+    hooks: '',
+    apiMenuID: '',
+  })
+}
+
+
+const userConfigDialog = ref(false)
+const setUserConfig = () => {
+  userConfigDialog.value = true
+}
+
+const closeDialogUserConfig = () => {
+  userConfigDialog.value = false
+}
+
+const saveUserConfig = async () => {
+  const res = await createUserConfig({api_config_id:configId.value,api_env_id:apiEnvId.value})
+  if (res.code === 0) {
+    ElMessage({
+      type: 'success',
+      message: '保存成功'
+    })
+    userConfigDialog.value = false
+  }
+}
+const userConfigs = ref({})
+const getUserConfigs = async () => {
+  let res = await getUserConfig()
+  if (res.code === 0 && res.data) {
+    userConfigs.value = res.data
+    console.log("============",userConfigs.value)
+  }
+}
+getUserConfigs()
+
 
 </script>
 

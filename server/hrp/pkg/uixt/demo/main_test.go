@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/test-instructor/cheetah/server/hrp/pkg/uixt"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/uixt"
 )
 
 func TestIOSDemo(t *testing.T) {

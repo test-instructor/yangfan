@@ -2,10 +2,10 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	email_response "github.com/test-instructor/cheetah/server/plugin/email/model/response"
-	"github.com/test-instructor/cheetah/server/plugin/email/service"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	email_response "github.com/test-instructor/yangfan/server/plugin/email/model/response"
+	"github.com/test-instructor/yangfan/server/plugin/email/service"
 	"go.uber.org/zap"
 )
 

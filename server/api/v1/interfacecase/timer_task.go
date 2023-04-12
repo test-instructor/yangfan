@@ -2,14 +2,15 @@ package interfacecase
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	interfacecaseReq "github.com/test-instructor/cheetah/server/model/interfacecase/request"
-	"github.com/test-instructor/cheetah/server/service"
-	"github.com/test-instructor/cheetah/server/utils"
 	"go.uber.org/zap"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	interfacecaseReq "github.com/test-instructor/yangfan/server/model/interfacecase/request"
+	"github.com/test-instructor/yangfan/server/service"
+	"github.com/test-instructor/yangfan/server/utils"
 )
 
 type TimerTaskApi struct {
@@ -30,7 +31,7 @@ func (taskApi *TimerTaskApi) CreateTimerTask(c *gin.Context) {
 	var task interfacecase.ApiTimerTask
 	_ = c.ShouldBindJSON(&task)
 	task.ProjectID = utils.GetUserProject(c)
-	task.CreatedByID = utils.GetUserIDAddress(c)
+	task.CreatedBy = utils.GetUserIDAddress(c)
 	if err := taskService.CreateTimerTask(task); err != nil {
 		global.GVA_LOG.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
@@ -52,7 +53,7 @@ func (taskApi *TimerTaskApi) DeleteTimerTask(c *gin.Context) {
 	var task interfacecase.ApiTimerTask
 	_ = c.ShouldBindJSON(&task)
 	task.ProjectID = utils.GetUserProject(c)
-	task.DeleteByID = utils.GetUserIDAddress(c)
+	task.DeleteBy = utils.GetUserIDAddress(c)
 	if err := taskService.DeleteTimerTask(task); err != nil {
 		global.GVA_LOG.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
@@ -94,7 +95,7 @@ func (taskApi *TimerTaskApi) UpdateTimerTask(c *gin.Context) {
 	var task interfacecase.ApiTimerTask
 	_ = c.ShouldBindJSON(&task)
 	task.ProjectID = utils.GetUserProject(c)
-	task.UpdateByID = utils.GetUserIDAddress(c)
+	task.UpdateBy = utils.GetUserIDAddress(c)
 	if err := taskService.UpdateTimerTask(task); err != nil {
 		global.GVA_LOG.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
@@ -251,13 +252,13 @@ func (taskApi *TimerTaskApi) CreateTaskTag(c *gin.Context) {
 	var taskTag interfacecase.ApiTimerTaskTag
 	_ = c.ShouldBindJSON(&taskTag)
 	taskTag.ProjectID = utils.GetUserProject(c)
-	taskTag.CreatedByID = utils.GetUserIDAddress(c)
+	taskTag.CreatedBy = utils.GetUserIDAddress(c)
 	caseApiDetail, err := taskService.CreateTaskTag(taskTag)
 	if err != nil {
-		global.GVA_LOG.Error("标签添加失败!", zap.Error(err))
-		response.FailWithMessage("标签添加失败", c)
+		global.GVA_LOG.Error("标签操作失败!", zap.Error(err))
+		response.FailWithMessage("标签操作失败", c)
 	} else {
-		response.OkWithDetailed(caseApiDetail, "标签添加成功", c)
+		response.OkWithDetailed(caseApiDetail, "标签操作成功", c)
 	}
 }
 
@@ -265,7 +266,7 @@ func (taskApi *TimerTaskApi) DeleteTimerTaskTag(c *gin.Context) {
 	var taskTag interfacecase.ApiTimerTaskTag
 	_ = c.ShouldBindJSON(&taskTag)
 	taskTag.ProjectID = utils.GetUserProject(c)
-	taskTag.DeleteByID = utils.GetUserIDAddress(c)
+	taskTag.DeleteBy = utils.GetUserIDAddress(c)
 	if err := taskService.DeleteTimerTaskTag(taskTag); err != nil {
 		global.GVA_LOG.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)

@@ -1,6 +1,6 @@
 package gidevice
 
-import "github.com/test-instructor/cheetah/server/hrp/pkg/gidevice/pkg/libimobiledevice"
+import "github.com/test-instructor/yangfan/server/hrp/pkg/gidevice/pkg/libimobiledevice"
 
 func newDiagnosticsRelay(client *libimobiledevice.DiagnosticsRelayClient) *diagnostics {
 	return &diagnostics{

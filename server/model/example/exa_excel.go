@@ -1,6 +1,6 @@
 package example
 
-import "github.com/test-instructor/cheetah/server/model/system"
+import "github.com/test-instructor/yangfan/server/model/system"
 
 type ExcelInfo struct {
 	FileName string               `json:"fileName"` // 文件名

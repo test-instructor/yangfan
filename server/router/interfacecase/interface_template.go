@@ -2,8 +2,9 @@ package interfacecase
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/api/v1"
-	"github.com/test-instructor/cheetah/server/middleware"
+
+	"github.com/test-instructor/yangfan/server/api/v1"
+	"github.com/test-instructor/yangfan/server/middleware"
 )
 
 type InterfaceTemplateRouter struct {
@@ -21,10 +22,13 @@ func (s *InterfaceTemplateRouter) InitInterfaceTemplateRouter(Router *gin.Router
 		apicaseRouter.PUT("updateInterfaceTemplate", apiCaseApi.UpdateInterfaceTemplate)              // 更新InterfaceTemplate
 		apicaseRouter.PUT("updateDebugTalk", apiCaseApi.UpdateDebugTalk)
 		apicaseRouter.POST("getDebugTalk", apiCaseApi.GetDebugTalk)
+		apicaseRouter.POST("createUserConfig", apiCaseApi.CreateUserConfig)
 	}
 	{
 		apicaseRouterWithoutRecord.GET("findInterfaceTemplate", apiCaseApi.FindInterfaceTemplate)       // 根据ID获取InterfaceTemplate
 		apicaseRouterWithoutRecord.GET("getInterfaceTemplateList", apiCaseApi.GetInterfaceTemplateList) // 获取InterfaceTemplate列表
 		apicaseRouterWithoutRecord.GET("getDebugTalk", apiCaseApi.GetDebugTalk)
+		apicaseRouterWithoutRecord.POST("getGrpc", apiCaseApi.GetGrpc)
+		apicaseRouterWithoutRecord.GET("getUserConfig", apiCaseApi.GetUserConfig)
 	}
 }

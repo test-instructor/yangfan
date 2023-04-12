@@ -1,6 +1,6 @@
 package api
 
-import "github.com/test-instructor/cheetah/server/plugin/fslogin/passport"
+import "github.com/test-instructor/yangfan/server/plugin/fslogin/passport"
 
 type ApiGroup struct {
 	FsLoginApi

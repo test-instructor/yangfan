@@ -2,14 +2,14 @@ package global
 
 import (
 	"github.com/songzhibin97/gkit/cache/local_cache"
-	"github.com/test-instructor/cheetah/server/utils/timer"
+	"github.com/test-instructor/yangfan/server/utils/timer"
 	"sync"
 
 	"golang.org/x/sync/singleflight"
 
 	"go.uber.org/zap"
 
-	"github.com/test-instructor/cheetah/server/config"
+	"github.com/test-instructor/yangfan/server/config"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/spf13/viper"

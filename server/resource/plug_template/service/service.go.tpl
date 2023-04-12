@@ -2,7 +2,7 @@ package service
 
  {{- if .NeedModel }}
 import (
-   "github.com/test-instructor/cheetah/server/plugin/{{ .Snake}}/model"
+   "github.com/test-instructor/yangfan/server/plugin/{{ .Snake}}/model"
 )
 {{ end }}
 

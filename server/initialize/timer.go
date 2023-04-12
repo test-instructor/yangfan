@@ -2,14 +2,16 @@ package initialize
 
 import (
 	"fmt"
-	"github.com/robfig/cron/v3"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	"github.com/test-instructor/cheetah/server/service/interfacecase/runTestCase"
 	"strconv"
 
-	"github.com/test-instructor/cheetah/server/config"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/utils"
+	"github.com/robfig/cron/v3"
+
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	"github.com/test-instructor/yangfan/server/service/interfacecase/runTestCase"
+
+	"github.com/test-instructor/yangfan/server/config"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/utils"
 )
 
 func Timer() {

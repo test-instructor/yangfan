@@ -1,8 +1,8 @@
 package {{.Package}}
 
 import (
-	"github.com/test-instructor/cheetah/server/api/v1"
-	"github.com/test-instructor/cheetah/server/middleware"
+	"github.com/test-instructor/yangfan/server/api/v1"
+	"github.com/test-instructor/yangfan/server/middleware"
 	"github.com/gin-gonic/gin"
 )
 

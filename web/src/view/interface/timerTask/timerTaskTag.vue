@@ -6,12 +6,13 @@
       :data="tagTableData"
       @cell-mouse-enter="cellMouseEnter"
       @cell-mouse-leave="cellMouseLeave"
+      max-height="500"
   >
     <el-table-column label="标签名称" width="300" >
       <template #default="scope">
         <el-input
             v-model="scope.row.name"
-            placeholder="Value"
+            placeholder="请输入标签名称"
             :disabled="!showBtn(scope.row)"
         ></el-input>
       </template>
@@ -21,7 +22,7 @@
       <template #default="scope">
         <el-input
             v-model="scope.row.remarks"
-            placeholder="Value"
+            placeholder="请输入标签备注"
             :disabled="!showBtn(scope.row)"
         ></el-input>
       </template>
@@ -30,7 +31,7 @@
     <el-table-column label="操作" mini-width="100">
       <template #default="scope">
         <el-button class="mt-4"  @click="editTag(scope.row)" v-if="!showBtn(scope.row)">{{ "编辑" }}</el-button>
-        <el-button class="mt-4"  @click="cancelTag(scope.row)" v-if="showBtn(scope.row)">{{ "取消" }}</el-button>
+        <el-button class="mt-4"  @click="cancelTag(scope.row)" v-if="showCancelBtn(scope.row)">{{ "取消" }}</el-button>
         <el-button class="mt-4"  @click="saveTag(scope.$index,scope.row)" v-if="showBtn(scope.row)">{{ "保存" }}</el-button>
         <el-button class="mt-4"  @click="deleteTag(scope.$index, scope.row)">{{ "删除" }}</el-button>
       </template>
@@ -80,6 +81,10 @@ const showBtn = (row) => {
   return  editTagRow.value === row.ID
 }
 
+const showCancelBtn = (row) => {
+  return row.ID && row.ID > 0 && editTagRow.value === row.ID;
+}
+
 
 const editTag = (row) => {
   editTagRow.value = row.ID
@@ -90,6 +95,13 @@ const cancelTag = (row) => {
 }
 
 const saveTag = async (index, row) => {
+  if (!(row.name && row !== "")){
+    ElMessage({
+      type: 'error',
+      message: "标签名称不能为空"
+    })
+    return
+  }
   let res = await createTimerTaskTag(row)
   if (res.code === 0) {
     let message = '标签【' + row.name + '】创建成功'
@@ -123,6 +135,8 @@ const deleteTag = async (index, row) => {
         message: '标签【' + row.name + '】删除失败'
       })
     }
+  }else {
+    envTableData.value.splice(index, 1)
   }
 
 

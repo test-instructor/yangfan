@@ -2,10 +2,12 @@ package runTestCase
 
 import (
 	"errors"
-	"github.com/test-instructor/cheetah/server/hrp"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
 	"testing"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/hrp"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
 )
 
 func NewRunTask(runCaseReq request.RunCaseReq, runType interfacecase.RunType) TestCase {
@@ -25,13 +27,23 @@ type runTask struct {
 	caseType        interfacecase.CaseType
 	tcm             ApisCaseModel
 	d               debugTalkOperation
+	envVars         map[string]string
 }
 
 func (r *runTask) LoadCase() (err error) {
 	var testCaseList []interfacecase.HrpCase
+	var task interfacecase.ApiTimerTask
+	err = global.GVA_DB.Model(interfacecase.ApiTimerTask{}).Where("id = ? ", r.runCaseReq.TaskID).First(&task).Error
+	if err != nil {
+		return errors.New("获取定时任务失败")
+	}
 	var reportName string
+	var envName string
 	taskCase := taskSort(r.runCaseReq.TaskID)
-
+	r.envVars, envName, err = GetEnvVar(task.ProjectID, task.ApiEnvID)
+	if err != nil {
+		return errors.New("获取环境变量失败")
+	}
 	for _, c := range taskCase {
 		var testCase interfacecase.HrpCase
 		reportName = c.ApiTimerTask.Name
@@ -42,6 +54,7 @@ func (r *runTask) LoadCase() (err error) {
 		if err != nil {
 			return errors.New("获取配置失败")
 		}
+		apiConfig.Environs = r.envVars
 
 		//设置前置套件
 		if apiConfig.SetupCaseID != nil && *apiConfig.SetupCaseID != 0 {
@@ -50,7 +63,9 @@ func (r *runTask) LoadCase() (err error) {
 			if err != nil {
 				return err
 			}
-			testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
+			if hrpCaseStep != nil {
+				testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
+			}
 			testCase.Confing = *apiConfig
 		}
 		r.tcm.Config = *apiConfig
@@ -61,7 +76,9 @@ func (r *runTask) LoadCase() (err error) {
 			if err != nil {
 				return err
 			}
-			testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
+			if hrpCaseStep != nil {
+				testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
+			}
 			testCase.Confing = *apiConfig
 		}
 		testCaseList = append(testCaseList, testCase)
@@ -78,8 +95,12 @@ func (r *runTask) LoadCase() (err error) {
 			Name:      reportName,
 			CaseType:  r.caseType,
 			RunType:   r.runType,
-			ProjectID: r.d.ProjectID,
 			SetupCase: r.tcm.SetupCase,
+			Operator: interfacecase.Operator{
+				ProjectID: r.d.ProjectID,
+			},
+			ApiEnvName: envName,
+			ApiEnvID:   task.ApiEnvID,
 		},
 	}
 	r.reportOperation.CreateReport()

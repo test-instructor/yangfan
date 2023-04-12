@@ -1,16 +1,17 @@
 package initialize
 
 import (
-	"github.com/test-instructor/cheetah/server/config"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/initialize/internal"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+
+	"github.com/test-instructor/yangfan/server/config"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/initialize/internal"
 )
 
 // GormMysql 初始化Mysql数据库
 
-// Author [SliverHorn](https://github.com/SliverHorn)
+// GormMysql Author [SliverHorn](https://github.com/SliverHorn)
 func GormMysql() *gorm.DB {
 	m := global.GVA_CONFIG.Mysql
 	if m.Dbname == "" {

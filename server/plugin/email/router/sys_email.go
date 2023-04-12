@@ -2,8 +2,8 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/middleware"
-	"github.com/test-instructor/cheetah/server/plugin/email/api"
+	"github.com/test-instructor/yangfan/server/middleware"
+	"github.com/test-instructor/yangfan/server/plugin/email/api"
 )
 
 type EmailRouter struct{}

@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	_ "embed"
 	"encoding/json"
-	"github.com/test-instructor/cheetah/server/model/interfacecase/hrp"
 	"net"
 	"net/http"
 	"net/http/cookiejar"
@@ -15,6 +14,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/test-instructor/yangfan/server/model/interfacecase/hrp"
+
 	"github.com/gorilla/websocket"
 	"github.com/httprunner/funplugin"
 	"github.com/jinzhu/copier"
@@ -22,10 +23,10 @@ import (
 	"github.com/rs/zerolog/log"
 	"golang.org/x/net/http2"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/builtin"
-	"github.com/test-instructor/cheetah/server/hrp/internal/sdk"
-	"github.com/test-instructor/cheetah/server/hrp/internal/version"
-	"github.com/test-instructor/cheetah/server/hrp/pkg/uixt"
+	"github.com/test-instructor/yangfan/server/hrp/internal/builtin"
+	"github.com/test-instructor/yangfan/server/hrp/internal/sdk"
+	"github.com/test-instructor/yangfan/server/hrp/internal/version"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/uixt"
 )
 
 // Run starts to run API test with default configs.
@@ -350,6 +351,10 @@ func (r *CaseRunner) parseConfig() error {
 		return err
 	}
 	r.parsedConfig.Variables = parsedVariables
+
+	for k, _ := range cfg.Environs {
+		parsedVariables[k] = cfg.Environs[k]
+	}
 
 	// parse config name
 	parsedName, err := r.parser.ParseString(cfg.Name, parsedVariables)

@@ -1,9 +1,9 @@
 package interfacecase
 
 import (
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	"github.com/test-instructor/cheetah/server/service/interfacecase/runTestCase"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	"github.com/test-instructor/yangfan/server/service/interfacecase/runTestCase"
 )
 
 type RunCaseService struct {
@@ -11,12 +11,12 @@ type RunCaseService struct {
 
 // RunTestCase TestCase排序
 
-func (apicaseService *RunCaseService) RunTestCaseStep(runCase request.RunCaseReq, runType interfacecase.RunType) (reports *interfacecase.ApiReport, err error) {
+func (r *RunCaseService) RunTestCaseStep(runCase request.RunCaseReq, runType interfacecase.RunType) (reports *interfacecase.ApiReport, err error) {
 	reports, err = runTestCase.RunStep(runCase, runType)
 	return
 }
 
-func (apicaseService *RunCaseService) RunApiCase(runCase request.RunCaseReq, runType interfacecase.RunType) (report *interfacecase.ApiReport, err error) {
+func (r *RunCaseService) RunApiCase(runCase request.RunCaseReq, runType interfacecase.RunType) (report *interfacecase.ApiReport, err error) {
 	report, err = runTestCase.RunCase(runCase, runType)
 	if err != nil {
 		return
@@ -24,29 +24,35 @@ func (apicaseService *RunCaseService) RunApiCase(runCase request.RunCaseReq, run
 	return
 }
 
-func (apicaseService *RunCaseService) RunBoomerDebug(runCase request.RunCaseReq, runType interfacecase.RunType) (report *interfacecase.ApiReport, err error) {
+func (r *RunCaseService) RunBoomerDebug(runCase request.RunCaseReq, runType interfacecase.RunType) (report *interfacecase.ApiReport, err error) {
 	report, err = runTestCase.RunBoomerDebug(runCase, runType)
 	return
 }
 
-func (apicaseService *RunCaseService) RunBoomer(runCase request.RunCaseReq, runType interfacecase.RunType) (report *interfacecase.ApiReport, err error) {
+func (r *RunCaseService) RunBoomer(runCase request.RunCaseReq, runType interfacecase.RunType) (report *interfacecase.ApiReport, err error) {
 	report, err = runTestCase.RunBoomer(runCase, runType)
 	return
 }
 
-func (apicaseService *RunCaseService) RunTimerTask(runCase request.RunCaseReq, runType interfacecase.RunType) {
+func (r *RunCaseService) RunTimerTask(runCase request.RunCaseReq, runType interfacecase.RunType) {
 	if runCase.TaskID > 0 {
-		runTestCase.RunTimerTask(runCase, runType)
+		_, err := runTestCase.RunTimerTask(runCase, runType)
+		if err != nil {
+			return
+		}
 		return
 	}
 	if runCase.TagID > 0 {
-		runTestCase.RunTimerTag(runCase, runType)
+		_, err := runTestCase.RunTimerTag(runCase, runType)
+		if err != nil {
+			return
+		}
 		return
 	}
 	return
 }
 
-func (apicaseService *RunCaseService) RunApi(runCase request.RunCaseReq) (reports *interfacecase.ApiReport, err error) {
+func (r *RunCaseService) RunApi(runCase request.RunCaseReq) (reports *interfacecase.ApiReport, err error) {
 	report, err := runTestCase.RunApi(runCase, interfacecase.RunType(runCase.RunType))
 	if err != nil {
 		return nil, err

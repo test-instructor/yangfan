@@ -5,10 +5,10 @@ import (
 	"mime/multipart"
 	"strings"
 
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/example"
-	"github.com/test-instructor/cheetah/server/utils/upload"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/example"
+	"github.com/test-instructor/yangfan/server/utils/upload"
 )
 
 //@author: [piexlmax](https://github.com/piexlmax)

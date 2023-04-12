@@ -1,11 +1,14 @@
 package interfacecase
 
 import (
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	interfacecaseReq "github.com/test-instructor/cheetah/server/model/interfacecase/request"
+	"github.com/pkg/errors"
+	"github.com/test-instructor/grpc-plugin/plugin"
 	"gorm.io/gorm"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	interfacecaseReq "github.com/test-instructor/yangfan/server/model/interfacecase/request"
 )
 
 type ApiParams struct {
@@ -18,7 +21,7 @@ type InterfaceTemplateService struct {
 
 // CreateInterfaceTemplate 创建InterfaceTemplate记录
 
-func (apicaseService *InterfaceTemplateService) CreateInterfaceTemplate(apicase interfacecase.ApiStep) (err error) {
+func (i *InterfaceTemplateService) CreateInterfaceTemplate(apicase interfacecase.ApiStep) (err error) {
 	apicase.ValidateNumber = uint(len(apicase.Validate))
 	err = global.GVA_DB.Create(&apicase).Error
 	return err
@@ -26,35 +29,41 @@ func (apicaseService *InterfaceTemplateService) CreateInterfaceTemplate(apicase 
 
 // DeleteInterfaceTemplate 删除InterfaceTemplate记录
 
-func (apicaseService *InterfaceTemplateService) DeleteInterfaceTemplate(apicase interfacecase.ApiStep) (err error) {
+func (i *InterfaceTemplateService) DeleteInterfaceTemplate(apicase interfacecase.ApiStep) (err error) {
 	err = global.GVA_DB.Delete(&apicase).Error
 	return err
 }
 
 // DeleteInterfaceTemplateByIds 批量删除InterfaceTemplate记录
 
-func (apicaseService *InterfaceTemplateService) DeleteInterfaceTemplateByIds(ids request.IdsReq) (err error) {
+func (i *InterfaceTemplateService) DeleteInterfaceTemplateByIds(ids request.IdsReq) (err error) {
 	err = global.GVA_DB.Delete(&[]interfacecase.ApiStep{}, "id in ?", ids.Ids).Error
 	return err
 }
 
 // UpdateInterfaceTemplate 更新InterfaceTemplate记录
 
-func (apicaseService *InterfaceTemplateService) UpdateInterfaceTemplate(apicase interfacecase.ApiStep) (id uint, err error) {
+func (i *InterfaceTemplateService) UpdateInterfaceTemplate(apicase interfacecase.ApiStep) (id uint, err error) {
 	var oId interfacecase.Operator
 	global.GVA_DB.Model(interfacecase.ApiStep{}).Where("id = ?", apicase.ID).First(&oId)
-	apicase.CreatedByID = oId.CreatedByID
+	apicase.CreatedBy = oId.CreatedBy
 	apicase.ValidateNumber = uint(len(apicase.Validate))
 	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
 		err = tx.Where(&interfacecase.ApiStep{
 			GVA_MODEL: global.GVA_MODEL{ID: apicase.ID},
-		}).
-			Save(&apicase).Error
+		}).Save(&apicase).Error
 		if err != nil {
 			return err
 		}
-		err = tx.Where(&interfacecase.ApiRequest{GVA_MODEL: global.GVA_MODEL{ID: apicase.Request.ID}}).
-			Save(&apicase.Request).Error
+		if apicase.Request != nil {
+			err = tx.Where(&interfacecase.ApiRequest{GVA_MODEL: global.GVA_MODEL{ID: apicase.Request.ID}}).
+				Save(&apicase.Request).Error
+		}
+		if apicase.Grpc != nil {
+			err = tx.Where(&interfacecase.ApiGrpc{GVA_MODEL: global.GVA_MODEL{ID: apicase.Grpc.ID}}).
+				Save(&apicase.Grpc).Error
+		}
+
 		return err
 	})
 
@@ -63,9 +72,10 @@ func (apicaseService *InterfaceTemplateService) UpdateInterfaceTemplate(apicase 
 
 // GetInterfaceTemplate 根据id获取InterfaceTemplate记录
 
-func (apicaseService *InterfaceTemplateService) GetInterfaceTemplate(id uint) (err error, apiCase interfacecase.ApiStep) {
+func (i *InterfaceTemplateService) GetInterfaceTemplate(id uint) (err error, apiCase interfacecase.ApiStep) {
 	db := global.GVA_DB.
 		Preload("Request").
+		Preload("Grpc").
 		Preload("Validate").
 		Model(&interfacecase.ApiStep{})
 	db.Where("id = ?", id).Find(&apiCase)
@@ -74,13 +84,13 @@ func (apicaseService *InterfaceTemplateService) GetInterfaceTemplate(id uint) (e
 
 // GetInterfaceTemplateInfoList 分页获取InterfaceTemplate记录
 
-func (apicaseService *InterfaceTemplateService) GetInterfaceTemplateInfoList(info interfacecaseReq.InterfaceTemplateSearch) (err error, list interface{}, total int64) {
+func (i *InterfaceTemplateService) GetInterfaceTemplateInfoList(info interfacecaseReq.InterfaceTemplateSearch) (err error, list interface{}, total int64) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
 	db := global.GVA_DB.
 		Model(&interfacecase.ApiStep{}).
-		Preload("Request").Preload("ApiMenu").
+		Preload("Request").Preload("ApiMenu").Preload("Grpc").
 		Preload("Project").Joins("Project").Where("Project.ID = ?", info.ProjectID)
 	if info.ApiMenuID > 0 {
 		db.Preload("ApiMenu").Joins("ApiMenu").Where("ApiMenu.ID = ?", info.ApiMenuID)
@@ -99,12 +109,12 @@ func (apicaseService *InterfaceTemplateService) GetInterfaceTemplateInfoList(inf
 	return err, apicases, total
 }
 
-func (apicaseService *InterfaceTemplateService) UpdateDebugTalk(debugTalk interfacecase.ApiDebugTalk) (err error) {
+func (i *InterfaceTemplateService) UpdateDebugTalk(debugTalk interfacecase.ApiDebugTalk) (err error) {
 	err = global.GVA_DB.Save(&debugTalk).Error
 	return err
 }
 
-func (apicaseService *InterfaceTemplateService) GetDebugTalk(debugTalk interfacecase.ApiDebugTalk) (err error, debugTalkFirst interfacecase.ApiDebugTalk) {
+func (i *InterfaceTemplateService) GetDebugTalk(debugTalk interfacecase.ApiDebugTalk) (err error, debugTalkFirst interfacecase.ApiDebugTalk) {
 
 	db := global.GVA_DB.
 		Model(&interfacecase.ApiDebugTalk{}).
@@ -119,4 +129,72 @@ func (apicaseService *InterfaceTemplateService) GetDebugTalk(debugTalk interface
 		err = defaultDB.First(&debugTalkFirst).Error
 	}
 	return err, debugTalkFirst
+}
+
+func (i *InterfaceTemplateService) GetGrpc(gRPC interfacecaseReq.GrpcFunc) (err error, data interface{}) {
+	var gData = make(map[string]interface{})
+	var g plugin.Grpc
+	if gRPC.Host == nil {
+		err = errors.New("请输入对应的服务信息")
+	}
+	g.Host = *gRPC.Host
+	ig := plugin.NewInvokeGrpc(&g)
+	err = ig.GetResource()
+	if err != nil {
+		return err, gData
+	}
+	if gRPC.Ref != nil && *gRPC.Ref {
+		err = ig.Reset()
+		return
+	}
+	svc, err := ig.GetSvs()
+	if err != nil {
+		return err, gData
+	}
+	gData["servers"] = svc
+	if gRPC.Server == nil || *gRPC.Server == "" {
+		return err, gData
+	}
+	methods, err := ig.GetMethod(*gRPC.Server)
+	if err != nil {
+		return err, gData
+	}
+	gData["methods"] = methods
+	if gRPC.Method == nil || *gRPC.Method == "" {
+		return err, gData
+	}
+	results, err := ig.GetReq(*gRPC.Server, *gRPC.Method)
+	if err != nil {
+		return err, gData
+	}
+	req := make(map[string]interface{})
+	req["type"] = results.RequestType
+	req["stream"] = results.RequestStream
+	req["message"] = results.MessageTypes
+	req["enum"] = results.EnumTypes
+	req["body"] = results.Body
+	gData["request"] = req
+
+	return err, gData
+}
+
+func (i *InterfaceTemplateService) CreateUserConfig(userConfig interfacecase.ApiUserConfig) (err error) {
+	userConfigOld := interfacecase.ApiUserConfig{}
+	err = global.GVA_DB.Where("project_id = ? and user_id = ?", userConfig.ProjectID, userConfig.UserID).First(&userConfigOld).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			global.GVA_LOG.Warn("用户配置不存在，创建新的配置")
+		} else {
+			return err
+		}
+	}
+	userConfig.ID = userConfigOld.ID
+	err = global.GVA_DB.Where("id = ?", userConfig.ID).Save(&userConfig).Error
+	return err
+}
+
+func (i *InterfaceTemplateService) GetUserConfig(projectID uint, userID uint) (userConfig *interfacecase.ApiUserConfig, err error) {
+	err = global.GVA_DB.Model(interfacecase.ApiUserConfig{}).Preload("ApiConfig").Preload("ApiEnv").
+		Where("project_id = ? and user_id = ?", projectID, userID).First(&userConfig).Error
+	return
 }

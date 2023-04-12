@@ -2,18 +2,19 @@ package system
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/system"
-	systemReq "github.com/test-instructor/cheetah/server/model/system/request"
-	"github.com/test-instructor/cheetah/server/utils"
 	"go.uber.org/zap"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/system"
+	systemReq "github.com/test-instructor/yangfan/server/model/system/request"
+	"github.com/test-instructor/yangfan/server/utils"
 )
 
 type OperationRecordApi struct{}
 
-// @Tags SysOperationRecord
+// CreateSysOperationRecord @Tags SysOperationRecord
 // @Summary 创建SysOperationRecord
 // @Security ApiKeyAuth
 // @accept application/json
@@ -32,7 +33,7 @@ func (s *OperationRecordApi) CreateSysOperationRecord(c *gin.Context) {
 	}
 }
 
-// @Tags SysOperationRecord
+// DeleteSysOperationRecord @Tags SysOperationRecord
 // @Summary 删除SysOperationRecord
 // @Security ApiKeyAuth
 // @accept application/json
@@ -51,7 +52,7 @@ func (s *OperationRecordApi) DeleteSysOperationRecord(c *gin.Context) {
 	}
 }
 
-// @Tags SysOperationRecord
+// DeleteSysOperationRecordByIds @Tags SysOperationRecord
 // @Summary 批量删除SysOperationRecord
 // @Security ApiKeyAuth
 // @accept application/json
@@ -70,7 +71,7 @@ func (s *OperationRecordApi) DeleteSysOperationRecordByIds(c *gin.Context) {
 	}
 }
 
-// @Tags SysOperationRecord
+// FindSysOperationRecord @Tags SysOperationRecord
 // @Summary 用id查询SysOperationRecord
 // @Security ApiKeyAuth
 // @accept application/json
@@ -93,7 +94,7 @@ func (s *OperationRecordApi) FindSysOperationRecord(c *gin.Context) {
 	}
 }
 
-// @Tags SysOperationRecord
+// GetSysOperationRecordList @Tags SysOperationRecord
 // @Summary 分页获取SysOperationRecord列表
 // @Security ApiKeyAuth
 // @accept application/json

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/json"
+	"github.com/test-instructor/yangfan/server/hrp/internal/json"
 )
 
 func TestConvertPoints(t *testing.T) {

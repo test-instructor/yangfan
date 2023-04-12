@@ -11,8 +11,8 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/json"
-	"github.com/test-instructor/cheetah/server/hrp/pkg/boomer"
+	"github.com/test-instructor/yangfan/server/hrp/internal/json"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/boomer"
 )
 
 const jsonContentType = "application/json; encoding=utf-8"

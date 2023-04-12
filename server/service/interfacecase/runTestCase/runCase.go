@@ -2,12 +2,14 @@ package runTestCase
 
 import (
 	"errors"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/hrp"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	"gorm.io/gorm"
 	"testing"
+
+	"gorm.io/gorm"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/hrp"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
 )
 
 func NewRunCase(runCaseReq request.RunCaseReq, runType interfacecase.RunType) TestCase {
@@ -27,6 +29,7 @@ type runCase struct {
 	caseType        interfacecase.CaseType
 	tcm             ApisCaseModel
 	d               debugTalkOperation
+	envVars         map[string]string
 }
 
 func (r *runCase) LoadCase() (err error) {
@@ -34,6 +37,7 @@ func (r *runCase) LoadCase() (err error) {
 	var testCaseList []interfacecase.HrpCase
 	var apiCase interfacecase.ApiCase
 	var apiCaseCase []interfacecase.ApiCaseRelationship
+	var envName string
 
 	//获取测试用例下对应的配置信息
 	{
@@ -43,12 +47,18 @@ func (r *runCase) LoadCase() (err error) {
 			return err
 		}
 		r.runCaseReq.ConfigID = testCase.RunConfigID
+		r.runCaseReq.Env = testCase.ApiEnvID
 	}
 	//获取运行配置
 	apiConfig, err := getConfig(r.runCaseReq.ConfigID)
 	if err != nil {
 		return errors.New("获取配置失败")
 	}
+	r.envVars, envName, err = GetEnvVar(apiConfig.ProjectID, r.runCaseReq.Env)
+	if err != nil {
+		return errors.New("获取环境变量失败")
+	}
+	apiConfig.Environs = r.envVars
 
 	//设置前置套件
 	if apiConfig.SetupCaseID != nil && *apiConfig.SetupCaseID != 0 {
@@ -56,7 +66,9 @@ func (r *runCase) LoadCase() (err error) {
 		if err != nil {
 			return err
 		}
-		testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
+		if hrpCaseStep != nil {
+			testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
+		}
 		testCase.Confing = *apiConfig
 	}
 	r.tcm.Config = *apiConfig
@@ -75,12 +87,13 @@ func (r *runCase) LoadCase() (err error) {
 	caseDB.Find(&apiCaseCase)
 	for _, v := range apiCaseCase {
 		//testCaseList = append(testCaseList, v.ApiCaseStep)
-
 		hrpCaseStep, err := getCaseStepHrp(v.ApiCaseStepId)
 		if err != nil {
 			return err
 		}
-		testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
+		if hrpCaseStep != nil {
+			testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
+		}
 		testCase.Confing = *apiConfig
 	}
 	testCaseList = append(testCaseList, testCase)
@@ -96,8 +109,12 @@ func (r *runCase) LoadCase() (err error) {
 			Name:      apiCase.Name,
 			CaseType:  r.caseType,
 			RunType:   r.runType,
-			ProjectID: apiConfig.ProjectID,
 			SetupCase: r.tcm.SetupCase,
+			Operator: interfacecase.Operator{
+				ProjectID: apiConfig.ProjectID,
+			},
+			ApiEnvName: envName,
+			ApiEnvID:   r.runCaseReq.Env,
 		},
 	}
 	r.reportOperation.CreateReport()

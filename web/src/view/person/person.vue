@@ -47,14 +47,14 @@
                 <el-tooltip
                   class="item"
                   effect="light"
-                  content="cheetah-技术部-测试事业群"
+                  content="yangfan-技术部-测试事业群"
                   placement="top"
                 >
                   <li>
                     <el-icon>
                       <data-analysis />
                     </el-icon>
-                    cheetah-技术部-测试事业群
+                      yangfan-技术部-测试事业群
                   </li>
                 </el-tooltip>
                 <li>

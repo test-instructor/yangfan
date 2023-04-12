@@ -1,11 +1,11 @@
 package example
 
 import (
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/example"
-	"github.com/test-instructor/cheetah/server/model/system"
-	systemService "github.com/test-instructor/cheetah/server/service/system"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/example"
+	"github.com/test-instructor/yangfan/server/model/system"
+	systemService "github.com/test-instructor/yangfan/server/service/system"
 )
 
 type CustomerService struct{}

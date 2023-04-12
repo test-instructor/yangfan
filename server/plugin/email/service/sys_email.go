@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/test-instructor/cheetah/server/plugin/email/utils"
+	"github.com/test-instructor/yangfan/server/plugin/email/utils"
 )
 
 type EmailService struct{}

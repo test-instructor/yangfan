@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/test-instructor/cheetah/server/plugin/{{ .Snake}}/api"
+	"github.com/test-instructor/yangfan/server/plugin/{{ .Snake}}/api"
 	"github.com/gin-gonic/gin"
 )
 

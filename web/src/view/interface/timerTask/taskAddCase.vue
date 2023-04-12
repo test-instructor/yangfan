@@ -1,16 +1,19 @@
 <template>
   <div>
     <el-form model="addTestCaseTag">
-      <el-tag
-          v-for="item in addTestCaseTag"
-          :key="item.key"
-          class="mx-1"
-          closable
-          :disable-transitions="false"
-          @close="handleClose(item)"
-      >
-        {{ item.name }}
-      </el-tag>
+      <div style="padding: 5px">
+        <el-tag
+            style="margin: 3px 5px 3px 5px"
+            v-for="item in addTestCaseTag"
+            :key="item.key"
+            class="mx-1"
+            closable
+            :disable-transitions="false"
+            @close="handleClose(item)"
+        >
+          {{ item.name }}
+        </el-tag>
+      </div>
     </el-form>
   </div>
   <div style="display: flex;">
@@ -189,7 +192,7 @@ const getTableData = async() => {
 
 .left-table {
   margin-left: 30px;
-  height: 650px;
+  height: 580px;
   overflow: auto;
 }
 
@@ -202,7 +205,7 @@ const getTableData = async() => {
 .left {
   margin:10px;
   width: 300px;
-  height: 98%;
+  height: 580px;
   padding:8px;
   background: #ffffff;
 }

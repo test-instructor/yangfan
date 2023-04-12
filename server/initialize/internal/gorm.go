@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/test-instructor/cheetah/server/global"
+	"github.com/test-instructor/yangfan/server/global"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )

@@ -2,18 +2,19 @@ package example
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/example"
-	exampleRes "github.com/test-instructor/cheetah/server/model/example/response"
-	"github.com/test-instructor/cheetah/server/utils"
 	"go.uber.org/zap"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/example"
+	exampleRes "github.com/test-instructor/yangfan/server/model/example/response"
+	"github.com/test-instructor/yangfan/server/utils"
 )
 
 type CustomerApi struct{}
 
-// @Tags ExaCustomer
+// CreateExaCustomer @Tags ExaCustomer
 // @Summary 创建客户
 // @Security ApiKeyAuth
 // @accept application/json
@@ -38,7 +39,7 @@ func (e *CustomerApi) CreateExaCustomer(c *gin.Context) {
 	}
 }
 
-// @Tags ExaCustomer
+// DeleteExaCustomer @Tags ExaCustomer
 // @Summary 删除客户
 // @Security ApiKeyAuth
 // @accept application/json
@@ -61,7 +62,7 @@ func (e *CustomerApi) DeleteExaCustomer(c *gin.Context) {
 	}
 }
 
-// @Tags ExaCustomer
+// UpdateExaCustomer @Tags ExaCustomer
 // @Summary 更新客户信息
 // @Security ApiKeyAuth
 // @accept application/json
@@ -88,7 +89,7 @@ func (e *CustomerApi) UpdateExaCustomer(c *gin.Context) {
 	}
 }
 
-// @Tags ExaCustomer
+// GetExaCustomer @Tags ExaCustomer
 // @Summary 获取单一客户信息
 // @Security ApiKeyAuth
 // @accept application/json
@@ -112,7 +113,7 @@ func (e *CustomerApi) GetExaCustomer(c *gin.Context) {
 	}
 }
 
-// @Tags ExaCustomer
+// GetExaCustomerList @Tags ExaCustomer
 // @Summary 分页获取权限客户列表
 // @Security ApiKeyAuth
 // @accept application/json

@@ -13,9 +13,9 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"howett.net/plist"
 
-	"github.com/test-instructor/cheetah/server/hrp/pkg/gidevice/pkg/ipa"
-	"github.com/test-instructor/cheetah/server/hrp/pkg/gidevice/pkg/libimobiledevice"
-	"github.com/test-instructor/cheetah/server/hrp/pkg/gidevice/pkg/nskeyedarchiver"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/gidevice/pkg/ipa"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/gidevice/pkg/libimobiledevice"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/gidevice/pkg/nskeyedarchiver"
 )
 
 const LockdownPort = 62078

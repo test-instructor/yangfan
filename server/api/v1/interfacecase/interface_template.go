@@ -1,16 +1,19 @@
 package interfacecase
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	interfacecaseReq "github.com/test-instructor/cheetah/server/model/interfacecase/request"
-	"github.com/test-instructor/cheetah/server/service"
-	"github.com/test-instructor/cheetah/server/utils"
-	"go.uber.org/zap"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+	"gorm.io/gorm"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	interfacecaseReq "github.com/test-instructor/yangfan/server/model/interfacecase/request"
+	"github.com/test-instructor/yangfan/server/service"
+	"github.com/test-instructor/yangfan/server/utils"
 )
 
 type InterfaceTemplateApi struct {
@@ -31,7 +34,7 @@ func (apiCaseApi *InterfaceTemplateApi) CreateInterfaceTemplate(c *gin.Context) 
 	var apicase interfacecase.ApiStep
 	_ = c.ShouldBindJSON(&apicase)
 	apicase.ProjectID = utils.GetUserProject(c)
-	apicase.CreatedByID = utils.GetUserIDAddress(c)
+	apicase.CreatedBy = utils.GetUserIDAddress(c)
 	menuStr := c.Query("menu")
 	menuInt, _ := strconv.Atoi(menuStr)
 	menu := interfacecase.ApiMenu{GVA_MODEL: global.GVA_MODEL{ID: uint(menuInt)}}
@@ -57,7 +60,7 @@ func (apiCaseApi *InterfaceTemplateApi) DeleteInterfaceTemplate(c *gin.Context) 
 	var apicase interfacecase.ApiStep
 	_ = c.ShouldBindJSON(&apicase)
 	apicase.ProjectID = utils.GetUserProject(c)
-	apicase.DeleteByID = utils.GetUserIDAddress(c)
+	apicase.DeleteBy = utils.GetUserIDAddress(c)
 	if err := apicaseServices.DeleteInterfaceTemplate(apicase); err != nil {
 		global.GVA_LOG.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
@@ -99,7 +102,7 @@ func (apiCaseApi *InterfaceTemplateApi) UpdateInterfaceTemplate(c *gin.Context) 
 	var apicase interfacecase.ApiStep
 	_ = c.ShouldBindJSON(&apicase)
 	apicase.ProjectID = utils.GetUserProject(c)
-	apicase.UpdateByID = utils.GetUserIDAddress(c)
+	apicase.UpdateBy = utils.GetUserIDAddress(c)
 	menuStr := c.Query("menu")
 	menuInt, _ := strconv.Atoi(menuStr)
 	menu := interfacecase.ApiMenu{GVA_MODEL: global.GVA_MODEL{ID: uint(menuInt)}}
@@ -184,5 +187,44 @@ func (apiCaseApi *InterfaceTemplateApi) GetDebugTalk(c *gin.Context) {
 		response.FailWithMessage("查询失败", c)
 	} else {
 		response.OkWithData(gin.H{"reapicase": reapicase}, c)
+	}
+}
+
+func (apiCaseApi *InterfaceTemplateApi) GetGrpc(c *gin.Context) {
+	var gRPC interfacecaseReq.GrpcFunc
+	_ = c.ShouldBindJSON(&gRPC)
+	if err, data := apicaseServices.GetGrpc(gRPC); err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithDetailed(data, "获取成功", c)
+	}
+}
+
+func (apiCaseApi *InterfaceTemplateApi) CreateUserConfig(c *gin.Context) {
+	var userConfig interfacecase.ApiUserConfig
+	_ = c.ShouldBindJSON(&userConfig)
+	userConfig.ProjectID = utils.GetUserProject(c)
+	userConfig.UserID = utils.GetUserID(c)
+	if err := apicaseServices.CreateUserConfig(userConfig); err != nil {
+		global.GVA_LOG.Error("创建失败!", zap.Error(err))
+		response.FailWithMessage("创建失败", c)
+	} else {
+		response.OkWithMessage("创建成功", c)
+	}
+}
+
+func (apiCaseApi *InterfaceTemplateApi) GetUserConfig(c *gin.Context) {
+
+	if userConfig, err := apicaseServices.GetUserConfig(utils.GetUserProject(c), utils.GetUserID(c)); err != nil {
+		if err == gorm.ErrRecordNotFound {
+			global.GVA_LOG.Warn("查询成功，但没有获取到对应的数据", zap.Error(err))
+			response.OkWithDetailed(nil, "查询成功，但没有获取到对应的数据", c)
+		} else {
+			global.GVA_LOG.Error("查询失败!", zap.Error(err))
+			response.FailWithMessage("查询失败", c)
+		}
+	} else {
+		response.OkWithDetailed(userConfig, "查询成功", c)
 	}
 }

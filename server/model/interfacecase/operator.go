@@ -1,9 +1,14 @@
 package interfacecase
 
+import "github.com/test-instructor/yangfan/server/model/system"
+
 type Operator struct {
-	CreatedByID *uint `gorm:"comment:创建者"`
-	UpdateByID  *uint `gorm:"comment:更新者"`
-	DeleteByID  *uint `gorm:"comment:删除者"`
+	CreatedBy *uint `gorm:"column:created_by_id;comment:创建者"`
+	UpdateBy  *uint `gorm:"column:update_by_id;comment:更新者"`
+	DeleteBy  *uint `gorm:"column:delete_by_id;comment:删除者"`
+
+	Project   system.Project `json:"-"`
+	ProjectID uint           `json:"-"`
 	//CreatedBy   *system.SysUser
 	//UpdateBy    *system.SysUser
 	//DeleteBy    *system.SysUser

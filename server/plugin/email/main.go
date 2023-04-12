@@ -2,8 +2,8 @@ package email
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/plugin/email/global"
-	"github.com/test-instructor/cheetah/server/plugin/email/router"
+	"github.com/test-instructor/yangfan/server/plugin/email/global"
+	"github.com/test-instructor/yangfan/server/plugin/email/router"
 )
 
 type emailPlugin struct{}

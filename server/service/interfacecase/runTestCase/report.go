@@ -2,9 +2,10 @@ package runTestCase
 
 import (
 	"encoding/json"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/hrp"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/hrp"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
 )
 
 type ReportOperation struct {
@@ -75,6 +76,8 @@ func (r *ReportOperation) UpdateReport(reports *interfacecase.ApiReport) {
 	reports.Project.ID = r.report.ProjectID
 	reports.Status = 1
 	reports.SetupCase = r.report.SetupCase
+	reports.ApiEnvName = r.report.ApiEnvName
+	reports.ApiEnvID = r.report.ApiEnvID
 	for i, v := range reports.Details {
 		if v.Name == "" {
 			testCase := interfacecase.ApiCase{

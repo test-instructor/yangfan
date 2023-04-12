@@ -1,6 +1,6 @@
 package request
 
-import model "github.com/test-instructor/cheetah/server/model/system"
+import model "github.com/test-instructor/yangfan/server/model/system"
 
 // User register structure
 type Register struct {

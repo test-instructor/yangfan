@@ -11,3 +11,5 @@ func projectDB(db *gorm.DB, projectid uint) *gorm.DB {
 func menuDB(db *gorm.DB, menuid uint) *gorm.DB {
 	return db.Preload("ApiMenu").Joins("ApiMenu").Where("ApiMenu.ID = ?", menuid)
 }
+
+var _ = menuDB

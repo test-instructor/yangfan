@@ -1,9 +1,10 @@
 package initialize
 
 import (
-	"github.com/test-instructor/cheetah/server/config"
-	"github.com/test-instructor/cheetah/server/global"
 	"gorm.io/gorm"
+
+	"github.com/test-instructor/yangfan/server/config"
+	"github.com/test-instructor/yangfan/server/global"
 )
 
 const sys = "system"

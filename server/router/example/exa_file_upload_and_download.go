@@ -2,7 +2,7 @@ package example
 
 import (
 	"github.com/gin-gonic/gin"
-	v1 "github.com/test-instructor/cheetah/server/api/v1"
+	v1 "github.com/test-instructor/yangfan/server/api/v1"
 )
 
 type FileUploadAndDownloadRouter struct{}

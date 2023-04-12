@@ -2,10 +2,12 @@ package internal
 
 import (
 	"fmt"
-	"github.com/test-instructor/cheetah/server/global"
+	"time"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"time"
+
+	"github.com/test-instructor/yangfan/server/global"
 )
 
 var Zap = new(_zap)

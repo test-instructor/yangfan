@@ -6,10 +6,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
-	_ "github.com/test-instructor/cheetah/server/docs"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/middleware"
-	"github.com/test-instructor/cheetah/server/router"
+
+	_ "github.com/test-instructor/yangfan/server/docs"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/middleware"
+	"github.com/test-instructor/yangfan/server/router"
 )
 
 // 初始化总路由
@@ -126,6 +127,12 @@ func Routers() *gin.Engine {
 		performanceRouter.InitPerformanceRouter(performanceGroup)
 	}
 
+	environmentRouter := router.RouterGroupApp.Environment
+	environmentGroup := Router.Group("env/:project")
+	environmentGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler())
+	{
+		environmentRouter.InitEnvironmentRouter(environmentGroup)
+	}
 	InstallPlugin(
 		Router,
 		InterfaceGroup,
@@ -135,6 +142,7 @@ func Routers() *gin.Engine {
 		apiCaseGroup,
 		timerTaskGroup,
 		performanceGroup,
+		environmentGroup,
 	) // 安装插件
 
 	global.GVA_LOG.Info("router register success")

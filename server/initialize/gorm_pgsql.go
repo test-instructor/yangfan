@@ -1,16 +1,17 @@
 package initialize
 
 import (
-	"github.com/test-instructor/cheetah/server/config"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/initialize/internal"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	"github.com/test-instructor/yangfan/server/config"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/initialize/internal"
 )
 
 // GormPgSql 初始化 Postgresql 数据库
 
-// Author [SliverHorn](https://github.com/SliverHorn)
+// GormPgSql Author [SliverHorn](https://github.com/SliverHorn)
 func GormPgSql() *gorm.DB {
 	p := global.GVA_CONFIG.Pgsql
 	if p.Dbname == "" {

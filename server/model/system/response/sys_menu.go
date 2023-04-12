@@ -1,6 +1,6 @@
 package response
 
-import "github.com/test-instructor/cheetah/server/model/system"
+import "github.com/test-instructor/yangfan/server/model/system"
 
 type SysMenusResponse struct {
 	Menus []system.SysMenu `json:"menus"`

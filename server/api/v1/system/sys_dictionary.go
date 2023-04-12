@@ -2,17 +2,18 @@ package system
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/system"
-	"github.com/test-instructor/cheetah/server/model/system/request"
-	"github.com/test-instructor/cheetah/server/utils"
 	"go.uber.org/zap"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/system"
+	"github.com/test-instructor/yangfan/server/model/system/request"
+	"github.com/test-instructor/yangfan/server/utils"
 )
 
 type DictionaryApi struct{}
 
-// @Tags SysDictionary
+// CreateSysDictionary @Tags SysDictionary
 // @Summary 创建SysDictionary
 // @Security ApiKeyAuth
 // @accept application/json
@@ -31,7 +32,7 @@ func (s *DictionaryApi) CreateSysDictionary(c *gin.Context) {
 	}
 }
 
-// @Tags SysDictionary
+// DeleteSysDictionary @Tags SysDictionary
 // @Summary 删除SysDictionary
 // @Security ApiKeyAuth
 // @accept application/json
@@ -50,7 +51,7 @@ func (s *DictionaryApi) DeleteSysDictionary(c *gin.Context) {
 	}
 }
 
-// @Tags SysDictionary
+// UpdateSysDictionary @Tags SysDictionary
 // @Summary 更新SysDictionary
 // @Security ApiKeyAuth
 // @accept application/json
@@ -69,7 +70,7 @@ func (s *DictionaryApi) UpdateSysDictionary(c *gin.Context) {
 	}
 }
 
-// @Tags SysDictionary
+// FindSysDictionary @Tags SysDictionary
 // @Summary 用id查询SysDictionary
 // @Security ApiKeyAuth
 // @accept application/json
@@ -88,7 +89,7 @@ func (s *DictionaryApi) FindSysDictionary(c *gin.Context) {
 	}
 }
 
-// @Tags SysDictionary
+// GetSysDictionaryList @Tags SysDictionary
 // @Summary 分页获取SysDictionary列表
 // @Security ApiKeyAuth
 // @accept application/json

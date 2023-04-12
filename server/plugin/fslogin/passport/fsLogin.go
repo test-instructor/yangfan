@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/test-instructor/cheetah/server/plugin/fslogin/global"
-	"github.com/test-instructor/cheetah/server/plugin/fslogin/model"
+	"github.com/test-instructor/yangfan/server/plugin/fslogin/global"
+	"github.com/test-instructor/yangfan/server/plugin/fslogin/model"
 	"io"
 	"net/http"
 )

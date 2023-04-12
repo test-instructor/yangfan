@@ -1,7 +1,7 @@
 package response
 
 import (
-	"github.com/test-instructor/cheetah/server/model/system"
+	"github.com/test-instructor/yangfan/server/model/system"
 )
 
 type SysUserResponse struct {

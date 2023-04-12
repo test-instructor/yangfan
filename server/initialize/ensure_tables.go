@@ -2,11 +2,13 @@ package initialize
 
 import (
 	"context"
+
 	adapter "github.com/casbin/gorm-adapter/v3"
-	"github.com/test-instructor/cheetah/server/model/example"
-	sysModel "github.com/test-instructor/cheetah/server/model/system"
-	"github.com/test-instructor/cheetah/server/service/system"
 	"gorm.io/gorm"
+
+	"github.com/test-instructor/yangfan/server/model/example"
+	sysModel "github.com/test-instructor/yangfan/server/model/system"
+	"github.com/test-instructor/yangfan/server/service/system"
 )
 
 const initOrderEnsureTables = system.InitOrderExternal - 1

@@ -2,17 +2,18 @@ package example
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/example"
-	exampleRes "github.com/test-instructor/cheetah/server/model/example/response"
 	"go.uber.org/zap"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/example"
+	exampleRes "github.com/test-instructor/yangfan/server/model/example/response"
 )
 
 type FileUploadAndDownloadApi struct{}
 
-// @Tags ExaFileUploadAndDownload
+// UploadFile @Tags ExaFileUploadAndDownload
 // @Summary 上传文件示例
 // @Security ApiKeyAuth
 // @accept multipart/form-data
@@ -50,7 +51,7 @@ func (b *FileUploadAndDownloadApi) EditFileName(c *gin.Context) {
 	response.OkWithMessage("编辑成功", c)
 }
 
-// @Tags ExaFileUploadAndDownload
+// DeleteFile @Tags ExaFileUploadAndDownload
 // @Summary 删除文件
 // @Security ApiKeyAuth
 // @Produce  application/json
@@ -68,7 +69,7 @@ func (b *FileUploadAndDownloadApi) DeleteFile(c *gin.Context) {
 	response.OkWithMessage("删除成功", c)
 }
 
-// @Tags ExaFileUploadAndDownload
+// GetFileList @Tags ExaFileUploadAndDownload
 // @Summary 分页文件列表
 // @Security ApiKeyAuth
 // @accept application/json

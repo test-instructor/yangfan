@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/test-instructor/cheetah/server/hrp/pkg/httpstat"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/httpstat"
 )
 
 func TestMain(t *testing.T) {

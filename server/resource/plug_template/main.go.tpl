@@ -2,9 +2,9 @@ package {{ .Snake}}
 
 import (
 {{- if .HasGlobal }}
-	"github.com/test-instructor/cheetah/server/plugin/{{ .Snake}}/global"
+	"github.com/test-instructor/yangfan/server/plugin/{{ .Snake}}/global"
 {{- end }}
-	"github.com/test-instructor/cheetah/server/plugin/{{ .Snake}}/router"
+	"github.com/test-instructor/yangfan/server/plugin/{{ .Snake}}/router"
 	"github.com/gin-gonic/gin"
 )
 

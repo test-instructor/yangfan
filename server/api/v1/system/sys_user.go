@@ -3,20 +3,20 @@ package system
 import (
 	"strconv"
 
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/system"
-	systemReq "github.com/test-instructor/cheetah/server/model/system/request"
-	systemRes "github.com/test-instructor/cheetah/server/model/system/response"
-	"github.com/test-instructor/cheetah/server/utils"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/system"
+	systemReq "github.com/test-instructor/yangfan/server/model/system/request"
+	systemRes "github.com/test-instructor/yangfan/server/model/system/response"
+	"github.com/test-instructor/yangfan/server/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"go.uber.org/zap"
 )
 
-// @Tags Base
+// Login @Tags Base
 // @Summary 用户登录
 // @Produce  application/json
 // @Param data body systemReq.Login true "用户名, 密码, 验证码"
@@ -47,7 +47,7 @@ func (b *BaseApi) Login(c *gin.Context) {
 	}
 }
 
-// 登录以后签发jwt
+// TokenNext 登录以后签发jwt
 func (b *BaseApi) TokenNext(c *gin.Context, user system.SysUser) {
 	j := &utils.JWT{SigningKey: []byte(global.GVA_CONFIG.JWT.SigningKey)} // 唯一签名
 	claims := j.CreateClaims(systemReq.BaseClaims{
@@ -105,7 +105,7 @@ func (b *BaseApi) TokenNext(c *gin.Context, user system.SysUser) {
 	}
 }
 
-// @Tags SysUser
+// Register @Tags SysUser
 // @Summary 用户注册账号
 // @Produce  application/json
 // @Param data body systemReq.Register true "用户名, 昵称, 密码, 角色ID"
@@ -151,7 +151,7 @@ func (b *BaseApi) Register(c *gin.Context) {
 	}
 }
 
-// @Tags SysUser
+// ChangePassword @Tags SysUser
 // @Summary 用户修改密码
 // @Security ApiKeyAuth
 // @Produce  application/json
@@ -175,7 +175,7 @@ func (b *BaseApi) ChangePassword(c *gin.Context) {
 	}
 }
 
-// @Tags SysUser
+// GetUserList @Tags SysUser
 // @Summary 分页获取用户列表
 // @Security ApiKeyAuth
 // @accept application/json
@@ -203,7 +203,7 @@ func (b *BaseApi) GetUserList(c *gin.Context) {
 	}
 }
 
-// @Tags SysUser
+// SetUserAuthority @Tags SysUser
 // @Summary 更改用户权限
 // @Security ApiKeyAuth
 // @accept application/json
@@ -238,7 +238,7 @@ func (b *BaseApi) SetUserAuthority(c *gin.Context) {
 	}
 }
 
-// @Tags SysUser
+// SetUserAuthorities @Tags SysUser
 // @Summary 设置用户权限
 // @Security ApiKeyAuth
 // @accept application/json
@@ -257,7 +257,7 @@ func (b *BaseApi) SetUserAuthorities(c *gin.Context) {
 	}
 }
 
-// @Tags SysUser
+// SetUserProjects @Tags SysUser
 // @Summary 设置用户权限
 // @Security ApiKeyAuth
 // @accept application/json
@@ -276,7 +276,7 @@ func (b *BaseApi) SetUserProjects(c *gin.Context) {
 	}
 }
 
-// @Tags SysUser
+// DeleteUser @Tags SysUser
 // @Summary 删除用户
 // @Security ApiKeyAuth
 // @accept application/json
@@ -304,7 +304,7 @@ func (b *BaseApi) DeleteUser(c *gin.Context) {
 	}
 }
 
-// @Tags SysUser
+// SetUserInfo @Tags SysUser
 // @Summary 设置用户信息
 // @Security ApiKeyAuth
 // @accept application/json
@@ -347,7 +347,7 @@ func (b *BaseApi) SetUserInfo(c *gin.Context) {
 	}
 }
 
-// @Tags SysUser
+// SetSelfInfo @Tags SysUser
 // @Summary 设置用户信息
 // @Security ApiKeyAuth
 // @accept application/json
@@ -377,7 +377,7 @@ func (b *BaseApi) SetSelfInfo(c *gin.Context) {
 	}
 }
 
-// @Tags SysUser
+// GetUserInfo @Tags SysUser
 // @Summary 获取用户信息
 // @Security ApiKeyAuth
 // @accept application/json
@@ -394,7 +394,7 @@ func (b *BaseApi) GetUserInfo(c *gin.Context) {
 	}
 }
 
-// @Tags SysUser
+// ResetPassword @Tags SysUser
 // @Summary 重置用户密码
 // @Security ApiKeyAuth
 // @Produce  application/json

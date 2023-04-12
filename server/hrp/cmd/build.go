@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/test-instructor/cheetah/server/hrp"
+	"github.com/test-instructor/yangfan/server/hrp"
 )
 
 var buildCmd = &cobra.Command{

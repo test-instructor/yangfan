@@ -1,50 +1,9 @@
 <template>
   <div>
     <div>
-<!--      <div style="display: flex;">
-        <div style="width: 120px; margin-top: 5px; display: table; margin-left:20px; ">
-          <span>verify: </span>
-          <el-switch
-              v-model="formLabelAlign.verify"
-              class="mb-2"
-              size="large"
-              name="verify"
-          />
-        </div>
-        <div style="width: 150px; margin-top: 5px; display: table;  ">
-          <span style="margin-right:5px;">允许重定向:  </span>
-          <el-switch
-              v-model="formLabelAlign.allow_redirects"
-              class="mb-2"
-              size="large"
-              name="allowRedirects"
-          />
-        </div>
-        <div style="width: 150px; margin-top: 5px; display: table; margin-left:20px; ">
-          <span style="margin-right:5px;">http2:  </span>
-          <el-switch
-              v-model="formLabelAlign.http2"
-              class="mb-2"
-              size="large"
-              name="http2"
-          />
-        </div>
-        <div>
-          <span style="margin-right:5px;">超时时间:  </span>
-          <el-input-number
-              v-model="formLabelAlign.timeout"
-              :precision="2"
-              :step="0.1"
-              :max="3600"
-              size="small"
-              controls-position="right"
-              :min="0"
-          />
-        </div>
-
-      </div>-->
+      <user-config/>
     </div>
-    <div style="width: 800px; margin-top: 10px">
+    <div style="width: 800px">
       <el-input
           v-model="formLabelAlign.name"
           placeholder="请输入接口名称">
@@ -63,7 +22,7 @@
           <el-select
               style="width: 150px"
               v-model="formLabelAlign.method"
-              placeholder="请选址请求方法"
+              placeholder="请选择请求方法"
           >
             <el-option
                 v-for="item in httpOptions"
@@ -197,15 +156,16 @@ const router = useRouter()
 import {
   createInterfaceTemplate,
   updateInterfaceTemplate,
-  findInterfaceTemplate
+  findInterfaceTemplate, getUserConfig
 } from '@/api/interfaceTemplate'
 import {ElMessage} from "element-plus";
 import {getDict} from "@/utils/dictionary";
+import UserConfig from "@/view/interface/interfaceComponents/userConfig.vue";
 
 const emit = defineEmits(["close"]);
 const props = defineProps({
   cid:ref(),
-  heights: ref(),
+  heights: ref(0),
   eventType: ref(),
   apiType: ref(),
   formData: ref({
@@ -228,7 +188,7 @@ const props = defineProps({
 
 })
 
-const heightDiv = ref(false)
+const heightDiv = ref(0)
 const eventType = ref('')
 const formData = reactive({})
 let configId
@@ -384,24 +344,26 @@ const saveRun = async () => {
   }
   res = await createInterface(false)
   if (res.code === 0){
-    res1 = await runInterfaceTemplateFunc(res.data.id)
-    if (res1.code === 0){
-      reportDetailFunc(res1.data.id)
-    }
+    await runInterfaceTemplateFunc(res.data.id)
   }
 
 
 }
 
 const runInterfaceTemplateFunc = async (id) => {
-  if (configId === 0) {
+  if (!userConfigs.value ||  !userConfigs.value.api_config_id ||  userConfigs.value.api_config_id < 1) {
     ElMessage({
       type: 'error',
       message: '请选择配置后再运行'
     })
     return
   }
-  const res = await runApi({caseID: id, configID: configId, run_type: 5})
+  let data = {caseID: id, configID: userConfigs.value.api_config_id, run_type: 5}
+  if (userConfigs.value &&  userConfigs.value.api_env_id &&  userConfigs.value.api_env_id >0 ){
+    console.log("============",userConfigs.value.api_env_id)
+    data["env"] = userConfigs.value.api_env_id
+  }
+  const res = await runApi(data)
   if (res.code === 0) {
     reportDetailFunc(res.data.id)
   }
@@ -517,6 +479,16 @@ const teardownHooks = (hooks) => {
 const setupHooks = (hooks) => {
   setupHook = hooks
 }
+
+const userConfigs = ref({})
+const getUserConfigs = async () => {
+  let res = await getUserConfig()
+  if (res.code === 0 && res.data) {
+    userConfigs.value = res.data
+    console.log("============",userConfigs.value)
+  }
+}
+getUserConfigs()
 
 </script>
 
