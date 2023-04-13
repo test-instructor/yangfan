@@ -213,8 +213,8 @@ import {reactive} from "vue";
 import {useRouter} from "vue-router";
 import UserConfig from "@/view/interface/interfaceComponents/userConfig.vue";
 const router = useRouter()
-const configId = ref(0)
-const apiEnvId = ref(0)
+const configId = ref("")
+const apiEnvId = ref("")
 
 // 自动化生成的字典（可能为空）以及字段
 const formDatas = reactive({
@@ -512,6 +512,7 @@ const closeDialogGrpc = () => {
 
 const userConfigDialog = ref(false)
 const setUserConfig = () => {
+  console.log("userconfig",userConfigs.value)
   userConfigDialog.value = true
 }
 
@@ -520,6 +521,13 @@ const closeDialogUserConfig = () => {
 }
 
 const saveUserConfig = async () => {
+  if (configId.value === "" ||apiEnvId.value === ""){
+      ElMessage({
+          type: 'error',
+          message: "运行标签和环境变量不能为空，请设置后再运行"
+      })
+      return
+  }
   const res = await createUserConfig({api_config_id:configId.value,api_env_id:apiEnvId.value})
   if (res.code === 0) {
     ElMessage({
@@ -529,12 +537,19 @@ const saveUserConfig = async () => {
     userConfigDialog.value = false
   }
 }
-const userConfigs = ref({})
+const userConfigs = ref({
+    api_config_id:"",
+    api_env_id:""
+})
 const getUserConfigs = async () => {
   let res = await getUserConfig()
   if (res.code === 0 && res.data) {
-    userConfigs.value = res.data
-    console.log("============",userConfigs.value)
+    if (res.data.api_env_id > 0){
+        userConfigs.value.api_env_id = res.data.api_env_id
+    }
+    if (res.data.api_config_id > 0){
+        userConfigs.value.api_config_id = res.data.api_config_id
+    }
   }
 }
 getUserConfigs()

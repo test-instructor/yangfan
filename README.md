@@ -1,4 +1,4 @@
-# Cheetah
+# 扬帆测试平台
 ![logoLogin](docs/img/logoLogin.jpg)
 
 
@@ -54,7 +54,7 @@
 ### 后端
 首次安装运行，由于httprunner在Linux上环境缺少pip，所以需要执行2-4步骤，非首次安装只需要执行步骤1即可
 
-> 1. 执行脚本`cheeath.sh`，config为根目录下的`config.production.yaml`
+> 1. 执行脚本`start_server.sh`，config为根目录下的`config.production.yaml`
 > 2. 进入接口管理并在任意功能模块（接口管理、测试套件、测试用例、定时任务）运行1次
 > 3. cd `./docs`，执行`/root/.hrp/venv/bin/python3 get-pip.py`
 > 4. 重启服务

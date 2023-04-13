@@ -84,12 +84,13 @@ const getConfigData = async () => {
 
 const getConfig = async () => {
   let res = await getUserConfig()
-  if (res.code === 0 && res.data){
-    console.log("res.data.config", res)
-    configId.value = res.data.api_config_id
-    emit("configId", configId.value)
-    envId.value = res.data.api_env_id
-    emit("envId", envId.value)
+  if (res.code === 0 && res.data) {
+      if (res.data.api_env_id > 0){
+          userConfigs.value.api_env_id = res.data.api_env_id
+      }
+      if (res.data.api_config_id > 0){
+          userConfigs.value.api_config_id = res.data.api_config_id
+      }
   }
 }
 

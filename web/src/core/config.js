@@ -3,7 +3,7 @@
  */
 
 const config = {
-  appName: 'yangfan',
+  appName: '扬帆测试平台',
   appLogo: 'http://qiniu.yangfan.gd.cn/demo/logo.png',
   showViteLogo: true
 }

@@ -173,6 +173,20 @@
               />
             </el-select>
           </el-form-item>
+          <el-form-item label="环境变量:">
+              <el-select
+                      v-model="runEnvId"
+                      placeholder="请选择"
+                      @change="envChange"
+              >
+                  <el-option
+                          v-for="item in apiEnvData"
+                          :key="item.ID"
+                          :label="item.name"
+                          :value="item.ID"
+                  />
+              </el-select>
+          </el-form-item>
         </el-form>
         <div class="dialog-footer">
           <el-button size="small" @click="closeDialogTagRung">取 消</el-button>
@@ -236,6 +250,7 @@ const formData = ref({
   config: {
     ID: 0
   },
+  api_env_id: 0
 })
 const cronVisible = ref(false)
 const cronFun = () => {
@@ -431,7 +446,8 @@ const type = ref('')
 const tagDialog = ref(false)
 const tagDialogRun = ref(false)
 const tagIds = ref([])
-const runTagId = ref()
+const runTagId = ref("")
+const runEnvId = ref("")
 // 更新行
 const updateTimerTaskFunc = async (row) => {
   tagIds.value = []
@@ -502,6 +518,7 @@ const getTagData = async () => {
     }
     tagTableOption.value.push(option)
   })
+  await getApiEnv()
   console.log("tagTableOption", tagTableOption)
 }
 
@@ -524,6 +541,7 @@ const closeDialogTag = () => {
 const closeDialogTagRung = () => {
   tagDialogRun.value = false
   runTagId.value = ""
+  runEnvId.value = ""
 }
 
 // 关闭弹窗
@@ -543,8 +561,15 @@ const closeDialog = () => {
 }
 // 弹窗确定
 const runDialog = async () => {
+  if (runTagId.value === "" || runEnvId.value === "" ){
+      ElMessage({
+          type: 'error',
+          message: "运行标签和环境变量不能为空，请设置后再运行"
+      })
+      return
+  }
   console.log("runTagId", runTagId.value)
-  let data = {tagID: runTagId.value}
+  let data = {tagID: runTagId.value, env: runEnvId.value}
   const res = await runTimerTask(data)
   if (res.code === 0) {
     ElMessage({
@@ -569,6 +594,13 @@ const enterDialog = async () => {
       message: '开启定时任务时时间配置不能为空'
     })
     return
+  }
+  if (formData.value.api_env_id < 1){
+      ElMessage({
+          type:"error",
+          message: '请选择环境变量'
+      })
+      return
   }
   apiEnvData.value.forEach((item, index, arr) => {
     if (item.ID === formData.value.api_env_id){
