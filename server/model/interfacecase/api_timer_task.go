@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/model/system"
 )
 
 // ApiTimerTask  结构体
@@ -35,8 +34,6 @@ type ApiTimerTaskTag struct {
 	ApiTimerTask []ApiTimerTask `json:"apiTimerTask" form:"apiTimerTask" gorm:"many2many:ApiTimerTaskTagRelationship;"`
 	Name         string         `json:"name"`
 	Remarks      string         `json:"remarks"`
-	ProjectID    uint           `json:"-" gorm:"comment:所属项目"`
-	Project      system.Project `json:"-"`
 }
 
 type ApiTimerTaskTagRelationship struct {

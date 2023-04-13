@@ -478,6 +478,13 @@ const enterDialog = async () => {
     })
     return
   }
+  if (formData.value.api_env_id < 1){
+      ElMessage({
+          type:"error",
+          message: '请选择环境变量'
+      })
+      return
+  }
   if (formData.value.status && formData.value.runTime ===""){
     ElMessage({
       type: 'error',

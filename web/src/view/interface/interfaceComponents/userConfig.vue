@@ -39,12 +39,19 @@ const props = defineProps({
 
 const userConfig = ref({
     api_config:{name:""},
-    api_env:{name:""}
+    api_env:{name:""},
+    api_config_id:"",
+    api_env_id:""
 })
 const getUserConfigs = async () => {
   let res = await getUserConfig()
   if (res.code === 0 && res.data) {
-    userConfig.value = res.data
+      if (res.data.api_env_id > 0){
+          userConfigs.value.api_env_id = res.data.api_env_id
+      }
+      if (res.data.api_config_id > 0){
+          userConfigs.value.api_config_id = res.data.api_config_id
+      }
   }
 }
 const init = () => {

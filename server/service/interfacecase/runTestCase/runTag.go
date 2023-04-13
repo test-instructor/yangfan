@@ -33,27 +33,24 @@ type runTag struct {
 
 func (r *runTag) LoadCase() (err error) {
 
-	var tags interfacecase.ApiTimerTaskTag
+	var tag interfacecase.ApiTimerTaskTag
+	var envName string
 	db := global.GVA_DB.Model(interfacecase.ApiTimerTaskTag{})
 	db.Preload("ApiTimerTask")
-	db.First(&tags, "id = ?", r.runCaseReq.TagID)
+	db.First(&tag, "id = ?", r.runCaseReq.TagID)
 
 	var testCaseList []interfacecase.HrpCase
-	var reportName = tags.Name
+	var reportName = tag.Name
 
-	for _, v := range tags.ApiTimerTask {
+	r.envVars, envName, err = GetEnvVar(tag.ProjectID, r.runCaseReq.Env)
+	if err != nil {
+		return errors.New("获取环境变量失败")
+	}
+	for _, v := range tag.ApiTimerTask {
 
 		taskId := v.ID
 		taskCase := taskSort(taskId)
-		var task interfacecase.ApiTimerTask
-		err = global.GVA_DB.Model(interfacecase.ApiTimerTask{}).Where("id = ? ", taskId).First(&task).Error
-		if err != nil {
-			return errors.New("获取定时任务失败")
-		}
-		r.envVars, _, err = GetEnvVar(task.ProjectID, task.ApiEnvID)
-		if err != nil {
-			return errors.New("获取环境变量失败")
-		}
+
 		for _, c := range taskCase {
 			var testCase interfacecase.HrpCase
 			r.d.ProjectID = c.ApiCase.ProjectID
@@ -110,6 +107,8 @@ func (r *runTag) LoadCase() (err error) {
 			Operator: interfacecase.Operator{
 				ProjectID: r.d.ProjectID,
 			},
+			ApiEnvName: envName,
+			ApiEnvID:   r.runCaseReq.Env,
 		},
 	}
 	r.reportOperation.CreateReport()
