@@ -43,7 +43,7 @@
 > - 1、新建数据库，并导入docs/sql/yangfan.sql文件
 > - 2、修改`server/config.yaml`文件中的数据库`mysql`、飞书登录`fs`相关配置
 > - 3、修改`web/.env.development`、 `web/.env.production`中的`VITE_FS_LOGIN`、`VITE_FS_APP_ID`
-
+> - 4、管理员账号`yangfan`,密码`123456`
 ### [本地调试](https://www.gin-vue-admin.com/guide/start-quickly/initialization.html)
 
 ## 项目上线
