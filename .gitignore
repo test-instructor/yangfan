@@ -27,3 +27,6 @@ yarn-error.log*
 /server/latest_log
 
 *.iml
+
+./docker/data/*
+./docker/logs
