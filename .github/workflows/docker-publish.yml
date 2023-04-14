@@ -22,7 +22,7 @@ jobs:
           go-version: 1.18
 
       - name: Build the Go app
-        run: go build -o yangfan/server server/main.go
+        run: go build server/main.go
 
       - name: Build the Docker image
         uses: docker/build-push-action@v2
