@@ -25,6 +25,8 @@ jobs:
 #
 #      - name: Build the Go app
 #        run: go build server/main.go
+      - name: Print current directory
+        run: pwd
 
       - name: Build the Docker image
         uses: docker/build-push-action@v2
