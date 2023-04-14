@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  IMAGE_NAME: my-docker-image
+  IMAGE_NAME: cheetah_server
   DOCKER_REGISTRY: registry.cn-hangzhou.aliyuncs.com
 
 jobs:
