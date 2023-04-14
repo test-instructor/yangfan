@@ -6,7 +6,7 @@ import (
 	"net/smtp"
 	"strings"
 
-	"github.com/test-instructor/cheetah/server/plugin/email/global"
+	"github.com/test-instructor/yangfan/server/plugin/email/global"
 
 	"github.com/jordan-wright/email"
 )

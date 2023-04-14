@@ -9,7 +9,7 @@ import (
 
 	"github.com/qiniu/api.v7/v7/auth/qbox"
 	"github.com/qiniu/api.v7/v7/storage"
-	"github.com/test-instructor/cheetah/server/global"
+	"github.com/test-instructor/yangfan/server/global"
 	"go.uber.org/zap"
 )
 

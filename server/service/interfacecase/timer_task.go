@@ -1,14 +1,16 @@
 package interfacecase
 
 import (
-	"github.com/robfig/cron/v3"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	interfacecaseReq "github.com/test-instructor/cheetah/server/model/interfacecase/request"
-	"github.com/test-instructor/cheetah/server/service/interfacecase/runTestCase"
-	"gorm.io/gorm"
 	"strconv"
+
+	"github.com/robfig/cron/v3"
+	"gorm.io/gorm"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	interfacecaseReq "github.com/test-instructor/yangfan/server/model/interfacecase/request"
+	"github.com/test-instructor/yangfan/server/service/interfacecase/runTestCase"
 )
 
 type TimerTaskService struct {
@@ -68,7 +70,7 @@ func (taskService *TimerTaskService) UpdateTimerTask(task interfacecase.ApiTimer
 		return
 	}
 	global.GVA_DB.Model(interfacecase.ApiTimerTask{}).Where("id = ?", task.ID).First(&oId)
-	task.CreatedByID = oId.CreatedByID
+	task.CreatedBy = oId.CreatedBy
 	task.TestCase = []*interfacecase.ApiCase{}
 	err = global.GVA_DB.Where("id = ?", task.ID).Save(&task).Error
 	if err != nil {
@@ -179,7 +181,7 @@ func (taskService *TimerTaskService) SetTaskCase(id uint, caseIds []uint) (err e
 		if TxErr != nil {
 			return TxErr
 		}
-		timerCase := []interfacecase.ApiTimerTaskRelationship{}
+		var timerCase []interfacecase.ApiTimerTaskRelationship
 		for _, caseID := range caseIds {
 			timerCase = append(timerCase, interfacecase.ApiTimerTaskRelationship{
 				ApiTimerTaskId: id,
@@ -235,9 +237,6 @@ func (taskService *TimerTaskService) CreateTaskTag(taskTag interfacecase.ApiTime
 	}
 	db := global.GVA_DB.Model(&interfacecase.ApiTimerTaskTag{})
 	err = db.Find(&taskTags, projectDB(db, taskTag.ProjectID)).Error
-	if err != nil {
-		return nil, err
-	}
 	return
 }
 

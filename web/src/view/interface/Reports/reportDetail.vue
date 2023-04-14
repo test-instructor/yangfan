@@ -169,10 +169,10 @@
         title="请求详情"
         :tabindex=-1
     >
-      <div id="requestTimeEl"></div>
+      <div v-if="requestTimeShow"  id="requestTimeEl"></div>
 
       <div
-          style="margin:20px;height: 750px;overflow:auto;padding-right: 10px"
+          style="margin:20px;overflow:auto;padding-right: 10px"
       >
         <div class="tableDetail">
           <div>
@@ -489,6 +489,7 @@ requestTimeOption = {
   },
 }
 const tableDatas = ref()
+const requestTimeShow = ref(false)
 const tableKeyToValue = (data) => {
   let tableData = []
   for (let k in data) {
@@ -499,12 +500,17 @@ const tableKeyToValue = (data) => {
   return tableData
 }
 
+
 const dataMethod = (row) => {
   if (!row.data){
     return ["delete", "执行错误"]
   }else {
-    let method = row.data.req_resps.request.method.toLowerCase()
-    return [method, method]
+    if (row.data.req_resps.response.proto==='gRPC'){
+      return ['put', 'gRPC']
+    }else {
+      let method = row.data.req_resps.request.method.toLowerCase()
+      return [method, method]
+    }
   }
 }
 
@@ -518,6 +524,7 @@ const shouStep = (data) => {
 
 const openDrawer = (row) => {
   if (row.data){
+    requestTimeShow.value = row.data.req_resps.response.proto !== 'gRPC'
     drawer.value = true
     validatorsTable.value = true
     responseTable.value = true
@@ -526,14 +533,28 @@ const openDrawer = (row) => {
     let responseData = []
     {
       requestData.push({key: "url", value: row.data.req_resps.request.url})
-      requestData.push({key: "method", value: row.data.req_resps.request.method})
+      if (row.data.req_resps.request.method){
+        requestData.push({key: "method", value: row.data.req_resps.request.method})
+      }
       requestData.push({key: "headers", value: row.data.req_resps.request.headers, isTable: true})
-      requestData.push({key: "body", value: row.data.req_resps.request.body, isTable: true})
-      requestData.push({key: "data", value: row.data.req_resps.request.data, isTable: true})
-      requestData.push({key: "params", value: row.data.req_resps.request.params, isTable: true})
+      console.log("row.data.req_resps.request.body || !requestTimeShow", row.data.req_resps.request.body || requestTimeShow)
+      if (row.data.req_resps.request.body || requestTimeShow){
+        requestData.push({key: "body", value: row.data.req_resps.request.body, isTable: true})
+      }
+      if (row.data.req_resps.request.data){
+        requestData.push({key: "data", value: row.data.req_resps.request.data, isTable: true})
+      }
+      if (row.data.req_resps.request.params){
+        requestData.push({key: "params", value: row.data.req_resps.request.params, isTable: true})
+      }
       responseData.push({key: "status_code", value: row.data.req_resps.response.status_code})
+      if (row.data.req_resps.response.err){
+        responseData.push({key: "err", value: row.data.req_resps.response.err})
+      }
       responseData.push({key: "body", value: row.data.req_resps.response.body})
-      responseData.push({key: "cookies", value: row.data.req_resps.response.cookies, isTable: true})
+      if (row.data.req_resps.response.cookies){
+        responseData.push({key: "cookies", value: row.data.req_resps.response.cookies, isTable: true})
+      }
       responseData.push({key: "headers", value: row.data.req_resps.response.headers, isTable: true})
     }
     let export_vars = tableKeyToValue(row.export_vars)
@@ -544,77 +565,79 @@ const openDrawer = (row) => {
       exportVars: export_vars,
     }
     let series = [];
-    series = [
-      {
-        name: 'DNS 解析',
-        type: 'bar',
-        stack: 'total',
-        label: {
-          show: true
+    if (requestTimeShow.value){
+      series = [
+        {
+          name: 'DNS 解析',
+          type: 'bar',
+          stack: 'total',
+          label: {
+            show: true
+          },
+          emphasis: {
+            focus: 'series'
+          },
+          data: [row.httpstat.DNSLookup]
         },
-        emphasis: {
-          focus: 'series'
+        {
+          name: 'TCP 连接',
+          type: 'bar',
+          stack: 'total',
+          label: {
+            show: true
+          },
+          emphasis: {
+            focus: 'series'
+          },
+          data: [row.httpstat.TCPConnection]
         },
-        data: [row.httpstat.DNSLookup]
-      },
-      {
-        name: 'TCP 连接',
-        type: 'bar',
-        stack: 'total',
-        label: {
-          show: true
+        {
+          name: 'TLS 握手',
+          type: 'bar',
+          stack: 'total',
+          label: {
+            show: true
+          },
+          emphasis: {
+            focus: 'series'
+          },
+          data: [row.httpstat.TLSHandshake]
         },
-        emphasis: {
-          focus: 'series'
+        {
+          name: '服务端处理',
+          type: 'bar',
+          stack: 'total',
+          label: {
+            show: true
+          },
+          emphasis: {
+            focus: 'series'
+          },
+          data: [row.httpstat.ServerProcessing]
         },
-        data: [row.httpstat.TCPConnection]
-      },
-      {
-        name: 'TLS 握手',
-        type: 'bar',
-        stack: 'total',
-        label: {
-          show: true
-        },
-        emphasis: {
-          focus: 'series'
-        },
-        data: [row.httpstat.TLSHandshake]
-      },
-      {
-        name: '服务端处理',
-        type: 'bar',
-        stack: 'total',
-        label: {
-          show: true
-        },
-        emphasis: {
-          focus: 'series'
-        },
-        data: [row.httpstat.ServerProcessing]
-      },
-      {
-        name: '数据传输',
-        type: 'bar',
-        stack: 'total',
-        label: {
-          show: true
-        },
-        emphasis: {
-          focus: 'series'
-        },
-        data: [row.httpstat.ContentTransfer]
-      }
-    ]
-    requestTimeOption.series = series
-    setTimeout(() => {
-      const requestTimeChartDom = document.getElementById('requestTimeEl');
-      const requestTimeChart = echarts.init(requestTimeChartDom, null, {
-        renderer: 'canvas',
-        useDirtyRect: false
-      });
-      requestTimeChart.setOption(requestTimeOption);
-    }, 50)
+        {
+          name: '数据传输',
+          type: 'bar',
+          stack: 'total',
+          label: {
+            show: true
+          },
+          emphasis: {
+            focus: 'series'
+          },
+          data: [row.httpstat.ContentTransfer]
+        }
+      ]
+      requestTimeOption.series = series
+      setTimeout(() => {
+        const requestTimeChartDom = document.getElementById('requestTimeEl');
+        const requestTimeChart = echarts.init(requestTimeChartDom, null, {
+          renderer: 'canvas',
+          useDirtyRect: false
+        });
+        requestTimeChart.setOption(requestTimeOption);
+      }, 50)
+    }
   }else {
     ElMessageBox.alert(
         '当前用例执行错误，错误详情：'+row.attachments,
@@ -824,7 +847,7 @@ const toggleExpand = (row) => {
 }
 
 #testcases, #testSteps {
-  height: 300px;
+  height: 400px;
   width: 300px;
 }
 
@@ -838,7 +861,7 @@ const toggleExpand = (row) => {
 }
 
 #requestTimeEl {
-  height: 100px;
+  height: 10%;
   margin-top: 40px;
   margin-bottom: 40px;
 }

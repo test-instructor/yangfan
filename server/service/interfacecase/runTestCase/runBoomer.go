@@ -4,11 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/rs/zerolog"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/hrp"
-	"github.com/test-instructor/cheetah/server/hrp/pkg/boomer"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/hrp"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/boomer"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"gorm.io/gorm"
 )
 
@@ -123,7 +123,9 @@ func (r *runBoomer) LoadCase() (err error) {
 		if hrpCaseStep.TestCase != nil {
 			//testCase.TestSteps = append(testCase.TestSteps, hrpCaseStep)
 			if hrpCaseStep.ThinkTime != nil || hrpCaseStep.Transaction != nil || hrpCaseStep.Rendezvous != nil {
-				testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
+				if hrpCaseStep != nil {
+					testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
+				}
 			} else {
 				testcase, ok := hrpCaseStep.TestCase.(interfacecase.HrpTestCase)
 				if ok {
@@ -159,7 +161,9 @@ func (r *runBoomer) LoadCase() (err error) {
 		}
 		//testCase.TestSteps = append(testCase.TestSteps, hrpCaseStep)
 		if hrpCaseStep.ThinkTime != nil || hrpCaseStep.Transaction != nil || hrpCaseStep.Rendezvous != nil {
-			testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
+			if hrpCaseStep != nil {
+				testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
+			}
 		} else {
 			testcase, ok := hrpCaseStep.TestCase.(interfacecase.HrpTestCase)
 			if ok {

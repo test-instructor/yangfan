@@ -1,12 +1,14 @@
 package interfacecase
 
 import (
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	interfacecaseReq "github.com/test-instructor/cheetah/server/model/interfacecase/request"
-	"gorm.io/gorm"
 	"strconv"
+
+	"gorm.io/gorm"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	interfacecaseReq "github.com/test-instructor/yangfan/server/model/interfacecase/request"
 )
 
 type ApiCaseService struct {
@@ -38,7 +40,7 @@ func (testCaseService *ApiCaseService) DeleteApiCaseByIds(ids request.IdsReq) (e
 func (testCaseService *ApiCaseService) UpdateApiCase(testCase interfacecase.ApiCase) (err error) {
 	var oId interfacecase.Operator
 	global.GVA_DB.Model(interfacecase.ApiCase{}).Where("id = ?", testCase.ID).First(&oId)
-	testCase.CreatedByID = oId.CreatedByID
+	testCase.CreatedBy = oId.CreatedBy
 	testCase.ApiCaseStep = []interfacecase.ApiCaseStep{}
 	err = global.GVA_DB.Where("id = ?", testCase.ID).Save(&testCase).Error
 	if err != nil {
@@ -146,7 +148,7 @@ func (testCaseService *ApiCaseService) SetApisCase(id uint, caseIds []uint) (err
 		if TxErr != nil {
 			return TxErr
 		}
-		timerCase := []interfacecase.ApiCaseRelationship{}
+		var timerCase []interfacecase.ApiCaseRelationship
 		for _, caseID := range caseIds {
 			timerCase = append(timerCase, interfacecase.ApiCaseRelationship{
 				ApiCaseId:     id,

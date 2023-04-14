@@ -2,11 +2,12 @@ package runTestCase
 
 import (
 	"errors"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/hrp"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
 	"testing"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/hrp"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
 )
 
 func NewRunApi(runCaseReq request.RunCaseReq, runType interfacecase.RunType) TestCase {
@@ -26,35 +27,43 @@ type runAPI struct {
 	caseType        interfacecase.CaseType
 	tcm             ApisCaseModel
 	d               debugTalkOperation
+	envVars         map[string]string
 }
 
 func (r *runAPI) LoadCase() (err error) {
 	var apiStep interfacecase.ApiStep
-	//var testCaseList []interfacecase.ApiCaseStep
-	//var apiCase interfacecase.ApiCaseStep
 	//获取运行配置
 	var testCase interfacecase.HrpCase
 	var testCaseList []interfacecase.HrpCase
+	var envName string
 
 	//获取运行配置
 	apiConfig, err := getConfig(r.runCaseReq.ConfigID)
 	if err != nil {
 		return errors.New("获取配置失败")
 	}
-
+	//获取环境变量
+	r.envVars, envName, err = GetEnvVar(apiConfig.ProjectID, r.runCaseReq.Env)
+	if err != nil {
+		return errors.New("获取环境变量失败")
+	}
+	apiConfig.Environs = r.envVars
 	//设置前置套件
 	if apiConfig.SetupCaseID != nil && *apiConfig.SetupCaseID != 0 {
 		hrpCaseStep, err := getCaseStepHrp(*apiConfig.SetupCaseID)
 		if err != nil {
 			return err
 		}
-		testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
+		if hrpCaseStep != nil {
+			testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
+		}
 		testCase.Confing = *apiConfig
 	}
 	r.tcm.Config = *apiConfig
 
 	global.GVA_DB.Model(&interfacecase.ApiStep{}).
 		Preload("Request").
+		Preload("Grpc").
 		First(&apiStep, "id = ?", r.runCaseReq.CaseID)
 	testCase.Name = apiStep.Name
 	var hrpTestCase interfacecase.HrpTestCase
@@ -82,8 +91,12 @@ func (r *runAPI) LoadCase() (err error) {
 			Name:      apiStep.Name,
 			CaseType:  r.caseType,
 			RunType:   r.runType,
-			ProjectID: apiStep.ProjectID,
 			SetupCase: r.tcm.SetupCase,
+			Operator: interfacecase.Operator{
+				ProjectID: apiStep.ProjectID,
+			},
+			ApiEnvName: envName,
+			ApiEnvID:   r.runCaseReq.Env,
 		},
 	}
 	r.reportOperation.CreateReport()

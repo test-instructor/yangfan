@@ -10,8 +10,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/code"
-	"github.com/test-instructor/cheetah/server/hrp/internal/env"
+	"github.com/test-instructor/yangfan/server/hrp/internal/code"
+	"github.com/test-instructor/yangfan/server/hrp/internal/env"
 )
 
 var python3Executable string = "python3" // system default python3

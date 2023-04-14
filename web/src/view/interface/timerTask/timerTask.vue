@@ -38,12 +38,13 @@
       >
         <el-table-column type="selection" width="55"/>
         <el-table-column align="left" label="任务名称" prop="name" width="240"/>
+        <el-table-column align="left" label="运行环境" prop="api_env_name" width="240"/>
         <el-table-column align="left" label="时间配置" prop="runTime" width="120"/>
         <el-table-column align="left" label="下次执行时间" width="180">
           <template #default="scope">{{ formatDate(scope.row.nextRunTime) }}</template>
         </el-table-column>
         <el-table-column align="left" label="运行次数" prop="runNumber" width="120"/>
-        <el-table-column align="left" label="备注" prop="describe" width="240"/>
+        <el-table-column align="left" label="备注" prop="describe" width="200"/>
         <el-table-column align="left" label="定时执行" prop="status" width="120">
           <template #default="scope">
             <el-tag :type="scope.row.status ? 'success' : 'info'">{{ scope.row.status ? '启用' : '禁用' }}</el-tag>
@@ -106,6 +107,20 @@
           <el-switch v-model="formData.status" active-color="#13ce66" active-text="启用" clearable
                      inactive-color="#ff4949" inactive-text="禁用"></el-switch>
         </el-form-item>
+        <el-form-item label="环境变量:">
+          <el-select
+              v-model="apiEnvID"
+              placeholder="请选择"
+              @change="envChange"
+          >
+            <el-option
+                v-for="item in apiEnvData"
+                :key="item.ID"
+                :label="item.name"
+                :value="item.ID"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="运行标签" prop="tagId">
           <el-cascader
               v-if="dialogFormVisible"
@@ -135,7 +150,7 @@
         :close-on-press-escape="false"
         title="标签管理"
     >
-      <timer-task-tag></timer-task-tag>
+      <timer-task-tag v-if="tagDialog"></timer-task-tag>
     </el-dialog>
     <el-dialog
         width="350px"
@@ -143,7 +158,7 @@
         :before-close="closeDialogTagRung"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
-        title="标签管理"
+        title="运行标签"
         center
     >
       <template #footer>
@@ -157,6 +172,20 @@
                   :value="item.ID"
               />
             </el-select>
+          </el-form-item>
+          <el-form-item label="环境变量:">
+              <el-select
+                      v-model="runEnvId"
+                      placeholder="请选择"
+                      @change="envChange"
+              >
+                  <el-option
+                          v-for="item in apiEnvData"
+                          :key="item.ID"
+                          :label="item.name"
+                          :value="item.ID"
+                  />
+              </el-select>
           </el-form-item>
         </el-form>
         <div class="dialog-footer">
@@ -205,6 +234,7 @@ import {getApiConfigList} from "@/api/apiConfig";
 import {runTimerTask} from "@/api/runTestCase";
 import {useRouter} from "vue-router";
 import TimerTaskTag from "@/view/interface/timerTask/timerTaskTag.vue";
+import {getEnvList} from "@/api/env";
 
 const router = useRouter()
 
@@ -220,6 +250,7 @@ const formData = ref({
   config: {
     ID: 0
   },
+  api_env_id: 0
 })
 const cronVisible = ref(false)
 const cronFun = () => {
@@ -415,12 +446,14 @@ const type = ref('')
 const tagDialog = ref(false)
 const tagDialogRun = ref(false)
 const tagIds = ref([])
-const runTagId = ref()
+const runTagId = ref("")
+const runEnvId = ref("")
 // 更新行
 const updateTimerTaskFunc = async (row) => {
   tagIds.value = []
   const res = await findTimerTask({ID: row.ID})
   await getConfigData()
+  await getApiEnv()
   await getTagData()
   creatCron.value = true
   // configID.value = configData.value.config.ID
@@ -437,6 +470,9 @@ const updateTimerTaskFunc = async (row) => {
     console.log("tagIds", tagIds.value)
     formData.value.apiTimerTaskTag = []
     formData.value.tagIds = tagIds.value
+    if (formData.value.api_env_id>0){
+      apiEnvID.value = formData.value.api_env_id
+    }
   }
 }
 
@@ -461,6 +497,7 @@ const dialogFormVisible = ref(false)
 // 打开弹窗
 const openDialog = () => {
   getConfigData()
+  getApiEnv()
   getTagData()
   type.value = 'create'
   creatCron.value = true
@@ -481,6 +518,7 @@ const getTagData = async () => {
     }
     tagTableOption.value.push(option)
   })
+  await getApiEnv()
   console.log("tagTableOption", tagTableOption)
 }
 
@@ -503,6 +541,7 @@ const closeDialogTag = () => {
 const closeDialogTagRung = () => {
   tagDialogRun.value = false
   runTagId.value = ""
+  runEnvId.value = ""
 }
 
 // 关闭弹窗
@@ -522,14 +561,22 @@ const closeDialog = () => {
 }
 // 弹窗确定
 const runDialog = async () => {
+  if (runTagId.value === "" || runEnvId.value === "" ){
+      ElMessage({
+          type: 'error',
+          message: "运行标签和环境变量不能为空，请设置后再运行"
+      })
+      return
+  }
   console.log("runTagId", runTagId.value)
-  let data = {tagID: runTagId.value}
+  let data = {tagID: runTagId.value, env: runEnvId.value}
   const res = await runTimerTask(data)
   if (res.code === 0) {
     ElMessage({
       type: 'success',
       message: '运行成功'
     })
+    closeDialogTagRung()
   }
 }
 
@@ -548,6 +595,18 @@ const enterDialog = async () => {
     })
     return
   }
+  if (formData.value.api_env_id < 1){
+      ElMessage({
+          type:"error",
+          message: '请选择环境变量'
+      })
+      return
+  }
+  apiEnvData.value.forEach((item, index, arr) => {
+    if (item.ID === formData.value.api_env_id){
+      formData.value.api_env_name = item.name
+    }
+  })
   let res
   formData.value.TestCase = []
   formData.value.tagIds = tagIds
@@ -570,6 +629,23 @@ const enterDialog = async () => {
     closeDialog()
     getTableData()
     creatCron.value = false
+  }
+}
+
+const apiEnvData = ref([])
+const apiEnvID = ref()
+const getApiEnv = async () => {
+  const res = await getEnvList()
+  if (res.code === 0) {
+    apiEnvData.value = res.data.list
+    console.log("==========",apiEnvData.value)
+  }
+}
+
+const envChange = (key) => {
+  formData.value.api_env_id = null
+  if (key && key>0) {
+    formData.value.api_env_id = key
   }
 }
 </script>

@@ -14,10 +14,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/builtin"
-	"github.com/test-instructor/cheetah/server/hrp/internal/code"
-	"github.com/test-instructor/cheetah/server/hrp/internal/myexec"
-	"github.com/test-instructor/cheetah/server/hrp/internal/version"
+	"github.com/test-instructor/yangfan/server/hrp/internal/builtin"
+	"github.com/test-instructor/yangfan/server/hrp/internal/code"
+	"github.com/test-instructor/yangfan/server/hrp/internal/myexec"
+	"github.com/test-instructor/yangfan/server/hrp/internal/version"
 )
 
 //go:embed internal/scaffold/templates/plugin/debugtalkPythonTemplate

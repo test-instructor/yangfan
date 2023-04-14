@@ -7,9 +7,9 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/myexec"
-	"github.com/test-instructor/cheetah/server/hrp/internal/version"
-	"github.com/test-instructor/cheetah/server/hrp/pkg/convert"
+	"github.com/test-instructor/yangfan/server/hrp/internal/myexec"
+	"github.com/test-instructor/yangfan/server/hrp/internal/version"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/convert"
 )
 
 var convertCmd = &cobra.Command{

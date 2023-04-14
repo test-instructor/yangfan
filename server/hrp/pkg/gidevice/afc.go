@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/test-instructor/cheetah/server/hrp/pkg/gidevice/pkg/libimobiledevice"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/gidevice/pkg/libimobiledevice"
 )
 
 var ErrAfcStatNotExist = errors.New("afc stat: no such file or directory")

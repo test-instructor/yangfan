@@ -2,8 +2,9 @@ package system
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/api/v1"
-	"github.com/test-instructor/cheetah/server/middleware"
+
+	"github.com/test-instructor/yangfan/server/api/v1"
+	"github.com/test-instructor/yangfan/server/middleware"
 )
 
 type ProjectRouter struct {

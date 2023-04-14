@@ -4,9 +4,9 @@ import (
 	"context"
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
-	sysModel "github.com/test-instructor/cheetah/server/model/system"
-	"github.com/test-instructor/cheetah/server/service/system"
-	"github.com/test-instructor/cheetah/server/utils"
+	sysModel "github.com/test-instructor/yangfan/server/model/system"
+	"github.com/test-instructor/yangfan/server/service/system"
+	"github.com/test-instructor/yangfan/server/utils"
 	"gorm.io/gorm"
 )
 

@@ -8,9 +8,9 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 
-	"github.com/test-instructor/cheetah/server/hrp"
-	"github.com/test-instructor/cheetah/server/hrp/pkg/boomer"
-	"github.com/test-instructor/cheetah/server/hrp/pkg/convert"
+	"github.com/test-instructor/yangfan/server/hrp"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/boomer"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/convert"
 )
 
 var runCurlCmd = &cobra.Command{

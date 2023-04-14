@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/config"
-	"github.com/test-instructor/cheetah/server/global"
+	"github.com/test-instructor/yangfan/server/config"
+	"github.com/test-instructor/yangfan/server/global"
 	"net/http"
 )
 

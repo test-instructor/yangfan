@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/builtin"
+	"github.com/test-instructor/yangfan/server/hrp/internal/builtin"
 )
 
 func TestRun(t *testing.T) {

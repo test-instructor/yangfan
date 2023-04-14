@@ -2,9 +2,9 @@
 package interfacecase
 
 import (
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/system"
 	"time"
+
+	"github.com/test-instructor/yangfan/server/global"
 )
 
 // ApiTimerTask  结构体
@@ -18,14 +18,14 @@ type ApiTimerTask struct {
 	Status          *bool             `json:"status" form:"status" gorm:"column:status;comment:运行状态;"`
 	Describe        string            `json:"describe" form:"describe" gorm:"column:describe;comment:备注;"`
 	RunNumber       *int              `json:"runNumber" form:"runNumber" gorm:"column:run_number;comment:运行次数;"`
-	ProjectID       uint              `json:"-" gorm:"comment:所属项目"`
-	Project         system.Project    `json:"-"`
 	RunConfig       ApiConfig         `json:"config" form:"config"`
 	RunConfigID     uint              `json:"RunConfigID" form:"RunConfigID" gorm:"comment:运行配置"`
 	TestCase        []*ApiCase        `json:"TestCase" form:"TestCase" gorm:"many2many:ApiTimerTaskRelationship;"`
 	EntryID         int               `json:"-"`
 	ApiTimerTaskTag []ApiTimerTaskTag `json:"apiTimerTaskTag" form:"apiTimerTaskTag" gorm:"many2many:ApiTimerTaskTagRelationship;"`
 	TagIds          []uint            `json:"tagIds" gorm:"-"`
+	ApiEnvName      *string           `json:"api_env_name" gorm:"comment:所属环境名称;"`
+	ApiEnvID        uint              `json:"api_env_id" gorm:"comment:所属环境;"`
 }
 
 type ApiTimerTaskTag struct {
@@ -34,8 +34,6 @@ type ApiTimerTaskTag struct {
 	ApiTimerTask []ApiTimerTask `json:"apiTimerTask" form:"apiTimerTask" gorm:"many2many:ApiTimerTaskTagRelationship;"`
 	Name         string         `json:"name"`
 	Remarks      string         `json:"remarks"`
-	ProjectID    uint           `json:"-" gorm:"comment:所属项目"`
-	Project      system.Project `json:"-"`
 }
 
 type ApiTimerTaskTagRelationship struct {

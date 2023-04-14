@@ -112,7 +112,7 @@ func cheetahInitPlugin(path, venv string, logOn bool) (plugin funplugin.IPlugin,
 ![img_7.png](https://testerhome.com/uploads/photo/2022/d3e0b96c-919f-46a4-ab6a-8403dfb42ab2.png)
 
 # 往期文档
-* cheetah 自动化测试平台[开源项目](https://testerhome.com/opensource_projects/cheetah)
+* yangfan 自动化测试平台[开源项目](https://testerhome.com/opensource_projects/yangfan)
 * 了解如何接入httprunner
 * [测试平台接入 HttpRunner V4（一）基本功能接入](https://testerhome.com/topics/35126)
 * [测试平台接入 HttpRunner V4（二）使用 config 实现用例之间的参数传递](https://testerhome.com/topics/35125)

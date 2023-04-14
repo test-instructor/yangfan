@@ -6,15 +6,16 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/hrp/internal/builtin"
-	"github.com/test-instructor/cheetah/server/hrp/internal/code"
-	"github.com/test-instructor/cheetah/server/hrp/internal/sdk"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/hrp/internal/builtin"
+	"github.com/test-instructor/yangfan/server/hrp/internal/code"
+	"github.com/test-instructor/yangfan/server/hrp/internal/sdk"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"go.uber.org/zap"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sync"
 	"time"
 )
@@ -41,9 +42,15 @@ func (r *HRPRunner) RunJsons(testcases ...ITestCase) (interfacecase.ApiReport, e
 	var runErr error
 	// run testcase one by one
 	var wg sync.WaitGroup
-	intChan := make(chan int, 5)
+	cpu := 2
+	if runtime.NumCPU() >= 4 {
+		cpu = runtime.NumCPU() - 2
+	}
+	//cpu = 1
+	intChan := make(chan int, cpu)
+	defer close(intChan)
 	wg.Add(len(testcases))
-	for _, testTase := range testCases {
+	for _, testCase := range testCases {
 		// each testcase has its own case runner
 		go func(testcase *TestCase) {
 			defer wg.Done()
@@ -90,7 +97,7 @@ func (r *HRPRunner) RunJsons(testcases ...ITestCase) (interfacecase.ApiReport, e
 					}
 				}
 			}
-		}(testTase)
+		}(testCase)
 	}
 	wg.Wait()
 	s.Time.Duration = time.Since(s.Time.StartAt).Seconds()
@@ -356,6 +363,10 @@ func (testCaseJson *JsonToCase) ToTestCase() (ITestCase, error) {
 			})
 		} else if step.WebSocket != nil {
 			testCase.TestSteps = append(testCase.TestSteps, &StepWebSocket{
+				step: step,
+			})
+		} else if step.GRPC != nil {
+			testCase.TestSteps = append(testCase.TestSteps, &StepGrpc{
 				step: step,
 			})
 		} else {

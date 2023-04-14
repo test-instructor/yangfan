@@ -2,12 +2,12 @@ package interfacecase
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	"github.com/test-instructor/cheetah/server/service"
-	"github.com/test-instructor/cheetah/server/utils"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	"github.com/test-instructor/yangfan/server/service"
+	"github.com/test-instructor/yangfan/server/utils"
 	"go.uber.org/zap"
 )
 
@@ -23,7 +23,7 @@ func (runCaseApi *RunCaseApi) RunTestCaseStep(c *gin.Context) {
 		reports, err := runCaseService.RunTestCaseStep(runCase, interfacecase.RunTypeDebug)
 		if err != nil {
 			global.GVA_LOG.Error("运行失败!", zap.Error(err))
-			response.FailWithMessage("运行失败", c)
+			response.FailWithMessage(err.Error(), c)
 		} else {
 			response.OkWithData(gin.H{"id": reports.ID}, c)
 		}

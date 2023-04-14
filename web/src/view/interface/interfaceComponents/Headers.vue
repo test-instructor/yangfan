@@ -169,6 +169,7 @@ export default {
     querySearch(queryString, cb) {
       const headerOptions = this.headerOptions
       const results = queryString ? headerOptions.filter(this.createFilter(queryString)) : headerOptions
+      console.log("results", results.value)
       cb(results)
     },
 

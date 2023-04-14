@@ -2,14 +2,15 @@ package interfacecase
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/api/v1"
-	"github.com/test-instructor/cheetah/server/middleware"
+
+	"github.com/test-instructor/yangfan/server/api/v1"
+	"github.com/test-instructor/yangfan/server/middleware"
 )
 
 type ApiMenuRouter struct {
 }
 
-// ApiMenuRouter 初始化 ApiMenu 路由信息
+// InitApiMenuRouter  初始化 ApiMenu 路由信息
 func (s *ApiMenuRouter) InitApiMenuRouter(Router *gin.RouterGroup) {
 	apiMenuRouter := Router.Group("").Use(middleware.OperationRecord())
 	apiMenuRouterWithoutRecord := Router.Group("")

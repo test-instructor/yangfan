@@ -3,8 +3,8 @@
  */
 
 const config = {
-  appName: 'cheetah',
-  appLogo: 'https://cheetah-1259641046.cos.ap-nanjing.myqcloud.com/logo.png',
+  appName: '扬帆测试平台',
+  appLogo: 'http://qiniu.yangfan.gd.cn/demo/logo.png',
   showViteLogo: true
 }
 
@@ -13,12 +13,12 @@ export const viteLogo = (env) => {
     const chalk = require('chalk')
     console.log(
       chalk.green(
-        `> 欢迎使用 cheetah`
+        `> 欢迎使用 yangfan`
       )
     )
     console.log(
       chalk.green(
-        `> 当前版本:v1.1.0`
+        `> 当前版本:v1.2.0`
       )
     )
     console.log(

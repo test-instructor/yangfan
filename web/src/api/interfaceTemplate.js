@@ -116,3 +116,26 @@ export const updateDebugTalk = (data) => {
         data
     })
 }
+
+export const getGrpcFunc = (data) => {
+    return service({
+        url: baseURL + '/getGrpc',
+        method: 'post',
+        data
+    })
+}
+
+export const createUserConfig = (data) => {
+    return service({
+        url: baseURL + '/createUserConfig',
+        method: 'post',
+        data
+    })
+}
+
+export const getUserConfig = () => {
+    return service({
+        url: baseURL + '/getUserConfig',
+        method: 'get',
+    })
+}

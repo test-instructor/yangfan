@@ -11,10 +11,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/code"
-	"github.com/test-instructor/cheetah/server/hrp/internal/json"
-	"github.com/test-instructor/cheetah/server/hrp/internal/myexec"
-	"github.com/test-instructor/cheetah/server/hrp/pkg/gadb"
+	"github.com/test-instructor/yangfan/server/hrp/internal/code"
+	"github.com/test-instructor/yangfan/server/hrp/internal/json"
+	"github.com/test-instructor/yangfan/server/hrp/internal/myexec"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/gadb"
 )
 
 var (

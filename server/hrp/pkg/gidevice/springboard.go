@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/test-instructor/cheetah/server/hrp/pkg/gidevice/pkg/libimobiledevice"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/gidevice/pkg/libimobiledevice"
 )
 
 func newSpringBoard(client *libimobiledevice.SpringBoardClient) *springboard {

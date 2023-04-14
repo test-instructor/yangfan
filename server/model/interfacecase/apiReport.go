@@ -1,16 +1,17 @@
 package interfacecase
 
 import (
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/system"
-	"gorm.io/datatypes"
 	"time"
+
+	"gorm.io/datatypes"
+
+	"github.com/test-instructor/yangfan/server/global"
 )
 
 type CaseType int
 type RunType int
 
-var (
+const (
 	CaseTypeApi         CaseType = 1 // api 运行
 	CaseTypeStep        CaseType = 2 // 套件运行
 	CaseTypeCases       CaseType = 3 // 用例运行
@@ -25,24 +26,27 @@ var (
 	RunTypeRunSave      RunType  = 5 // 调试并保存
 )
 
+var _ = CaseTypeBoomer
+var _ = RunTypeRunSave
+
 type ApiReport struct {
 	global.GVA_MODEL
 	Operator
-	Name      string             `json:"name"`
-	Success   *bool              `json:"success"`
-	Stat      *ApiReportStat     `json:"stat"`
-	StatID    uint               `json:"-"`
-	Time      *ApiReportTime     `json:"time"`
-	TimeID    uint               `json:"-"`
-	Platform  datatypes.JSON     `json:"platform"`
-	Details   []ApiReportDetails `json:"details"`
-	CaseType  CaseType           `json:"runType"` //1、api，2、case，3、task
-	RunType   RunType            `json:"type"`    //1、调试，2、立即运行，3、后台运行
-	Status    int                `json:"status"`
-	Project   system.Project     `json:"-"`
-	ProjectID uint               `json:"-"`
-	SetupCase bool               `json:"setup_case"`
-	Describe  string             `json:"describe" form:"describe" gorm:"column:describe;comment:;"`
+	Name       string             `json:"name"`
+	Success    *bool              `json:"success"`
+	Stat       *ApiReportStat     `json:"stat"`
+	StatID     uint               `json:"-"`
+	Time       *ApiReportTime     `json:"time"`
+	TimeID     uint               `json:"-"`
+	Platform   datatypes.JSON     `json:"platform"`
+	Details    []ApiReportDetails `json:"details"`
+	CaseType   CaseType           `json:"runType"` //1、api，2、case，3、task
+	RunType    RunType            `json:"type"`    //1、调试，2、立即运行，3、后台运行
+	Status     int                `json:"status"`
+	SetupCase  bool               `json:"setup_case"`
+	Describe   string             `json:"describe" form:"describe" gorm:"column:describe;comment:;"`
+	ApiEnvName string             `json:"api_env_name" gorm:"comment:所属环境名称;"`
+	ApiEnvID   uint               `json:"api_env_id" gorm:"comment:所属环境;"`
 }
 
 type ApiReportTime struct {

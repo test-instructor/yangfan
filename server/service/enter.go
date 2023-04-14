@@ -1,9 +1,9 @@
 package service
 
 import (
-	"github.com/test-instructor/cheetah/server/service/example"
-	"github.com/test-instructor/cheetah/server/service/interfacecase"
-	"github.com/test-instructor/cheetah/server/service/system"
+	"github.com/test-instructor/yangfan/server/service/example"
+	"github.com/test-instructor/yangfan/server/service/interfacecase"
+	"github.com/test-instructor/yangfan/server/service/system"
 )
 
 type ServiceGroup struct {

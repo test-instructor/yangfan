@@ -1,10 +1,10 @@
 package interfacecase
 
 import (
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/request"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	interfacecaseReq "github.com/test-instructor/cheetah/server/model/interfacecase/request"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/request"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	interfacecaseReq "github.com/test-instructor/yangfan/server/model/interfacecase/request"
 )
 
 type ApiConfigService struct {
@@ -36,7 +36,7 @@ func (acService *ApiConfigService) DeleteApiConfigByIds(ids request.IdsReq) (err
 func (acService *ApiConfigService) UpdateApiConfig(ac interfacecase.ApiConfig) (err error) {
 	var oId interfacecase.Operator
 	global.GVA_DB.Model(interfacecase.ApiConfig{}).Where("id = ?", ac.ID).First(&oId)
-	ac.CreatedByID = oId.CreatedByID
+	ac.CreatedBy = oId.CreatedBy
 	err = global.GVA_DB.Where(&interfacecase.ApiConfig{GVA_MODEL: global.GVA_MODEL{ID: ac.ID}}).
 		Save(&ac).Error
 	return err

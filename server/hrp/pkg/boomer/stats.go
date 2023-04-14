@@ -4,7 +4,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/json"
+	"github.com/test-instructor/yangfan/server/hrp/internal/json"
 )
 
 type transaction struct {

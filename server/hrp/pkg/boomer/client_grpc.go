@@ -17,8 +17,8 @@ import (
 	"google.golang.org/grpc/credentials/oauth"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/test-instructor/cheetah/server/hrp/pkg/boomer/data"
-	"github.com/test-instructor/cheetah/server/hrp/pkg/boomer/grpc/messager"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/boomer/data"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/boomer/grpc/messager"
 )
 
 type grpcClient struct {

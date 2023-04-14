@@ -9,8 +9,8 @@ export default {
   install: (app) => {
     register(app)
     console.log(`
-       欢迎使用 cheetah
-       当前版本:v1.1.0
+       欢迎使用 yangfan
+       当前版本:v1.2.0
        加群方式:微信号：test-instructor QQ群：873175584
     `)
   }

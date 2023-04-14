@@ -1,12 +1,12 @@
 package {{.Package}}
 
 import (
-	"github.com/test-instructor/cheetah/server/global"
-    "github.com/test-instructor/cheetah/server/model/{{.Package}}"
-    "github.com/test-instructor/cheetah/server/model/common/request"
-    {{.Package}}Req "github.com/test-instructor/cheetah/server/model/{{.Package}}/request"
-    "github.com/test-instructor/cheetah/server/model/common/response"
-    "github.com/test-instructor/cheetah/server/service"
+	"github.com/test-instructor/yangfan/server/global"
+    "github.com/test-instructor/yangfan/server/model/{{.Package}}"
+    "github.com/test-instructor/yangfan/server/model/common/request"
+    {{.Package}}Req "github.com/test-instructor/yangfan/server/model/{{.Package}}/request"
+    "github.com/test-instructor/yangfan/server/model/common/response"
+    "github.com/test-instructor/yangfan/server/service"
     "github.com/gin-gonic/gin"
     "go.uber.org/zap"
 )

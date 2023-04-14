@@ -1,9 +1,9 @@
 package router
 
 import (
-	"github.com/test-instructor/cheetah/server/router/example"
-	"github.com/test-instructor/cheetah/server/router/interfacecase"
-	"github.com/test-instructor/cheetah/server/router/system"
+	"github.com/test-instructor/yangfan/server/router/example"
+	"github.com/test-instructor/yangfan/server/router/interfacecase"
+	"github.com/test-instructor/yangfan/server/router/system"
 )
 
 type RouterGroup struct {
@@ -16,6 +16,7 @@ type RouterGroup struct {
 	ApiCase       interfacecase.ApiCaseGroup
 	TimerTask     interfacecase.TimerTaskGroup
 	Performance   interfacecase.PerformanceRouterGroup
+	Environment   interfacecase.EnvironmentRouterGroup
 }
 
 var RouterGroupApp = new(RouterGroup)

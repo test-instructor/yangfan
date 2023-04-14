@@ -1,4 +1,4 @@
-# Cheetah
+# 扬帆测试平台
 ![logoLogin](docs/img/logoLogin.jpg)
 
 
@@ -17,7 +17,8 @@
 - [x] 网络性能采集：在场景化接口测试的基础上，可额外采集网络链路性能指标（DNS 解析、TCP 连接、SSL 握手、网络传输等）
 - [x] 数据驱动`parameterize`
 - [x] python 函数驱动
-- [x] python 函数驱动
+- [x] 通过标签运行定时任务(可用户发版时做全量回归)
+- [x] 定时任务并发执行，定时任务可以根据用户设置并发数，节省等待时间
 - [x] 通过标签运行定时任务(可用户发版时做全量回归)
 - [x] 定时任务并发执行，定时任务可以根据用户设置并发数，节省等待时间
 - [ ] 支持sql操作
@@ -39,7 +40,7 @@
 
 
 > - [环境准备](https://www.gin-vue-admin.com/guide/start-quickly/env.html)
-> - 1、新建数据库，并导入docs/sql/cheetah.sql文件
+> - 1、新建数据库，并导入docs/sql/yangfan.sql文件
 > - 2、修改`server/config.yaml`文件中的数据库`mysql`、飞书登录`fs`相关配置
 > - 3、修改`web/.env.development`、 `web/.env.production`中的`VITE_FS_LOGIN`、`VITE_FS_APP_ID`
 
@@ -53,7 +54,7 @@
 ### 后端
 首次安装运行，由于httprunner在Linux上环境缺少pip，所以需要执行2-4步骤，非首次安装只需要执行步骤1即可
 
-> 1. 执行脚本`cheeath.sh`，config为根目录下的`config.production.yaml`
+> 1. 执行脚本`start_server.sh`，config为根目录下的`config.production.yaml`
 > 2. 进入接口管理并在任意功能模块（接口管理、测试套件、测试用例、定时任务）运行1次
 > 3. cd `./docs`，执行`/root/.hrp/venv/bin/python3 get-pip.py`
 > 4. 重启服务

@@ -22,7 +22,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/builtin"
+	"github.com/test-instructor/yangfan/server/hrp/internal/builtin"
 )
 
 // hrpPath is .hrp directory under the user directory.

@@ -5,7 +5,7 @@
         v-if="btnShow"
         class="user-box"
     >
-      <a href="https://github.com/test-instructor/cheetah" target="_blank"><img style="width: 20px;height: 20px" src="@/assets/github.png" alt></a>
+      <a href="https://github.com/test-instructor/yangfan" target="_blank"><img style="width: 20px;height: 20px" src="@/assets/github.png" alt></a>
     </div>
     <transition name="el-fade-in-linear">
       <div v-show="show" class="transition-box" style="display: inline-block;">

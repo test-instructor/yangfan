@@ -20,10 +20,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/builtin"
-	"github.com/test-instructor/cheetah/server/hrp/internal/code"
-	"github.com/test-instructor/cheetah/server/hrp/internal/json"
-	"github.com/test-instructor/cheetah/server/hrp/pkg/httpstat"
+	"github.com/test-instructor/yangfan/server/hrp/internal/builtin"
+	"github.com/test-instructor/yangfan/server/hrp/internal/code"
+	"github.com/test-instructor/yangfan/server/hrp/internal/json"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/httpstat"
 )
 
 type HTTPMethod string
@@ -342,7 +342,7 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 	for _, setupHook := range step.SetupHooks {
 		req, err := parser.Parse(setupHook, stepVariables)
 		if err != nil {
-			return stepResult, errors.Wrap(err, "run setup hooks failed")
+			continue
 		}
 		reqMap, ok := req.(map[string]interface{})
 		if ok && reqMap != nil {
@@ -441,7 +441,7 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 	for _, teardownHook := range step.TeardownHooks {
 		res, err := parser.Parse(teardownHook, stepVariables)
 		if err != nil {
-			return stepResult, errors.Wrap(err, "run teardown hooks failed")
+			continue
 		}
 		resMpa, ok := res.(map[string]interface{})
 		if ok {

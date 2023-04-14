@@ -11,7 +11,7 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/test-instructor/cheetah/server/hrp/pkg/gidevice/pkg/nskeyedarchiver"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/gidevice/pkg/nskeyedarchiver"
 )
 
 const (

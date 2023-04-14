@@ -8,7 +8,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/json"
+	"github.com/test-instructor/yangfan/server/hrp/internal/json"
 )
 
 // All elements returned by search endpoints have assigned element_id.

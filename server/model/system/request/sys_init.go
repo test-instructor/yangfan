@@ -3,7 +3,7 @@ package request
 import (
 	"fmt"
 
-	"github.com/test-instructor/cheetah/server/config"
+	"github.com/test-instructor/yangfan/server/config"
 )
 
 type InitDB struct {

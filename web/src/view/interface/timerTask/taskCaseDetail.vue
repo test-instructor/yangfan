@@ -83,6 +83,7 @@
         title="添加测试用例"
         width="1250px"
         top="30px"
+        height="100vh"
     >
       <TaskCaseAdd
           @close="closeDialogAddCase"
@@ -263,4 +264,8 @@ const addTeseCase = (caseIDs) => {
 
 <style lang="scss" scoped>
 @import 'src/style/apiList';
+.el-dialog-div {
+  height: 60vh;
+  overflow-x: hidden;
+}
 </style>

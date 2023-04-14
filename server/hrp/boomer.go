@@ -13,11 +13,11 @@ import (
 	"github.com/rs/zerolog/log"
 	"golang.org/x/net/context"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/builtin"
-	"github.com/test-instructor/cheetah/server/hrp/internal/code"
-	"github.com/test-instructor/cheetah/server/hrp/internal/json"
-	"github.com/test-instructor/cheetah/server/hrp/internal/sdk"
-	"github.com/test-instructor/cheetah/server/hrp/pkg/boomer"
+	"github.com/test-instructor/yangfan/server/hrp/internal/builtin"
+	"github.com/test-instructor/yangfan/server/hrp/internal/code"
+	"github.com/test-instructor/yangfan/server/hrp/internal/json"
+	"github.com/test-instructor/yangfan/server/hrp/internal/sdk"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/boomer"
 )
 
 func NewStandaloneBoomer(spawnCount int64, spawnRate float64) *HRPBoomer {

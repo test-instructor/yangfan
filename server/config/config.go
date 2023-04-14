@@ -1,6 +1,6 @@
 package config
 
-import "github.com/test-instructor/cheetah/server/plugin/fslogin/config"
+import "github.com/test-instructor/yangfan/server/plugin/fslogin/config"
 
 type Server struct {
 	JWT     JWT     `mapstructure:"jwt" json:"jwt" yaml:"jwt"`

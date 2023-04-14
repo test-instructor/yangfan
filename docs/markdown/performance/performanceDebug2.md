@@ -2,7 +2,7 @@
 
 ## 错误信息
 ```shell
-do request failed: Get "http://43.138.118.180:8080/hello/cheetah": dial tcp 43.138.118.180:8080: connectex: Only one usage of each socket address (protocol/network address/port) is normally permitted.
+do request failed: Get "http://43.138.118.180:8080/hello/yangfan": dial tcp 43.138.118.180:8080: connectex: Only one usage of each socket address (protocol/network address/port) is normally permitted.
 ```
 
 

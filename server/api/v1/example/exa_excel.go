@@ -1,13 +1,15 @@
 package example
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/example"
-	"go.uber.org/zap"
 	"os"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/example"
 )
 
 type ExcelApi struct{}
@@ -17,7 +19,7 @@ type ExcelApi struct{}
 // /excel/exportExcel 接口，用于读取前端传来的tableData，生成Excel文件并返回
 // /excel/downloadTemplate 接口，用于下载resource/excel目录下的 ExcelTemplate.xlsx 文件，作为导入的模板
 
-// @Tags excel
+// ExportExcel @Tags excel
 // @Summary 导出Excel
 // @Security ApiKeyAuth
 // @accept application/json
@@ -43,7 +45,7 @@ func (e *ExcelApi) ExportExcel(c *gin.Context) {
 	c.File(filePath)
 }
 
-// @Tags excel
+// ImportExcel @Tags excel
 // @Summary 导入Excel文件
 // @Security ApiKeyAuth
 // @accept multipart/form-data
@@ -62,7 +64,7 @@ func (e *ExcelApi) ImportExcel(c *gin.Context) {
 	response.OkWithMessage("导入成功", c)
 }
 
-// @Tags excel
+// LoadExcel @Tags excel
 // @Summary 加载Excel数据
 // @Security ApiKeyAuth
 // @Produce  application/json
@@ -83,7 +85,7 @@ func (e *ExcelApi) LoadExcel(c *gin.Context) {
 	}, "加载数据成功", c)
 }
 
-// @Tags excel
+// DownloadTemplate @Tags excel
 // @Summary 下载模板
 // @Security ApiKeyAuth
 // @accept multipart/form-data

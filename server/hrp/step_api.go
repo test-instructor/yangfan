@@ -6,7 +6,7 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/rs/zerolog/log"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/builtin"
+	"github.com/test-instructor/yangfan/server/hrp/internal/builtin"
 )
 
 // IAPI represents interface for api,

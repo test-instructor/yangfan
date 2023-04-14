@@ -6,7 +6,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/scaffold"
+	"github.com/test-instructor/yangfan/server/hrp/internal/scaffold"
 )
 
 var scaffoldCmd = &cobra.Command{

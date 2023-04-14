@@ -2,8 +2,8 @@ package utils
 
 import (
 	"fmt"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/system"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/system"
 	"strconv"
 )
 

@@ -9,8 +9,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
-	"github.com/test-instructor/cheetah/server/hrp/internal/builtin"
-	"github.com/test-instructor/cheetah/server/hrp/internal/code"
+	"github.com/test-instructor/yangfan/server/hrp/internal/builtin"
+	"github.com/test-instructor/yangfan/server/hrp/internal/code"
 )
 
 // ITestCase represents interface for testcases,
@@ -274,6 +274,10 @@ func (tc *TCase) toTestCase() (*TestCase, error) {
 			})
 		} else if step.Android != nil {
 			testCase.TestSteps = append(testCase.TestSteps, &StepMobile{
+				step: step,
+			})
+		} else if step.GRPC != nil {
+			testCase.TestSteps = append(testCase.TestSteps, &StepGrpc{
 				step: step,
 			})
 		} else {

@@ -2,15 +2,16 @@ package system
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/system/request"
 	"go.uber.org/zap"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/system/request"
 )
 
 type AuthorityBtnApi struct{}
 
-// @Tags AuthorityBtn
+// GetAuthorityBtn @Tags AuthorityBtn
 // @Summary 获取权限按钮
 // @Security ApiKeyAuth
 // @accept application/json
@@ -29,7 +30,7 @@ func (a *AuthorityBtnApi) GetAuthorityBtn(c *gin.Context) {
 	}
 }
 
-// @Tags AuthorityBtn
+// SetAuthorityBtn @Tags AuthorityBtn
 // @Summary 设置权限按钮
 // @Security ApiKeyAuth
 // @accept application/json
@@ -48,7 +49,7 @@ func (a *AuthorityBtnApi) SetAuthorityBtn(c *gin.Context) {
 	}
 }
 
-// @Tags AuthorityBtn
+// CanRemoveAuthorityBtn @Tags AuthorityBtn
 // @Summary 设置权限按钮
 // @Security ApiKeyAuth
 // @accept application/json

@@ -60,3 +60,20 @@ def setup_hook_example(name):
 def teardown_hook_example(name):
     logging.warning("teardown_hook_example")
     return f"teardown_hook_example: {name}"
+
+def get_user_name(randomlength=12):
+    import random
+    random_str = ''
+    base_str = 'ABCDEFGHIGKLMNOPQRSTUVWXYZabcdefghigklmnopqrstuvwxyz0123456789'
+    length = len(base_str) - 1
+    for i in range(randomlength):
+        random_str += base_str[random.randint(0, length)]
+    return random_str
+
+def setup_hook_example_grpc(request):
+    request['body']['Password'] = 'setup_hook_example_grpc'
+    return request
+
+def teardown_hook_example_grpc(response):
+    response['body']['hook'] = 'setup_hook_example_grpc'
+    return response

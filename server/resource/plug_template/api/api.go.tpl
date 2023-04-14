@@ -1,10 +1,10 @@
 package api
 
 import (
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-{{ if .NeedModel }}	"github.com/test-instructor/cheetah/server/plugin/{{ .Snake}}/model" {{ end }}
-	"github.com/test-instructor/cheetah/server/plugin/{{ .Snake}}/service"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+{{ if .NeedModel }}	"github.com/test-instructor/yangfan/server/plugin/{{ .Snake}}/model" {{ end }}
+	"github.com/test-instructor/yangfan/server/plugin/{{ .Snake}}/service"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )

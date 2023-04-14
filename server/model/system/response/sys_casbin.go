@@ -1,7 +1,7 @@
 package response
 
 import (
-	"github.com/test-instructor/cheetah/server/model/system/request"
+	"github.com/test-instructor/yangfan/server/model/system/request"
 )
 
 type PolicyPathResponse struct {

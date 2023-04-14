@@ -2,13 +2,13 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/system"
-	systemReq "github.com/test-instructor/cheetah/server/model/system/request"
-	"github.com/test-instructor/cheetah/server/plugin/fslogin/model"
-	"github.com/test-instructor/cheetah/server/plugin/fslogin/service"
-	"github.com/test-instructor/cheetah/server/utils"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/system"
+	systemReq "github.com/test-instructor/yangfan/server/model/system/request"
+	"github.com/test-instructor/yangfan/server/plugin/fslogin/model"
+	"github.com/test-instructor/yangfan/server/plugin/fslogin/service"
+	"github.com/test-instructor/yangfan/server/utils"
 	"go.uber.org/zap"
 )
 

@@ -3,8 +3,8 @@ package system
 import (
 	"context"
 	"github.com/pkg/errors"
-	sysModel "github.com/test-instructor/cheetah/server/model/system"
-	"github.com/test-instructor/cheetah/server/service/system"
+	sysModel "github.com/test-instructor/yangfan/server/model/system"
+	"github.com/test-instructor/yangfan/server/service/system"
 	"gorm.io/gorm"
 )
 

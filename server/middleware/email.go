@@ -6,13 +6,13 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/test-instructor/cheetah/server/plugin/email/utils"
-	utils2 "github.com/test-instructor/cheetah/server/utils"
+	"github.com/test-instructor/yangfan/server/plugin/email/utils"
+	utils2 "github.com/test-instructor/yangfan/server/utils"
 
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/system"
-	"github.com/test-instructor/cheetah/server/service"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/system"
+	"github.com/test-instructor/yangfan/server/service"
 	"go.uber.org/zap"
 )
 

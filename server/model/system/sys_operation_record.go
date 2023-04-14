@@ -4,7 +4,7 @@ package system
 import (
 	"time"
 
-	"github.com/test-instructor/cheetah/server/global"
+	"github.com/test-instructor/yangfan/server/global"
 )
 
 // 如果含有time.Time 请自行import time包

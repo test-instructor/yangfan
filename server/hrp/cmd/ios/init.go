@@ -6,8 +6,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/test-instructor/cheetah/server/hrp/pkg/gidevice"
-	"github.com/test-instructor/cheetah/server/hrp/pkg/uixt"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/gidevice"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/uixt"
 )
 
 var iosRootCmd = &cobra.Command{
