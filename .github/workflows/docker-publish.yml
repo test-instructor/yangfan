@@ -43,7 +43,7 @@ jobs:
           context: /home/runner/work/yangfan/yangfan/server
           dockerfile: ./Dockerfile   # 指定 Dockerfile 的路径
           push: true
-          tags: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          tags: ${{ env.DOCKER_REGISTRY }}/zfsn/${{ env.IMAGE_NAME }}:latest
           build-args: |
             APP_NAME=myapp
 
