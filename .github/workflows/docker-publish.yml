@@ -34,7 +34,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          dockerfile: ./server/.   # 指定 Dockerfile 的路径
+          dockerfile: /home/runner/work/yangfan/yangfan/server/Dockerfile   # 指定 Dockerfile 的路径
           push: true
           tags: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           build-args: |
