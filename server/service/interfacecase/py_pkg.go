@@ -3,9 +3,9 @@ package interfacecase
 import (
 	"encoding/json"
 	"errors"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/interfacecase"
-	"github.com/test-instructor/cheetah/server/model/interfacecase/request"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	"github.com/test-instructor/yangfan/server/model/interfacecase/request"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"os"

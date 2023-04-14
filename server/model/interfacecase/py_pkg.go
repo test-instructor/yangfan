@@ -1,6 +1,6 @@
 package interfacecase
 
-import "github.com/test-instructor/cheetah/server/global"
+import "github.com/test-instructor/yangfan/server/global"
 
 type HrpPyPkg struct {
 	global.GVA_MODEL
