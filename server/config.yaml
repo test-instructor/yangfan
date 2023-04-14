@@ -99,7 +99,7 @@ mysql:
   config: charset=utf8mb4&parseTime=True&loc=Local
   db-name: gva
   username: root
-  password: 111111
+  password: 5bc5ef915ed146de960379db620fc46a@YOOZOO
   max-idle-conns: 10
   max-open-conns: 100
   log-mode: error
@@ -125,8 +125,8 @@ qiniu:
   use-cdn-domains: false
 redis:
   db: 0
-  addr: 127.0.0.1:6379
-  password: ""
+  addr: 127.0.0.1:6378
+  password: "nYhjtZ2vri6KDl7Z"
 system:
   env: public
   addr: 8888
