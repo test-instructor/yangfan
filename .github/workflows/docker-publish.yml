@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  IMAGE_NAME: cheetah_server
+  IMAGE_NAME: cheetah
   DOCKER_REGISTRY: registry.cn-beijing.aliyuncs.com
 
 jobs:
