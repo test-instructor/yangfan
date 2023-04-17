@@ -1,0 +1,27 @@
+version: '3.7'
+services:
+  mysql:
+    image: mysql:5.7.23
+    container_name: mysql-cheetah
+    restart: always
+    expose:
+      - "3306"
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/data/mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=5bc5ef915ed146de960379db620fc46a
+      - MYSQL_DATABASE=gva
+  redis:
+    container_name: redis
+    image: redis:3.2.10
+    restart: always
+    expose:
+      - "6378"
+    ports:
+      - "6378:6378"
+    volumes:
+      - ./docker/data/redis:/data
+      - ./docker/conf/redis/redis.conf:/etc/redis/redis.conf
+    command: redis-server  /etc/redis/redis.conf --appendonly yes

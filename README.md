@@ -8,25 +8,24 @@
 ## 支持功能
 - [x] 用户管理
 - [x] 项目管理
+- [x] 环境管理
 - [x] 接口管理
 - [x] 测试用例管理
-- [x] 定时任务
-- [x] 生成测试报告
-- [x] 并发执行多个定时任务/用例/接口
 - [x] 用例之间的数据传递：请求头和参数导出
+- [x] 定时任务
+- [x] 通过标签运行定时任务(可用户发版时做全量回归)
+- [x] 定时任务并发执行，定时任务可以根据用户设置并发数，节省等待时间
+- [x] 生成测试报告
 - [x] 网络性能采集：在场景化接口测试的基础上，可额外采集网络链路性能指标（DNS 解析、TCP 连接、SSL 握手、网络传输等）
 - [x] 数据驱动`parameterize`
 - [x] python 函数驱动
-- [x] 通过标签运行定时任务(可用户发版时做全量回归)
-- [x] 定时任务并发执行，定时任务可以根据用户设置并发数，节省等待时间
-- [x] 通过标签运行定时任务(可用户发版时做全量回归)
-- [x] 定时任务并发执行，定时任务可以根据用户设置并发数，节省等待时间
 - [ ] 支持sql操作
 - [ ] 可视化数据报表
 - [ ] 数据驱动`parameterize`,页面操作
 - [ ] go 函数驱动
-- [ ] 支持更多协议，`HTTP/2`、`WebSocket`、`TCP`、`RPC`等
-- [ ] 支持用例导入，`json`、`postman`、`swagger`等
+- [ ] 支持更多协议，`WebSocket`、`TCP`、`RPC`等
+- [x] 已支持协议：`HTTP/2`、`Grpc`
+- [x] 支持用例导入，`json`、`postman`、`swagger`等
 - [x] 性能测试
 - [ ] web UI 自动化测试
 
@@ -43,7 +42,7 @@
 > - 1、新建数据库，并导入docs/sql/yangfan.sql文件
 > - 2、修改`server/config.yaml`文件中的数据库`mysql`、飞书登录`fs`相关配置
 > - 3、修改`web/.env.development`、 `web/.env.production`中的`VITE_FS_LOGIN`、`VITE_FS_APP_ID`
-
+> - 4、管理员账号`yangfan`,密码`123456`
 ### [本地调试](https://www.gin-vue-admin.com/guide/start-quickly/initialization.html)
 
 ## 项目上线
