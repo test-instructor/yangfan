@@ -16,7 +16,7 @@ COPY . .
 #RUN cnpm install
 # 使用npm进行安装依赖
 RUN ls -al
-RUN  npm install
+RUN  npm install --force
 
 # 使用npm run build命令打包web项目
 RUN npm run build
