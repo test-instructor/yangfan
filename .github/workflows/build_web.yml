@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - font_end
 
 env:
   IMAGE_NAME: cheetah
