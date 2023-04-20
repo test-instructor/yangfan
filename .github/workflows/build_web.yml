@@ -1,0 +1,38 @@
+name: Build and deploy Docker image
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  IMAGE_NAME: cheetah
+  DOCKER_REGISTRY: registry.cn-beijing.aliyuncs.com
+  TAG: cheetah-web
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Print current directory
+        run: pwd
+      - name: Print files
+        run: ls -l
+      - name: Login to Aliyun Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
+          password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
+      - name: Build the Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: /home/runner/work/yangfan/yangfan/web
+          dockerfile: ./Dockerfile   # 指定 Dockerfile 的路径
+          push: true
+          tags: ${{ env.DOCKER_REGISTRY }}/zfsn/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          build-args: |
+            APP_NAME=cheetah-web
+
