@@ -2,10 +2,10 @@ package interfacecase
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/cheetah/server/global"
-	"github.com/test-instructor/cheetah/server/model/common/response"
-	"github.com/test-instructor/cheetah/server/model/interfacecase/request"
-	"github.com/test-instructor/cheetah/server/service"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/interfacecase/request"
+	"github.com/test-instructor/yangfan/server/service"
 	"go.uber.org/zap"
 )
 
