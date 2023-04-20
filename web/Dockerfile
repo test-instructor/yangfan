@@ -2,7 +2,7 @@
 FROM node:16
 
 # 声明工作目录
-WORKDIR /go/src/cheetah/web
+WORKDIR /cheetah/web
 # 限制内存，否则报错
 ENV NODE_OPTIONS=--max_old_space_size=4096
 
