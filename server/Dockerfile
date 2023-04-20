@@ -24,7 +24,7 @@ FROM python:3.10.10-slim
 # Copy the binary
 WORKDIR /cheetah
 COPY --from=builder /go/src/cheetah/server .
-RUN python3 -m venv ~/.hrp
+RUN python3 -m venv ~/.hrp/venv
 RUN python3 -m pip install --upgrade pip \
     && pip3 install  funppy -i  https://pypi.tuna.tsinghua.edu.cn/simple
 
