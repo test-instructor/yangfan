@@ -2,7 +2,7 @@
 FROM node:16
 
 # 声明工作目录
-WORKDIR /cheetah/web/
+WORKDIR /go/src/cheetah/web
 # 限制内存，否则报错
 ENV NODE_OPTIONS=--max_old_space_size=4096
 
@@ -15,6 +15,7 @@ COPY . .
 ## 使用cnpm进行安装依赖
 #RUN cnpm install
 # 使用npm进行安装依赖
+RUN cd
 RUN  npm install
 
 # 使用npm run build命令打包web项目
