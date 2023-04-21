@@ -7,8 +7,8 @@ WORKDIR /go/src/cheetah/server
 # 拷贝整个server项目到工作目录
 COPY . .
 
-# 设置go env
-ENV GOPROXY=https://goproxy.cn,direct
+## 设置go env
+#ENV GOPROXY=https://goproxy.cn,direct
 
 # go generate 编译前自动执行代码
 # go env 查看go的环境变量
@@ -24,7 +24,7 @@ FROM python:3.10.10-slim
 # Copy the binary
 WORKDIR /cheetah
 COPY --from=builder /go/src/cheetah/server .
-RUN python3 -m venv ~/.hrp
+RUN python3 -m venv ~/.hrp/venv
 RUN python3 -m pip install --upgrade pip \
     && pip3 install  funppy -i  https://pypi.tuna.tsinghua.edu.cn/simple
 
