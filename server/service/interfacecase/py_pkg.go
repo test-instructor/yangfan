@@ -3,6 +3,7 @@ package interfacecase
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"github.com/test-instructor/yangfan/server/model/interfacecase/request"
@@ -21,8 +22,8 @@ type PyPkgVersionList struct {
 
 func (p *PyPkgService) PythonEnv() (PyEnvPath string, PipEnvPath string) {
 	hostname, _ := os.UserHomeDir()
-	PyEnvPath = hostname + "/.hrp/bin/python3"
-	PipEnvPath = hostname + "/.hrp/bin/pip3"
+	PyEnvPath = hostname + "/.hrp/venv/bin/python3"
+	PipEnvPath = hostname + "/.hrp/venv/bin/pip3"
 	return
 }
 
@@ -48,12 +49,14 @@ func (p *PyPkgService) PyPkgListService(info request.HrpPyPkgRequest) (list inte
 
 // PyPkgInstallService 安装Python包
 func (p *PyPkgService) PyPkgInstallService(pyPkg request.HrpPyPkgRequest, localPkg ...string) (err error) {
+	_ = localPkg
 	// todo 需要查询一下数据库中是否有改包，避免垃圾数据
 	var hrpPyPkg interfacecase.HrpPyPkg
 	_, PipEnvPath := p.PythonEnv()
 	// 未指定版本号时，安装最新版本
 	if pyPkg.Version == "" {
 		output, _ := exec.Command(PipEnvPath, "install", pyPkg.Name).Output()
+		global.GVA_LOG.Debug(fmt.Sprintln("安装日志信息", string(output)))
 		global.GVA_LOG.Info("安装Python包", zap.String("output", string(output)))
 		if strings.Contains(string(output), "Successfully installed") {
 			pyPkgInfo, err := p.FindPyPkg(pyPkg.Name)
@@ -82,6 +85,7 @@ func (p *PyPkgService) PyPkgInstallService(pyPkg request.HrpPyPkgRequest, localP
 		if err != nil {
 			return err
 		}
+		global.GVA_LOG.Debug(fmt.Sprintln("安装日志信息", string(output)))
 		if strings.Contains(string(output), "Successfully installed") {
 			pyPkgInfo, err := p.FindPyPkg(pyPkg.Name)
 			if err != nil {

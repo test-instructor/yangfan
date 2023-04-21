@@ -13,13 +13,13 @@ func (p *PyPkgRouter) InitPyPkgRouter(Router *gin.RouterGroup) {
 	pyPkgRouterWithoutRecord := Router.Group("pyPkg")
 	pkg := v1.ApiGroupApp.InterfaceCaseApiGroup.PyPkg
 	{
-		pyPkgRouter.GET("pyPkgList", pkg.GetPyPkgList) // 获取Python包列表
+		pyPkgRouter.POST("installPyPkg", pkg.InstallPyPkg) // 安装Python包
+		pyPkgRouter.POST("uninstallPyPkg", pkg.UninstallPyPkg)
+		pyPkgRouter.POST("updatePyPkg", pkg.UpdatePyPkg)
+		pyPkgRouter.POST("searchPyPkg", pkg.SearchPyPkg)
+		pyPkgRouter.POST("getPkgVersionList", pkg.GetPkgVersion)
 	}
 	{
-		pyPkgRouterWithoutRecord.POST("installPyPkg", pkg.InstallPyPkg) // 安装Python包
-		pyPkgRouterWithoutRecord.POST("uninstallPyPkg", pkg.UninstallPyPkg)
-		pyPkgRouterWithoutRecord.POST("updatePyPkg", pkg.UpdatePyPkg)
-		pyPkgRouterWithoutRecord.POST("searchPyPkg", pkg.SearchPyPkg)
-		pyPkgRouterWithoutRecord.POST("getPkgVersionList", pkg.GetPkgVersion)
+		pyPkgRouterWithoutRecord.GET("pyPkgList", pkg.GetPyPkgList) // 获取Python包列表
 	}
 }

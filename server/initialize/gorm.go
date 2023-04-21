@@ -69,6 +69,8 @@ func RegisterTables(db *gorm.DB) {
 		interfacecase.ApiCaseRelationship{},
 		interfacecase.ApiUserConfig{},
 
+		interfacecase.HrpPyPkg{},
+
 		//环境变量
 		interfacecase.ApiEnv{},
 		interfacecase.ApiEnvDetail{},
