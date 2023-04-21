@@ -2,20 +2,18 @@
 FROM node:16
 
 # 声明工作目录
-WORKDIR /cheetah/web
+WORKDIR /cheetah/web/
 # 限制内存，否则报错
 ENV NODE_OPTIONS=--max_old_space_size=4096
 
 # 拷贝整个web项目到当前工作目录
 COPY . .
 
-# 通过npm下载cnpm, 用于加速npm下载,我这边是在GitHub actions中构建的,使用官方,国内使用则使用淘宝镜像
-# RUN npm install -g cnpm --registry=https://registry.npm.taobao.org
+# 通过npm下载cnpm
+RUN npm install -g cnpm --registry=https://registry.npm.taobao.org
 
-## 使用cnpm进行安装依赖
-#RUN cnpm install
-# 使用npm进行安装依赖
-RUN  npm install --force
+# 使用cnpm进行安装依赖
+RUN cnpm install || npm install
 
 # 使用npm run build命令打包web项目
 RUN npm run build
