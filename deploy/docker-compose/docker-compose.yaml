@@ -1,0 +1,35 @@
+version: "3"
+
+# 声明一个名为network的networks,subnet为network的子网地址,默认网关是177.7.0.1
+networks:
+  network:
+    ipam:
+      driver: default
+      config:
+        - subnet: '177.7.0.0/16'
+
+services:
+  web:
+    build:
+      context: ../../web
+      dockerfile: ./Dockerfile
+    container_name: gva-web
+    restart: always
+    ports:
+      - '8080:8080'
+    command: [ 'nginx-debug', '-g', 'daemon off;' ]
+    networks:
+      network:
+        ipv4_address: 177.7.0.11
+
+  server:
+    build:
+      context: ../../server
+      dockerfile: ./Dockerfile
+    container_name: gva-server
+    restart: always
+    ports:
+      - '8888:8888'
+    networks:
+      network:
+        ipv4_address: 177.7.0.12
