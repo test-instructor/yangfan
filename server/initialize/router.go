@@ -83,6 +83,7 @@ func Routers() *gin.Engine {
 		interfacecaseRouter.InitApiMenuRouter(InterfaceGroup)
 		interfacecaseRouter.InitInterfaceTemplateRouter(InterfaceGroup)
 		interfacecaseRouter.InitTestCaseRouter(InterfaceGroup)
+		interfacecaseRouter.InitPyPkgRouter(InterfaceGroup) // python包管理
 	}
 
 	runCaseRouter := router.RouterGroupApp.RunCase

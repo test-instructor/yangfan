@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/test-instructor/cheetah/server/hrp/pkg/gadb"
+	"github.com/test-instructor/yangfan/server/hrp/pkg/gadb"
 )
 
 func main() {

@@ -149,6 +149,12 @@ func RegisterApis() {
 		{ApiGroup: "api模板", Method: "POST", Path: "/case/:project/createUserConfig", Description: "创建/更新用户配置"},
 		{ApiGroup: "api模板", Method: "GET", Path: "/case/:project/getUserConfig", Description: "获取用户配置"},
 
+		{ApiGroup: "py库管理", Method: "POST", Path: "/case/:project/pyPkg/installPyPkg", Description: "安装python第三方库"},
+		{ApiGroup: "py库管理", Method: "POST", Path: "/case/:project/pyPkg/uninstallPyPkg", Description: "卸载ython第三方库"},
+		{ApiGroup: "py库管理", Method: "POST", Path: "/case/:project/pyPkg/updatePyPkg", Description: "更新ython第三方库"},
+		{ApiGroup: "py库管理", Method: "POST", Path: "/case/:project/pyPkg/getPkgVersionList", Description: "获取python第三方库版本信息"},
+		{ApiGroup: "py库管理", Method: "GET", Path: "/case/:project/pyPkg/pyPkgList", Description: "获取python第三方库列表"},
+
 		{ApiGroup: "定时任务", Method: "POST", Path: "/task/:project/addTaskTestCase", Description: "添加测试用例"},
 		{ApiGroup: "定时任务", Method: "POST", Path: "/task/:project/setTaskCase", Description: "定时任务设置测试用例"},
 		{ApiGroup: "定时任务", Method: "POST", Path: "/task/:project/createTimerTask", Description: "新增定时任务"},
@@ -292,6 +298,7 @@ func RegisterMenus() {
 		{GVA_MODEL: global.GVA_MODEL{ID: 59, CreatedAt: time.Time{}, UpdatedAt: time.Time{}, DeletedAt: gorm.DeletedAt{}}, MenuLevel: 0, Hidden: true, ParentId: "55", Path: "pReportDetail/:id", Name: "pReportDetail", Component: "view/performance/reportDetail.vue", Sort: 999, Meta: system.Meta{Title: "性能测试报告详情-${id}", Icon: "document"}},
 		{GVA_MODEL: global.GVA_MODEL{ID: 60, CreatedAt: time.Time{}, UpdatedAt: time.Time{}, DeletedAt: gorm.DeletedAt{}}, MenuLevel: 0, Hidden: true, ParentId: "33", Path: "jsonCompare", Name: "jsonCompare", Component: "view/interface/interfaceComponents/jsonCompare.vue", Sort: 99999, Meta: system.Meta{Title: "json", Icon: "aim"}},
 		{GVA_MODEL: global.GVA_MODEL{ID: 61, CreatedAt: time.Time{}, UpdatedAt: time.Time{}, DeletedAt: gorm.DeletedAt{}}, MenuLevel: 0, Hidden: false, ParentId: "33", Path: "env", Name: "env", Component: "view/interface/environment/environment.vue", Sort: 0, Meta: system.Meta{Title: "环境变量", Icon: "grid"}},
+		{GVA_MODEL: global.GVA_MODEL{ID: 62, CreatedAt: time.Time{}, UpdatedAt: time.Time{}, DeletedAt: gorm.DeletedAt{}}, MenuLevel: 0, Hidden: false, ParentId: "33", Path: "py_pkg", Name: "py_pkg", Component: "view/py_pkg/py_pkg.vue", Sort: 680, Meta: system.Meta{Title: "py库管理", Icon: "office-building"}},
 	}
 	baseMenuService := system2.BaseMenuService{}
 	for i := 0; i < len(entities); i++ {
