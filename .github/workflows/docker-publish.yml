@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  IMAGE_NAME: cheetah
+  IMAGE_NAME: yangfan
   DOCKER_REGISTRY: registry.cn-beijing.aliyuncs.com
 
 jobs:

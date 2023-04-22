@@ -2,7 +2,7 @@
 FROM node:16
 
 # 声明工作目录
-WORKDIR /cheetah/web
+WORKDIR /yangfan/web
 # 限制内存，否则报错
 ENV NODE_OPTIONS=--max_old_space_size=4096
 
@@ -24,13 +24,13 @@ RUN npm run build
 # 声明镜像来源为nginx:alpine, alpine 镜像小
 FROM nginx:alpine
 
-WORKDIR /cheetah/web/
+WORKDIR /yangfan/web/
 
 # 从.docker-compose/nginx/conf.d/目录拷贝my.conf到容器内的/etc/nginx/conf.d/my.conf
 COPY .docker-compose/nginx/conf.d/my.conf /etc/nginx/conf.d/my.conf
 
 # 从第一阶段进行拷贝文件
-COPY --from=0 /cheetah/web/dist .
+COPY --from=0 /yangfan/web/dist .
 
 # 查看/etc/nginx/nginx.conf文件
 RUN cat /etc/nginx/nginx.conf

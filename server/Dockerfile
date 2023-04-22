@@ -2,7 +2,7 @@
 FROM golang:alpine AS builder
 
 # 声明工作目录
-WORKDIR /go/src/cheetah/server
+WORKDIR /go/src/yangfan/server
 
 # 拷贝整个server项目到工作目录
 COPY . .
@@ -22,8 +22,8 @@ RUN echo "===================="
 # Path: docs/docker/Dockerfile
 FROM python:3.10.10-slim
 # Copy the binary
-WORKDIR /cheetah
-COPY --from=builder /go/src/cheetah/server .
+WORKDIR /yangfan
+COPY --from=builder /go/src/yangfan/server .
 RUN python3 -m venv ~/.hrp/venv
 RUN python3 -m pip install --upgrade pip \
     && pip3 install  funppy -i  https://pypi.tuna.tsinghua.edu.cn/simple

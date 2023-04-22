@@ -3,18 +3,22 @@ package runTestCase
 import (
 	"encoding/json"
 	"fmt"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/hrp"
 	mic "github.com/test-instructor/yangfan/server/model/interfacecase"
 )
 
-func cheetahTestCaseToHrpCase(testCaseList []mic.HrpCase, debugTalkFilePath string, tcm *ApisCaseModel) error {
+func yangfanTestCaseToHrpCase(testCaseList []mic.HrpCase, debugTalkFilePath string, tcm *ApisCaseModel) error {
 
 	for _, testCase := range testCaseList {
-		apiConfig_json, _ := json.Marshal(testCase.Confing)
+		apiConfigJson, _ := json.Marshal(testCase.Confing)
 		var tConfig hrp.TConfig
-		json.Unmarshal(apiConfig_json, &tConfig)
+		err := json.Unmarshal(apiConfigJson, &tConfig)
+		if err != nil {
+			global.GVA_LOG.Error("用例转换出现错误", zap.Error(err))
+		}
 		global.GVA_LOG.Debug(fmt.Sprintf("用例id", testCase.ID))
 		global.GVA_LOG.Debug("case name" + testCase.Name)
 		toTestCase := ToTestCase{TestSteps: testCase.TestSteps, Config: tcm.Config}

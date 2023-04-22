@@ -71,7 +71,7 @@ server {
         root /usr/share/nginx/html/dist;
         add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
         try_files $uri $uri/ /index.html;
-    }
+    }[README.md](README.md)
 
     location /api {
         proxy_set_header Host $http_host;

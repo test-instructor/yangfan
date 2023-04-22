@@ -40,7 +40,7 @@ func RunBoomer(runCaseReq request.RunCaseReq, runType interfacecase.RunType) (re
 		report, err := RunTestCase(api)
 		return report, err
 	}
-	RunCheetahBoomer(nil, nil, nil, runCaseReq)
+	RunYangfanBoomer(nil, nil, nil, runCaseReq)
 	return nil, nil
 }
 
@@ -61,11 +61,5 @@ func RunTimerTaskBack(taskID uint) func() {
 		var runCaseReq request.RunCaseReq
 		runCaseReq.TaskID = taskID
 		RunTimerTask(runCaseReq, interfacecase.RunTypeRunTimer)
-	}
-}
-
-func RunApiCaseBack(apiCaseID uint) func() {
-	return func() {
-		//RunCase(apiCaseID, interfacecase.CaseTypeCases, interfacecase.RunTypeRunTimer)
 	}
 }

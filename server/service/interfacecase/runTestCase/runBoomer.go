@@ -26,7 +26,7 @@ type B struct {
 
 var b *B
 
-func RunCheetahBoomer(r *runBoomer, pReport *interfacecase.PerformanceReport, pTask *interfacecase.Performance, runCaseReq request.RunCaseReq) {
+func RunYangfanBoomer(r *runBoomer, pReport *interfacecase.PerformanceReport, pTask *interfacecase.Performance, runCaseReq request.RunCaseReq) {
 	spawnCount := runCaseReq.Operation.SpawnCount
 	spawnRate := runCaseReq.Operation.SpawnRate
 	profile := &boomer.Profile{}
@@ -44,7 +44,7 @@ func RunCheetahBoomer(r *runBoomer, pReport *interfacecase.PerformanceReport, pT
 		b.OutputDB = boomer.NewDbOutput(*pReport, *pTask)
 		//b.OutputDB.OnStart()
 		b.Boom.SetProfile(profile)
-		b.Boom.InitBoomerCheetah()
+		b.Boom.InitBoomerYangfan()
 		b.Boom.AddOutput(b.OutputDB)
 		b.State = BoomerStateRunning
 		go b.Boom.Run(r.tcm.Case...)
@@ -178,7 +178,7 @@ func (r *runBoomer) LoadCase() (err error) {
 	r.d.ProjectID = apiConfig.ProjectID
 	r.d.ID = r.runCaseReq.ApiID
 	r.d.RunDebugTalkFile()
-	err = cheetahTestCaseToHrpCase(testCaseList, r.d.FilePath, &r.tcm)
+	err = yangfanTestCaseToHrpCase(testCaseList, r.d.FilePath, &r.tcm)
 	if err != nil {
 		return errors.New("用例转换失败")
 	}
@@ -221,7 +221,7 @@ func (r *runBoomer) RunCase() (err error) {
 		}
 
 	}()
-	RunCheetahBoomer(r, &pReport, &pTask, r.runCaseReq)
+	RunYangfanBoomer(r, &pReport, &pTask, r.runCaseReq)
 
 	//var t *testing.T
 	//r.reportOperation.CreateReport()

@@ -211,12 +211,12 @@ func (testCaseJson *TestCaseJson) ToTestCase() (*TestCase, error) {
 		step.ParntID = step.ID
 		step.ID = 0
 		if step.TestCase != nil {
-			testcaseCheetahStr, _ := json.Marshal(step.TestCase)
+			testcaseYangfanStr, _ := json.Marshal(step.TestCase)
 			//apiConfig_json, _ := json.Marshal(step.TestCase.(map[string]interface{})["Config"])
 			//var tConfig TConfig
 			//json.Unmarshal(apiConfig_json, &tConfig)
 			tcj := &TestCaseJson{
-				JsonString:        string(testcaseCheetahStr),
+				JsonString:        string(testcaseYangfanStr),
 				ID:                step.ID,
 				DebugTalkFilePath: testCaseJson.GetPath(),
 				Config:            testCaseJson.Config,

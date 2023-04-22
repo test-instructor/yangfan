@@ -97,8 +97,8 @@ mysql:
   path: gz-cdb-63h2hl6v.sql.tencentcdb.com
   port: "57892"
   config: charset=utf8mb4&parseTime=True&loc=Local
-  db-name: cheetah
-  username: cheetah
+  db-name: yangfan
+  username: yangfan
   password: 79NNaSX76jqroygH
   max-idle-conns: 10
   max-open-conns: 100

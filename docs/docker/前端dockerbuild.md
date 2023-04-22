@@ -18,7 +18,7 @@ docker build -t web:1.0 .
 #### 本地启动容器部署
 
 ```bash
-docker run -d -p 8080:8080 --network cheetah --name cheetah-web web:1.0
+docker run -d -p 8080:8080 --network yangfan --name yangfan-web web:1.0
 ```
 
 #### 离线部署方式
@@ -40,7 +40,7 @@ docker load -i web.tar
 5. 执行
 
 ```bash
-docker run -d -p 8080:8080 --network cheetah --name cheetah-web web:1.0
+docker run -d -p 8080:8080 --network yangfan --name yangfan-web web:1.0
 ```
 
 **注意:** 前端构建较慢,请耐心等待
