@@ -1,9 +1,9 @@
 go version
 export WORKSPACEPATH=$(cd $(dirname $0);pwd)
-export CHEETAHPATH=/home/cheeath
+export YANGFANPATH=/home/cheeath
 export SERVERPATH=$WORKSPACEPATH/server
 export WEBPATH=$WORKSPACEPATH/web
-echo $CHEETAHPATH
+echo $YANGFANPATH
 echo $SERVERPATH
 echo $WEBPATH
 cd $SERVERPATH
@@ -15,7 +15,7 @@ APP_NAME=yangfan
 # go mod tidy 根据实际情况，如果没有更新库可以不用执行
 go mod tidy
 go build -o yangfan main.go
-# 删除cheetah进程，首次部署可以不用停止
+# 删除yangfan进程，首次部署可以不用停止
 
 is_exist(){
   echo "获取pid"
@@ -46,31 +46,31 @@ stop(){
 }
 copy(){
 	echo "复制文件"
-	cp $SERVERPATH/yangfan $CHEETAHPATH/yangfan
-	cp $WORKSPACEPATH/config.production.yaml $CHEETAHPATH/config.yaml
-	cp -r $SERVERPATH/resource/* $CHEETAHPATH/resource/
-	cd $CHEETAHPATH
+	cp $SERVERPATH/yangfan $YANGFANPATH/yangfan
+	cp $WORKSPACEPATH/config.production.yaml $YANGFANPATH/config.yaml
+	cp -r $SERVERPATH/resource/* $YANGFANPATH/resource/
+	cd $YANGFANPATH
 }
 
 set_path(){
 	{
-	  echo "执行 rm -rf ${CHEETAHPATH}/yangfan"
-	  rm -rf $CHEETAHPATH/yangfan
+	  echo "执行 rm -rf ${YANGFANPATH}/yangfan"
+	  rm -rf $YANGFANPATH/yangfan
 	}||{
-	  echo 'cheetah可执行文件不存在'
+	  echo 'yangfan可执行文件不存在'
 	}
 
 	{
-	  echo "执行 mkdir ${CHEETAHPATH}"
-	  mkdir $CHEETAHPATH
+	  echo "执行 mkdir ${YANGFANPATH}"
+	  mkdir $YANGFANPATH
 	} || {
-	  echo '$CHEETAHPATH 已存在'
+	  echo '$YANGFANPATH 已存在'
 	}
 
 	{
-	  mkdir $CHEETAHPATH/resource
+	  mkdir $YANGFANPATH/resource
 	} || {
-	  echo '$CHEETAHPATH/resource 已存在'
+	  echo '$YANGFANPATH/resource 已存在'
 	}
 }
 run_server(){
