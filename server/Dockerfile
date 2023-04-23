@@ -7,8 +7,9 @@ WORKDIR /go/src/yangfan/server
 # 拷贝整个server项目到工作目录
 COPY . .
 
-## 设置go env
-#ENV GOPROXY=https://goproxy.cn,direct
+# 设置go env
+ENV GO111MODULE=on
+ENV GOPROXY=https://goproxy.cn
 
 # go generate 编译前自动执行代码
 # go env 查看go的环境变量
