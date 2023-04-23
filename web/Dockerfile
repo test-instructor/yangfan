@@ -15,10 +15,8 @@ COPY . .
 ## 使用cnpm进行安装依赖
 #RUN cnpm install
 # 使用npm进行安装依赖
-RUN  npm install --force
+RUN yarn && yarn build
 
-# 使用npm run build命令打包web项目
-RUN npm run build
 # ===================================================== 以下为多阶段构建 ==========================================================
 
 # 声明镜像来源为nginx:alpine, alpine 镜像小
