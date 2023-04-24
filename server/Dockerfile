@@ -31,7 +31,7 @@ RUN python3 -m pip install --upgrade pip \
 
 EXPOSE 8888
 # 配置文件一定需要写对了,否则会报错
-ENTRYPOINT ./server -c config.yaml
+ENTRYPOINT ./server/ -c docker.config.yaml
 
 CMD ["tail", "-f", "/dev/null"]
 

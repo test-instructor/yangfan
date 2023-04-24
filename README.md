@@ -50,7 +50,7 @@
 
 1. 环境准备
    * 前端Dockerfile：`web/Dockerfile`,env:`web/.env.production`中的`VITE_FS_LOGIN`、`VITE_FS_APP_ID`
-   * 后端Dockerfile：`server/Dockerfile`，config：`server/config.yaml`
+   * 后端Dockerfile：`server/Dockerfile`，config：`server/docker.config.yaml`
    * nginx配置文件: web/.docker-compose/nginx/conf.d/my.conf
 2. 容器编排：`deploy/docker-compose/docker-compose.yaml`
 3. 部署，cd 到 `deploy/docker-compose/` 目录下执行 `docker-compose up --build --force-recreate -d`
