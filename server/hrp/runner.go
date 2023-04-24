@@ -282,7 +282,7 @@ func (r *HRPRunner) NewCaseRunner(testcase *TestCase) (*CaseRunner, error) {
 	// init parser plugin
 	//plugin, err := initPlugin(testcase.Config.Path, r.venv, r.pluginLogOn)
 	//压测运行时会同时运行多个plugin，用单例方式控制每次压测任务只能运行一个plugin
-	plugin, err := cheetahInitPlugin(testcase.Config.Path, r.venv, r.pluginLogOn)
+	plugin, err := yangfanInitPlugin(testcase.Config.Path, r.venv, r.pluginLogOn)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "init plugin failed")

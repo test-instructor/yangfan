@@ -2,13 +2,14 @@
 FROM golang:alpine AS builder
 
 # 声明工作目录
-WORKDIR /go/src/cheetah/server
+WORKDIR /go/src/yangfan/server
 
 # 拷贝整个server项目到工作目录
 COPY . .
 
-## 设置go env
-#ENV GOPROXY=https://goproxy.cn,direct
+# 设置go env
+ENV GO111MODULE=on
+ENV GOPROXY=https://goproxy.cn
 
 # go generate 编译前自动执行代码
 # go env 查看go的环境变量
@@ -22,15 +23,15 @@ RUN echo "===================="
 # Path: docs/docker/Dockerfile
 FROM python:3.10.10-slim
 # Copy the binary
-WORKDIR /cheetah
-COPY --from=builder /go/src/cheetah/server .
+WORKDIR /yangfan
+COPY --from=builder /go/src/yangfan/server .
 RUN python3 -m venv ~/.hrp/venv
 RUN python3 -m pip install --upgrade pip \
     && pip3 install  funppy -i  https://pypi.tuna.tsinghua.edu.cn/simple
 
 EXPOSE 8888
 # 配置文件一定需要写对了,否则会报错
-ENTRYPOINT ./server -c config.yaml
+ENTRYPOINT ./server/ -c docker.config.yaml
 
 CMD ["tail", "-f", "/dev/null"]
 

@@ -5,7 +5,7 @@
 - 前后端采用[gin-vue-admin v2.5.3](https://www.gin-vue-admin.com/), Gin + Vue全栈开发基础平台
 - 测试引擎采用[HttpRunner V4](https://httprunner.com/),支持 HTTP(S)/HTTP2/WebSocket/RPC 等网络协议，涵盖接口测试、性能测试、数字体验监测等测试类型。简单易用，功能强大，具有丰富的插件化机制和高度的可扩展能力。
 - [测试平台接入HttpRunner V4](https://www.yuque.com/docs/share/bb392180-8ea9-46a0-a27b-bb4fbec3450e?#)
-## 支持功能
+# 支持功能
 - [x] 用户管理
 - [x] 项目管理
 - [x] 环境管理
@@ -19,6 +19,7 @@
 - [x] 网络性能采集：在场景化接口测试的基础上，可额外采集网络链路性能指标（DNS 解析、TCP 连接、SSL 握手、网络传输等）
 - [x] 数据驱动`parameterize`
 - [x] python 函数驱动
+- [X] 安装python第三方库，服务器第一次启动时默认安装所有第三方库
 - [ ] 支持sql操作
 - [ ] 可视化数据报表
 - [ ] 数据驱动`parameterize`,页面操作
@@ -45,7 +46,19 @@
 > - 4、管理员账号`yangfan`,密码`123456`
 ### [本地调试](https://www.gin-vue-admin.com/guide/start-quickly/initialization.html)
 
-## 项目上线
+## docker 部署
+
+1. 环境准备
+   * 前端Dockerfile：`web/Dockerfile`,env:`web/.env.production`中的`VITE_FS_LOGIN`、`VITE_FS_APP_ID`
+   * 后端Dockerfile：`server/Dockerfile`，config：`server/docker.config.yaml`
+   * nginx配置文件: web/.docker-compose/nginx/conf.d/my.conf
+2. 容器编排：`deploy/docker-compose/docker-compose.yaml`
+3. 部署，cd 到 `deploy/docker-compose/` 目录下执行 `docker-compose up --build --force-recreate -d`
+
+
+
+
+## 服务器直接部署
 
 ### 前端
 > 在web目录下执行 npm run build 得到 dist文件夹 将dist文件夹上传到服务器 建议使用nginx进行代理 并且设置 proxy 把请求代理到后端
@@ -71,7 +84,7 @@ server {
         root /usr/share/nginx/html/dist;
         add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
         try_files $uri $uri/ /index.html;
-    }
+    }[README.md](README.md)
 
     location /api {
         proxy_set_header Host $http_host;

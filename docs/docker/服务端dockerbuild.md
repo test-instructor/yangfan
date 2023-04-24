@@ -5,7 +5,7 @@
 无论是本地还是离线部署均需要创建网络服务因为使用的docker网络模式为host，所以需要创建一个docker网络服务，否则无法访问
 
 ```bash
-docker network create cheetah
+docker network create yangfan
 ```
 
 #### 构建镜像
@@ -20,11 +20,11 @@ docker build -t server:1.0 .
 #### 本地启动容器部署
 
 1. 修改配置文件
-2. 复制配置文件到 /home/cheetah/config.yaml
+2. 复制配置文件到 /home/yangfan/config.yaml
 3. 执行
 
 ```bash 
-docker run -d -p 8888:8888 --network cheetah -v /home/cheetah/config.yaml:/cheetah/config.yaml --name cheetah-server
+docker run -d -p 8888:8888 --network yangfan -v /home/yangfan/config.yaml:/yangfan/config.yaml --name yangfan-server
    server:1.0
 ```
 
@@ -50,7 +50,7 @@ docker load -i server.tar
 5. 执行
 
 ```bash
-docker run -d -p 8888:8888 --network cheetah -v /home/cheetah/config.yaml:/cheetah/config.yaml --name cheetah-server
+docker run -d -p 8888:8888 --network yangfan -v /home/yangfan/config.yaml:/yangfan/config.yaml --name yangfan-server
    server:1.0
 ```
 

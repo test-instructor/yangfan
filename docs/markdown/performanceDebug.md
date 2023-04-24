@@ -44,7 +44,7 @@
 3. 通过map实现可以同时运行多个实例，主要是兼容接口测试，否则不同项目访问到的可能是同一个plugin实例
 
 ```go
-// Package hrp NewCaseRunner 方法下把initPlugin修改成cheetahInitPlugin
+// Package hrp NewCaseRunner 方法下把initPlugin修改成yangfanInitPlugin
 package hrp
 
 func (r *HRPRunner) NewCaseRunner(testcase *TestCase) (*CaseRunner, error) {
@@ -57,7 +57,7 @@ func (r *HRPRunner) NewCaseRunner(testcase *TestCase) (*CaseRunner, error) {
    // init parser plugin
    //plugin, err := initPlugin(testcase.Config.Path, r.venv, r.pluginLogOn)
    //压测运行时会同时运行多个plugin，用单例方式控制每次压测任务只能运行一个plugin
-   plugin, err := cheetahInitPlugin(testcase.Config.Path, r.venv, r.pluginLogOn)
+   plugin, err := yangfanInitPlugin(testcase.Config.Path, r.venv, r.pluginLogOn)
 
    if err != nil {
       return nil, errors.Wrap(err, "init plugin failed")
@@ -72,7 +72,7 @@ func (r *HRPRunner) NewCaseRunner(testcase *TestCase) (*CaseRunner, error) {
 ```
 
 ```go
-// Package hrp 增加 cheetahInitPlugin 函数
+// Package hrp 增加 yangfanInitPlugin 函数
 package hrp
 
 import (
@@ -81,11 +81,11 @@ import (
    "sync"
 )
 
-var cheetahPlugin = make(map[string]*funplugin.IPlugin)
+var yangfanPlugin = make(map[string]*funplugin.IPlugin)
 var mutex sync.Mutex
 
-func cheetahInitPlugin(path, venv string, logOn bool) (plugin funplugin.IPlugin, err error) {
-   plugins := cheetahPlugin[path]
+func yangfanInitPlugin(path, venv string, logOn bool) (plugin funplugin.IPlugin, err error) {
+   plugins := yangfanPlugin[path]
    if plugins == nil {
       mutex.Lock()
       defer mutex.Unlock()
@@ -94,7 +94,7 @@ func cheetahInitPlugin(path, venv string, logOn bool) (plugin funplugin.IPlugin,
          if err != nil {
             return nil, errors.Wrap(err, "init plugin failed")
          }
-         cheetahPlugin[path] = &plugin
+         yangfanPlugin[path] = &plugin
          plugins = &plugin
       }
    }

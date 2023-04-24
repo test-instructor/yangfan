@@ -94,7 +94,7 @@ func (r *runBoomerDebug) LoadCase() (err error) {
 	r.d.ProjectID = apiConfig.ProjectID
 	r.d.ID = r.runCaseReq.ApiID
 	r.d.RunDebugTalkFile()
-	err = cheetahTestCaseToHrpCase(testCaseList, r.d.FilePath, &r.tcm)
+	err = yangfanTestCaseToHrpCase(testCaseList, r.d.FilePath, &r.tcm)
 	if err != nil {
 		return errors.New("用例转换失败")
 	}

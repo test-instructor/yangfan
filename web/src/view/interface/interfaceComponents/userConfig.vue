@@ -43,14 +43,17 @@ const userConfig = ref({
     api_config_id:"",
     api_env_id:""
 })
+
 const getUserConfigs = async () => {
   let res = await getUserConfig()
   if (res.code === 0 && res.data) {
       if (res.data.api_env_id > 0){
-          userConfigs.value.api_env_id = res.data.api_env_id
+          userConfig.value.api_env_id = res.data.api_env_id
+          userConfig.value.api_env.name = res.data.api_env.name
       }
       if (res.data.api_config_id > 0){
-          userConfigs.value.api_config_id = res.data.api_config_id
+          userConfig.value.api_config_id = res.data.api_config_id
+          userConfig.value.api_config.name = res.data.api_config.name
       }
   }
 }

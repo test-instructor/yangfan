@@ -1,6 +1,6 @@
 package hrp
 
-func (b *HRPBoomer) InitBoomerCheetah() {
+func (b *HRPBoomer) InitBoomerYangfan() {
 	b.SetSpawnCount(b.GetProfile().SpawnCount)
 	b.SetSpawnRate(b.GetProfile().SpawnRate)
 	b.SetRunTime(b.GetProfile().RunTime)

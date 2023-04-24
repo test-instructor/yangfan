@@ -7,9 +7,9 @@ on:
       - front_end
 
 env:
-  IMAGE_NAME: cheetah
+  IMAGE_NAME: yangfan
   DOCKER_REGISTRY: registry.cn-beijing.aliyuncs.com
-  TAG: cheetah-web
+  TAG: yangfan-web
 
 jobs:
   build:
@@ -35,5 +35,5 @@ jobs:
           push: true
           tags: ${{ env.DOCKER_REGISTRY }}/zfsn/${{ env.IMAGE_NAME }}:${{ env.TAG }}
           build-args: |
-            APP_NAME=cheetah-web
+            APP_NAME=yangfan-web
 

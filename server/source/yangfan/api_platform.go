@@ -1,4 +1,4 @@
-package system
+package yangfan
 
 import (
 	system2 "github.com/test-instructor/yangfan/server/service/system"
@@ -258,7 +258,7 @@ func RegisterApis() {
 	for i := 0; i < len(entities); i++ {
 		global.GVA_DB.Find(&[]system.SysApi{}, "path = ? and method = ?", entities[i].Path, entities[i].Method).Count(&count)
 		if count > 0 {
-			global.GVA_LOG.Debug("插件已安装或存在同名路由" + entities[i].Path)
+			//global.GVA_LOG.Debug("插件已安装或存在同名路由" + entities[i].Path)
 			continue
 		}
 		err := global.GVA_DB.Create(&entities[i]).Error

@@ -9,7 +9,7 @@ import (
 var pluginMapRW = make(map[string]*funplugin.IPlugin)
 var pluginMutex sync.RWMutex
 
-func cheetahInitPlugin(path, venv string, logOn bool) (plugin funplugin.IPlugin, err error) {
+func yangfanInitPlugin(path, venv string, logOn bool) (plugin funplugin.IPlugin, err error) {
 	pluginMutex.RLock()
 	plugins := pluginMapRW[path]
 	pluginMutex.RUnlock()
