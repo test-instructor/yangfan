@@ -359,6 +359,21 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 				rb.req.ContentLength = int64(len(body))
 			}
 		}
+		requestParams, ok := rb.requestMap["params"].(map[string]interface{})
+		if ok {
+			rb.stepRequest.Params = requestParams
+			err = rb.prepareUrlParams(stepVariables)
+			if err != nil {
+				log.Error().Err(err)
+			}
+		}
+		requestHeaders, ok := rb.requestMap["headers"].(map[string]interface{})
+		if ok {
+			rb.req.Header = http.Header{}
+			for k, v := range requestHeaders {
+				rb.req.Header.Set(k, v.(string))
+			}
+		}
 	}
 
 	{
