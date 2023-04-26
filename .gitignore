@@ -25,9 +25,13 @@ yarn-error.log*
 /server/log/
 /server/gva
 /server/latest_log
-yangfan.yaml
+
 
 *.iml
 
 ./docker/data/*
 ./docker/logs
+/go.work
+./server/yangfan.yaml
+./server/config.yaml
+/config.yaml

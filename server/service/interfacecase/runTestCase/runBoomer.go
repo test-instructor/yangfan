@@ -12,6 +12,8 @@ import (
 	"gorm.io/gorm"
 )
 
+type BoomerState int
+
 var (
 	BoomerStateRunning BoomerState = 1
 	BoomerStateStop    BoomerState = 2
@@ -235,5 +237,3 @@ func (r *runBoomer) RunCase() (err error) {
 
 	return nil
 }
-
-type BoomerState int
