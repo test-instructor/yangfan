@@ -31,7 +31,7 @@ func (b *B) Run() {
 	go b.Boom.StartServer(ctx, masterHttpAddress)
 	go b.Boom.PollTestCases(ctx)
 	b.Boom.RunMaster()
-	//./hrp boom --worker --master-host 192.168.0.218 --master-port 7966 --ignore-quit
+	//./hrp boom --worker --master-host 0.0.0.0 --master-port 7966 --ignore-quit
 	//./hrp boom --master --master-bind-host 0.0.0.0 --master-bind-port 7966 --master-http-address "0.0.0.0:9092"
 	//127.0.0.1:9092
 }
