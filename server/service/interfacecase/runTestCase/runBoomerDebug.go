@@ -30,6 +30,7 @@ type runBoomerDebug struct {
 	caseType        interfacecase.CaseType
 	tcm             ApisCaseModel
 	d               debugTalkOperation
+	envVars         map[string]string
 }
 
 func (r *runBoomerDebug) LoadCase() (err error) {
@@ -39,6 +40,8 @@ func (r *runBoomerDebug) LoadCase() (err error) {
 	var testCaseList []interfacecase.HrpCase
 	var apiCase interfacecase.Performance
 	var apiCaseCase []interfacecase.PerformanceRelationship
+	var envName string
+
 	{
 		var testCaseStep interfacecase.Performance
 		err := global.GVA_DB.Model(interfacecase.Performance{}).Where("id = ? ", r.runCaseReq.CaseID).First(&testCaseStep).Error
@@ -46,13 +49,20 @@ func (r *runBoomerDebug) LoadCase() (err error) {
 			return err
 		}
 		r.runCaseReq.ConfigID = testCaseStep.RunConfigID
+		r.runCaseReq.Env = testCaseStep.ApiEnvID
 	}
 	//获取运行配置
 	apiConfig, err := getConfig(r.runCaseReq.ConfigID)
 	if err != nil {
 		return errors.New("获取配置失败")
 	}
+	r.envVars, envName, err = GetEnvVar(apiConfig.ProjectID, r.runCaseReq.Env)
+	if err != nil {
+		return errors.New("获取环境变量失败")
+	}
+	apiConfig.Environs = r.envVars
 	global.GVA_LOG.Debug(fmt.Sprintf("boomer debug 1 apiConfig:%d", apiConfig.ID))
+
 	//设置前置套件
 	if apiConfig.SetupCaseID != nil && *apiConfig.SetupCaseID != 0 {
 		global.GVA_LOG.Debug(fmt.Sprintf("boomer debug 2 apiConfig.SetupCaseID %d", *apiConfig.SetupCaseID))
@@ -107,6 +117,8 @@ func (r *runBoomerDebug) LoadCase() (err error) {
 			Operator: interfacecase.Operator{
 				ProjectID: apiConfig.ProjectID,
 			},
+			ApiEnvName: envName,
+			ApiEnvID:   r.runCaseReq.Env,
 		},
 	}
 	r.reportOperation.CreateReport()
