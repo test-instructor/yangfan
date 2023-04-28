@@ -1,13 +1,9 @@
-<template>
-
-</template>
+<template></template>
 
 <script>
 export default {
-  name: "reportDetailApi"
-}
+  name: "reportDetailApi",
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

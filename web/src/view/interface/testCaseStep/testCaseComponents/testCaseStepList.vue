@@ -3,35 +3,42 @@
     <div class="parent">
       <div id="g1">
         <el-table
-            ref="multipleTable"
-            style="width: 100%"
-            :show-header="false"
-            :data="tableData"
-            row-key="ID"
-            :cell-style="{paddingTop: '4px', paddingBottom: '4px'}"
-            @keyup="rowDrop"
+          ref="multipleTable"
+          style="width: 100%"
+          :show-header="false"
+          :data="tableData"
+          row-key="ID"
+          :cell-style="{ paddingTop: '4px', paddingBottom: '4px' }"
+          @keyup="rowDrop"
         >
-          <el-table-column width="35" type="index">
-          </el-table-column>
-          <el-table-column
-              min-width="600"
-              align="center"
-          >
+          <el-table-column width="35" type="index"> </el-table-column>
+          <el-table-column min-width="600" align="center">
             <template #default="scope">
-              <div class="block" :class="`block_${scope.row.request.method.toLowerCase()}`">
-                  <span class="block-method block_method_color"
-                        :class="`block_method_${scope.row.request.method.toLowerCase()}`">
-                    {{ scope.row.request.method }}
-                  </span>
+              <div
+                class="block"
+                :class="`block_${scope.row.request.method.toLowerCase()}`"
+              >
+                <span
+                  class="block-method block_method_color"
+                  :class="`block_method_${scope.row.request.method.toLowerCase()}`"
+                >
+                  {{ scope.row.request.method }}
+                </span>
                 <div class="block">
-                    <span class="block-method block_method_color block_method_options"
-                          v-if="scope.row.creator==='yapi'"
-                          :title="'从YAPI导入的接口'">
-                      YAPI
-                    </span>
+                  <span
+                    class="block-method block_method_color block_method_options"
+                    v-if="scope.row.creator === 'yapi'"
+                    :title="'从YAPI导入的接口'"
+                  >
+                    YAPI
+                  </span>
                 </div>
-                <span class="block-method block_url">{{ scope.row.request.url }}</span>
-                <span class="block-summary-description">{{ scope.row.name }}</span>
+                <span class="block-method block_url">{{
+                  scope.row.request.url
+                }}</span>
+                <span class="block-summary-description">{{
+                  scope.row.name
+                }}</span>
                 <!--                  <div>-->
                 <!--                    <span class="el-icon-s-flag"-->
                 <!--                          v-if="scope.row.cases.length > 0 "-->
@@ -105,8 +112,8 @@
 
 <script>
 export default {
-  name: 'testCaseList'
-}
+  name: "testCaseList",
+};
 </script>
 
 <script setup>
@@ -117,17 +124,17 @@ import {
   updateTestCase,
   findTestCase,
   getTestCaseList,
-  sortTestCase
-} from '@/api/testCase'
-import {useRoute} from "vue-router";
-import {ref, watch} from "vue";
-import {onMounted} from "vue"
+  sortTestCase,
+} from "@/api/testCase";
+import { useRoute } from "vue-router";
+import { ref, watch } from "vue";
+import { onMounted } from "vue";
 
-import interfaceTempleForm from '@/view/interface/interfaceTemplate/interfaceTemplateForm.vue'
-import {findInterfaceTemplate} from "@/api/interfaceTemplate";
-import {reactive} from "vue";
-import {ElMessageBox} from "element-plus";
-import Sortable from 'sortablejs'
+import interfaceTempleForm from "@/view/interface/interfaceTemplate/interfaceTemplateForm.vue";
+import { findInterfaceTemplate } from "@/api/interfaceTemplate";
+import { reactive } from "vue";
+import { ElMessageBox } from "element-plus";
+import Sortable from "sortablejs";
 
 const props = defineProps({
   listType: ref(""),
@@ -135,129 +142,124 @@ const props = defineProps({
   caseId: ref(0),
   menuId: ref(0),
   data: ref({}),
-})
-let listType = ""
-const route = useRoute()
-let testCaseID = 1
-const tableData = ref([])
-const apiTypes = 2
-const interfaceTempleFormVisible = ref(false)
-const dialogTitle = ref(false)
-const type = ref('')
-const heightDiv = ref()
-const caseName = ref()
-let sortIdList = ""
-heightDiv.value = window.screen.height - 480
+});
+let listType = "";
+const route = useRoute();
+let testCaseID = 1;
+const tableData = ref([]);
+const apiTypes = 2;
+const interfaceTempleFormVisible = ref(false);
+const dialogTitle = ref(false);
+const type = ref("");
+const heightDiv = ref();
+const caseName = ref();
+let sortIdList = "";
+heightDiv.value = window.screen.height - 480;
 const formDatas = reactive({
-  name: '',
+  name: "",
   request: reactive({
-    agreement: '',
-    method: '',
-    url: '',
-    params: '',
-    headers: '',
-    json: '',
-    data: '',
+    agreement: "",
+    method: "",
+    url: "",
+    params: "",
+    headers: "",
+    json: "",
+    data: "",
   }),
-  variables: '',
-  extract: '',
-  validate: '',
-  hooks: '',
-  apiMenuID: '',
-})
+  variables: "",
+  extract: "",
+  validate: "",
+  hooks: "",
+  apiMenuID: "",
+});
 const sortData = ref({
   ID: 0,
-  TStep: []
-})
-
-watch(() => props.data, (newValue, oldValue) => {
-  tableData.value = newValue
+  TStep: [],
 });
 
+watch(
+  () => props.data,
+  (newValue, oldValue) => {
+    tableData.value = newValue;
+  }
+);
 
 const getTestCaseDetailFunc = async (testCaseID) => {
-  const res = await findTestCase({ID: testCaseID})
+  const res = await findTestCase({ ID: testCaseID });
   if (res.code === 0) {
-    tableData.value = res.data.reapicase.TStep
-    caseName.value = res.data.reapicase.name
+    tableData.value = res.data.reapicase.TStep;
+    caseName.value = res.data.reapicase.name;
     // dialogFormVisible.value = true
   }
-}
-
+};
 
 const init = () => {
-  tableData.value = props.data
+  tableData.value = props.data;
   if (props.listType === "api") {
-
   } else if (props.listType === "case") {
-    testCaseID = props.caseId
+    testCaseID = props.caseId;
     if (testCaseID) {
-      getTestCaseDetailFunc(testCaseID)
+      getTestCaseDetailFunc(testCaseID);
     }
   }
-}
-
+};
 
 const updateInterfaceTemplateFunc = async (row) => {
-  const res = await findInterfaceTemplate({ID: row.ID})
-  type.value = 'update'
-  dialogTitle.value = '编辑用例步骤'
+  const res = await findInterfaceTemplate({ ID: row.ID });
+  type.value = "update";
+  dialogTitle.value = "编辑用例步骤";
   if (res.code === 0) {
-    formDatas.value = res.data.reapicase
-    interfaceTempleFormVisible.value = true
+    formDatas.value = res.data.reapicase;
+    interfaceTempleFormVisible.value = true;
   }
-}
+};
 
 const deleteRow = (row) => {
-  ElMessageBox.confirm('确定要删除吗?', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
+  ElMessageBox.confirm("确定要删除吗?", "提示", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
   }).then(() => {
     // deleteInterfaceTemplateFunc(row)
-  })
-}
+  });
+};
 onMounted(() => {
-  rowDrop()
-})
+  rowDrop();
+});
 
 //行拖拽
 const rowDrop = async () => {
-  sortData.value.ID = Number(testCaseID)
-  const tbody = document.getElementById('g1');
+  sortData.value.ID = Number(testCaseID);
+  const tbody = document.getElementById("g1");
 
   Sortable.create(tbody, {
-    async onEnd(evt) {
-    }
-
-  })
-
-}
+    async onEnd(evt) {},
+  });
+};
 
 // 关闭弹窗
 const closeDialog = () => {
-  interfaceTempleFormVisible.value = false
+  interfaceTempleFormVisible.value = false;
   formDatas.value = reactive({
-    name: '',
+    name: "",
     request: reactive({
-      agreement: '',
-      method: '',
-      url: '',
-      params: '',
-      headers: '',
-      json: '',
-      data: '',
+      agreement: "",
+      method: "",
+      url: "",
+      params: "",
+      headers: "",
+      json: "",
+      data: "",
     }),
-    variables: '',
-    extract: '',
-    validate: '',
-    hooks: '',
-    apiMenuID: '',
-  })
-}
-
+    variables: "",
+    extract: "",
+    validate: "",
+    hooks: "",
+    apiMenuID: "",
+  });
+};
 </script>
 
 <style lang="scss" scoped>
-@import 'src/style/apiList';
+@import "src/style/apiList";
 </style>
