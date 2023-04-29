@@ -22,7 +22,7 @@ func NewAgent() *Agent {
 func (a *Agent) Work() {
 	a.Boom = hrp.NewWorkerBoomer("0.0.0.0", 7966)
 	ctx := a.Boom.EnableGracefulQuit(context.Background())
-	//go a.Boom.PollTestCases(ctx)
+	//go a.Boom.PollTestCasesPlatform(ctx)
 	go a.Boom.PollTasks(ctx)
 	a.Boom.RunWorker()
 }

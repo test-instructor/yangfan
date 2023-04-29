@@ -448,3 +448,35 @@ func (b *HRPBoomer) convertBoomerTask(testcase *TestCase, rendezvousList []*Rend
 		},
 	}
 }
+
+func (b *HRPBoomer) PollTestCasesPlatform(ctx context.Context) {
+	// quit all plugins
+	defer func() {
+		pluginMap.Range(func(key, value interface{}) bool {
+			if plugin, ok := value.(funplugin.IPlugin); ok {
+				plugin.Quit()
+			}
+			return true
+		})
+	}()
+
+	for {
+		select {
+		case <-b.Boomer.ParseTestCasesChan():
+			var tcs []ITestCase
+			//id := b.GetTestCasesID()
+			//masterCase := runTestCase.NewBoomerMaster(id)
+			//err := masterCase.LoadCase()
+			//if err != nil {
+			//	return
+			//}
+			//tcs = append(tcs, masterCase.TCM.Case...)
+			b.TestCaseBytesChan() <- b.TestCasesToBytes(tcs...)
+			log.Info().Msg("put testcase successfully")
+		case <-b.Boomer.GetCloseChan():
+			return
+		case <-ctx.Done():
+			return
+		}
+	}
+}

@@ -617,6 +617,10 @@ func (b *Boomer) SetTestCasesID(id uint) {
 	b.testcaseID = id
 }
 
+func (b *Boomer) GetTestCasesID() uint {
+	return b.testcaseID
+}
+
 func (b *Boomer) StartPlatform(Args *Profile) error {
 	if b.masterRunner.isStarting() {
 		return errors.New("already started")
@@ -631,6 +635,6 @@ func (b *Boomer) StartPlatform(Args *Profile) error {
 	b.SetSpawnRate(Args.SpawnRate)
 	b.SetRunTime(Args.RunTime)
 	b.SetProfile(Args)
-	err := b.masterRunner.start()
+	err := b.masterRunner.startPlatform()
 	return err
 }

@@ -1,4 +1,4 @@
-module github.com/test-instructor/yangfan/agent
+module github.com/test-instructor/yangfan/work
 
 go 1.19
 

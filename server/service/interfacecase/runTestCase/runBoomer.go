@@ -23,12 +23,12 @@ type B struct {
 	Boom     *hrp.HRPBoomer
 	State    BoomerState
 	OutputDB *boomer.DbOutput
-	r        *RunBoomerMaster
+	r        *RunBoomerStandalone
 }
 
 var b *B
 
-func RunYangfanBoomer(r *RunBoomerMaster, pReport *interfacecase.PerformanceReport, pTask *interfacecase.Performance, runCaseReq request.RunCaseReq) {
+func RunYangfanBoomer(r *RunBoomerStandalone, pReport *interfacecase.PerformanceReport, pTask *interfacecase.Performance, runCaseReq request.RunCaseReq) {
 	spawnCount := runCaseReq.Operation.SpawnCount
 	spawnRate := runCaseReq.Operation.SpawnRate
 	profile := &boomer.Profile{}
@@ -71,7 +71,7 @@ func RunYangfanBoomer(r *RunBoomerMaster, pReport *interfacecase.PerformanceRepo
 }
 
 func NewBoomer(runCaseReq request.RunCaseReq, runType interfacecase.RunType) TestCase {
-	return &RunBoomerMaster{
+	return &RunBoomerStandalone{
 		CaseID:     runCaseReq.CaseID,
 		caseType:   interfacecase.CaseTypeBoomerDebug,
 		runCaseReq: runCaseReq,
@@ -79,7 +79,7 @@ func NewBoomer(runCaseReq request.RunCaseReq, runType interfacecase.RunType) Tes
 	}
 }
 
-type RunBoomerMaster struct {
+type RunBoomerStandalone struct {
 	reportID   uint
 	pTask      interfacecase.Performance
 	CaseID     uint
@@ -91,7 +91,7 @@ type RunBoomerMaster struct {
 	envVars    map[string]string
 }
 
-func (r *RunBoomerMaster) LoadCase() (err error) {
+func (r *RunBoomerStandalone) LoadCase() (err error) {
 	//获取运行配置
 
 	var testCase interfacecase.HrpCase
@@ -168,7 +168,7 @@ func (r *RunBoomerMaster) LoadCase() (err error) {
 	return nil
 }
 
-func (r *RunBoomerMaster) RunCase() (err error) {
+func (r *RunBoomerStandalone) RunCase() (err error) {
 	//defer r.d.StopDebugTalkFile()
 	var pTask interfacecase.Performance
 	var pReport interfacecase.PerformanceReport
@@ -218,6 +218,6 @@ func (r *RunBoomerMaster) RunCase() (err error) {
 	return nil
 }
 
-func (r *RunBoomerMaster) Report() (report *interfacecase.ApiReport, err error) {
+func (r *RunBoomerStandalone) Report() (report *interfacecase.ApiReport, err error) {
 	return
 }
