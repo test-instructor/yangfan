@@ -3,11 +3,10 @@ package boomer
 import (
 	"context"
 	"errors"
-	"fmt"
-	"github.com/mitchellh/mapstructure"
 	"github.com/test-instructor/yangfan/hrp"
 	"github.com/test-instructor/yangfan/hrp/pkg/boomer"
 	"github.com/test-instructor/yangfan/proto/pb"
+	"time"
 )
 
 type masterServer struct {
@@ -19,18 +18,20 @@ func (b masterServer) Start(ctx context.Context, request *pb.StartReq) (resp *pb
 	req := hrp.StartRequestPlatformBody{
 		Profile: *boomer.NewProfile(),
 	}
-	err = mapstructure.Decode(request, &req)
-	if err != nil {
-		return
-	}
-	if len(req.Other) > 0 {
-		keys := make([]string, 0, len(req.Other))
-		for k := range req.Other {
-			keys = append(keys, k)
-		}
-		err = fmt.Errorf("failed to recognize params: %v", keys)
-		return
-	}
+	req.Profile.SpawnCount = request.Profile.SpawnCount
+	req.Profile.SpawnRate = request.Profile.SpawnRate
+	req.Profile.RunTime = request.Profile.RunTime
+	req.Profile.MaxRPS = request.Profile.MaxRPS
+	req.Profile.LoopCount = request.Profile.LoopCount
+	req.Profile.RequestIncreaseRate = request.Profile.RequestIncreaseRate
+	req.Profile.MemoryProfile = request.Profile.MemoryProfile
+	req.Profile.MemoryProfileDuration = time.Duration(request.Profile.MemoryProfileDuration)
+	req.Profile.CPUProfile = request.Profile.CPUProfile
+	req.Profile.CPUProfileDuration = time.Duration(request.Profile.CPUProfileDuration)
+	req.Profile.PrometheusPushgatewayURL = request.Profile.PrometheusPushgatewayURL
+	req.Profile.DisableCompression = request.Profile.DisableCompression
+	req.Profile.DisableKeepalive = request.Profile.DisableKeepalive
+	req.ID = uint(request.Profile.ID)
 
 	if req.ID < 1 {
 		err = errors.New("missing testcases ID")
