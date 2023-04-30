@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/rs/zerolog"
+	"github.com/test-instructor/yangfan/hrp"
+	"github.com/test-instructor/yangfan/hrp/pkg/boomer"
 	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/hrp"
-	"github.com/test-instructor/yangfan/server/hrp/pkg/boomer"
 	"github.com/test-instructor/yangfan/server/model/common/request"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"gorm.io/gorm"
@@ -63,7 +63,7 @@ func RunYangfanBoomer(r *RunBoomerStandalone, pReport *interfacecase.Performance
 			return
 		}
 		b.Boom.Quit()
-		b.OutputDB.PReport.State = interfacecase.StateStopped
+		//b.OutputDB.PReport.State = interfacecase.StateStopped
 		b.State = BoomerStateStop
 		b.r.d.StopDebugTalkFile()
 		b = nil

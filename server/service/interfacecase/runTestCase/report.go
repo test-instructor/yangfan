@@ -3,8 +3,8 @@ package runTestCase
 import (
 	"encoding/json"
 
+	"github.com/test-instructor/yangfan/hrp"
 	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/hrp"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
 )
 

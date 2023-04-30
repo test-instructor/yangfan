@@ -3,18 +3,14 @@ package hrp
 import (
 	"crypto/tls"
 	_ "embed"
-	"encoding/json"
 	"net"
 	"net/http"
 	"net/http/cookiejar"
-	"net/textproto"
 	"net/url"
 	"path/filepath"
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/test-instructor/yangfan/server/model/interfacecase/hrp"
 
 	"github.com/gorilla/websocket"
 	"github.com/httprunner/funplugin"
@@ -530,16 +526,16 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 			r.sessionVariables[k] = v
 		}
 
-		var StepResults hrp.StepResultStruct
-		stepResultStr, _ := json.Marshal(stepResult)
-		json.Unmarshal(stepResultStr, &StepResults)
-		for _, v := range step.Struct().ExportHeader {
-			headerKey := textproto.CanonicalMIMEHeaderKey(v)
-			r.caseRunner.testCase.Config.Headers[headerKey] = StepResults.Data.ReqResps.Request.Headers[headerKey]
-		}
-		for _, v := range step.Struct().ExportParameter {
-			r.caseRunner.testCase.Config.Variables[v] = StepResults.ExportVars[v]
-		}
+		//var StepResults hrp.StepResultStruct
+		//stepResultStr, _ := json.Marshal(stepResult)
+		//json.Unmarshal(stepResultStr, &StepResults)
+		//for _, v := range step.Struct().ExportHeader {
+		//	headerKey := textproto.CanonicalMIMEHeaderKey(v)
+		//	r.caseRunner.testCase.Config.Headers[headerKey] = StepResults.Data.ReqResps.Request.Headers[headerKey]
+		//}
+		//for _, v := range step.Struct().ExportParameter {
+		//	r.caseRunner.testCase.Config.Variables[v] = StepResults.ExportVars[v]
+		//}
 
 		if err == nil {
 			log.Info().Str("step", stepResult.Name).

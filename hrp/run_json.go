@@ -9,9 +9,6 @@ import (
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
 	"github.com/test-instructor/yangfan/hrp/internal/code"
 	"github.com/test-instructor/yangfan/hrp/internal/sdk"
-	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/model/interfacecase"
-	"go.uber.org/zap"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -20,7 +17,7 @@ import (
 	"time"
 )
 
-func (r *HRPRunner) RunJsons(testcases ...ITestCase) (interfacecase.ApiReport, error) {
+func (r *HRPRunner) RunJsons(testcases ...ITestCase) (data []byte, err error) {
 	event := sdk.EventTracking{
 		Category: "RunAPITests",
 		Action:   "hrp run",
@@ -36,7 +33,7 @@ func (r *HRPRunner) RunJsons(testcases ...ITestCase) (interfacecase.ApiReport, e
 	testCases, err := LoadTestCases(testcases...)
 	if err != nil {
 		log.Error().Err(err).Msg("run json failed to load testcases")
-		return interfacecase.ApiReport{}, err
+		return
 	}
 
 	var runErr error
@@ -104,25 +101,21 @@ func (r *HRPRunner) RunJsons(testcases ...ITestCase) (interfacecase.ApiReport, e
 
 	// save summary
 	if r.saveTests {
-		err := s.genSummary()
+		err = s.genSummary()
 		if err != nil {
-			return interfacecase.ApiReport{}, err
+			return
 		}
 	}
 
 	// generate HTML report
 	if r.genHTMLReport {
-		err := s.genHTMLReport()
+		err = s.genHTMLReport()
 		if err != nil {
-			return interfacecase.ApiReport{}, err
+			return
 		}
 	}
 	sj, _ := json.Marshal(s)
-	global.GVA_LOG.Debug("测试报告json格式")
-	global.GVA_LOG.Debug("\n" + string(sj))
-	var reportsStruct interfacecase.ApiReport
-	err = json.Unmarshal(sj, &reportsStruct)
-	return reportsStruct, runErr
+	return sj, runErr
 }
 
 func tmpls(relativePath, debugTalkFileName string) string {
@@ -142,7 +135,7 @@ func RemoveHashicorpPyPlugin(debugTalkFilePath string) {
 	log.Info().Msg("[teardown] remove hashicorp python plugin")
 	err := os.RemoveAll(debugTalkFilePath)
 	if err != nil {
-		global.GVA_LOG.Error("删除debugTalkFilePath文件夹失败", zap.Error(err))
+		log.Error().Err(err).Msg("删除debugTalkFilePath文件夹失败")
 	}
 }
 

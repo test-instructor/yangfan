@@ -2,8 +2,8 @@ package runTestCase
 
 import (
 	"fmt"
+	"github.com/test-instructor/yangfan/hrp"
 	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/hrp"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"math/rand"
 	"os"

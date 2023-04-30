@@ -1,7 +1,7 @@
 package runTestCase
 
 import (
-	"github.com/test-instructor/yangfan/server/hrp"
+	"github.com/test-instructor/yangfan/hrp"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
 )
 

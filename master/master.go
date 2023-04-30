@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/rs/zerolog"
+	"github.com/test-instructor/yangfan/master/yf"
 
 	"github.com/test-instructor/yangfan/server/core"
 	"github.com/test-instructor/yangfan/server/global"
@@ -23,6 +24,8 @@ func main() {
 	global.GVA_DB = initialize.Gorm()
 	zerolog.SetGlobalLevel(zerolog.WarnLevel)
 	zap.ReplaceGlobals(global.GVA_LOG)
+	b := yf.NewMasterBoom()
+	b.Run()
 
 	//./hrp boom --worker --master-host 0.0.0.0 --master-port 7966 --ignore-quit
 	//./hrp boom --master --master-bind-host 0.0.0.0 --master-bind-port 7966 --master-http-address "0.0.0.0:9092"

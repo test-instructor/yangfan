@@ -2,7 +2,6 @@ package hrp
 
 import (
 	"fmt"
-	"github.com/test-instructor/yangfan/server/service/interfacecase/runTestCase"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -300,14 +299,14 @@ func (b *HRPBoomer) PollTestCases(ctx context.Context) {
 		select {
 		case <-b.Boomer.ParseTestCasesChan():
 			var tcs []ITestCase
-			id := b.GetTestCasesID()
-			_ = id
-			boom := runTestCase.NewBoomerMaster(id)
-			err := boom.LoadCase()
-			if err != nil {
-				log.Error().Err(err).Msg("获取用例失败")
-				return
-			}
+			//id := b.GetTestCasesID()
+			//_ = id
+			//boom := runTestCase.NewBoomerMaster(id)
+			//err := boom.LoadCase()
+			//if err != nil {
+			//	log.Error().Err(err).Msg("获取用例失败")
+			//	return
+			//}
 			//tcs = append(tcs, boom.TCM.Case...)
 			for _, tc := range b.GetTestCasesPath() {
 				tcp := TestCasePath(tc)
