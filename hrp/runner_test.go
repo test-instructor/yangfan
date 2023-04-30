@@ -1,6 +1,7 @@
 package hrp
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -172,8 +173,8 @@ func TestRunCaseWithPluginJSON(t *testing.T) {
 }
 
 func TestRunCaseWithPluginYAML(t *testing.T) {
-	buildHashicorpGoPlugin()
-	defer removeHashicorpGoPlugin()
+	buildHashicorpPyPlugin()
+	defer removeHashicorpPyPlugin()
 
 	testCase := TestCasePath(demoTestCaseWithPluginYAMLPath)
 	err := NewRunner(nil).Run(&testCase) // hrp.Run(testCase)
@@ -250,4 +251,22 @@ func TestLoadTestCases(t *testing.T) {
 	if !assert.Equal(t, len(testCases), 1) {
 		t.Fatal()
 	}
+}
+
+func TestRunner(t *testing.T) {
+	buildHashicorpPyPlugin()
+	defer removeHashicorpPyPlugin()
+	tc := TestCasePath(demoTestCaseWithPluginJSONPath)
+	testCases, err := LoadTestCases(&tc)
+	if !assert.Nil(t, err) {
+		t.Fatal()
+	}
+	fmt.Println(testCases)
+	r := NewRunner(t)
+	//r.SetPluginLogOn()
+	////iTestCases ...ITestCase
+	////TestCase
+	////testcases ...ITestCase
+	r.Run(&tc)
+
 }

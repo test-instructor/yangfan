@@ -23,6 +23,8 @@ type ITestCase interface {
 // TestCase is a container for one testcase, which is used for testcase runner.
 // TestCase implements ITestCase interface.
 type TestCase struct {
+	ID        uint
+	Name      string
 	Config    *TConfig
 	TestSteps []IStep
 }
@@ -272,6 +274,10 @@ func (tc *TCase) toTestCase() (*TestCase, error) {
 			})
 		} else if step.Android != nil {
 			testCase.TestSteps = append(testCase.TestSteps, &StepMobile{
+				step: step,
+			})
+		} else if step.GRPC != nil {
+			testCase.TestSteps = append(testCase.TestSteps, &StepGrpc{
 				step: step,
 			})
 		} else {

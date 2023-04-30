@@ -339,6 +339,7 @@ func (api *apiHandler) Handler() http.Handler {
 
 	mux.HandleFunc("/", methods(api.Index, "GET"))
 	mux.HandleFunc("/start", methods(api.Start, "POST"))
+	mux.HandleFunc("/start/platform", methods(api.StartPlatform, "POST"))
 	mux.HandleFunc("/rebalance", methods(api.ReBalance, "POST"))
 	mux.HandleFunc("/stop", methods(api.Stop, "GET"))
 	mux.HandleFunc("/quit", methods(api.Quit, "GET"))
@@ -349,6 +350,13 @@ func (api *apiHandler) Handler() http.Handler {
 }
 
 func (apiHandler) ServeHTTP(http.ResponseWriter, *http.Request) {}
+
+type StartRequestPlatformBody struct {
+	boomer.Profile `mapstructure:",squash"`
+	Worker         string                 `json:"worker,omitempty" yaml:"worker,omitempty" mapstructure:"worker"` // all
+	ID             uint                   `json:"id" yaml:"id" mapstructure:"id"`
+	Other          map[string]interface{} `mapstructure:",remain"`
+}
 
 func (b *HRPBoomer) StartServer(ctx context.Context, addr string) {
 	h := b.NewAPIHandler()
@@ -378,4 +386,57 @@ func (b *HRPBoomer) StartServer(ctx context.Context, addr string) {
 			log.Fatal("server closed unexpected")
 		}
 	}
+}
+
+func (api *apiHandler) StartPlatform(w http.ResponseWriter, r *http.Request) {
+	var resp *CommonResponseBody
+	var err error
+	defer func() {
+		if err != nil {
+			resp = &CommonResponseBody{
+				ServerStatus: EnumAPIResponseServerError(err.Error()),
+			}
+		} else {
+			resp = &CommonResponseBody{
+				ServerStatus: EnumAPIResponseSuccess,
+			}
+		}
+		body, _ := json.Marshal(resp)
+		writeJSON(w, body, http.StatusOK)
+	}()
+
+	// parse body
+	data, err := parseBody(r)
+	if err != nil {
+		return
+	}
+	req := StartRequestPlatformBody{
+		Profile: *boomer.NewProfile(),
+	}
+	err = mapstructure.Decode(data, &req)
+	if err != nil {
+		return
+	}
+
+	// recognize invalid parameters
+	if len(req.Other) > 0 {
+		keys := make([]string, 0, len(req.Other))
+		for k := range req.Other {
+			keys = append(keys, k)
+		}
+		err = fmt.Errorf("failed to recognize params: %v", keys)
+		return
+	}
+
+	// parse testcase path
+	if req.ID < 1 {
+		err = errors.New("missing testcases path")
+		return
+	}
+
+	// set testcase path
+	api.boomer.SetTestCasesID(req.ID)
+
+	// start boomer with profile
+	err = api.boomer.StartPlatform(&req.Profile)
 }

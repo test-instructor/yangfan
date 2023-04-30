@@ -145,6 +145,7 @@ type Platform struct {
 
 // TestCaseSummary stores tests summary for one testcase
 type TestCaseSummary struct {
+	CaseID  uint
 	Name    string         `json:"name" yaml:"name"`
 	Success bool           `json:"success" yaml:"success"`
 	CaseId  string         `json:"case_id,omitempty" yaml:"case_id,omitempty"` // TODO

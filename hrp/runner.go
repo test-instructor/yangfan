@@ -3,14 +3,18 @@ package hrp
 import (
 	"crypto/tls"
 	_ "embed"
+	"encoding/json"
 	"net"
 	"net/http"
 	"net/http/cookiejar"
+	"net/textproto"
 	"net/url"
 	"path/filepath"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/test-instructor/yangfan/server/model/interfacecase/hrp"
 
 	"github.com/gorilla/websocket"
 	"github.com/httprunner/funplugin"
@@ -276,7 +280,10 @@ func (r *HRPRunner) NewCaseRunner(testcase *TestCase) (*CaseRunner, error) {
 	}
 
 	// init parser plugin
-	plugin, err := initPlugin(testcase.Config.Path, r.venv, r.pluginLogOn)
+	//plugin, err := initPlugin(testcase.Config.Path, r.venv, r.pluginLogOn)
+	//压测运行时会同时运行多个plugin，用单例方式控制每次压测任务只能运行一个plugin
+	plugin, err := yangfanInitPlugin(testcase.Config.Path, r.venv, r.pluginLogOn)
+
 	if err != nil {
 		return nil, errors.Wrap(err, "init plugin failed")
 	}
@@ -344,6 +351,10 @@ func (r *CaseRunner) parseConfig() error {
 		return err
 	}
 	r.parsedConfig.Variables = parsedVariables
+
+	for k, _ := range cfg.Environs {
+		parsedVariables[k] = cfg.Environs[k]
+	}
 
 	// parse config name
 	parsedName, err := r.parser.ParseString(cfg.Name, parsedVariables)
@@ -519,6 +530,17 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 			r.sessionVariables[k] = v
 		}
 
+		var StepResults hrp.StepResultStruct
+		stepResultStr, _ := json.Marshal(stepResult)
+		json.Unmarshal(stepResultStr, &StepResults)
+		for _, v := range step.Struct().ExportHeader {
+			headerKey := textproto.CanonicalMIMEHeaderKey(v)
+			r.caseRunner.testCase.Config.Headers[headerKey] = StepResults.Data.ReqResps.Request.Headers[headerKey]
+		}
+		for _, v := range step.Struct().ExportParameter {
+			r.caseRunner.testCase.Config.Variables[v] = StepResults.ExportVars[v]
+		}
+
 		if err == nil {
 			log.Info().Str("step", stepResult.Name).
 				Str("type", string(stepResult.StepType)).
@@ -533,7 +555,6 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 			Str("type", string(stepResult.StepType)).
 			Bool("success", false).
 			Msg("run step end")
-
 		// check if failfast
 		if r.caseRunner.hrpRunner.failfast {
 			return errors.Wrap(err, "abort running due to failfast setting")

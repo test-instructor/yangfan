@@ -854,7 +854,7 @@ func (d *device) XCTest(bundleID string, opts ...XCTestOption) (out <-chan strin
 		return _out, cancelFunc, err
 	}
 
-	// see https://github.com/test-instructor/yangfan/hrp/pkg/gidevice/issues/31
+	// see https://github.com/httprunner/httprunner/v4/hrp/pkg/gidevice/issues/31
 	// if err = d.instruments.startObserving(pid); err != nil {
 	// 	return _out, cancelFunc, err
 	// }

@@ -1415,3 +1415,64 @@ func (r *masterRunner) reportStats() {
 	table.Render()
 	println()
 }
+
+func (r *masterRunner) startPlatform() error {
+	numWorkers := r.server.getAvailableClientsLength()
+	if numWorkers == 0 {
+		return errors.New("current available workers: 0")
+	}
+
+	// fetching testcases
+	testCasesBytes, err := r.fetchTestCases()
+	if err != nil {
+		return err
+	}
+
+	workerProfile := &Profile{}
+	if err := copier.Copy(workerProfile, r.profile); err != nil {
+		log.Error().Err(err).Msg("copy workerProfile failed")
+		return err
+	}
+
+	// spawn count
+	spawnCounts := builtin.SplitInteger(int(r.profile.SpawnCount), numWorkers)
+
+	// spawn rate
+	spawnRate := workerProfile.SpawnRate / float64(numWorkers)
+	if spawnRate < 1 {
+		spawnRate = 1
+	}
+
+	// max RPS
+	maxRPSs := builtin.SplitInteger(int(workerProfile.MaxRPS), numWorkers)
+
+	r.updateState(StateSpawning)
+	log.Info().Msg("send spawn data to worker")
+
+	cur := 0
+	r.server.clients.Range(func(key, value interface{}) bool {
+		if workerInfo, ok := value.(*WorkerNode); ok {
+			if workerInfo.getState() == StateQuitting || workerInfo.getState() == StateMissing {
+				return true
+			}
+
+			if workerProfile.SpawnCount > 0 {
+				workerProfile.SpawnCount = int64(spawnCounts[cur])
+			}
+			workerProfile.MaxRPS = int64(maxRPSs[cur])
+			workerProfile.SpawnRate = spawnRate
+
+			workerInfo.getStream() <- &messager.StreamResponse{
+				Type:    "spawn",
+				Profile: ProfileToBytes(workerProfile),
+				NodeID:  workerInfo.ID,
+				Tasks:   testCasesBytes,
+			}
+			cur++
+		}
+		return true
+	})
+
+	log.Warn().Interface("profile", r.profile).Msg("send spawn data to worker successfully")
+	return nil
+}
