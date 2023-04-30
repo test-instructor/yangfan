@@ -32,6 +32,7 @@ yarn-error.log*
 ./docker/data/*
 ./docker/logs
 /go.work
+/go.work.sum
 ./server/yangfan.yaml
 ./server/config.yaml
 /config.yaml
