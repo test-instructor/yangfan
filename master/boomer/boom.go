@@ -42,7 +42,7 @@ func (b *MasterBoom) Run() {
 	b.HRPBoomer = hrp.NewMasterBoomer("0.0.0.0", 7966)
 	ctx := b.HRPBoomer.EnableGracefulQuit(context.Background())
 	go b.StartServer(ctx, masterHttpAddress)
-	//go StartGrpc("0.0.0.0:9093")
+	go StartGrpc("0.0.0.0:9093")
 	go b.HRPBoomer.PollTestCasesPlatform(ctx)
 	b.HRPBoomer.RunMaster()
 }

@@ -299,15 +299,6 @@ func (b *HRPBoomer) PollTestCases(ctx context.Context) {
 		select {
 		case <-b.Boomer.ParseTestCasesChan():
 			var tcs []ITestCase
-			//id := b.GetTestCasesID()
-			//_ = id
-			//boom := runTestCase.NewBoomerMaster(id)
-			//err := boom.LoadCase()
-			//if err != nil {
-			//	log.Error().Err(err).Msg("获取用例失败")
-			//	return
-			//}
-			//tcs = append(tcs, boom.TCM.Case...)
 			for _, tc := range b.GetTestCasesPath() {
 				tcp := TestCasePath(tc)
 				tcs = append(tcs, &tcp)
@@ -473,13 +464,15 @@ func (b *HRPBoomer) PollTestCasesPlatform(ctx context.Context) {
 		select {
 		case <-b.Boomer.ParseTestCasesChan():
 			var tcs []ITestCase
-			//id := b.GetTestCasesID()
-			//masterCase := runTestCase.NewBoomerMaster(id)
-			//err := masterCase.LoadCase()
-			//if err != nil {
-			//	return
-			//}
-			//tcs = append(tcs, masterCase.TCM.Case...)
+			id := b.GetTestCasesID()
+			_ = id
+			boom := NewBoomerMaster(id)
+			err := boom.LoadCase()
+			if err != nil {
+				log.Error().Err(err).Msg("获取用例失败")
+				return
+			}
+			tcs = append(tcs, boom.TCM.Case...)
 			b.TestCaseBytesChan() <- b.TestCasesToBytes(tcs...)
 			log.Info().Msg("put testcase successfully")
 		case <-b.Boomer.GetCloseChan():
