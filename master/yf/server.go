@@ -1,6 +1,7 @@
 package yf
 
 import (
+	"github.com/test-instructor/yangfan/proto/pb"
 	"github.com/test-instructor/yangfan/server/global"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -16,7 +17,7 @@ func StartGrpc(address string) {
 		global.GVA_LOG.Panic("failed to listen", zap.Error(err))
 	}
 	ns = grpc.NewServer()
-	boomerSer.RegisterBoomerSerServer(ns, &BoomerServerGrpc{MasterBoom: NewMasterBoom()})
+	pb.RegisterBoomerSerServer(ns, &masterServer{MasterBoom: NewMasterBoom()})
 	reflection.Register(ns)
 	if err := ns.Serve(lis); err != nil {
 		global.GVA_LOG.Panic("failed to serve", zap.Error(err))

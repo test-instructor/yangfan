@@ -10,12 +10,12 @@ import (
 	"github.com/test-instructor/yangfan/proto/pb"
 )
 
-type pbverGrpc struct {
+type masterServer struct {
 	pb.UnimplementedBoomerSerServer
 	*MasterBoom
 }
 
-func (b pbverGrpc) Start(ctx context.Context, request *pb.StartReq) (resp *pb.StartResp, err error) {
+func (b masterServer) Start(ctx context.Context, request *pb.StartReq) (resp *pb.StartResp, err error) {
 	req := hrp.StartRequestPlatformBody{
 		Profile: *boomer.NewProfile(),
 	}
@@ -43,12 +43,12 @@ func (b pbverGrpc) Start(ctx context.Context, request *pb.StartReq) (resp *pb.St
 	return
 }
 
-func (b pbverGrpc) Rebalance(ctx context.Context, req *pb.RebalanceReq) (*pb.RebalanceResp, error) {
+func (b masterServer) Rebalance(ctx context.Context, req *pb.RebalanceReq) (*pb.RebalanceResp, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (b pbverGrpc) Work(ctx context.Context, req *pb.WorkReq) (*pb.WorkResp, error) {
+func (b masterServer) Work(ctx context.Context, req *pb.WorkReq) (*pb.WorkResp, error) {
 	workInfo := b.GetWorkersInfo()
 	workResp := new(pb.WorkResp)
 	var works []*pb.Work
@@ -73,7 +73,7 @@ func (b pbverGrpc) Work(ctx context.Context, req *pb.WorkReq) (*pb.WorkResp, err
 	return workResp, nil
 }
 
-func (b pbverGrpc) Master(ctx context.Context, req *pb.MasterReq) (*pb.MasterResp, error) {
+func (b masterServer) Master(ctx context.Context, req *pb.MasterReq) (*pb.MasterResp, error) {
 	masterInfo := b.GetMasterInfo()
 	var masterResp = new(pb.MasterResp)
 	masterResp.State = masterInfo["state"].(int32)
@@ -83,12 +83,12 @@ func (b pbverGrpc) Master(ctx context.Context, req *pb.MasterReq) (*pb.MasterRes
 	return masterResp, nil
 }
 
-func (b pbverGrpc) Stop(ctx context.Context, req *pb.StopReq) (*pb.StopResp, error) {
+func (b masterServer) Stop(ctx context.Context, req *pb.StopReq) (*pb.StopResp, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (b pbverGrpc) Quit(ctx context.Context, req *pb.QuitReq) (*pb.QuitResp, error) {
+func (b masterServer) Quit(ctx context.Context, req *pb.QuitReq) (*pb.QuitResp, error) {
 	//TODO implement me
 	panic("implement me")
 }
