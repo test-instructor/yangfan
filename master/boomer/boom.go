@@ -1,6 +1,7 @@
-package yf
+package boomer
 
 import (
+	"context"
 	"github.com/test-instructor/yangfan/hrp"
 	"github.com/test-instructor/yangfan/hrp/pkg/boomer"
 	"sync"
@@ -37,13 +38,13 @@ func NewMasterBoom() *MasterBoom {
 
 func (b *MasterBoom) Run() {
 
-	//masterHttpAddress := "0.0.0.0:9092"
-	//b.HRPBoomer = hrp.NewMasterBoomer("0.0.0.0", 7966)
-	//ctx := b.HRPBoomer.EnableGracefulQuit(context.Background())
-	//go b.StartServer(ctx, masterHttpAddress)
-	////go StartGrpc("0.0.0.0:9093")
-	//go b.HRPBoomer.PollTestCasesPlatform(ctx)
-	//b.HRPBoomer.RunMaster()
+	masterHttpAddress := "0.0.0.0:9092"
+	b.HRPBoomer = hrp.NewMasterBoomer("0.0.0.0", 7966)
+	ctx := b.HRPBoomer.EnableGracefulQuit(context.Background())
+	go b.StartServer(ctx, masterHttpAddress)
+	//go StartGrpc("0.0.0.0:9093")
+	go b.HRPBoomer.PollTestCasesPlatform(ctx)
+	b.HRPBoomer.RunMaster()
 }
 
 func RunHrpBoomerMaster() {
