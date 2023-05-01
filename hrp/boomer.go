@@ -2,9 +2,11 @@ package hrp
 
 import (
 	"fmt"
+	"github.com/test-instructor/yangfan/server/global"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -56,6 +58,7 @@ type HRPBoomer struct {
 	hrpRunner    *HRPRunner
 	plugins      []funplugin.IPlugin // each task has its own plugin process
 	pluginsMutex *sync.RWMutex       // avoid data race
+	debugtalk    *debugTalkOperation
 }
 
 func (b *HRPBoomer) InitBoomer() {
@@ -136,7 +139,16 @@ func (b *HRPBoomer) ConvertTestCasesToBoomerTasks(testcases ...ITestCase) (taskS
 
 func (b *HRPBoomer) ParseTestCases(testCases []*TestCase) []*TCase {
 	var parsedTestCases []*TCase
+	var config *TConfig
 	for _, tc := range testCases {
+		if config == nil {
+			config = tc.Config
+		}
+		tc.Config = config
+		if global.HrpMode == global.HrpModeMaster {
+			b.initPluginMaster(tc.Config.ProjectID)
+			tc.Config.Path = b.debugtalk.FilePath
+		}
 		caseRunner, err := b.hrpRunner.NewCaseRunner(tc)
 		if err != nil {
 			log.Error().Err(err).Msg("failed to create runner")
@@ -149,6 +161,25 @@ func (b *HRPBoomer) ParseTestCases(testCases []*TestCase) []*TCase {
 		})
 	}
 	return parsedTestCases
+}
+
+func (b *HRPBoomer) initPlugin(path string) string {
+	paths := strings.Split(path, "/")
+	ids := strings.Split(paths[1], "_")
+	id, _ := strconv.Atoi(ids[0])
+	b.debugtalk = new(debugTalkOperation)
+	b.debugtalk.ProjectID = uint(id)
+	b.debugtalk.FilePath = path
+	b.debugtalk.CreateDebugTalkWork()
+	b.debugtalk.RunDebugTalkFile()
+	return b.debugtalk.FilePath
+}
+
+func (b *HRPBoomer) initPluginMaster(id uint) {
+	b.debugtalk = new(debugTalkOperation)
+	b.debugtalk.ProjectID = id
+	b.debugtalk.CreateDebugTalkMaster()
+	b.debugtalk.RunDebugTalkFile()
 }
 
 func (b *HRPBoomer) TestCasesToBytes(testcases ...ITestCase) []byte {
@@ -183,6 +214,9 @@ func (b *HRPBoomer) Quit() {
 func (b *HRPBoomer) parseTCases(testCases []*TCase) (testcases []ITestCase) {
 	for _, tc := range testCases {
 		// create temp dir to save testcase
+		if global.HrpMode == 1 {
+			b.initPlugin(tc.Config.Path)
+		}
 		tempDir, err := ioutil.TempDir("", "hrp_testcases")
 		if err != nil {
 			log.Error().Err(err).Msg("failed to create hrp testcases directory")
@@ -270,6 +304,9 @@ func (b *HRPBoomer) PollTasks(ctx context.Context) {
 				testcases := b.parseTCases(b.BytesToTCases(task.TestCasesBytes))
 				log.Info().Interface("testcases", testcases).Interface("profile", b.GetProfile()).Msg("starting to run tasks")
 				// run testcases
+				if global.HrpMode == 1 {
+					fmt.Println(1)
+				}
 				go b.Run(testcases...)
 			} else {
 				// rebalance runner with profile

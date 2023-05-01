@@ -1,4 +1,4 @@
-package boomer
+package server
 
 import (
 	"context"

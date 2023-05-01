@@ -5,6 +5,9 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/test-instructor/yangfan/hrp"
 	"github.com/test-instructor/yangfan/hrp/pkg/boomer"
+	"github.com/test-instructor/yangfan/server/core"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/initialize"
 	"sync"
 )
 
@@ -43,6 +46,10 @@ func (a *Agent) Work() {
 }
 
 func main() {
+	global.HrpMode = 1
+	global.GVA_VP = core.Viper()
+	global.GVA_LOG = core.Zap()
+	global.GVA_DB = initialize.Gorm()
 	zerolog.SetGlobalLevel(zerolog.WarnLevel)
 	NewAgent("0.0.0.0", 7966).Work()
 }

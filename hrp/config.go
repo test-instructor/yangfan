@@ -37,6 +37,8 @@ type TConfig struct {
 	Weight            int                    `json:"weight,omitempty" yaml:"weight,omitempty"`
 	Path              string                 `json:"path,omitempty" yaml:"path,omitempty"`     // testcase file path
 	PluginSetting     *PluginConfig          `json:"plugin,omitempty" yaml:"plugin,omitempty"` // plugin config
+
+	ProjectID uint `json:"project_id"`
 }
 
 // WithVariables sets variables for current testcase.

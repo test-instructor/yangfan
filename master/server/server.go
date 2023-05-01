@@ -1,4 +1,4 @@
-package boomer
+package server
 
 import (
 	"github.com/test-instructor/yangfan/proto/pb"

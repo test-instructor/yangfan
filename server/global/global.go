@@ -31,6 +31,15 @@ var (
 	lock              sync.RWMutex
 	DebugTalkLock     = make(map[string]*sync.Mutex)
 	DebugTalkFileLock = sync.RWMutex{}
+
+	HrpMode HrpModes
+)
+
+type HrpModes int
+
+const (
+	HrpModeMaster HrpModes = 1
+	HrpModeWork   HrpModes = 2
 )
 
 // GetGlobalDBByDBName 通过名称获取db list中的db

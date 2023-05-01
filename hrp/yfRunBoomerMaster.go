@@ -23,7 +23,6 @@ type RunBoomerMaster struct {
 	//CaseID     uint
 	runCaseReq request.RunCaseReq
 	TCM        ApisCaseModel
-	d          debugTalkOperation
 	envVars    map[string]string
 	ID         uint
 }
@@ -95,10 +94,7 @@ func (r *RunBoomerMaster) LoadCase() (err error) {
 	}
 	testCase.Confing = *apiConfig
 	testCaseList = append(testCaseList, testCase)
-	r.d.ProjectID = apiConfig.ProjectID
-	r.d.ID = r.runCaseReq.ApiID
-	r.d.RunDebugTalkFile()
-	err = yangfanTestCaseToHrpCase(testCaseList, r.d.FilePath, &r.TCM)
+	err = yangfanTestCaseToHrpCase(testCaseList, "", &r.TCM)
 	if err != nil {
 		return errors.New("用例转换失败")
 	}
