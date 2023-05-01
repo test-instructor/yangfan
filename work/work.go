@@ -46,7 +46,7 @@ func (a *Agent) Work() {
 }
 
 func main() {
-	global.HrpMode = 1
+	global.HrpMode = global.HrpModeWork
 	global.GVA_VP = core.Viper()
 	global.GVA_LOG = core.Zap()
 	global.GVA_DB = initialize.Gorm()

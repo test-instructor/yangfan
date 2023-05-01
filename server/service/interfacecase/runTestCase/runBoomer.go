@@ -204,18 +204,7 @@ func (r *RunBoomerStandalone) RunCase() (err error) {
 
 	}()
 	RunYangfanBoomer(r, &pReport, &pTask, r.runCaseReq)
-
-	//var t *testing.T
-	//r.reportOperation.CreateReport()
-	//defer recoverHrp(r.reportOperation)
-	//defer r.d.StopDebugTalkFile()
-	//report, err := hrp.NewRunner(t).
-	//	SetHTTPStatOn().
-	//	SetFailfast(false).
-	//	RunJsons(r.tcm.Case...)
-	//r.reportOperation.UpdateReport(&report)
-
-	return nil
+	return err
 }
 
 func (r *RunBoomerStandalone) Report() (report *interfacecase.ApiReport, err error) {

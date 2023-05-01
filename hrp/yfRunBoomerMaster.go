@@ -19,7 +19,8 @@ func NewBoomerMaster(id uint) *RunBoomerMaster {
 
 type RunBoomerMaster struct {
 	reportID uint
-	pTask    interfacecase.Performance
+	PTask    interfacecase.Performance
+	PReport  interfacecase.PerformanceReport
 	//CaseID     uint
 	runCaseReq request.RunCaseReq
 	TCM        ApisCaseModel
@@ -102,7 +103,31 @@ func (r *RunBoomerMaster) LoadCase() (err error) {
 }
 
 func (r *RunBoomerMaster) RunCase() (err error) {
-	return
+	var pTask interfacecase.Performance
+	var pReport interfacecase.PerformanceReport
+	err = global.GVA_DB.Model(&interfacecase.Performance{}).
+		Where("id = ?", r.runCaseReq.CaseID).First(&pTask).Error
+	if err != nil {
+		return err
+	}
+	pReport.Name = pTask.Name
+	pReport.PerformanceID = pTask.ID
+	pReport.ProjectID = pTask.ProjectID
+	pReport.State = 1
+	err = global.GVA_DB.Save(&pReport).Error
+	if err != nil {
+		return err
+	}
+	r.reportID = pReport.ID
+	r.PReport = pReport
+	pTask.PerformanceReportId = pReport.ID
+	pTask.State = interfacecase.StateInit
+	err = global.GVA_DB.Save(&pTask).Error
+	if err != nil {
+		return err
+	}
+	r.PTask = pTask
+	return err
 }
 
 func (r *RunBoomerMaster) Report() (report *interfacecase.ApiReport, err error) {

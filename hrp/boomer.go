@@ -55,10 +55,12 @@ func NewWorkerBoomer(masterHost string, masterPort int) *HRPBoomer {
 
 type HRPBoomer struct {
 	*boomer.Boomer
-	hrpRunner    *HRPRunner
-	plugins      []funplugin.IPlugin // each task has its own plugin process
-	pluginsMutex *sync.RWMutex       // avoid data race
-	debugtalk    *debugTalkOperation
+	hrpRunner       *HRPRunner
+	plugins         []funplugin.IPlugin // each task has its own plugin process
+	pluginsMutex    *sync.RWMutex       // avoid data race
+	debugtalk       *debugTalkOperation
+	runBoomerMaster *RunBoomerMaster
+	OutputDB        *boomer.DbOutput
 }
 
 func (b *HRPBoomer) InitBoomer() {
@@ -214,7 +216,7 @@ func (b *HRPBoomer) Quit() {
 func (b *HRPBoomer) parseTCases(testCases []*TCase) (testcases []ITestCase) {
 	for _, tc := range testCases {
 		// create temp dir to save testcase
-		if global.HrpMode == 1 {
+		if global.HrpMode == global.HrpModeWork {
 			b.initPlugin(tc.Config.Path)
 		}
 		tempDir, err := ioutil.TempDir("", "hrp_testcases")
@@ -304,9 +306,6 @@ func (b *HRPBoomer) PollTasks(ctx context.Context) {
 				testcases := b.parseTCases(b.BytesToTCases(task.TestCasesBytes))
 				log.Info().Interface("testcases", testcases).Interface("profile", b.GetProfile()).Msg("starting to run tasks")
 				// run testcases
-				if global.HrpMode == 1 {
-					fmt.Println(1)
-				}
 				go b.Run(testcases...)
 			} else {
 				// rebalance runner with profile
@@ -503,13 +502,19 @@ func (b *HRPBoomer) PollTestCasesPlatform(ctx context.Context) {
 			var tcs []ITestCase
 			id := b.GetTestCasesID()
 			_ = id
-			boom := NewBoomerMaster(id)
-			err := boom.LoadCase()
+			b.runBoomerMaster = NewBoomerMaster(id)
+			err := b.runBoomerMaster.LoadCase()
 			if err != nil {
 				log.Error().Err(err).Msg("获取用例失败")
 				return
 			}
-			tcs = append(tcs, boom.TCM.Case...)
+			err = b.runBoomerMaster.RunCase()
+			if err != nil {
+				return
+			}
+			b.OutputDB = boomer.NewDbOutput(b.runBoomerMaster.PReport, b.runBoomerMaster.PTask)
+			b.Boomer.AddOutput(b.OutputDB)
+			tcs = append(tcs, b.runBoomerMaster.TCM.Case...)
 			b.TestCaseBytesChan() <- b.TestCasesToBytes(tcs...)
 			log.Info().Msg("put testcase successfully")
 		case <-b.Boomer.GetCloseChan():
