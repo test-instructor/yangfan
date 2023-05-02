@@ -121,7 +121,7 @@ func (r *RunBoomerMaster) LoadCase() (err error) {
 			return err
 		}
 		r.PTask = pTask
-		r.TCM.Config.ReportID = r.PReport.ID
+		r.TCM.Config.ReportID = pReport.ID
 	}
 	err = yangfanTestCaseToHrpCase(testCaseList, "", &r.TCM)
 	if err != nil {

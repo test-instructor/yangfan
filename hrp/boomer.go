@@ -150,6 +150,7 @@ func (b *HRPBoomer) ParseTestCases(testCases []*TestCase) []*TCase {
 		if global.HrpMode == global.HrpModeMaster {
 			b.initPluginMaster(tc.Config.ProjectID)
 			tc.Config.Path = b.debugtalk.FilePath
+			tc.Config.ReportID = b.OutputDB.PReport.ID
 		}
 		caseRunner, err := b.hrpRunner.NewCaseRunner(tc)
 		if err != nil {
@@ -157,6 +158,7 @@ func (b *HRPBoomer) ParseTestCases(testCases []*TestCase) []*TCase {
 			os.Exit(code.GetErrorCode(err))
 		}
 		caseRunner.parsedConfig.Parameters = caseRunner.parametersIterator.outParameters()
+
 		parsedTestCases = append(parsedTestCases, &TCase{
 			Config:    caseRunner.parsedConfig,
 			TestSteps: caseRunner.testCase.ToTCase().TestSteps,
@@ -216,7 +218,7 @@ func (b *HRPBoomer) Quit() {
 var mutex sync.Mutex
 
 func (b *HRPBoomer) parseTCases(testCases []*TCase) (testcases []ITestCase) {
-	if testCases != nil && len(testcases) > 0 {
+	if testCases != nil && len(testCases) > 0 {
 		tc := testCases[0]
 		if global.HrpMode == global.HrpModeWork {
 			b.initPlugin(tc.Config.Path)
