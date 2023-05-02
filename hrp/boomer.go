@@ -32,6 +32,24 @@ func NewStandaloneBoomer(spawnCount int64, spawnRate float64) *HRPBoomer {
 	return b
 }
 
+var HrpBoomer *HRPBoomer
+var mutexBoomer sync.Mutex
+
+func NewMasterBoomerSingleton(masterBindHost string, masterBindPort int) *HRPBoomer {
+	if HrpBoomer == nil {
+		mutexBoomer.Lock()
+		defer mutexBoomer.Unlock()
+		if HrpBoomer == nil {
+			HrpBoomer = &HRPBoomer{
+				Boomer:       boomer.NewMasterBoomer(masterBindHost, masterBindPort),
+				pluginsMutex: new(sync.RWMutex),
+			}
+			HrpBoomer.hrpRunner = NewRunner(nil)
+		}
+	}
+	return HrpBoomer
+}
+
 func NewMasterBoomer(masterBindHost string, masterBindPort int) *HRPBoomer {
 	b := &HRPBoomer{
 		Boomer:       boomer.NewMasterBoomer(masterBindHost, masterBindPort),

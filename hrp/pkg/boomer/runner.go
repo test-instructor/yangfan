@@ -2,6 +2,9 @@ package boomer
 
 import (
 	"fmt"
+	"github.com/test-instructor/yangfan/hrp"
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"math/rand"
 	"os"
 	"runtime/debug"
@@ -1413,6 +1416,35 @@ func (r *masterRunner) reportStats() {
 		table.Append(row)
 	}
 	table.Render()
+	var reportMaster interfacecase.PerformanceReportMaster
+	var work []interfacecase.PerformanceReportWork
+	var worker interfacecase.PerformanceReportWorker
+	for _, worker := range hrp.HrpBoomer.Boomer.GetWorkersInfo() {
+		var w interfacecase.PerformanceReportWork
+		w.WorkID = worker.ID
+		w.IP = worker.IP
+		w.OS = worker.OS
+		w.Arch = worker.Arch
+		w.State = worker.State
+		w.Heartbeat = worker.Heartbeat
+		w.UserCount = worker.UserCount
+		w.WorkerCpuUsage = worker.WorkerCPUUsage
+		w.CpuUsage = worker.CPUUsage
+		w.CpuWarningEmitted = worker.CPUWarningEmitted
+		w.WorkerMemoryUsage = worker.WorkerMemoryUsage
+		w.MemoryUsage = worker.MemoryUsage
+		work = append(work, w)
+	}
+	worker.PerformanceReportWork = work
+
+	masterInfo := hrp.HrpBoomer.Boomer.GetMasterInfo()
+	reportMaster.State = masterInfo["state"].(int32)
+	reportMaster.Workers = int32(masterInfo["workers"].(int))
+	reportMaster.TargetUsers = masterInfo["target_users"].(int64)
+	reportMaster.CurrentUsers = int32(masterInfo["current_users"].(int))
+	global.GVA_DB.Model(interfacecase.PerformanceReportMaster{}).Save(&reportMaster)
+	global.GVA_DB.Model(interfacecase.PerformanceReportWorker{}).Save(&worker)
+
 	println()
 }
 

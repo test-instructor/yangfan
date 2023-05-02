@@ -39,7 +39,7 @@ func NewMasterBoom() *MasterBoom {
 func (b *MasterBoom) Run() {
 
 	masterHttpAddress := "0.0.0.0:9092"
-	b.HRPBoomer = hrp.NewMasterBoomer("0.0.0.0", 7966)
+	b.HRPBoomer = hrp.NewMasterBoomerSingleton("0.0.0.0", 7966)
 	ctx := b.HRPBoomer.EnableGracefulQuit(context.Background())
 	go b.StartServer(ctx, masterHttpAddress)
 	go StartGrpc("0.0.0.0:9093")
