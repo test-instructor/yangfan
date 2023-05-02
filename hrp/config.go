@@ -39,6 +39,8 @@ type TConfig struct {
 	PluginSetting     *PluginConfig          `json:"plugin,omitempty" yaml:"plugin,omitempty"` // plugin config
 
 	ProjectID uint `json:"project_id"`
+	CaseID    uint `json:"case_id"`
+	ReportID  uint `json:"report_id"`
 }
 
 // WithVariables sets variables for current testcase.

@@ -24,10 +24,17 @@ func NewDbOutput(pReport interfacecase.PerformanceReport, pTask interfacecase.Pe
 	return &DbOutput{ID: pReport.ID, pTask: pTask, PReport: pReport}
 }
 
+func NewDbOutputWork(reportID uint, taskID uint) *DbOutput {
+	var pTask interfacecase.Performance
+	var pReport interfacecase.PerformanceReport
+	global.GVA_DB.Model(interfacecase.Performance{}).First(&pTask, "id = ?", taskID)
+	global.GVA_DB.Model(interfacecase.PerformanceReport{}).First(&pReport, "id = ?", reportID)
+	return &DbOutput{ID: reportID, pTask: pTask, PReport: pReport}
+}
+
 func (o *DbOutput) OnStart() {
 	o.ReportChannel = make(chan map[string]interface{}, 1000)
 	go func() {
-
 		for {
 			if o.closeChannel == true {
 				break

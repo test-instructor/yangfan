@@ -55,6 +55,7 @@ func (r *RunBoomerMaster) LoadCase() (err error) {
 		return errors.New("获取环境变量失败")
 	}
 	apiConfig.Environs = r.envVars
+	apiConfig.CaseID = r.runCaseReq.CaseID
 	global.GVA_LOG.Debug(fmt.Sprintf("boomer debug 1 apiConfig:%d", apiConfig.ID))
 
 	//设置前置套件
@@ -95,6 +96,33 @@ func (r *RunBoomerMaster) LoadCase() (err error) {
 	}
 	testCase.Confing = *apiConfig
 	testCaseList = append(testCaseList, testCase)
+	{
+		var pTask interfacecase.Performance
+		var pReport interfacecase.PerformanceReport
+		err = global.GVA_DB.Model(&interfacecase.Performance{}).
+			Where("id = ?", r.runCaseReq.CaseID).First(&pTask).Error
+		if err != nil {
+			return err
+		}
+		pReport.Name = pTask.Name
+		pReport.PerformanceID = pTask.ID
+		pReport.ProjectID = pTask.ProjectID
+		pReport.State = 1
+		err = global.GVA_DB.Save(&pReport).Error
+		if err != nil {
+			return err
+		}
+		r.reportID = pReport.ID
+		r.PReport = pReport
+		pTask.PerformanceReportId = pReport.ID
+		pTask.State = interfacecase.StateInit
+		err = global.GVA_DB.Save(&pTask).Error
+		if err != nil {
+			return err
+		}
+		r.PTask = pTask
+		r.TCM.Config.ReportID = r.PReport.ID
+	}
 	err = yangfanTestCaseToHrpCase(testCaseList, "", &r.TCM)
 	if err != nil {
 		return errors.New("用例转换失败")
@@ -103,30 +131,6 @@ func (r *RunBoomerMaster) LoadCase() (err error) {
 }
 
 func (r *RunBoomerMaster) RunCase() (err error) {
-	var pTask interfacecase.Performance
-	var pReport interfacecase.PerformanceReport
-	err = global.GVA_DB.Model(&interfacecase.Performance{}).
-		Where("id = ?", r.runCaseReq.CaseID).First(&pTask).Error
-	if err != nil {
-		return err
-	}
-	pReport.Name = pTask.Name
-	pReport.PerformanceID = pTask.ID
-	pReport.ProjectID = pTask.ProjectID
-	pReport.State = 1
-	err = global.GVA_DB.Save(&pReport).Error
-	if err != nil {
-		return err
-	}
-	r.reportID = pReport.ID
-	r.PReport = pReport
-	pTask.PerformanceReportId = pReport.ID
-	pTask.State = interfacecase.StateInit
-	err = global.GVA_DB.Save(&pTask).Error
-	if err != nil {
-		return err
-	}
-	r.PTask = pTask
 	return err
 }
 

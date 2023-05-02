@@ -29,4 +29,6 @@ type ApiConfig struct {
 	SetupCase      *ApiCaseStep        `json:"setup_case" `
 	SetupCaseID    *uint               `json:"setup_case_id" form:"setup_case_id" gorm:"comment:前置用例"`
 	Environs       map[string]string   `json:"environs,omitempty" yaml:"environs,omitempty" gorm:"-"` // environment variables
+	CaseID         uint                `json:"case_id" gorm:"-"`
+	ReportID       uint                `json:"report_id" gorm:"-"`
 }

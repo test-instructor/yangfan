@@ -213,12 +213,25 @@ func (b *HRPBoomer) Quit() {
 	b.Boomer.Quit()
 }
 
+var mutex sync.Mutex
+
 func (b *HRPBoomer) parseTCases(testCases []*TCase) (testcases []ITestCase) {
-	for _, tc := range testCases {
-		// create temp dir to save testcase
+	if testCases != nil && len(testcases) > 0 {
+		tc := testCases[0]
 		if global.HrpMode == global.HrpModeWork {
 			b.initPlugin(tc.Config.Path)
+			if b.OutputDB == nil {
+				mutex.Lock()
+				defer mutex.Unlock()
+				if b.OutputDB == nil {
+					b.OutputDB = boomer.NewDbOutputWork(tc.Config.ReportID, tc.Config.CaseID)
+					b.Boomer.AddOutput(b.OutputDB)
+				}
+			}
 		}
+	}
+	for _, tc := range testCases {
+		// create temp dir to save testcase
 		tempDir, err := ioutil.TempDir("", "hrp_testcases")
 		if err != nil {
 			log.Error().Err(err).Msg("failed to create hrp testcases directory")
@@ -508,7 +521,6 @@ func (b *HRPBoomer) PollTestCasesPlatform(ctx context.Context) {
 				log.Error().Err(err).Msg("获取用例失败")
 				return
 			}
-			err = b.runBoomerMaster.RunCase()
 			if err != nil {
 				return
 			}
