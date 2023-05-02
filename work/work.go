@@ -8,7 +8,11 @@ import (
 	"github.com/test-instructor/yangfan/server/core"
 	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/initialize"
+	"github.com/test-instructor/yangfan/server/source/yangfan"
+	"go.uber.org/zap"
+	"math/rand"
 	"sync"
+	"time"
 )
 
 //go:generate go env -w GO111MODULE=on
@@ -46,10 +50,13 @@ func (a *Agent) Work() {
 }
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
 	global.HrpMode = global.HrpModeWork
 	global.GVA_VP = core.Viper()
 	global.GVA_LOG = core.Zap()
 	global.GVA_DB = initialize.Gorm()
 	zerolog.SetGlobalLevel(zerolog.WarnLevel)
+	zap.ReplaceGlobals(global.GVA_LOG)
+	yangfan.PyPkg()
 	NewAgent("0.0.0.0", 7966).Work()
 }

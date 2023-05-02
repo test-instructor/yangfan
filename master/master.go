@@ -6,6 +6,7 @@ import (
 	"github.com/test-instructor/yangfan/server/core"
 	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/initialize"
+	"github.com/test-instructor/yangfan/server/source/yangfan"
 	"go.uber.org/zap"
 	"math/rand"
 	"time"
@@ -24,6 +25,7 @@ func main() {
 	global.HrpMode = global.HrpModeMaster
 	zerolog.SetGlobalLevel(zerolog.WarnLevel)
 	zap.ReplaceGlobals(global.GVA_LOG)
+	yangfan.PyPkg()
 	b := server.NewMasterBoom()
 	b.Run()
 
