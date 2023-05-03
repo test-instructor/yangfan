@@ -2,7 +2,6 @@ package boomer
 
 import (
 	"fmt"
-	"github.com/test-instructor/yangfan/hrp"
 	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"math/rand"
@@ -1416,10 +1415,9 @@ func (r *masterRunner) reportStats() {
 		table.Append(row)
 	}
 	table.Render()
-	var reportMaster interfacecase.PerformanceReportMaster
 	var work []interfacecase.PerformanceReportWork
 	var worker interfacecase.PerformanceReportWorker
-	for _, worker := range hrp.HrpBoomer.Boomer.GetWorkersInfo() {
+	for _, worker := range r.server.getAllWorkers() {
 		var w interfacecase.PerformanceReportWork
 		w.WorkID = worker.ID
 		w.IP = worker.IP
@@ -1437,11 +1435,11 @@ func (r *masterRunner) reportStats() {
 	}
 	worker.PerformanceReportWork = work
 
-	masterInfo := hrp.HrpBoomer.Boomer.GetMasterInfo()
-	reportMaster.State = masterInfo["state"].(int32)
-	reportMaster.Workers = int32(masterInfo["workers"].(int))
-	reportMaster.TargetUsers = masterInfo["target_users"].(int64)
-	reportMaster.CurrentUsers = int32(masterInfo["current_users"].(int))
+	var reportMaster interfacecase.PerformanceReportMaster
+	reportMaster.State = r.getState()
+	reportMaster.Workers = int32(r.server.getAvailableClientsLength())
+	reportMaster.TargetUsers = r.getSpawnCount()
+	reportMaster.CurrentUsers = int32(r.server.getCurrentUsers())
 	global.GVA_DB.Model(interfacecase.PerformanceReportMaster{}).Save(&reportMaster)
 	global.GVA_DB.Model(interfacecase.PerformanceReportWorker{}).Save(&worker)
 
