@@ -189,7 +189,8 @@ type grpcServer struct {
 	disconnectedChan chan bool
 	shutdownChan     chan bool
 
-	wg sync.WaitGroup
+	wg       sync.WaitGroup
+	reportID *uint
 }
 
 var (
@@ -276,6 +277,14 @@ func newServer(masterHost string, masterPort int) (server *grpcServer) {
 		wg:               sync.WaitGroup{},
 	}
 	return server
+}
+
+func (s *grpcServer) getReportID() *uint {
+	return s.reportID
+}
+
+func (s *grpcServer) setReportID(reportID *uint) {
+	s.reportID = reportID
 }
 
 func (s *grpcServer) start() (err error) {

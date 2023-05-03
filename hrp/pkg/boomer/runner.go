@@ -1415,35 +1415,40 @@ func (r *masterRunner) reportStats() {
 		table.Append(row)
 	}
 	table.Render()
-	var work []interfacecase.PerformanceReportWork
-	var worker interfacecase.PerformanceReportWorker
-	for _, worker := range r.server.getAllWorkers() {
-		var w interfacecase.PerformanceReportWork
-		w.WorkID = worker.ID
-		w.IP = worker.IP
-		w.OS = worker.OS
-		w.Arch = worker.Arch
-		w.State = worker.State
-		w.Heartbeat = worker.Heartbeat
-		w.UserCount = worker.UserCount
-		w.WorkerCpuUsage = worker.WorkerCPUUsage
-		w.CpuUsage = worker.CPUUsage
-		w.CpuWarningEmitted = worker.CPUWarningEmitted
-		w.WorkerMemoryUsage = worker.WorkerMemoryUsage
-		w.MemoryUsage = worker.MemoryUsage
-		work = append(work, w)
-	}
-	worker.PerformanceReportWork = work
-
-	var reportMaster interfacecase.PerformanceReportMaster
-	reportMaster.State = r.getState()
-	reportMaster.Workers = int32(r.server.getAvailableClientsLength())
-	reportMaster.TargetUsers = r.getSpawnCount()
-	reportMaster.CurrentUsers = int32(r.server.getCurrentUsers())
-	global.GVA_DB.Model(interfacecase.PerformanceReportMaster{}).Save(&reportMaster)
-	global.GVA_DB.Model(interfacecase.PerformanceReportWorker{}).Save(&worker)
-
 	println()
+
+	reportID := r.server.getReportID()
+	if reportID != nil && r.getState() >= StateSpawning {
+		var work []interfacecase.PerformanceReportWork
+		var worker interfacecase.PerformanceReportWorker
+		for _, worker := range r.server.getAllWorkers() {
+			var w interfacecase.PerformanceReportWork
+			w.WorkID = worker.ID
+			w.IP = worker.IP
+			w.OS = worker.OS
+			w.Arch = worker.Arch
+			w.State = worker.State
+			w.Heartbeat = worker.Heartbeat
+			w.UserCount = worker.UserCount
+			w.WorkerCpuUsage = worker.WorkerCPUUsage
+			w.CpuUsage = worker.CPUUsage
+			w.CpuWarningEmitted = worker.CPUWarningEmitted
+			w.WorkerMemoryUsage = worker.WorkerMemoryUsage
+			w.MemoryUsage = worker.MemoryUsage
+			work = append(work, w)
+		}
+		worker.PerformanceReportWork = work
+		worker.PerformanceReportID = *reportID
+
+		var reportMaster interfacecase.PerformanceReportMaster
+		reportMaster.State = r.getState()
+		reportMaster.Workers = int32(r.server.getAvailableClientsLength())
+		reportMaster.TargetUsers = r.getSpawnCount()
+		reportMaster.CurrentUsers = int32(r.server.getCurrentUsers())
+		reportMaster.PerformanceReportID = *reportID
+		global.GVA_DB.Model(interfacecase.PerformanceReportMaster{}).Save(&reportMaster)
+		global.GVA_DB.Model(interfacecase.PerformanceReportWorker{}).Save(&worker)
+	}
 }
 
 func (r *masterRunner) startPlatform() error {

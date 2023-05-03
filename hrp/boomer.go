@@ -169,6 +169,7 @@ func (b *HRPBoomer) ParseTestCases(testCases []*TestCase) []*TCase {
 			b.initPluginMaster(tc.Config.ProjectID)
 			tc.Config.Path = b.debugtalk.FilePath
 			tc.Config.ReportID = b.OutputDB.PReport.ID
+			b.Boomer.SetServerReportID(b.OutputDB.PReport.ID)
 		}
 		caseRunner, err := b.hrpRunner.NewCaseRunner(tc)
 		if err != nil {

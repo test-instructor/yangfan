@@ -78,6 +78,10 @@ func NewProfile() *Profile {
 	}
 }
 
+func (b *Boomer) SetServerReportID(report uint) {
+	b.masterRunner.server.reportID = &report
+}
+
 func (b *Boomer) GetProfile() *Profile {
 	switch b.mode {
 	case DistributedMasterMode:
