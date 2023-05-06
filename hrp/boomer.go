@@ -79,14 +79,12 @@ type HRPBoomer struct {
 	debugtalk       *debugTalkOperation
 	runBoomerMaster *RunBoomerMaster
 	OutputDB        *boomer.DbOutput
+	ReportName      string
 }
 
 func (b *HRPBoomer) InitBoomer() {
 	if !b.GetProfile().DisableConsoleOutput {
 		b.AddOutput(boomer.NewConsoleOutput())
-	}
-	if b.GetProfile().PrometheusPushgatewayURL != "" {
-		b.AddOutput(boomer.NewPrometheusPusherOutput(b.GetProfile().PrometheusPushgatewayURL, "hrp", b.GetMode()))
 	}
 	b.SetSpawnCount(b.GetProfile().SpawnCount)
 	b.SetSpawnRate(b.GetProfile().SpawnRate)
@@ -249,6 +247,10 @@ func (b *HRPBoomer) parseTCases(testCases []*TCase) (testcases []ITestCase) {
 					b.Boomer.AddOutput(b.OutputDB)
 				}
 			}
+		}
+		if b.GetProfile().PrometheusPushgatewayURL != "" && (global.HrpMode == global.HrpModeMaster || global.HrpMode == global.HrpModeWork) {
+			b.ReportName = fmt.Sprintf("%s_id_%d", b.OutputDB.PReport.Name, b.OutputDB.PReport.ID)
+			b.AddOutput(boomer.NewPrometheusPusherOutput(b.GetProfile().PrometheusPushgatewayURL, "hrp", b.GetMode(), b.ReportName))
 		}
 	}
 	for _, tc := range testCases {

@@ -460,11 +460,12 @@ var (
 )
 
 // NewPrometheusPusherOutput returns a PrometheusPusherOutput.
-func NewPrometheusPusherOutput(gatewayURL, jobName string, mode string) *PrometheusPusherOutput {
+func NewPrometheusPusherOutput(gatewayURL, jobName string, mode string, reportName string) *PrometheusPusherOutput {
 	return &PrometheusPusherOutput{
 		pusher: push.New(gatewayURL, jobName).
 			Grouping("instance", uuid.NewV1().String()).
-			Grouping("mode", mode),
+			Grouping("mode", mode).
+			Grouping("report_name", reportName),
 	}
 }
 
