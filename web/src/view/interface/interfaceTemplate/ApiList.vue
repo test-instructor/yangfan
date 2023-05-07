@@ -1,13 +1,8 @@
 <template>
-  <div>
-
-  </div>
-
+  <div></div>
 </template>
 
-<script>
-
-</script>
+<script></script>
 
 <style>
 .mask::-webkit-scrollbar {
@@ -18,7 +13,6 @@
   display: flex;
   padding: 0px;
   height: 100%;
-
 }
 
 .left {
@@ -33,7 +27,5 @@
   height: 100%;
   padding: 10px;
   font-size: 24px;
-
 }
-
 </style>

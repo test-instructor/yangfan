@@ -4,13 +4,15 @@ import (
 	"errors"
 	"fmt"
 	"github.com/rs/zerolog"
+	"github.com/test-instructor/yangfan/hrp"
+	"github.com/test-instructor/yangfan/hrp/pkg/boomer"
 	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/hrp"
-	"github.com/test-instructor/yangfan/server/hrp/pkg/boomer"
 	"github.com/test-instructor/yangfan/server/model/common/request"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"gorm.io/gorm"
 )
+
+type BoomerState int
 
 var (
 	BoomerStateRunning BoomerState = 1
@@ -21,12 +23,12 @@ type B struct {
 	Boom     *hrp.HRPBoomer
 	State    BoomerState
 	OutputDB *boomer.DbOutput
-	r        *runBoomer
+	r        *RunBoomerStandalone
 }
 
 var b *B
 
-func RunYangfanBoomer(r *runBoomer, pReport *interfacecase.PerformanceReport, pTask *interfacecase.Performance, runCaseReq request.RunCaseReq) {
+func RunYangfanBoomer(r *RunBoomerStandalone, pReport *interfacecase.PerformanceReport, pTask *interfacecase.Performance, runCaseReq request.RunCaseReq) {
 	spawnCount := runCaseReq.Operation.SpawnCount
 	spawnRate := runCaseReq.Operation.SpawnRate
 	profile := &boomer.Profile{}
@@ -61,19 +63,15 @@ func RunYangfanBoomer(r *runBoomer, pReport *interfacecase.PerformanceReport, pT
 			return
 		}
 		b.Boom.Quit()
-		b.OutputDB.PReport.State = interfacecase.StateStopped
+		//b.OutputDB.PReport.State = interfacecase.StateStopped
 		b.State = BoomerStateStop
 		b.r.d.StopDebugTalkFile()
 		b = nil
 	}
 }
 
-func (r *runBoomer) Report() (report *interfacecase.ApiReport, err error) {
-	return
-}
-
 func NewBoomer(runCaseReq request.RunCaseReq, runType interfacecase.RunType) TestCase {
-	return &runBoomer{
+	return &RunBoomerStandalone{
 		CaseID:     runCaseReq.CaseID,
 		caseType:   interfacecase.CaseTypeBoomerDebug,
 		runCaseReq: runCaseReq,
@@ -81,7 +79,7 @@ func NewBoomer(runCaseReq request.RunCaseReq, runType interfacecase.RunType) Tes
 	}
 }
 
-type runBoomer struct {
+type RunBoomerStandalone struct {
 	reportID   uint
 	pTask      interfacecase.Performance
 	CaseID     uint
@@ -90,16 +88,17 @@ type runBoomer struct {
 	caseType   interfacecase.CaseType
 	tcm        ApisCaseModel
 	d          debugTalkOperation
+	envVars    map[string]string
 }
 
-func (r *runBoomer) LoadCase() (err error) {
+func (r *RunBoomerStandalone) LoadCase() (err error) {
 	//获取运行配置
 
 	var testCase interfacecase.HrpCase
 	var testCaseList []interfacecase.HrpCase
 	var apiCase interfacecase.Performance
 	var apiCaseCase []interfacecase.PerformanceRelationship
-	//获取测试套件下对应的配置信息
+
 	{
 		var testCaseStep interfacecase.Performance
 		err := global.GVA_DB.Model(interfacecase.Performance{}).Where("id = ? ", r.runCaseReq.CaseID).First(&testCaseStep).Error
@@ -107,41 +106,38 @@ func (r *runBoomer) LoadCase() (err error) {
 			return err
 		}
 		r.runCaseReq.ConfigID = testCaseStep.RunConfigID
+		r.runCaseReq.Env = testCaseStep.ApiEnvID
 	}
 	//获取运行配置
 	apiConfig, err := getConfig(r.runCaseReq.ConfigID)
 	if err != nil {
 		return errors.New("获取配置失败")
 	}
+	r.envVars, _, err = GetEnvVar(apiConfig.ProjectID, r.runCaseReq.Env)
+	if err != nil {
+		return errors.New("获取环境变量失败")
+	}
+	apiConfig.Environs = r.envVars
+	global.GVA_LOG.Debug(fmt.Sprintf("boomer debug 1 apiConfig:%d", apiConfig.ID))
 
 	//设置前置套件
-	if apiConfig.SetupCase != nil && *apiConfig.SetupCaseID != 0 {
+	if apiConfig.SetupCaseID != nil && *apiConfig.SetupCaseID != 0 {
+		global.GVA_LOG.Debug(fmt.Sprintf("boomer debug 2 apiConfig.SetupCaseID %d", *apiConfig.SetupCaseID))
 		hrpCaseStep, err := getCaseStepHrp(*apiConfig.SetupCaseID)
 		if err != nil {
-			return err
+			global.GVA_LOG.Debug(fmt.Sprintf("boomer debug 8 已设置前置套件，%s", err))
 		}
-		if hrpCaseStep.TestCase != nil {
-			//testCase.TestSteps = append(testCase.TestSteps, hrpCaseStep)
-			if hrpCaseStep.ThinkTime != nil || hrpCaseStep.Transaction != nil || hrpCaseStep.Rendezvous != nil {
-				if hrpCaseStep != nil {
-					testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
-				}
-			} else {
-				testcase, ok := hrpCaseStep.TestCase.(interfacecase.HrpTestCase)
-				if ok {
-					for _, v := range testcase.TestSteps {
-						testCase.TestSteps = append(testCase.TestSteps, v)
-					}
-				}
-			}
-			testCase.Confing = *apiConfig
-		}
+		testCase.Confing = *apiConfig
+		testCase.TestSteps = append(testCase.TestSteps, hrpCaseStep)
 	}
+
+	global.GVA_LOG.Debug(fmt.Sprintf("boomer debug 3 已设置前置套件，%d", apiConfig.ID))
 	r.tcm.Config = *apiConfig
 
 	//读取用例信息
 	apiCase.ID = r.runCaseReq.CaseID
 	err = global.GVA_DB.Model(interfacecase.Performance{}).First(&apiCase).Error
+	global.GVA_LOG.Debug(fmt.Sprintf("boomer debug 4 apiCase，%v", apiCase))
 	caseDB := global.GVA_DB.Model(interfacecase.PerformanceRelationship{}).
 		Preload("ApiCaseStep").
 		Preload("ApiCaseStep.TStep", func(db2 *gorm.DB) *gorm.DB {
@@ -151,27 +147,14 @@ func (r *runBoomer) LoadCase() (err error) {
 		Where("performance_id = ?", r.runCaseReq.CaseID).
 		Order("Sort")
 	caseDB.Find(&apiCaseCase)
+	global.GVA_LOG.Debug(fmt.Sprintf("boomer debug 5 获取用例信息，%v", apiCaseCase))
 	for _, v := range apiCaseCase {
-		//testCaseList = append(testCaseList, v.ApiCaseStep)
-
 		hrpCaseStep, err := getCaseStepHrp(v.ApiCaseStepId)
-
 		if err != nil {
 			return err
 		}
-		//testCase.TestSteps = append(testCase.TestSteps, hrpCaseStep)
-		if hrpCaseStep.ThinkTime != nil || hrpCaseStep.Transaction != nil || hrpCaseStep.Rendezvous != nil {
-			if hrpCaseStep != nil {
-				testCase.TestSteps = append(testCase.TestSteps, *hrpCaseStep)
-			}
-		} else {
-			testcase, ok := hrpCaseStep.TestCase.(interfacecase.HrpTestCase)
-			if ok {
-				for _, v := range testcase.TestSteps {
-					testCase.TestSteps = append(testCase.TestSteps, v)
-				}
-			}
-		}
+		testCase.TestSteps = append(testCase.TestSteps, hrpCaseStep)
+		global.GVA_LOG.Debug(fmt.Sprintf("boomer debug 8 *apiConfig.SetupCaseID:%v", hrpCaseStep))
 	}
 	testCase.Confing = *apiConfig
 	testCaseList = append(testCaseList, testCase)
@@ -182,11 +165,10 @@ func (r *runBoomer) LoadCase() (err error) {
 	if err != nil {
 		return errors.New("用例转换失败")
 	}
-
 	return nil
 }
 
-func (r *runBoomer) RunCase() (err error) {
+func (r *RunBoomerStandalone) RunCase() (err error) {
 	//defer r.d.StopDebugTalkFile()
 	var pTask interfacecase.Performance
 	var pReport interfacecase.PerformanceReport
@@ -222,18 +204,9 @@ func (r *runBoomer) RunCase() (err error) {
 
 	}()
 	RunYangfanBoomer(r, &pReport, &pTask, r.runCaseReq)
-
-	//var t *testing.T
-	//r.reportOperation.CreateReport()
-	//defer recoverHrp(r.reportOperation)
-	//defer r.d.StopDebugTalkFile()
-	//report, err := hrp.NewRunner(t).
-	//	SetHTTPStatOn().
-	//	SetFailfast(false).
-	//	RunJsons(r.tcm.Case...)
-	//r.reportOperation.UpdateReport(&report)
-
-	return nil
+	return err
 }
 
-type BoomerState int
+func (r *RunBoomerStandalone) Report() (report *interfacecase.ApiReport, err error) {
+	return
+}

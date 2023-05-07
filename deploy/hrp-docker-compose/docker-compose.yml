@@ -1,0 +1,35 @@
+version: '2'
+
+networks:
+  monitor:
+    driver: bridge
+
+services:
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    hostname: prometheus
+    restart: always
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - monitor
+
+  pushgateway:
+    container_name: pushgateway
+    image: prom/pushgateway
+    ports:
+      - '9091:9091'
+
+  grafana:
+    container_name: "grafana"
+    image: "grafana/grafana:9.3.2"
+    user: root
+    ports:
+      - 3000:3000
+    restart: always
+    volumes:
+      - ./data/grafana/data:/var/lib/grafana
+      - ./data/grafana/log:/var/log/grafana

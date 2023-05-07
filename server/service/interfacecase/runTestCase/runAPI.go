@@ -1,11 +1,12 @@
 package runTestCase
 
 import (
+	"encoding/json"
 	"errors"
 	"testing"
 
+	"github.com/test-instructor/yangfan/hrp"
 	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/hrp"
 	"github.com/test-instructor/yangfan/server/model/common/request"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
 )
@@ -107,10 +108,12 @@ func (r *runAPI) RunCase() (err error) {
 	var t *testing.T
 	defer recoverHrp(r.reportOperation)
 	defer r.d.StopDebugTalkFile()
-	report, err := hrp.NewRunner(t).
+	reportHRP, err := hrp.NewRunner(t).
 		SetHTTPStatOn().
 		SetFailfast(false).
 		RunJsons(r.tcm.Case...)
+	var report interfacecase.ApiReport
+	json.Unmarshal(reportHRP, &report)
 	r.reportOperation.UpdateReport(&report)
 	global.GVA_LOG.Debug("debugtalk 目录")
 	global.GVA_LOG.Debug(r.d.FilePath)

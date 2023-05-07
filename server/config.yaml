@@ -97,9 +97,9 @@ mysql:
   path: 127.0.0.1
   port: "3306"
   config: charset=utf8mb4&parseTime=True&loc=Local
-  db-name: gva
-  username: root
-  password: 5bc5ef915ed146de960379db620fc46a@YOOZOO
+  db-name: test
+  username: test
+  password: abc123456
   max-idle-conns: 10
   max-open-conns: 100
   log-mode: error
@@ -156,7 +156,7 @@ timer:
       interval: 168h
 zap:
   level: info
-  prefix: '[github.com/flipped-aurora/gin-vue-admin/server]'
+  prefix: '[github.com/test-instructor/yangfan/server]'
   format: console
   director: log
   encode-level: LowercaseColorLevelEncoder

@@ -76,3 +76,35 @@ type PerformanceReportTotalStats struct {
 
 	ResponseTimer datatypes.JSONMap `json:"response_timer"`
 }
+
+type PerformanceReportMaster struct {
+	global.GVA_MODEL
+	State               int32 `json:"State"`
+	Workers             int32 `json:"workers"`
+	TargetUsers         int64 `json:"target_users"`
+	CurrentUsers        int32 `json:"current_users"`
+	PerformanceReportID uint  `json:"performance_report_id"`
+}
+
+type PerformanceReportWorker struct {
+	global.GVA_MODEL
+	PerformanceReportID   uint                    `json:"performance_report_id"`
+	PerformanceReportWork []PerformanceReportWork `json:"performance_report_work"`
+}
+
+type PerformanceReportWork struct {
+	global.GVA_MODEL
+	WorkID                    string  `json:"work_id"`
+	IP                        string  `json:"ip"`
+	OS                        string  `json:"os"`
+	Arch                      string  `json:"arch"`
+	State                     int32   `json:"state"`
+	Heartbeat                 int32   `json:"heartbeat"`
+	UserCount                 int64   `json:"user_count"`
+	WorkerCpuUsage            float64 `json:"worker_cpu_usage"`
+	CpuUsage                  float64 `json:"cpu_usage"`
+	CpuWarningEmitted         bool    `json:"cpu_warning_emitted"`
+	WorkerMemoryUsage         float64 `json:"worker_memory_usage"`
+	MemoryUsage               float64 `json:"memory_usage"`
+	PerformanceReportWorkerID uint    `json:"performance_report_id"`
+}

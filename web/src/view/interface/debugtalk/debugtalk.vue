@@ -1,24 +1,19 @@
 <template>
   <div>
-    <MonacoEditor
-        :debugTalkType="debugTalk"
-    />
+    <MonacoEditor :debugTalkType="debugTalk" />
   </div>
 </template>
 
 <script>
 export default {
-  name: "debugtalk"
-}
+  name: "debugtalk",
+};
 </script>
 
 <script setup>
-import MonacoEditor from '@/view/interface/debugtalk/debugtalk/MonacoEditor.vue'
-import {ref} from "vue";
-const debugTalk = ref(1)
-
+import MonacoEditor from "@/view/interface/debugtalk/debugtalk/MonacoEditor.vue";
+import { ref } from "vue";
+const debugTalk = ref(1);
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -1,6 +1,6 @@
 module github.com/test-instructor/yangfan/server
 
-go 1.18
+go 1.19
 
 require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
@@ -34,7 +34,7 @@ require (
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/lunixbochs/struc v0.0.0-20200707160740-784aaebc1d40
 	github.com/maja42/goval v1.2.1
-	github.com/miekg/dns v1.0.14
+	github.com/miekg/dns v1.1.3
 	github.com/mitchellh/mapstructure v1.2.2
 	github.com/mojocn/base64Captcha v1.3.1
 	github.com/olekukonko/tablewriter v0.0.5

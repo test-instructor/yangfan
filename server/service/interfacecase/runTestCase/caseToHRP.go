@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 
+	"github.com/test-instructor/yangfan/hrp"
 	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/hrp"
 	mic "github.com/test-instructor/yangfan/server/model/interfacecase"
 )
 
