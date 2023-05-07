@@ -6,6 +6,7 @@ import (
 	"github.com/test-instructor/yangfan/hrp"
 	"github.com/test-instructor/yangfan/hrp/pkg/boomer"
 	"github.com/test-instructor/yangfan/proto/pb"
+	"os"
 	"time"
 )
 
@@ -14,7 +15,18 @@ type masterServer struct {
 	*MasterBoom
 }
 
+var okResp = &pb.Resp{Code: 0, Message: "success"}
+var errResp = &pb.Resp{Code: 1, Message: "error"}
+
 func (b masterServer) Start(ctx context.Context, request *pb.StartReq) (resp *pb.StartResp, err error) {
+	defer func() {
+		resp = new(pb.StartResp)
+		if err != nil {
+			resp.Resp = errResp
+		} else {
+			resp.Resp = okResp
+		}
+	}()
 	req := hrp.StartRequestPlatformBody{
 		Profile: *boomer.NewProfile(),
 	}
@@ -44,9 +56,23 @@ func (b masterServer) Start(ctx context.Context, request *pb.StartReq) (resp *pb
 	return
 }
 
-func (b masterServer) Rebalance(ctx context.Context, req *pb.RebalanceReq) (*pb.RebalanceResp, error) {
-	//TODO implement me
-	panic("implement me")
+func (b masterServer) Rebalance(ctx context.Context, req *pb.RebalanceReq) (resp *pb.RebalanceResp, err error) {
+	defer func() {
+		resp = new(pb.RebalanceResp)
+		if err != nil {
+			resp.Resp = errResp
+		} else {
+			resp.Resp = okResp
+		}
+	}()
+
+	hrpReq := hrp.RebalanceRequestBody{
+		Profile: *b.Boomer.GetProfile(),
+	}
+	hrpReq.Profile.SpawnCount = req.SpawnCount
+	hrpReq.Profile.SpawnRate = req.SpawnRate
+	err = b.Boomer.ReBalance(&hrpReq.Profile)
+	return
 }
 
 func (b masterServer) Work(ctx context.Context, req *pb.WorkReq) (*pb.WorkResp, error) {
@@ -84,9 +110,23 @@ func (b masterServer) Master(ctx context.Context, req *pb.MasterReq) (*pb.Master
 	return masterResp, nil
 }
 
-func (b masterServer) Stop(ctx context.Context, req *pb.StopReq) (*pb.StopResp, error) {
-	//TODO implement me
-	panic("implement me")
+func (b masterServer) Stop(ctx context.Context, req *pb.StopReq) (resp *pb.StopResp, err error) {
+	defer func() {
+		resp = new(pb.StopResp)
+		if err != nil {
+			resp.Resp = errResp
+		} else {
+			go func() {
+				time.Sleep(30 * time.Second)
+				os.Exit(0)
+			}()
+			resp.Resp = okResp
+		}
+	}()
+
+	err = b.Boomer.Stop()
+
+	return
 }
 
 func (b masterServer) Quit(ctx context.Context, req *pb.QuitReq) (*pb.QuitResp, error) {

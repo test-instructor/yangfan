@@ -1000,6 +1000,10 @@ func (r *workerRunner) stop() {
 	if r.isStarting() {
 		r.runner.stop()
 	}
+	go func() {
+		time.Sleep(30 * time.Second)
+		os.Exit(0)
+	}()
 }
 
 func (r *workerRunner) close() {

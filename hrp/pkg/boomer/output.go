@@ -465,7 +465,7 @@ func NewPrometheusPusherOutput(gatewayURL, jobName string, mode string, reportNa
 		pusher: push.New(gatewayURL, jobName).
 			Grouping("instance", uuid.NewV1().String()).
 			Grouping("mode", mode).
-			Grouping("report_name", reportName),
+			Grouping("report", reportName),
 	}
 }
 

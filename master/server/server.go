@@ -23,3 +23,7 @@ func StartGrpc(address string) {
 		global.GVA_LOG.Panic("failed to serve", zap.Error(err))
 	}
 }
+
+func StopGrpc() {
+	ns.Stop()
+}
