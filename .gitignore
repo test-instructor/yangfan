@@ -29,8 +29,8 @@ yarn-error.log*
 
 *.iml
 
-./docker/data/*
-./docker/logs
+deploy/docker/data/*
+deploy/docker/logs
 /go.work
 /go.work.sum
 ./server/yangfan.yaml
