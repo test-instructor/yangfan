@@ -1,5 +1,5 @@
 mysql:
-  path: 127.0.0.1
+  path: 192.168.0.218
   port: "3306"
   config: charset=utf8mb4&parseTime=True&loc=Local
   db-name: yangfan

@@ -9,6 +9,18 @@ networks:
         - subnet: '177.7.0.0/16'
 
 services:
+  server:
+    build:
+      context: ../../server
+      dockerfile: ./Dockerfile
+    container_name: yangfan-server
+    restart: always
+    ports:
+      - '8888:8888'
+    networks:
+      network:
+        ipv4_address: 177.7.0.12
+
   web:
     build:
       context: ../../web
@@ -22,14 +34,26 @@ services:
       network:
         ipv4_address: 177.7.0.11
 
-  server:
+  master:
     build:
-      context: ../../server
+      context: ../../master
       dockerfile: ./Dockerfile
-    container_name: yangfan-server
+    container_name: yangfan-master
     restart: always
     ports:
-      - '8888:8888'
+      - '7966:7966'
+      - '9093:9093'
+      - '9092:9092'
     networks:
       network:
-        ipv4_address: 177.7.0.12
+        ipv4_address: 177.7.0.15
+
+  work:
+    build:
+      context: ../../work
+      dockerfile: ./Dockerfile
+    container_name: yangfan-work
+    restart: always
+    networks:
+      network:
+        ipv4_address: 177.7.0.16

@@ -1,5 +1,5 @@
 mysql:
-  path: 127.0.0.1
+  path: 192.168.0.218
   port: "3306"
   config: charset=utf8mb4&parseTime=True&loc=Local
   db-name: yangfan
@@ -20,7 +20,7 @@ system:
   iplimit-time: 3600
 zap:
   level: info
-  prefix: '[github.com/test-instructor/yangfan/work]'
+  prefix: '[github.com/test-instructor/yangfan/master]'
   format: console
   director: log
   encode-level: LowercaseColorLevelEncoder
@@ -28,4 +28,3 @@ zap:
   max-age: 30
   show-line: true
   log-in-console: true
-

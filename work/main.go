@@ -58,5 +58,5 @@ func main() {
 	zerolog.SetGlobalLevel(zerolog.WarnLevel)
 	zap.ReplaceGlobals(global.GVA_LOG)
 	yangfan.PyPkg()
-	NewAgent("177.7.1.12", 7966).Work()
+	NewAgent("177.7.0.15", 7966).Work()
 }

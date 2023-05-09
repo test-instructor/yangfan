@@ -17,6 +17,8 @@ services:
     restart: always
     ports:
       - '7966:7966'
+      - '9093:9093'
+      - '9092:9092'
     networks:
       network:
         ipv4_address: 177.7.1.12
@@ -24,7 +26,7 @@ services:
     build:
       context: ../../work
       dockerfile: ./Dockerfile
-    container_name: yangfan-master
+    container_name: yangfan-worker
     restart: always
     networks:
       network:
