@@ -11,6 +11,7 @@ import (
 	"github.com/test-instructor/yangfan/server/source/yangfan"
 	"go.uber.org/zap"
 	"math/rand"
+	"os"
 	"sync"
 	"time"
 )
@@ -55,6 +56,10 @@ func main() {
 	global.GVA_VP = core.Viper()
 	global.GVA_LOG = core.Zap()
 	global.GVA_DB = initialize.Gorm()
+	if global.GVA_DB.Error != nil {
+		global.GVA_LOG.Error("register db", zap.Error(global.GVA_DB.Error))
+		os.Exit(0)
+	}
 	zerolog.SetGlobalLevel(zerolog.WarnLevel)
 	zap.ReplaceGlobals(global.GVA_LOG)
 	yangfan.PyPkg()
