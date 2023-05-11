@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package master;
+
+option go_package = "./;master";
+
+service Master{
+  rpc start (startReq) returns (startResp) {}
+  rpc rebalance (rebalanceReq) returns (rebalanceResp) {}
+  rpc work (workReq) returns (workResp){}
+  rpc master (masterReq) returns (masterResp){}
+  rpc stop(stopReq) returns (stopResp){}
+  rpc Quit(quitReq) returns (quitResp){}
+}
+
+enum code {
+  OK = 0;
+  ERROR = 1;
+}
+
+message resp {
+  code  Code = 1;
+  string Message = 2;
+}
+
+message profile{
+  int64 SpawnCount = 1;
+  double SpawnRate = 2;
+  int64 RunTime = 3;
+  int64 MaxRPS = 4;
+  int64 LoopCount = 5;
+  string RequestIncreaseRate = 6;
+  string MemoryProfile = 7;
+  int64  MemoryProfileDuration = 8;
+  string  CPUProfile = 9;
+  int64 CPUProfileDuration = 10;
+  string PrometheusPushgatewayURL = 11;
+  bool DisableConsoleOutput = 12;
+  bool DisableCompression = 13;
+  bool   DisableKeepalive = 14;
+  uint64 ID = 15;
+}
+
+message startReq{
+  profile profile = 1;
+}
+
+message startResp{
+  resp resp = 1;
+}
+
+message rebalanceReq{
+  int64 SpawnCount = 1;
+  double SpawnRate = 2;
+}
+
+message rebalanceResp{
+  resp resp = 1;
+}
+
+message work {
+  string id = 1;
+  string ip = 2;
+  string  os = 3;
+  string arch = 4;
+  int32 state = 5;
+  int32 heartbeat = 6;
+  int64 user_count = 7;
+  double worker_cpu_usage = 8;
+  double cpu_usage = 9;
+  bool cpu_warning_emitted = 10;
+  double worker_memory_usage = 11;
+  double memory_usage = 12;
+}
+
+message workReq{}
+
+message workResp{
+  repeated work work = 1;
+}
+
+message masterReq{}
+
+message masterResp{
+  int32 State = 1;
+  int32 workers = 2;
+  int64 target_users = 3;
+  int32 current_users = 4;
+
+}
+
+message stopReq{}
+message stopResp{
+  resp resp = 1;
+}
+message quitReq{}
+message quitResp{
+  resp resp = 1;
+}

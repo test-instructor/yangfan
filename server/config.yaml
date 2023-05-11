@@ -164,3 +164,6 @@ zap:
   max-age: 30
   show-line: true
   log-in-console: true
+grpc:
+  background: ""
+  master: ""

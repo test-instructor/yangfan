@@ -5,22 +5,22 @@ import (
 	"errors"
 	"github.com/test-instructor/yangfan/hrp"
 	"github.com/test-instructor/yangfan/hrp/pkg/boomer"
-	"github.com/test-instructor/yangfan/proto/pb"
+	"github.com/test-instructor/yangfan/proto/master"
 	"os"
 	"time"
 )
 
 type masterServer struct {
-	pb.UnimplementedBoomerSerServer
+	master.UnimplementedMasterServer
 	*MasterBoom
 }
 
-var okResp = &pb.Resp{Code: 0, Message: "success"}
-var errResp = &pb.Resp{Code: 1, Message: "error"}
+var okResp = &master.Resp{Code: 0, Message: "success"}
+var errResp = &master.Resp{Code: 1, Message: "error"}
 
-func (b masterServer) Start(ctx context.Context, request *pb.StartReq) (resp *pb.StartResp, err error) {
+func (b masterServer) Start(ctx context.Context, request *master.StartReq) (resp *master.StartResp, err error) {
 	defer func() {
-		resp = new(pb.StartResp)
+		resp = new(master.StartResp)
 		if err != nil {
 			resp.Resp = errResp
 		} else {
@@ -56,9 +56,9 @@ func (b masterServer) Start(ctx context.Context, request *pb.StartReq) (resp *pb
 	return
 }
 
-func (b masterServer) Rebalance(ctx context.Context, req *pb.RebalanceReq) (resp *pb.RebalanceResp, err error) {
+func (b masterServer) Rebalance(ctx context.Context, req *master.RebalanceReq) (resp *master.RebalanceResp, err error) {
 	defer func() {
-		resp = new(pb.RebalanceResp)
+		resp = new(master.RebalanceResp)
 		if err != nil {
 			resp.Resp = errResp
 		} else {
@@ -75,12 +75,12 @@ func (b masterServer) Rebalance(ctx context.Context, req *pb.RebalanceReq) (resp
 	return
 }
 
-func (b masterServer) Work(ctx context.Context, req *pb.WorkReq) (*pb.WorkResp, error) {
+func (b masterServer) Work(ctx context.Context, req *master.WorkReq) (*master.WorkResp, error) {
 	workInfo := b.GetWorkersInfo()
-	workResp := new(pb.WorkResp)
-	var works []*pb.Work
+	workResp := new(master.WorkResp)
+	var works []*master.Work
 	for k, _ := range workInfo {
-		work := &pb.Work{
+		work := &master.Work{
 			Id:                workInfo[k].ID,
 			Ip:                workInfo[k].IP,
 			Os:                workInfo[k].OS,
@@ -100,9 +100,9 @@ func (b masterServer) Work(ctx context.Context, req *pb.WorkReq) (*pb.WorkResp, 
 	return workResp, nil
 }
 
-func (b masterServer) Master(ctx context.Context, req *pb.MasterReq) (*pb.MasterResp, error) {
+func (b masterServer) Master(ctx context.Context, req *master.MasterReq) (*master.MasterResp, error) {
 	masterInfo := b.GetMasterInfo()
-	var masterResp = new(pb.MasterResp)
+	var masterResp = new(master.MasterResp)
 	masterResp.State = masterInfo["state"].(int32)
 	masterResp.Workers = int32(masterInfo["workers"].(int))
 	masterResp.TargetUsers = masterInfo["target_users"].(int64)
@@ -110,9 +110,9 @@ func (b masterServer) Master(ctx context.Context, req *pb.MasterReq) (*pb.Master
 	return masterResp, nil
 }
 
-func (b masterServer) Stop(ctx context.Context, req *pb.StopReq) (resp *pb.StopResp, err error) {
+func (b masterServer) Stop(ctx context.Context, req *master.StopReq) (resp *master.StopResp, err error) {
 	defer func() {
-		resp = new(pb.StopResp)
+		resp = new(master.StopResp)
 		if err != nil {
 			resp.Resp = errResp
 		} else {
@@ -129,7 +129,7 @@ func (b masterServer) Stop(ctx context.Context, req *pb.StopReq) (resp *pb.StopR
 	return
 }
 
-func (b masterServer) Quit(ctx context.Context, req *pb.QuitReq) (*pb.QuitResp, error) {
+func (b masterServer) Quit(ctx context.Context, req *master.QuitReq) (*master.QuitResp, error) {
 	//TODO implement me
 	panic("implement me")
 }

@@ -13,10 +13,10 @@ import (
 
 var (
 	pyPkgService      = service.ServiceGroupApp.InterfacecaseServiceGroup
-	yangfanConfigPath = "yangfan.yaml"
+	yangfanConfigPath = "temp.yangfan.yaml"
 )
 
-type YangfanConfig struct {
+type Config struct {
 	Pkg *Pkg `json:"pkg" yaml:"pkg"`
 }
 
@@ -34,7 +34,7 @@ type Pkg struct {
 }
 
 func PyPkg() {
-	var config YangfanConfig
+	var config Config
 	bytes, err := os.ReadFile(yangfanConfigPath)
 	if err != nil {
 		global.GVA_LOG.Warn(fmt.Sprintln("扬帆配置文件不存在:", yangfanConfigPath))
