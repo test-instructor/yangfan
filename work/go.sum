@@ -282,6 +282,8 @@ github.com/gookit/color v1.3.1/go.mod h1:R3ogXq2B9rTbXoSHJ1HyUVAZ3poOJHpd9nQmyGZ
 github.com/gordonklaus/ineffassign v0.0.0-20200309095847-7953dde2c7bf/go.mod h1:cuNKsD1zp2v6XfE/orVX2QE1LC+i254ceGcVeDT3pTU=
 github.com/gorilla/websocket v1.5.0 h1:PPwGk2jz7EePpoHN/+ClbZu8SPxiqlu12wZP/3sWmnc=
 github.com/gorilla/websocket v1.5.0/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
+github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.0-rc.5 h1:3IZOAnD058zZllQTZNBioTlrzrBG/IjpiZ133IEtusM=
+github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.0-rc.5/go.mod h1:xbKERva94Pw2cPen0s79J3uXmGzbbpDYFBFDlZ4mV/w=
 github.com/grpc-ecosystem/grpc-gateway v1.16.0/go.mod h1:BDjrQk3hbvj6Nolgz8mAMFbcEtjT1g+wF4CSlocrBnw=
 github.com/hashicorp/go-hclog v1.5.0 h1:bI2ocEMgcVlz55Oj1xZNBsVi900c7II+fWDyV9o+13c=
 github.com/hashicorp/go-hclog v1.5.0/go.mod h1:W4Qnvbt70Wk/zYJryRzDRU/4r0kIg0PVHBcfoyhpF5M=
@@ -594,10 +596,12 @@ github.com/tencentyun/cos-go-sdk-v5 v0.7.19 h1:janAfTO4MglOrUFuKGTQJBuMc66+F7Tgt
 github.com/tencentyun/cos-go-sdk-v5 v0.7.19/go.mod h1:wQBO5HdAkLjj2q6XQiIfDSP8DXDNrppDRw2Kp/1BODA=
 github.com/test-instructor/grpc-plugin v0.1.5 h1:eBdr6SeHKgN2+NlHk4Dwj8ngaLHhVT42Mhn0aQ+EZBI=
 github.com/test-instructor/grpc-plugin v0.1.5/go.mod h1:OC2JlZ9KZFJ+sVISBSj/o3hnRqJmZ48BKasIkPcUJjg=
-github.com/test-instructor/yangfan/hrp v0.0.0-20230507173522-a0645ee39f50 h1:jRSV8baDBOnP4U3T+1Gmlhn/Osyj+nSPnzGodsxK8YU=
-github.com/test-instructor/yangfan/hrp v0.0.0-20230507173522-a0645ee39f50/go.mod h1:NrbGLNNcLfh5CywXc2hLhil2kmPQm9vl0Y6uXRiKLI0=
-github.com/test-instructor/yangfan/server v0.0.0-20230507173522-a0645ee39f50 h1:YrZFdS2SyVSaCw6bBG5uhlcHfi9pZ7UKlTI0k/SQLgQ=
-github.com/test-instructor/yangfan/server v0.0.0-20230507173522-a0645ee39f50/go.mod h1:OYtaAphVJEqiEu/XYD3C4ay0iZzmqFTl7oRZvf+jfpI=
+github.com/test-instructor/yangfan/hrp v0.0.0-20230515004013-b1c83ead83e6 h1:0LNM6RW5uyJ9xJq7LAyx6mftvJFN3BNBFa7xKiTJiq8=
+github.com/test-instructor/yangfan/hrp v0.0.0-20230515004013-b1c83ead83e6/go.mod h1:TAMLR3V99aU/ZC0+m+bXGuvxdjd5igrnMIJfp+Vka1M=
+github.com/test-instructor/yangfan/proto v0.0.0-20230515144446-fe9fe6860dca h1:Yqjz2YH4Vz9v4jUU15XaybiZwTCxuojfjBxhCH0SvUk=
+github.com/test-instructor/yangfan/proto v0.0.0-20230515144446-fe9fe6860dca/go.mod h1:6wQfTf6owTqVIiz0dx7H3sxBaH9mIsiQZZcIrnITzew=
+github.com/test-instructor/yangfan/server v0.0.0-20230515004013-b1c83ead83e6 h1:98LscqMIUSSz27yTMXrfrCQC9Z2lLyM3LK3TNj4vCqI=
+github.com/test-instructor/yangfan/server v0.0.0-20230515004013-b1c83ead83e6/go.mod h1:+KJm9WRfJ/z4Ju06APhnwNvHXopo0yy214U3QIBfbww=
 github.com/tklauser/go-sysconf v0.3.10/go.mod h1:C8XykCvCb+Gn0oNCWPIlcb0RuglQTYaQ2hGm7jmxEFk=
 github.com/tklauser/go-sysconf v0.3.11 h1:89WgdJhk5SNwJfu+GKyYveZ4IaJ7xAkecBo+KdJV0CM=
 github.com/tklauser/go-sysconf v0.3.11/go.mod h1:GqXfhXY3kiPa0nAXPDIQIWzJbMCB7AmcWpGR8lSZfqI=
@@ -755,8 +759,8 @@ golang.org/x/net v0.0.0-20211216030914-fe4d6282115f/go.mod h1:9nx3DQGgdP8bBQD5qx
 golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4/go.mod h1:CfG3xpIq0wQ8r1q4Su4UZFWDARRcnwPjda9FqA0JpMk=
 golang.org/x/net v0.0.0-20220722155237-a158d28d115b/go.mod h1:XRhObCWvk6IyKnWLug+ECip1KBveYUHfp+8e9klMJ9c=
 golang.org/x/net v0.6.0/go.mod h1:2Tu9+aMcznHK/AK1HMvgo6xiTLG5rD5rZLDS+rp2Bjs=
-golang.org/x/net v0.9.0 h1:aWJ/m6xSmxWBx+V0XRHTlrYrPG56jKsLdTFmsSsCzOM=
-golang.org/x/net v0.9.0/go.mod h1:d48xBJpPfHeWQsugry2m+kC02ZBRGRgulfHnEXEuWns=
+golang.org/x/net v0.10.0 h1:X2//UzNDwYmtCLn7To6G58Wr6f5ahEAQgKNzv9Y951M=
+golang.org/x/net v0.10.0/go.mod h1:0qNGK6F8kojg2nk9dLZ2mShWaEBan6FAoqfSigmmuDg=
 golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be/go.mod h1:N/0e6XlmueqKjAGxoOufVs8QHGRruUQn6yWY3a++T0U=
 golang.org/x/oauth2 v0.0.0-20190226205417-e64efc72b421/go.mod h1:gOpvHmFTYa4IltrdGE7lF6nIHvwfUNPOp7c8zoXwtLw=
 golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45/go.mod h1:gOpvHmFTYa4IltrdGE7lF6nIHvwfUNPOp7c8zoXwtLw=

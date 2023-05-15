@@ -2,6 +2,7 @@ package interfacecase
 
 import (
 	"context"
+	"fmt"
 	"github.com/test-instructor/yangfan/proto/master"
 	"github.com/test-instructor/yangfan/server/core/client"
 	"github.com/test-instructor/yangfan/server/global"
@@ -39,7 +40,7 @@ func (r *RunCaseService) RunBoomer(runCase request.RunCaseReq, runType interface
 }
 
 func (r *RunCaseService) RunMasterBoomer(runCase request.RunCaseReq, runType interfacecase.RunType) (report *interfacecase.ApiReport, err error) {
-	c, err := client.NewClient(global.GVA_CONFIG.GrpcServer.Master)
+	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.GrpcServer.Master, global.GVA_CONFIG.GrpcServer.MasterBoomerProt))
 	if err != nil {
 		return nil, err
 	}

@@ -4,8 +4,8 @@ go 1.19
 
 require (
 	github.com/rs/zerolog v1.29.1
-	github.com/test-instructor/yangfan/hrp v0.0.0-20230507173522-a0645ee39f50
-	github.com/test-instructor/yangfan/server v0.0.0-20230507173522-a0645ee39f50
+	github.com/test-instructor/yangfan/hrp v0.0.0-20230515004013-b1c83ead83e6
+	github.com/test-instructor/yangfan/server v0.0.0-20230515004013-b1c83ead83e6
 	go.uber.org/zap v1.24.0
 )
 
@@ -58,6 +58,7 @@ require (
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/gookit/color v1.3.1 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.0-rc.5 // indirect
 	github.com/hashicorp/go-hclog v1.5.0 // indirect
 	github.com/hashicorp/go-plugin v1.4.9 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
@@ -132,6 +133,7 @@ require (
 	github.com/swaggo/swag v1.7.0 // indirect
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.19 // indirect
 	github.com/test-instructor/grpc-plugin v0.1.5 // indirect
+	github.com/test-instructor/yangfan/proto v0.0.0-20230515144446-fe9fe6860dca // indirect
 	github.com/tklauser/go-sysconf v0.3.11 // indirect
 	github.com/tklauser/numcpus v0.6.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
@@ -144,7 +146,7 @@ require (
 	gocv.io/x/gocv v0.32.1 // indirect
 	golang.org/x/crypto v0.7.0 // indirect
 	golang.org/x/image v0.0.0-20210220032944-ac19c3e999fb // indirect
-	golang.org/x/net v0.9.0 // indirect
+	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/oauth2 v0.7.0 // indirect
 	golang.org/x/sync v0.2.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect

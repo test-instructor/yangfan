@@ -673,8 +673,8 @@ github.com/test-instructor/grpc-plugin v0.1.5 h1:eBdr6SeHKgN2+NlHk4Dwj8ngaLHhVT4
 github.com/test-instructor/grpc-plugin v0.1.5/go.mod h1:OC2JlZ9KZFJ+sVISBSj/o3hnRqJmZ48BKasIkPcUJjg=
 github.com/test-instructor/yangfan/hrp v0.0.0-20230507173522-a0645ee39f50 h1:jRSV8baDBOnP4U3T+1Gmlhn/Osyj+nSPnzGodsxK8YU=
 github.com/test-instructor/yangfan/hrp v0.0.0-20230507173522-a0645ee39f50/go.mod h1:NrbGLNNcLfh5CywXc2hLhil2kmPQm9vl0Y6uXRiKLI0=
-github.com/test-instructor/yangfan/proto v0.0.0-20230507173522-a0645ee39f50 h1:VwDUV0jptyX/vXA8wRWOzym++1lGBQqN3tyBwnIw+Mw=
-github.com/test-instructor/yangfan/proto v0.0.0-20230507173522-a0645ee39f50/go.mod h1:6wQfTf6owTqVIiz0dx7H3sxBaH9mIsiQZZcIrnITzew=
+github.com/test-instructor/yangfan/proto v0.0.0-20230515004013-b1c83ead83e6 h1:7+B46p6RDmeSIaJMU4+xirLN1Jyn45f/OZH9LnahMz8=
+github.com/test-instructor/yangfan/proto v0.0.0-20230515004013-b1c83ead83e6/go.mod h1:6wQfTf6owTqVIiz0dx7H3sxBaH9mIsiQZZcIrnITzew=
 github.com/test-instructor/yangfan/server v0.0.0-20230507173522-a0645ee39f50 h1:YrZFdS2SyVSaCw6bBG5uhlcHfi9pZ7UKlTI0k/SQLgQ=
 github.com/test-instructor/yangfan/server v0.0.0-20230507173522-a0645ee39f50/go.mod h1:OYtaAphVJEqiEu/XYD3C4ay0iZzmqFTl7oRZvf+jfpI=
 github.com/tklauser/go-sysconf v0.3.10/go.mod h1:C8XykCvCb+Gn0oNCWPIlcb0RuglQTYaQ2hGm7jmxEFk=

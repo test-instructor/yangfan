@@ -94,7 +94,7 @@ local:
   path: uploads/file
   store-path: uploads/file
 mysql:
-  path: 192.168.0.218
+  path: 127.0.0.1
   port: "3306"
   config: charset=utf8mb4&parseTime=True&loc=Local
   db-name: yangfan
@@ -155,8 +155,8 @@ timer:
       compareField: created_at
       interval: 168h
 zap:
-  level: info
-  prefix: '[github.com/test-instructor/yangfan/server]'
+  level: error
+  prefix: '[yangfan]'
   format: console
   director: log
   encode-level: LowercaseColorLevelEncoder
@@ -164,3 +164,8 @@ zap:
   max-age: 30
   show-line: true
   log-in-console: true
+yf:
+  background: ""
+  master: "yangfan-master"
+  master-boomer-prot: "9093"
+  master-server-prot: 7966

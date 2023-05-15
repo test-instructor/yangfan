@@ -102,7 +102,7 @@ mysql:
   password: 123456
   max-idle-conns: 10
   max-open-conns: 100
-  log-mode: error
+  log-mode: info
   log-zap: false
 pgsql:
   path: ""
@@ -155,8 +155,8 @@ timer:
       compareField: created_at
       interval: 168h
 zap:
-  level: info
-  prefix: '[github.com/test-instructor/yangfan/server]'
+  level: debug
+  prefix: '[yangfan]'
   format: console
   director: log
   encode-level: LowercaseColorLevelEncoder
@@ -166,4 +166,6 @@ zap:
   log-in-console: true
 grpc:
   background: ""
-  master: "localhost:9093"
+  master: "localhost"
+  master-boomer-prot: "9093"
+  master-server-prot: 7966
