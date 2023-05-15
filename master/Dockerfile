@@ -4,7 +4,8 @@ FROM golang:alpine AS builder
 # 声明工作目录
 WORKDIR /go/src/yangfan/master
 
-COPY . .
+COPY ./master .
+COPY docker.config.yaml .
 
 # 设置go env
 ENV GO111MODULE=on

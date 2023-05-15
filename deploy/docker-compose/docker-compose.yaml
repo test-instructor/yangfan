@@ -11,8 +11,8 @@ networks:
 services:
   server:
     build:
-      context: ../../server
-      dockerfile: ./Dockerfile
+      context: ../../
+      dockerfile: ./server/Dockerfile
     container_name: yangfan-server
     restart: always
     ports:
@@ -36,8 +36,8 @@ services:
 
   master:
     build:
-      context: ../../master
-      dockerfile: ./Dockerfile
+      context: ../../
+      dockerfile: ./master/Dockerfile
     container_name: yangfan-master
     restart: always
     ports:
@@ -50,8 +50,8 @@ services:
 
   work:
     build:
-      context: ../../work
-      dockerfile: ./Dockerfile
+      context: ../../
+      dockerfile: ./work/Dockerfile
     container_name: yangfan-work
     restart: always
     networks:
