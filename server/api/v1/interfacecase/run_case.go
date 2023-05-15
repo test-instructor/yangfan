@@ -58,14 +58,17 @@ func (runCaseApi *RunCaseApi) RunBoomer(c *gin.Context) {
 	var runApiCase request.RunCaseReq
 	_ = c.ShouldBindJSON(&runApiCase)
 
-	go runCaseService.RunBoomer(runApiCase, interfacecase.RunTypeRuning)
-	response.OkWithData("运行成功", c)
-	//if err != nil {
-	//	global.GVA_LOG.Error("运行失败!", zap.Error(err))
-	//	response.FailWithMessage("运行失败", c)
-	//} else {
-	//	response.OkWithData(gin.H{"id": reports.ID}, c)
-	//}
+	boomer, err := runCaseService.RunMasterBoomer(runApiCase, interfacecase.RunTypeRuning)
+	if err != nil {
+		return
+	}
+
+	if err != nil {
+		global.GVA_LOG.Error("运行失败!", zap.Error(err))
+		response.FailWithMessage("运行失败", c)
+	} else {
+		response.OkWithData(gin.H{"id": boomer.ID}, c)
+	}
 }
 
 func (runCaseApi *RunCaseApi) RunTimerTask(c *gin.Context) {

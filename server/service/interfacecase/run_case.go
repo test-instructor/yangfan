@@ -1,6 +1,10 @@
 package interfacecase
 
 import (
+	"context"
+	"github.com/test-instructor/yangfan/proto/master"
+	"github.com/test-instructor/yangfan/server/core/client"
+	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/model/common/request"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"github.com/test-instructor/yangfan/server/service/interfacecase/runTestCase"
@@ -31,6 +35,24 @@ func (r *RunCaseService) RunBoomerDebug(runCase request.RunCaseReq, runType inte
 
 func (r *RunCaseService) RunBoomer(runCase request.RunCaseReq, runType interfacecase.RunType) (report *interfacecase.ApiReport, err error) {
 	report, err = runTestCase.RunBoomer(runCase, runType)
+	return
+}
+
+func (r *RunCaseService) RunMasterBoomer(runCase request.RunCaseReq, runType interfacecase.RunType) (report *interfacecase.ApiReport, err error) {
+	c, err := client.NewClient(global.GVA_CONFIG.GrpcServer.Master)
+	if err != nil {
+		return nil, err
+	}
+	_, err = c.MasterClient.Start(context.Background(), &master.StartReq{
+		Profile: &master.Profile{
+			SpawnCount: runCase.Operation.SpawnCount,
+			SpawnRate:  runCase.Operation.SpawnRate,
+			ID:         uint64(runCase.CaseID),
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
 	return
 }
 

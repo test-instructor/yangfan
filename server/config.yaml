@@ -166,4 +166,4 @@ zap:
   log-in-console: true
 grpc:
   background: ""
-  master: ""
+  master: "localhost:9093"

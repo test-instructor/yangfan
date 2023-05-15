@@ -2,7 +2,6 @@ package client
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
 	"github.com/test-instructor/yangfan/proto/master"
@@ -10,7 +9,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/credentials"
 	"sync"
 	"time"
 )
@@ -21,12 +19,10 @@ type Client struct {
 
 var clientMap sync.Map
 var clientLock sync.Mutex
+var apiClient *Client
+var initOnce sync.Once
 
-func GetGRpcCredentialOption() grpc.DialOption {
-	return grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{MinVersion: tls.VersionTLS12}))
-}
-
-func NewClient(host string) (*Client, error) {
+func NewClientMap(host string) (*Client, error) {
 	var c *Client
 	var err error
 	clientLock.Lock()
@@ -40,6 +36,20 @@ func NewClient(host string) (*Client, error) {
 	}
 	clientMap.Store(host, c)
 	return c, err
+}
+
+func NewClient(host string) (*Client, error) {
+	var c *Client
+	var err error
+	initOnce.Do(func() {
+		c, err = newClient(host)
+		if err != nil {
+			return
+		}
+		apiClient = c
+	})
+	c, err = newClient(host)
+	return apiClient, nil
 }
 
 func newClient(host string) (*Client, error) {
@@ -57,8 +67,8 @@ func newClient(host string) (*Client, error) {
 	bc := backoff.DefaultConfig
 	c, err := grpc.Dial(
 		host,
-		GetGRpcCredentialOption(),
 		grpc.WithAuthority(host),
+		grpc.WithInsecure(),
 		grpc.WithConnectParams(grpc.ConnectParams{Backoff: bc, MinConnectTimeout: time.Minute}),
 		grpc.WithChainUnaryInterceptor(retry.UnaryClientInterceptor(retryMiddlewareConfig...)),
 		grpc.WithChainStreamInterceptor(retry.StreamClientInterceptor(retryMiddlewareConfig...)),

@@ -334,11 +334,17 @@ const getTaskCaseDetailFunc = async (task_id) => {
     taskName.value = res.data.name;
     TransactionStart.value = [];
     tableData.value.forEach((item, index) => {
-      if (item.ApiCaseStep.api_step_type === "TransactionStart") {
+      if (
+        item.ApiCaseStep &&
+        item.ApiCaseStep.api_step_type === "TransactionStart"
+      ) {
         let step = { key: item.ApiCaseStep.name };
         TransactionStart.value.push(step);
       }
-      if (item.ApiCaseStep.api_step_type === "TransactionEnd") {
+      if (
+        item.ApiCaseStep &&
+        item.ApiCaseStep.api_step_type === "TransactionEnd"
+      ) {
         TransactionStart.value.forEach(function (item2, index, arr) {
           if (item2.key === item.ApiCaseStep.name) {
             arr.splice(index, 1);
@@ -353,23 +359,23 @@ init();
 const StepType = (row) => {
   let step_type = [];
 
-  if (row.ApiCaseStep.api_step_type === "Transaction") {
+  if (row.ApiCaseStep && row.ApiCaseStep.api_step_type === "Transaction") {
     step_type.push("事务");
     step_type.push("patch");
     return step_type;
   }
-  if (row.ApiCaseStep.api_step_type === "Rendezvous") {
+  if (row.ApiCaseStep && row.ApiCaseStep.api_step_type === "Rendezvous") {
     step_type.push("集合点");
     step_type.push("delete");
     return step_type;
   }
-  if (row.ApiCaseStep.api_step_type === "TransactionStart") {
+  if (row.ApiCaseStep && row.ApiCaseStep.api_step_type === "TransactionStart") {
     step_type.push("事务");
     step_type.push("options");
     step_type.push("#168cff");
     return step_type;
   }
-  if (row.ApiCaseStep.api_step_type === "TransactionEnd") {
+  if (row.ApiCaseStep && row.ApiCaseStep.api_step_type === "TransactionEnd") {
     step_type.push("事务");
     step_type.push("head");
     step_type.push("#ff5722");
