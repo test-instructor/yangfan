@@ -36,3 +36,4 @@ deploy/docker/logs
 ./server/yangfan.yaml
 ./server/config.yaml
 /config.yaml
+*.temp*
