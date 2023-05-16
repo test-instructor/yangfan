@@ -596,12 +596,12 @@ github.com/tencentyun/cos-go-sdk-v5 v0.7.19 h1:janAfTO4MglOrUFuKGTQJBuMc66+F7Tgt
 github.com/tencentyun/cos-go-sdk-v5 v0.7.19/go.mod h1:wQBO5HdAkLjj2q6XQiIfDSP8DXDNrppDRw2Kp/1BODA=
 github.com/test-instructor/grpc-plugin v0.1.5 h1:eBdr6SeHKgN2+NlHk4Dwj8ngaLHhVT42Mhn0aQ+EZBI=
 github.com/test-instructor/grpc-plugin v0.1.5/go.mod h1:OC2JlZ9KZFJ+sVISBSj/o3hnRqJmZ48BKasIkPcUJjg=
-github.com/test-instructor/yangfan/hrp v0.0.0-20230515004013-b1c83ead83e6 h1:0LNM6RW5uyJ9xJq7LAyx6mftvJFN3BNBFa7xKiTJiq8=
-github.com/test-instructor/yangfan/hrp v0.0.0-20230515004013-b1c83ead83e6/go.mod h1:TAMLR3V99aU/ZC0+m+bXGuvxdjd5igrnMIJfp+Vka1M=
+github.com/test-instructor/yangfan/hrp v0.0.0-20230515173030-4544ed499044 h1:NoCKuLqYvfRIzYImMILE5vJrEHfo5aLJzHLMnSYQTDk=
+github.com/test-instructor/yangfan/hrp v0.0.0-20230515173030-4544ed499044/go.mod h1:TAMLR3V99aU/ZC0+m+bXGuvxdjd5igrnMIJfp+Vka1M=
 github.com/test-instructor/yangfan/proto v0.0.0-20230515144446-fe9fe6860dca h1:Yqjz2YH4Vz9v4jUU15XaybiZwTCxuojfjBxhCH0SvUk=
 github.com/test-instructor/yangfan/proto v0.0.0-20230515144446-fe9fe6860dca/go.mod h1:6wQfTf6owTqVIiz0dx7H3sxBaH9mIsiQZZcIrnITzew=
-github.com/test-instructor/yangfan/server v0.0.0-20230515004013-b1c83ead83e6 h1:98LscqMIUSSz27yTMXrfrCQC9Z2lLyM3LK3TNj4vCqI=
-github.com/test-instructor/yangfan/server v0.0.0-20230515004013-b1c83ead83e6/go.mod h1:+KJm9WRfJ/z4Ju06APhnwNvHXopo0yy214U3QIBfbww=
+github.com/test-instructor/yangfan/server v0.0.0-20230515173030-4544ed499044 h1:zf51emSyo/KYuPGVG1/D/OG1hmBMi7qtszHwZfPfO20=
+github.com/test-instructor/yangfan/server v0.0.0-20230515173030-4544ed499044/go.mod h1:btxYOwlS64lWdFdE/fHQfQW4lWUiX/m5qHGt7iKNpuE=
 github.com/tklauser/go-sysconf v0.3.10/go.mod h1:C8XykCvCb+Gn0oNCWPIlcb0RuglQTYaQ2hGm7jmxEFk=
 github.com/tklauser/go-sysconf v0.3.11 h1:89WgdJhk5SNwJfu+GKyYveZ4IaJ7xAkecBo+KdJV0CM=
 github.com/tklauser/go-sysconf v0.3.11/go.mod h1:GqXfhXY3kiPa0nAXPDIQIWzJbMCB7AmcWpGR8lSZfqI=
