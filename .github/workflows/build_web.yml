@@ -7,7 +7,7 @@ on:
       - front_end
 
 env:
-  IMAGE_NAME: yangfan
+  IMAGE_NAME: yangfan-web
   DOCKER_REGISTRY: registry.cn-beijing.aliyuncs.com
   TAG: yangfan-web
 
@@ -33,7 +33,7 @@ jobs:
           context: /home/runner/work/yangfan/yangfan/web
           dockerfile: ./Dockerfile   # 指定 Dockerfile 的路径
           push: true
-          tags: ${{ env.DOCKER_REGISTRY }}/zfsn/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          tags: ${{ env.DOCKER_REGISTRY }}/yangfan/${{ env.IMAGE_NAME }}:latest
           build-args: |
             APP_NAME=yangfan-web
 
