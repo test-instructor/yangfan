@@ -6,7 +6,7 @@ WORKDIR /go/src/yangfan/server
 
 # 拷贝整个server项目到工作目录
 COPY ./server .
-COPY docker-compose.yml .
+COPY docker.config.yaml .
 # 设置go env
 ENV GO111MODULE=on
 ENV GOPROXY=https://goproxy.cn

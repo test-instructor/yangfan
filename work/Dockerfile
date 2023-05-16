@@ -4,7 +4,7 @@ FROM golang:alpine AS builder
 WORKDIR /go/src/yangfan/work
 
 COPY ./work .
-COPY docker-compose.yml .
+COPY docker.config.yaml .
 
 # 设置go env
 ENV GO111MODULE=on
