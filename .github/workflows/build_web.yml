@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - front_end
+      - dev
 
 env:
   IMAGE_NAME: yangfan-web
