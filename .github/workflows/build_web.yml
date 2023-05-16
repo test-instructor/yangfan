@@ -8,7 +8,7 @@ on:
 
 env:
   IMAGE_NAME: yangfan-web
-  DOCKER_REGISTRY: registry.cn-beijing.aliyuncs.com
+  DOCKER_REGISTRY: registry.cn-hangzhou.aliyuncs.com
   TAG: yangfan-web
 
 jobs:
