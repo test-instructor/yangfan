@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package tools;
+option go_package = "./;tools";
+
+service ToolsPackage {
+  rpc InstallPackageStreamingMessage(installPackageReq) returns (stream installPackageRes) {};
+}
+
+enum Operate {
+  INSTALL = 0;
+  REMOVE = 1;
+  UPDATE = 2;
+}
+
+message installPackageRes {
+  string name = 1;
+  string version = 2;
+  Operate operate = 3;
+}
+
+message installPackageReq {}
