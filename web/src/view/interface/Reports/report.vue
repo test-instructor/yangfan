@@ -54,20 +54,27 @@
         </el-table-column>
         <el-table-column align="left" label="用例类型" width="120">
           <template #default="scope">
-            <a-tag
-              :key="caseType(scope.row.runType)[1]"
-              :color="caseType(scope.row.runType)[1]"
-              >{{ caseType(scope.row.runType)[0] }}</a-tag
+            <el-tag
+              :style="{
+                background: caseType(scope.row.runType)[1],
+                color: caseType(scope.row.runType)[2],
+                border: 'none',
+              }"
             >
+              {{ caseType(scope.row.runType)[0] }}
+            </el-tag>
           </template>
         </el-table-column>
         <el-table-column align="left" label="执行类型" width="120">
           <template #default="scope">
-            <a-tag
-              :key="runType(scope.row.type)[1]"
-              :color="runType(scope.row.type)[1]"
-              effect="plain"
-              >{{ runType(scope.row.type)[0] }}</a-tag
+            <el-tag
+              :style="{
+                background: runType(scope.row.type)[1],
+                color: runType(scope.row.type)[2],
+                border: 'none',
+              }"
+              effect="dark"
+              >{{ runType(scope.row.type)[0] }}</el-tag
             >
           </template>
         </el-table-column>
@@ -234,22 +241,22 @@ const handleCurrentChange = (val) => {
 
 const caseType = (t) => {
   if (t === 1) {
-    return ["\u3000\xa0api\u3000\xa0", "green"];
+    return ["\u3000\xa0api\u3000\xa0", "#89E9E0", "#ffffff"];
   }
   if (t === 2) {
-    return ["\xa0\xa0套\u3000件\xa0\xa0", "cyan"];
+    return ["\xa0\xa0套\u3000件\xa0\xa0", "#3FD4CF", "#ffffff"];
   }
   if (t === 3) {
-    return ["\xa0\xa0用\u3000例\xa0\xa0", "arcoblue"];
+    return ["\xa0\xa0用\u3000例\xa0\xa0", "#1FA6AA", "#ffffff"];
   }
   if (t === 4) {
-    return ["定时任务", "orange"];
+    return ["定时任务", "#4080FF", "#ffffff"];
   }
   if (t === 5) {
-    return ["性能测试", "pinkpurple"];
+    return ["性能测试", "#D91AD9", "#ffffff"];
   }
   if (t === 7) {
-    return ["任务标签", "gold"];
+    return ["任务标签", "#1664FF", "#ffffff"];
   }
   return ["定时任务"];
 };

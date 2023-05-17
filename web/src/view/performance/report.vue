@@ -60,10 +60,10 @@
         />
         <el-table-column align="left" label="执行状态" width="120">
           <template #default="scope">
-            <a-tag
-              :key="runState(scope.row.state)[1]"
-              :color="runState(scope.row.state)[1]"
-              >{{ runState(scope.row.state)[0] }}</a-tag
+            <el-tag
+              :key="runState(scope.row.state)[0]"
+              :type="runState(scope.row.state)[1]"
+              >{{ runState(scope.row.state)[0] }}</el-tag
             >
           </template>
         </el-table-column>
@@ -150,19 +150,19 @@ const router = useRouter();
 const runState = (t) => {
   console.log("---------", t);
   if (t === 1) {
-    return ["\xa0准备中\xa0", "green", false];
+    return ["\xa0准备中\xa0", "warning", false];
   }
   if (t === 2) {
-    return ["\xa0运行中\xa0", "arcoblue", true];
+    return ["\xa0运行中\xa0", "", true];
   }
   if (t === 3) {
-    return ["\xa0运行中\xa0", "arcoblue", true];
+    return ["\xa0运行中\xa0", "", true];
   }
   if (t === 4) {
-    return ["\xa0停止中\xa0", "orange", true];
+    return ["\xa0停止中\xa0", "danger", true];
   }
   if (t === 5) {
-    return ["\xa0已完成\xa0", "pinkpurple", true];
+    return ["\xa0已完成\xa0", "success", true];
   }
   return ["未知状态"];
 };

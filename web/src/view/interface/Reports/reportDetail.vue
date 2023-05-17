@@ -12,42 +12,33 @@
 
           <el-table-column width="230">
             <template #default="scope">
-              <a-table
-                :columns="columns"
+              <el-table
+                border
+                :show-header="false"
                 v-if="scope.row.str === 'case'"
                 :data="scope.row.name"
-                column-resizable
-                :bordered="{ cell: true }"
-                :pagination="false"
-                :show-header="false"
-                :cell="true"
               >
-                <template #columns>
-                  <a-table-column
-                    title="label"
-                    data-index="label"
-                    align="center"
-                    width="120"
-                  ></a-table-column>
-                  <a-table-column title="name" align="center" width="80">
-                    <template #cell="{ record }">
+                <template #default="scope">
+                  <el-table-column title="label" prop="label">
+                  </el-table-column>
+                  <el-table-column title="name" align="center" width="100">
+                    <template #default="scope">
                       <el-tag
-                        v-if="record.str === 'fail'"
+                        v-if="scope.row.str === 'fail'"
                         type="danger"
-                        :effect="record.name === 0 ? '' : 'dark'"
-                        >{{ record.name }}</el-tag
+                        :effect="scope.row.name === 0 ? '' : 'dark'"
+                        >{{ scope.row.name }}</el-tag
                       >
-                      <el-tag v-if="record.str === 'success'" type="success">{{
-                        record.name
-                      }}</el-tag>
-                      <el-tag v-if="record.str === 'total'">{{
-                        record.name
-                      }}</el-tag>
+                      <el-tag v-if="scope.row.str === 'success'" type="success">
+                        {{ scope.row.name }}
+                      </el-tag>
+                      <el-tag v-if="scope.row.str === 'total'">
+                        {{ scope.row.name }}
+                      </el-tag>
                     </template>
-                  </a-table-column>
+                  </el-table-column>
                 </template>
-              </a-table>
-
+              </el-table>
               <el-tag
                 v-if="scope.row.label === '运行状态'"
                 :type="scope.row.name ? 'success' : 'danger'"
