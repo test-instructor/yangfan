@@ -10,7 +10,6 @@ import (
 	"go.uber.org/zap"
 	"math/rand"
 	"os"
-	"sync"
 	"time"
 )
 
@@ -31,11 +30,9 @@ func main() {
 		global.GVA_LOG.Error("register db", zap.Error(global.GVA_DB.Error))
 		os.Exit(0)
 	}
-	yangfan.PyPkg()
+	yangfan.InitPythonPackage(true)
 	b := server.NewMasterBoom()
 	b.Run()
-	wait := &sync.WaitGroup{}
-	wait.Add(1)
 
 	//./hrp boom --worker --master-host 0.0.0.0 --master-port 7966 --ignore-quit
 	//./hrp boom --master --master-bind-host 0.0.0.0 --master-bind-port 7966 --master-http-address "0.0.0.0:9092"

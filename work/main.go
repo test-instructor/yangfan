@@ -62,6 +62,6 @@ func main() {
 	}
 	zerolog.SetGlobalLevel(zerolog.WarnLevel)
 	zap.ReplaceGlobals(global.GVA_LOG)
-	yangfan.PyPkg()
+	yangfan.InitPythonPackage(true)
 	NewAgent(global.GVA_CONFIG.GrpcServer.Master, global.GVA_CONFIG.GrpcServer.MasterServerProt).Work()
 }

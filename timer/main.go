@@ -25,7 +25,7 @@ func main() {
 	global.GVA_VP = core.Viper()
 	global.GVA_LOG = core.Zap()
 	global.GVA_DB = initialize.Gorm()
-	yangfan.PyPkg()
+	yangfan.InitPythonPackage(false)
 	initialize.TimerTaskCase()
 	s := <-c
 	fmt.Println("exit", s)
