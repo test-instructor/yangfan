@@ -238,6 +238,7 @@ func (b *HRPBoomer) parseTCases(testCases []*TCase) (testcases []ITestCase) {
 	if testCases != nil && len(testCases) > 0 {
 		tc := testCases[0]
 		if global.HrpMode == global.HrpModeWork {
+			global.IgnoreInstall = true
 			b.initPlugin(tc.Config.Path)
 			if b.OutputDB == nil {
 				mutex.Lock()

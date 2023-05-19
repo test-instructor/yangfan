@@ -32,7 +32,8 @@ var (
 	DebugTalkLock     = make(map[string]*sync.Mutex)
 	DebugTalkFileLock = sync.RWMutex{}
 
-	HrpMode HrpModes
+	HrpMode       HrpModes
+	IgnoreInstall bool
 )
 
 type HrpModes int

@@ -161,6 +161,10 @@ func (p *pyPkgInstall) installPythonPackage() {
 }
 
 func InitPythonPackage(limitation bool) {
+	if global.IgnoreInstall {
+		global.GVA_LOG.Warn("[InitPythonPackage]忽略安装python插件")
+		return
+	}
 	global.GVA_LOG.Debug("[InitPythonPackage]初始化python插件")
 	p := newPyPkgInstall()
 	if !limitation {

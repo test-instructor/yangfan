@@ -14,7 +14,7 @@ import (
 )
 
 type Client struct {
-	master.MasterClient
+	MasterClient master.MasterClient
 }
 
 var clientMap sync.Map

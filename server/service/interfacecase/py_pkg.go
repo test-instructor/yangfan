@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 )
 
 type PyPkgService struct {
@@ -47,6 +48,7 @@ func (p *PyPkgService) PyPkgListService(info request.HrpPyPkgRequest) (list inte
 	return pyPkgLists, total, err
 }
 
+// Deprecated:PyPkgInstallService is deprecated, please use PyPkgInstallServiceV2 instead.
 // PyPkgInstallService 安装Python包
 func (p *PyPkgService) PyPkgInstallService(pyPkg request.HrpPyPkgRequest, localPkg ...string) (err error) {
 	_ = localPkg
@@ -109,6 +111,41 @@ func (p *PyPkgService) PyPkgInstallService(pyPkg request.HrpPyPkgRequest, localP
 			return errors.New("pip安装出错：" + string(output))
 		}
 	}
+}
+
+func (p *PyPkgService) PyPkgInstallServiceV2(pyPkg request.HrpPyPkgRequest) (err error) {
+
+	var hrpPyPkg interfacecase.HrpPyPkg
+	// 设置安装参数
+	installArgs := []string{"install", pyPkg.Name}
+	if pyPkg.Version != "" && pyPkg.IsUninstall != nil && *pyPkg.IsUninstall == false {
+		installArgs[1] = pyPkg.Name + "==" + pyPkg.Version
+	}
+	if pyPkg.IsUninstall != nil && *pyPkg.IsUninstall == true {
+		installArgs[0] = "uninstall"
+	}
+	// 执行安装/卸载
+	_, PipEnvPath := p.PythonEnv()
+	output, _ := exec.Command(PipEnvPath, installArgs...).Output()
+	global.GVA_LOG.Debug("安装/卸载Python包", zap.String("output", string(output)))
+	if !strings.Contains(string(output), "Successfully installed") && !strings.Contains(string(output), "Successfully uninstalled") {
+		return errors.New("pip安装/卸载出错：" + string(output))
+	}
+	// 更新数据库
+	global.GVA_DB.Model(interfacecase.HrpPyPkg{}).First(&hrpPyPkg, "name = ?", pyPkg.Name)
+	pyPkgInfo, _ := p.FindPyPkgV2(pyPkg.Name)
+	if pyPkgInfo != nil {
+		hrpPyPkg.Version = pyPkgInfo.Version
+	} else {
+		now := time.Now()
+		hrpPyPkg.DeletedAt.Time = now
+		hrpPyPkg.DeletedAt.Valid = true
+	}
+	errSave := global.GVA_DB.Save(&hrpPyPkg).Error
+	if errSave != nil {
+		return errors.New("入库错误，请验证：" + errSave.Error())
+	}
+	return nil
 }
 
 // UnInstallService 卸载Python包
@@ -182,6 +219,7 @@ func (p *PyPkgService) SearchPyPkg(pkg request.HrpPyPkgRequest) (pkgInfo request
 	return request.HrpPyPkgRequest{}, errors.New("未找到该Python包")
 }
 
+// Deprecated:FindPyPkg is deprecated, please use FindPyPkgV2 instead.
 // FindPyPkg 查询Python包信息
 func (p *PyPkgService) FindPyPkg(name string) (pkgInfo interfacecase.HrpPyPkg, err error) {
 	_, PipEnvPath := p.PythonEnv()
@@ -195,6 +233,20 @@ func (p *PyPkgService) FindPyPkg(name string) (pkgInfo interfacecase.HrpPyPkg, e
 		}
 	}
 	return interfacecase.HrpPyPkg{}, errors.New("未找到该Python包")
+}
+
+func (p *PyPkgService) FindPyPkgV2(name string) (pkgInfo *interfacecase.HrpPyPkg, err error) {
+	_, PipEnvPath := p.PythonEnv()
+	var pkgList []interfacecase.HrpPyPkg
+	PyPkgByte, _ := exec.Command(PipEnvPath, "list", "--format=json").Output()
+	_ = json.Unmarshal(PyPkgByte, &pkgList)
+	for _, pkg := range pkgList {
+		if strings.ToLower(pkgInfo.Name) == strings.ToLower(name) {
+			//global.GVA_LOG.Info("查询数据库中的python包：", zap.String("入参：", name), zap.String("查询到的信息:", pkgInfo.Name))
+			return &pkg, nil
+		}
+	}
+	return &interfacecase.HrpPyPkg{}, errors.New("未找到该Python包")
 
 }
 

@@ -6,6 +6,7 @@ import (
 	"github.com/test-instructor/yangfan/hrp"
 	"github.com/test-instructor/yangfan/hrp/pkg/boomer"
 	"github.com/test-instructor/yangfan/proto/master"
+	"github.com/test-instructor/yangfan/server/global"
 	"os"
 	"time"
 )
@@ -25,6 +26,7 @@ func (b masterServer) Start(ctx context.Context, request *master.StartReq) (resp
 			resp.Resp = errResp
 		} else {
 			resp.Resp = okResp
+			global.IgnoreInstall = true
 		}
 	}()
 	req := hrp.StartRequestPlatformBody{
