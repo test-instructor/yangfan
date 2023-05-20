@@ -165,7 +165,9 @@ zap:
   show-line: true
   log-in-console: true
 grpc:
-  background: ""
-  master: "localhost"
-  master-boomer-prot: "9093"
+  background: "127.0.0.1"
+  background-grpc-port: 50051
+  master: "127.0.0.1"
+  master-boomer-prot: 9093
   master-server-prot: 7966
+

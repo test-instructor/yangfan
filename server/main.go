@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/test-instructor/yangfan/server/grpc"
 	"github.com/test-instructor/yangfan/server/source/yangfan"
 	"math/rand"
 	//_ "net/http/pprof"
@@ -44,6 +45,7 @@ func main() {
 		defer db.Close()
 	}
 	yangfan.Init()
+	go grpc.RunGrpcServer()
 	//go func() {
 	//	err := http.ListenAndServe("0.0.0.0:18090", nil)
 	//	if err != nil {

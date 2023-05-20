@@ -34,6 +34,7 @@ var (
 
 	HrpMode       HrpModes
 	IgnoreInstall bool
+	//GrpcServerInstallPackage *grpc.GrpcServerInstallPackage
 )
 
 type HrpModes int

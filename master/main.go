@@ -1,10 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"github.com/rs/zerolog"
 	"github.com/test-instructor/yangfan/master/server"
 	"github.com/test-instructor/yangfan/server/core"
 	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/grpc/client"
+	"github.com/test-instructor/yangfan/server/grpc/pkg"
 	"github.com/test-instructor/yangfan/server/initialize"
 	"github.com/test-instructor/yangfan/server/source/yangfan"
 	"go.uber.org/zap"
@@ -17,6 +20,16 @@ import (
 //go:generate go env -w GOPROXY=https://goproxy.cn,direct
 //go:generate go mod tidy
 //go:generate go mod download
+
+func RunPkgInstallClient() {
+	host := fmt.Sprintf("%s:%s", global.GVA_CONFIG.GrpcServer.Background, global.GVA_CONFIG.GrpcServer.BackgroundGrpcPort)
+	c, err := client.NewClient(host)
+	if err != nil {
+		global.GVA_LOG.Error("[RunClient]创建客户端失败", zap.Error(err))
+	}
+	p := pkg.NewRunInstallPkg(c)
+	p.RunClient()
+}
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
@@ -31,6 +44,7 @@ func main() {
 		os.Exit(0)
 	}
 	yangfan.InitPythonPackage(true)
+	go RunPkgInstallClient()
 	b := server.NewMasterBoom()
 	b.Run()
 

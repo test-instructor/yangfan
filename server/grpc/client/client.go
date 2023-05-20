@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
 	"github.com/test-instructor/yangfan/proto/master"
+	"github.com/test-instructor/yangfan/proto/tools"
 	"github.com/test-instructor/yangfan/server/global"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
@@ -14,7 +15,9 @@ import (
 )
 
 type Client struct {
-	MasterClient master.MasterClient
+	host               string
+	MasterClient       master.MasterClient
+	ToolsPackageClient tools.ToolsPackageClient
 }
 
 var clientMap sync.Map
@@ -48,7 +51,19 @@ func NewClient(host string) (*Client, error) {
 		}
 		apiClient = c
 	})
-	c, err = newClient(host)
+	return apiClient, nil
+}
+
+func Reconnect() (*Client, error) {
+	var c *Client
+	var err error
+	initOnce.Do(func() {
+		c, err = newClient(apiClient.host)
+		if err != nil {
+			return
+		}
+		apiClient = c
+	})
 	return apiClient, nil
 }
 
@@ -79,6 +94,8 @@ func newClient(host string) (*Client, error) {
 	}
 
 	return &Client{
-		MasterClient: master.NewMasterClient(c),
+		host:               host,
+		MasterClient:       master.NewMasterClient(c),
+		ToolsPackageClient: tools.NewToolsPackageClient(c),
 	}, nil
 }

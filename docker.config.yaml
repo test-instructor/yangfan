@@ -165,7 +165,8 @@ zap:
   show-line: true
   log-in-console: true
 yf:
-  background: ""
+  background: "yangfan-server"
+  background-grpc-port: 50051
   master: "yangfan-master"
-  master-boomer-prot: "9093"
+  master-boomer-prot: 9093
   master-server-prot: 7966
