@@ -49,16 +49,21 @@
               </span>
               <span class="block-method block_url">
                 {{ scope.row.ApiCaseStep.name }}
-                <a-tag
-                  :key="StepType(scope.row)[2]"
-                  :color="StepType(scope.row)[2]"
+                <el-tag
+                  :style="{
+                    background: StepType(scope.row)[2],
+                    color: '#ffffff',
+                    border: 'none',
+                  }"
+                  effect="dark"
                   v-if="showTag(scope.row.ApiCaseStep.api_step_type)"
-                  >{{
+                >
+                  {{
                     scope.row.ApiCaseStep.api_step_type == "TransactionStart"
                       ? "START"
                       : "END"
-                  }}</a-tag
-                >
+                  }}
+                </el-tag>
               </span>
             </div>
           </template>

@@ -6,7 +6,7 @@
           <span>{{ reportName }}</span>
         </el-form-item>
         <el-form-item label="任务状态：">
-          <a-tag :key="stateStyle" :color="stateStyle">{{ stateName }}</a-tag>
+          <el-tag :key="stateName" :type="stateStyle">{{ stateName }}</el-tag>
         </el-form-item>
         <el-form-item label="操作：">
           <el-button
@@ -322,27 +322,27 @@ const stateStyle = ref("");
 const runState = (t) => {
   if (t === 1) {
     stateName.value = "\xa0准备中\xa0";
-    stateStyle.value = "green";
+    stateStyle.value = "warning";
     return;
   }
   if (t === 2) {
     stateName.value = "\xa0运行中\xa0";
-    stateStyle.value = "arcoblue";
+    stateStyle.value = "";
     return;
   }
   if (t === 3) {
     stateName.value = "\xa0运行中\xa0";
-    stateStyle.value = "arcoblue";
+    stateStyle.value = "";
     return;
   }
   if (t === 4) {
     stateName.value = "\xa0停止中\xa0";
-    stateStyle.value = "orange";
+    stateStyle.value = "danger";
     return;
   }
   if (t === 5) {
     stateName.value = "\xa0已完成\xa0";
-    stateStyle.value = "pinkpurple";
+    stateStyle.value = "success";
     boomerButton.value = true;
     return;
   }

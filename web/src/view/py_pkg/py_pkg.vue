@@ -55,27 +55,27 @@
         </el-table-column> -->
         <el-table-column align="center" label="包名称" prop="name" />
         <el-table-column align="center" label="包版本" prop="version" />
-        <!--        <el-table-column align="center" label="操作">-->
-        <!--          <template #default="scope">-->
-        <!--            <el-button-->
-        <!--              type="primary"-->
-        <!--              link-->
-        <!--              icon="icon-upgrade"-->
-        <!--              size="small"-->
-        <!--              @click="updateRow(scope.row)"-->
-        <!--              >升级-->
-        <!--            </el-button>-->
-        <!--            <el-button-->
-        <!--              v-if="scope.row.isUninstall"-->
-        <!--              type="primary"-->
-        <!--              link-->
-        <!--              icon="delete"-->
-        <!--              size="small"-->
-        <!--              @click="deleteRow(scope.row)"-->
-        <!--              >卸载-->
-        <!--            </el-button>-->
-        <!--          </template>-->
-        <!--        </el-table-column>-->
+        <el-table-column align="center" label="操作">
+          <template #default="scope">
+            <el-button
+              type="primary"
+              link
+              icon="icon-upgrade"
+              size="small"
+              @click="updateRow(scope.row)"
+              >升级
+            </el-button>
+            <el-button
+              v-if="scope.row.isUninstall"
+              type="primary"
+              link
+              icon="delete"
+              size="small"
+              @click="deleteRow(scope.row)"
+              >卸载
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table>
       <div class="gva-pagination">
         <el-pagination
@@ -402,12 +402,6 @@ const enterDialog = async () => {
       });
       closeDialog();
       getTableData();
-    } else {
-      ElMessageBox.confirm(res.msg, "安装第三方库失败", {
-        confirmButtonText: "OK",
-        type: "error",
-        center: true,
-      });
     }
   });
 };
