@@ -1,0 +1,10 @@
+go 1.19
+
+use (
+	./hrp
+	./master
+	./proto
+	./server
+	./timer
+	./work
+)
