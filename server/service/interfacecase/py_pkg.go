@@ -4,7 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/test-instructor/yangfan/proto/tools"
+	"github.com/test-instructor/yangfan/server/core/pkg"
 	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/grpc"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"github.com/test-instructor/yangfan/server/model/interfacecase/request"
 	"go.uber.org/zap"
@@ -12,7 +15,6 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"time"
 )
 
 type PyPkgService struct {
@@ -61,7 +63,7 @@ func (p *PyPkgService) PyPkgInstallService(pyPkg request.HrpPyPkgRequest, localP
 		global.GVA_LOG.Debug(fmt.Sprintln("安装日志信息", string(output)))
 		global.GVA_LOG.Info("安装Python包", zap.String("output", string(output)))
 		if strings.Contains(string(output), "Successfully installed") {
-			pyPkgInfo, err := p.FindPyPkg(pyPkg.Name)
+			pyPkgInfo, err := p.FindPyPkgV2(pyPkg.Name)
 			if err != nil {
 				return err
 			}
@@ -89,7 +91,7 @@ func (p *PyPkgService) PyPkgInstallService(pyPkg request.HrpPyPkgRequest, localP
 		}
 		global.GVA_LOG.Debug(fmt.Sprintln("安装日志信息", string(output)))
 		if strings.Contains(string(output), "Successfully installed") {
-			pyPkgInfo, err := p.FindPyPkg(pyPkg.Name)
+			pyPkgInfo, err := p.FindPyPkgV2(pyPkg.Name)
 			if err != nil {
 				return err
 			}
@@ -114,38 +116,19 @@ func (p *PyPkgService) PyPkgInstallService(pyPkg request.HrpPyPkgRequest, localP
 }
 
 func (p *PyPkgService) PyPkgInstallServiceV2(pyPkg request.HrpPyPkgRequest) (err error) {
+	defer func() {
+		if err == nil {
+			var res = &tools.InstallPackageRes{
+				Name:    pyPkg.Name,
+				Version: pyPkg.Version,
+				Operate: tools.Operate_INSTALL,
+			}
+			grpc.ServerInstallPackage.SendMessageToSavedClients(res)
+		}
+	}()
 
-	var hrpPyPkg interfacecase.HrpPyPkg
-	// 设置安装参数
-	installArgs := []string{"install", pyPkg.Name}
-	if pyPkg.Version != "" && pyPkg.IsUninstall != nil && *pyPkg.IsUninstall == false {
-		installArgs[1] = pyPkg.Name + "==" + pyPkg.Version
-	}
-	if pyPkg.IsUninstall != nil && *pyPkg.IsUninstall == true {
-		installArgs[0] = "uninstall"
-	}
-	// 执行安装/卸载
-	_, PipEnvPath := p.PythonEnv()
-	output, _ := exec.Command(PipEnvPath, installArgs...).Output()
-	global.GVA_LOG.Debug("安装/卸载Python包", zap.String("output", string(output)))
-	if !strings.Contains(string(output), "Successfully installed") && !strings.Contains(string(output), "Successfully uninstalled") {
-		return errors.New("pip安装/卸载出错：" + string(output))
-	}
-	// 更新数据库
-	global.GVA_DB.Model(interfacecase.HrpPyPkg{}).First(&hrpPyPkg, "name = ?", pyPkg.Name)
-	pyPkgInfo, _ := p.FindPyPkgV2(pyPkg.Name)
-	if pyPkgInfo != nil {
-		hrpPyPkg.Version = pyPkgInfo.Version
-	} else {
-		now := time.Now()
-		hrpPyPkg.DeletedAt.Time = now
-		hrpPyPkg.DeletedAt.Valid = true
-	}
-	errSave := global.GVA_DB.Save(&hrpPyPkg).Error
-	if errSave != nil {
-		return errors.New("入库错误，请验证：" + errSave.Error())
-	}
-	return nil
+	err = pkg.PyPkgInstallServiceV2(pyPkg)
+	return
 }
 
 // UnInstallService 卸载Python包
@@ -173,7 +156,7 @@ func (p *PyPkgService) UpdatePyPkgService(PyPkg request.HrpPyPkgRequest) (err er
 	var hrpPyPkg interfacecase.HrpPyPkg
 	pkgInfo, _ := exec.Command(pipEnvPath, "install", PyPkg.Name, "--upgrade").Output()
 	if strings.Contains(string(pkgInfo), "Successfully installed") {
-		PyPkgInfo, err := p.FindPyPkg(PyPkg.Name)
+		PyPkgInfo, err := p.FindPyPkgV2(PyPkg.Name)
 		global.GVA_LOG.Info("更新Python包成功!", zap.String("PyPkgInfo.name", PyPkg.Name),
 			zap.String("PyPkgInfo.version", PyPkg.Version))
 		if err != nil {

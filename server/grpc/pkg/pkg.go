@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"context"
+	"github.com/test-instructor/yangfan/server/core/pkg"
 	"github.com/test-instructor/yangfan/server/grpc/client"
 
 	"github.com/test-instructor/yangfan/proto/tools"
@@ -86,20 +87,17 @@ func (p *PkgClient) RunClient() {
 				for {
 					// 等待一段时间后尝试重连
 					time.Sleep(5 * time.Second)
-
 					//conn, err := p.createClientConn(target)
 					p.client, err = client.Reconnect()
 					if err != nil {
 						global.GVA_LOG.Error("[RunClient]重新连接失败", zap.Error(err))
 						continue
 					}
-
 					stream, err = p.client.ToolsPackageClient.InstallPackageStreamingMessage(context.Background(), &tools.InstallPackageReq{})
 					if err != nil {
 						global.GVA_LOG.Error("[RunClient]流式接口连接失败", zap.Error(err))
 						continue
 					}
-
 					break
 				}
 				continue
@@ -121,9 +119,11 @@ func (p *PkgClient) installPythonPackage(res *tools.InstallPackageRes) {
 		isUninstall = true
 	}
 	pyPkg.IsUninstall = &isUninstall
-	if err := pyPkgService.PyPkgInstallService(request.HrpPyPkgRequest{HrpPyPkg: pyPkg}); err != nil {
+	if err := pkg.PyPkgInstallServiceV2(request.HrpPyPkgRequest{HrpPyPkg: pyPkg}); err != nil {
 		global.GVA_LOG.Error("[InitPythonPackage]安装 python 第三方库失败", zap.Any("pyPkg", pyPkg), zap.Error(err))
+		return
 	}
+	global.GVA_LOG.Debug("[InitPythonPackage]安装 python 第三方库成功", zap.Any("pyPkg", pyPkg))
 }
 
 func NewRunInstallPkg(client *client.Client) *PkgClient {

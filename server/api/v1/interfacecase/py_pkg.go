@@ -38,7 +38,7 @@ func (p *PyPkg) GetPyPkgList(ctx *gin.Context) {
 func (p *PyPkg) InstallPyPkg(ctx *gin.Context) {
 	var pyPkg request.HrpPyPkgRequest
 	_ = ctx.ShouldBindJSON(&pyPkg.HrpPyPkg)
-	if err := pyPkgService.PyPkgInstallService(pyPkg); err != nil {
+	if err := pyPkgService.PyPkgInstallServiceV2(pyPkg); err != nil {
 		response.FailWithMessage(err.Error(), ctx)
 	} else {
 		response.Ok(ctx)

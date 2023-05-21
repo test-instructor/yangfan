@@ -402,6 +402,12 @@ const enterDialog = async () => {
       });
       closeDialog();
       getTableData();
+    } else {
+      ElMessageBox.confirm(res.msg, "安装第三方库失败", {
+        confirmButtonText: "OK",
+        type: "error",
+        center: true,
+      });
     }
   });
 };

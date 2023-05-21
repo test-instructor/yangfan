@@ -70,7 +70,7 @@ func PyPkg() {
 	}
 	for _, pyPkg := range packages {
 		global.GVA_LOG.Debug("安装python插件")
-		if err := pyPkgService.PyPkgInstallService(request.HrpPyPkgRequest{HrpPyPkg: pyPkg}); err != nil {
+		if err := pyPkgService.PyPkgInstallServiceV2(request.HrpPyPkgRequest{HrpPyPkg: pyPkg}); err != nil {
 			global.GVA_LOG.Error("安装 python 第三方库失败", zap.Any("pyPkg", pyPkg), zap.Error(err))
 		}
 	}
@@ -154,7 +154,7 @@ func (p *pyPkgInstall) installPythonPackage() {
 	}
 	for _, pyPkg := range packages {
 		global.GVA_LOG.Debug("[InitPythonPackage]安装python插件")
-		if err := pyPkgService.PyPkgInstallService(request.HrpPyPkgRequest{HrpPyPkg: pyPkg}); err != nil {
+		if err := pyPkgService.PyPkgInstallServiceV2(request.HrpPyPkgRequest{HrpPyPkg: pyPkg}); err != nil {
 			global.GVA_LOG.Error("[InitPythonPackage]安装 python 第三方库失败", zap.Any("pyPkg", pyPkg), zap.Error(err))
 		}
 	}
