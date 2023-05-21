@@ -722,8 +722,8 @@ github.com/test-instructor/grpc-plugin v0.1.5 h1:eBdr6SeHKgN2+NlHk4Dwj8ngaLHhVT4
 github.com/test-instructor/grpc-plugin v0.1.5/go.mod h1:OC2JlZ9KZFJ+sVISBSj/o3hnRqJmZ48BKasIkPcUJjg=
 github.com/test-instructor/yangfan/hrp v0.0.0-20230515173030-4544ed499044 h1:NoCKuLqYvfRIzYImMILE5vJrEHfo5aLJzHLMnSYQTDk=
 github.com/test-instructor/yangfan/hrp v0.0.0-20230515173030-4544ed499044/go.mod h1:TAMLR3V99aU/ZC0+m+bXGuvxdjd5igrnMIJfp+Vka1M=
-github.com/test-instructor/yangfan/proto v0.0.0-20230515173030-4544ed499044 h1:a0iFMW1Hi8bndk5vvHJnF/20bAx5H/o/pZbDDNZevVY=
-github.com/test-instructor/yangfan/proto v0.0.0-20230515173030-4544ed499044/go.mod h1:6wQfTf6owTqVIiz0dx7H3sxBaH9mIsiQZZcIrnITzew=
+github.com/test-instructor/yangfan/proto v0.0.0-20230521150540-bdfa0196efa2 h1:hX4hjkr73fO7tP8kHFqcf5n2XLvzAGBXWZaAxDbkjUw=
+github.com/test-instructor/yangfan/proto v0.0.0-20230521150540-bdfa0196efa2/go.mod h1:6wQfTf6owTqVIiz0dx7H3sxBaH9mIsiQZZcIrnITzew=
 github.com/tklauser/go-sysconf v0.3.10/go.mod h1:C8XykCvCb+Gn0oNCWPIlcb0RuglQTYaQ2hGm7jmxEFk=
 github.com/tklauser/go-sysconf v0.3.11 h1:89WgdJhk5SNwJfu+GKyYveZ4IaJ7xAkecBo+KdJV0CM=
 github.com/tklauser/go-sysconf v0.3.11/go.mod h1:GqXfhXY3kiPa0nAXPDIQIWzJbMCB7AmcWpGR8lSZfqI=
