@@ -1,137 +1,149 @@
 <template>
   <div>
-    <div class="gva-search-box">
-      <el-form :inline="true" :model="searchInfo" class="demo-form-inline">
+    <div>
+      <div class="gva-search-box">
+        <el-form :inline="true" :model="searchInfo" class="demo-form-inline">
+          <el-form-item label="变量key">
+            <el-input v-model="searchInfo.key" placeholder="搜索条件" />
+          </el-form-item>
+          <el-form-item label="变量名称">
+            <el-input v-model="searchInfo.name" placeholder="搜索条件" />
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              icon="search"
+              size="mini"
+              type="primary"
+              @click="onSubmit()"
+              >查询</el-button
+            >
+            <el-button icon="refresh" size="mini" @click="onReset()"
+              >重置</el-button
+            >
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              icon="plus"
+              size="mini"
+              type="primary"
+              @click="openDialogEnv()"
+              >环境管理</el-button
+            >
+          </el-form-item>
+        </el-form>
+      </div>
+    </div>
+    <div class="gva-table-box">
+      <div class="gva-btn-list">
+        <el-button
+          icon="plus"
+          size="mini"
+          type="primary"
+          @click="openDialogEnv()"
+          >环境管理</el-button
+        >
+        <el-button
+          icon="plus"
+          size="mini"
+          type="primary"
+          @click="openDialogEnvVar()"
+          >添加变量</el-button
+        >
+      </div>
+      <el-table
+        ref="multipleTable"
+        row-key="ID"
+        :data="envVarData"
+        style="width: 100%"
+        tooltip-effect="dark"
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column label="变量key" prop="key" width="150" />
+
+        <el-table-column label="变量名" prop="name" width="150" />
+        <el-table-column
+          v-for="title in envTableData"
+          :label="title.name"
+          align="center"
+          :key="title.ID"
+          :index="title.index"
+        >
+          <template #default="scope">
+            {{ scope.row.value[title.ID] }}
+          </template>
+        </el-table-column>
+        <el-table-column align="left" label="按钮组" width="160">
+          <template #default="scope">
+            <el-button
+              class="table-button"
+              icon="edit"
+              size="small"
+              type="text"
+              @click="updateRow(scope.row)"
+              >变更
+            </el-button>
+            <el-button
+              icon="delete"
+              size="mini"
+              type="text"
+              @click="deleteRow(scope.row)"
+              >删除</el-button
+            >
+          </template>
+        </el-table-column>
+      </el-table>
+      <div class="gva-pagination">
+        <el-pagination
+          layout="total, sizes, prev, pager, next, jumper"
+          :current-page="page"
+          :page-size="pageSize"
+          :page-sizes="[10, 30, 50, 100]"
+          :total="total"
+          @current-change="handleCurrentChange"
+          @size-change="handleSizeChange"
+        />
+      </div>
+    </div>
+    <el-dialog
+      v-model="envDialog"
+      :before-close="closeDialogEnv"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      title="环境管理"
+    >
+      <env v-if="envDialog"></env>
+    </el-dialog>
+    <el-dialog
+      v-model="envVarDialog"
+      :before-close="closeDialogEnvVar"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :title="envVarType"
+    >
+      <el-form :model="varForm" label-width="120px">
         <el-form-item label="变量key">
-          <el-input v-model="searchInfo.key" placeholder="搜索条件" />
+          <el-input v-model="varForm.key" :disabled="envVarType === '更新变量'">
+            <template v-if="envVarType != '更新变量'" #prepend>env_</template>
+          </el-input>
         </el-form-item>
         <el-form-item label="变量名称">
-          <el-input v-model="searchInfo.name" placeholder="搜索条件" />
+          <el-input v-model="varForm.name" />
+        </el-form-item>
+        <el-divider />
+        <el-form-item v-for="(item, index) of envTableData" :label="item.name">
+          <el-input v-model="varForm.value[String(item.ID)]" />
         </el-form-item>
         <el-form-item>
-          <el-button icon="search" size="mini" type="primary" @click="onSubmit"
-            >查询</el-button
+          <el-button type="primary" @click="addEnvVarFunc" round
+            >保存</el-button
           >
-          <el-button icon="refresh" size="mini" @click="onReset"
-            >重置</el-button
-          >
-        </el-form-item>
-        <el-form-item>
-          <el-button
-            icon="plus"
-            size="mini"
-            type="primary"
-            @click="openDialogEnv"
-            >环境管理</el-button
+          <el-button type="primary" @click="closeDialogEnvVar" round
+            >取消</el-button
           >
         </el-form-item>
       </el-form>
-    </div>
+    </el-dialog>
   </div>
-  <div class="gva-table-box">
-    <div class="gva-btn-list">
-      <el-button icon="plus" size="mini" type="primary" @click="openDialogEnv"
-        >环境管理</el-button
-      >
-      <el-button
-        icon="plus"
-        size="mini"
-        type="primary"
-        @click="openDialogEnvVar"
-        >添加变量</el-button
-      >
-    </div>
-    <el-table
-      ref="multipleTable"
-      row-key="ID"
-      :data="envVarData"
-      style="width: 100%"
-      tooltip-effect="dark"
-      @selection-change="handleSelectionChange"
-    >
-      <el-table-column label="变量key" prop="key" width="150" />
-
-      <el-table-column label="变量名" prop="name" width="150" />
-      <el-table-column
-        v-for="title in envTableData"
-        :label="title.name"
-        align="center"
-        :key="title.ID"
-        :index="title.index"
-      >
-        <template #default="scope">
-          {{ scope.row.value[title.ID] }}
-        </template>
-      </el-table-column>
-      <el-table-column align="left" label="按钮组" width="160">
-        <template #default="scope">
-          <el-button
-            class="table-button"
-            icon="edit"
-            size="small"
-            type="text"
-            @click="updateRow(scope.row)"
-            >变更
-          </el-button>
-          <el-button
-            icon="delete"
-            size="mini"
-            type="text"
-            @click="deleteRow(scope.row)"
-            >删除</el-button
-          >
-        </template>
-      </el-table-column>
-    </el-table>
-    <div class="gva-pagination">
-      <el-pagination
-        layout="total, sizes, prev, pager, next, jumper"
-        :current-page="page"
-        :page-size="pageSize"
-        :page-sizes="[10, 30, 50, 100]"
-        :total="total"
-        @current-change="handleCurrentChange"
-        @size-change="handleSizeChange"
-      />
-    </div>
-  </div>
-  <el-dialog
-    v-model="envDialog"
-    :before-close="closeDialogEnv"
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
-    title="环境管理"
-  >
-    <env v-if="envDialog"></env>
-  </el-dialog>
-  <el-dialog
-    v-model="envVarDialog"
-    :before-close="closeDialogEnvVar"
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
-    :title="envVarType"
-  >
-    <el-form :model="varForm" label-width="120px">
-      <el-form-item label="变量key">
-        <el-input v-model="varForm.key" :disabled="envVarType === '更新变量'">
-          <template v-if="envVarType != '更新变量'" #prepend>env_</template>
-        </el-input>
-      </el-form-item>
-      <el-form-item label="变量名称">
-        <el-input v-model="varForm.name" />
-      </el-form-item>
-      <el-divider />
-      <el-form-item v-for="(item, index) of envTableData" :label="item.name">
-        <el-input v-model="varForm.value[String(item.ID)]" />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="addEnvVarFunc" round>保存</el-button>
-        <el-button type="primary" @click="closeDialogEnvVar" round
-          >取消</el-button
-        >
-      </el-form-item>
-    </el-form>
-  </el-dialog>
 </template>
 
 <script>
