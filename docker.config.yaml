@@ -155,7 +155,7 @@ timer:
       compareField: created_at
       interval: 168h
 zap:
-  level: error
+  level: debug
   prefix: '[yangfan]'
   format: console
   director: log
@@ -164,9 +164,9 @@ zap:
   max-age: 30
   show-line: true
   log-in-console: true
-yf:
-  background: "yangfan-server"
-  background-grpc-port: 50051
-  master: "yangfan-master"
+grpc:
+  background: "177.7.0.12"
+  background-grpc-port: 7967
+  master: "177.7.0.15"
   master-boomer-prot: 9093
   master-server-prot: 7966

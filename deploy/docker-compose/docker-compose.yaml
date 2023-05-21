@@ -17,6 +17,7 @@ services:
     restart: always
     ports:
       - '8888:8888'
+      - '7967:7967'
     networks:
       network:
         ipv4_address: 177.7.0.12
@@ -57,3 +58,13 @@ services:
     networks:
       network:
         ipv4_address: 177.7.0.16
+
+  timer:
+    build:
+      context: ../../
+      dockerfile: ./timer/Dockerfile
+    container_name: yangfan-timer
+    restart: always
+    networks:
+      network:
+        ipv4_address: 177.7.0.13

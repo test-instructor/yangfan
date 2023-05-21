@@ -104,6 +104,7 @@ func newGrpcServerInstallPackage() *GrpcServerInstallPackage {
 
 func RunGrpcServer() {
 	listenAddr := "0.0.0.0:" + global.GVA_CONFIG.GrpcServer.BackgroundGrpcPort // 服务监听的地址和端口
+	global.GVA_LOG.Debug("准备监听", zap.String("listenAddr", listenAddr))
 	lis, err := net.Listen("tcp", listenAddr)
 	if err != nil {
 		global.GVA_LOG.Panic("Failed to listen", zap.Error(err))

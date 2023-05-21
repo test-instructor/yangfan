@@ -40,7 +40,7 @@ func main() {
 	global.GVA_LOG = core.Zap()
 	global.GVA_DB = initialize.Gorm()
 	yangfan.InitPythonPackage(false)
-	initialize.TimerTaskCase()
+	//initialize.TimerTaskCase()
 	go RunPkgInstallClient()
 	s := <-c
 	fmt.Println("exit", s)

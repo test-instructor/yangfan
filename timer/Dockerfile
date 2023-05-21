@@ -3,7 +3,7 @@ FROM golang:alpine AS builder
 
 WORKDIR /go/src/yangfan/timer
 
-COPY . .
+COPY ./timer .
 COPY docker.config.yaml .
 
 # 设置go env

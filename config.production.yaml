@@ -164,7 +164,7 @@ zap:
   max-age: 30
   show-line: true
   log-in-console: true
-yf:
+grpc:
   background: "yangfan-server"
   background-grpc-port: 50051
   master: "yangfan-master"

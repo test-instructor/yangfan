@@ -166,7 +166,7 @@ zap:
   log-in-console: true
 grpc:
   background: "127.0.0.1"
-  background-grpc-port: 50051
+  background-grpc-port: 7967
   master: "127.0.0.1"
   master-boomer-prot: 9093
   master-server-prot: 7966
