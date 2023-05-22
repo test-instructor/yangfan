@@ -15,10 +15,8 @@ enum TimerStatusOperate {
 
 
 message setTaskRes {
-  int64 EntryID = 1;
-  uint64 ID = 2;
-  TimerStatusOperate TimerStatus = 3;
-  string RunTime = 4;
+  uint64 ID = 1;
+  TimerStatusOperate TimerStatus = 2;
 }
 
 message setTaskReq {}
