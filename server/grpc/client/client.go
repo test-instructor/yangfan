@@ -15,10 +15,9 @@ import (
 )
 
 type Client struct {
-	host               string
-	MasterClient       master.MasterClient
-	ToolsPackageClient tools.ToolsPackageClient
-	TimerTaskClient    tools.TimerTaskClient
+	host              string
+	MasterClient      master.MasterClient
+	ToolsServerClient tools.ToolsServerClient
 }
 
 var clientMap sync.Map
@@ -95,9 +94,8 @@ func newClient(host string) (*Client, error) {
 	}
 
 	return &Client{
-		host:               host,
-		MasterClient:       master.NewMasterClient(c),
-		ToolsPackageClient: tools.NewToolsPackageClient(c),
-		TimerTaskClient:    tools.NewTimerTaskClient(c),
+		host:              host,
+		MasterClient:      master.NewMasterClient(c),
+		ToolsServerClient: tools.NewToolsServerClient(c),
 	}, nil
 }

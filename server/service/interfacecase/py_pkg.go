@@ -122,7 +122,7 @@ func (p *PyPkgService) PyPkgInstallServiceV2(pyPkg request.HrpPyPkgRequest) (err
 				Version: pyPkg.Version,
 				Operate: tools.Operate_INSTALL,
 			}
-			grpc.ServerInstallPackage.SendMessageToSavedClients(res)
+			grpc.ServerToolsObj.SendMessageToSavedClients(res)
 		}
 	}()
 
@@ -209,10 +209,10 @@ func (p *PyPkgService) FindPyPkgV2(name string) (pkgInfo *interfacecase.HrpPyPkg
 	var pkgList []interfacecase.HrpPyPkg
 	PyPkgByte, _ := exec.Command(PipEnvPath, "list", "--format=json").Output()
 	_ = json.Unmarshal(PyPkgByte, &pkgList)
-	for _, pkg := range pkgList {
+	for _, PKG := range pkgList {
 		if strings.ToLower(pkgInfo.Name) == strings.ToLower(name) {
 			//global.GVA_LOG.Info("查询数据库中的python包：", zap.String("入参：", name), zap.String("查询到的信息:", pkgInfo.Name))
-			return &pkg, nil
+			return &PKG, nil
 		}
 	}
 	return &interfacecase.HrpPyPkg{}, errors.New("未找到该Python包")
