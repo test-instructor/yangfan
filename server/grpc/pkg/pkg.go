@@ -110,6 +110,7 @@ func (p *PkgClient) RunClient() {
 	// 等待程序退出
 	<-make(chan struct{})
 }
+
 func (p *PkgClient) installPythonPackage(res *tools.InstallPackageRes) {
 	var isUninstall bool
 	var pyPkg interfacecase.HrpPyPkg

@@ -7,17 +7,18 @@ service TimerTask {
   rpc SetTaskStreamingMessage(setTaskReq) returns (stream setTaskRes) {};
 }
 
-enum TaskStatus {
-  BEGIN = 0;
-  END = 1;
-  CANCEL = 2;
+enum TimerStatusOperate {
+  ADD = 0;
+  DELETE = 1;
+  RESET = 2;
 }
 
 
 message setTaskRes {
-  string name = 1;
-  string version = 2;
-  TaskStatus status = 3;
+  int64 EntryID = 1;
+  uint64 ID = 2;
+  TimerStatusOperate TimerStatus = 3;
+  string RunTime = 4;
 }
 
 message setTaskReq {}
