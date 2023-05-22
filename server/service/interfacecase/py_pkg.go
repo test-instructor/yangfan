@@ -11,7 +11,6 @@ import (
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"github.com/test-instructor/yangfan/server/model/interfacecase/request"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 	"os"
 	"os/exec"
 	"strings"
@@ -132,22 +131,9 @@ func (p *PyPkgService) PyPkgInstallServiceV2(pyPkg request.HrpPyPkgRequest) (err
 }
 
 // UnInstallService 卸载Python包
-func (p *PyPkgService) UnInstallService(pkg request.HrpPyPkgRequest) (err error) {
-	_, pipEnvPath := p.PythonEnv()
-	output, _ := exec.Command(pipEnvPath, "uninstall", pkg.Name, "-y").Output()
-	if strings.Contains(string(output), "Successfully uninstalled") {
-		err = global.GVA_DB.Where("name = ?", pkg.Name).First(&pkg).Error
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return err
-		}
-		err = global.GVA_DB.Delete(&pkg).Error
-		if err != nil {
-			return err
-		}
-	} else {
-		return errors.New(string(output))
-	}
-	return nil
+func (p *PyPkgService) UnInstallService(pkg interfacecase.HrpPyPkg) (err error) {
+	err = global.GVA_DB.Delete(&pkg).Error
+	return
 }
 
 // UpdatePyPkgService 更新Python包

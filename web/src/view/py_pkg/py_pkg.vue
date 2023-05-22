@@ -66,7 +66,6 @@
               >升级
             </el-button>
             <el-button
-              v-if="scope.row.isUninstall"
               type="primary"
               link
               icon="delete"
@@ -358,7 +357,7 @@ const updateHrpPyPkgFunc = async (row) => {
 
 // 卸载python包
 const uninstallHrpPyPkgFunc = async (row) => {
-  const res = await uninstallHrpPyPkg({ name: row.name });
+  const res = await uninstallHrpPyPkg({ ID: row.ID });
   if (res.code === 0) {
     ElMessage({
       type: "success",

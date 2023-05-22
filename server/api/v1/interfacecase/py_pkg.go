@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"github.com/test-instructor/yangfan/server/model/interfacecase/request"
 	"github.com/test-instructor/yangfan/server/service"
 	"go.uber.org/zap"
@@ -46,7 +47,7 @@ func (p *PyPkg) InstallPyPkg(ctx *gin.Context) {
 }
 
 func (p *PyPkg) UninstallPyPkg(ctx *gin.Context) {
-	var pyPkg request.HrpPyPkgRequest
+	var pyPkg interfacecase.HrpPyPkg
 	_ = ctx.ShouldBindJSON(&pyPkg)
 	if err := pyPkgService.UnInstallService(pyPkg); err != nil {
 		response.FailWithMessage(err.Error(), ctx)
