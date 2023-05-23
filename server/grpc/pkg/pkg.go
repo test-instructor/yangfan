@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"context"
+	"fmt"
 	"github.com/robfig/cron/v3"
 	"github.com/test-instructor/yangfan/server/core/pkg"
 	"github.com/test-instructor/yangfan/server/grpc/client"
@@ -215,18 +216,23 @@ func (t *ToolsClient) setTimerTask(res *tools.SetTaskRes) {
 
 func (t *ToolsClient) deleteTimer(res *tools.SetTaskRes) {
 	global.GVA_LOG.Debug("[deleteTimer]删除定时任务", zap.Any("task", res))
+	global.GVA_LOG.Debug(fmt.Sprintln(global.GVA_Timer.FindCron(strconv.Itoa(int(res.GetID())))))
 	global.GVA_Timer.Remove(strconv.Itoa(int(res.GetID())), int(res.GetEntryID()))
+	global.GVA_LOG.Debug(fmt.Sprintln(global.GVA_Timer.FindCron(strconv.Itoa(int(res.GetID())))))
 	return
 }
 
 func (t *ToolsClient) resetTimer(task interfacecase.ApiTimerTask) {
 	global.GVA_LOG.Debug("[deleteTimer]删除定时任务", zap.Any("task", task))
+	global.GVA_LOG.Debug(fmt.Sprintln(global.GVA_Timer.FindCron(strconv.Itoa(int(task.ID)))))
 	global.GVA_Timer.Remove(strconv.Itoa(int(task.ID)), task.EntryID)
+	global.GVA_LOG.Debug(fmt.Sprintln(global.GVA_Timer.FindCron(strconv.Itoa(int(task.ID)))))
 	task.EntryID = 0
 	global.GVA_DB.Save(&task)
 	if *task.Status {
 		global.GVA_LOG.Debug("[addTimer]添加定时任务", zap.Any("task", task))
 		id, err := global.GVA_Timer.AddTaskByFunc(strconv.Itoa(int(task.ID)), task.RunTime, runTestCase.RunTimerTaskBack(task.ID), cron.WithSeconds())
+		global.GVA_LOG.Debug(fmt.Sprintln(global.GVA_Timer.FindCron(strconv.Itoa(int(task.ID)))))
 		if err != nil {
 			return
 		}
@@ -243,6 +249,7 @@ func (t *ToolsClient) addTimer(task interfacecase.ApiTimerTask) {
 	if *task.Status {
 		global.GVA_LOG.Debug("[addTimer]添加定时任务", zap.Any("task", task))
 		id, err := global.GVA_Timer.AddTaskByFunc(strconv.Itoa(int(task.ID)), task.RunTime, runTestCase.RunTimerTaskBack(task.ID), cron.WithSeconds())
+		global.GVA_LOG.Debug(fmt.Sprintln(global.GVA_Timer.FindCron(strconv.Itoa(int(task.ID)))))
 		if err != nil {
 			return
 		}

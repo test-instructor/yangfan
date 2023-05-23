@@ -1,6 +1,7 @@
 package runTestCase
 
 import (
+	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/model/common/request"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
 )
@@ -60,6 +61,7 @@ func RunTimerTaskBack(taskID uint) func() {
 	return func() {
 		var runCaseReq request.RunCaseReq
 		runCaseReq.TaskID = taskID
+		global.GVA_LOG.Debug("执行定时任务")
 		RunTimerTask(runCaseReq, interfacecase.RunTypeRunTimer)
 	}
 }
