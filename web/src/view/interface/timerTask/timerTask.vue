@@ -670,7 +670,9 @@ const closeDialog = () => {
     describe: "",
     runNumber: 0,
     config: { ID: 0 },
+    api_env_id: 0,
   };
+  apiEnvID.value = "";
   creatCron.value = false;
 };
 // 弹窗确定
@@ -741,7 +743,7 @@ const enterDialog = async () => {
       message: "创建/更改成功",
     });
     closeDialog();
-    getTableData();
+    await getTableData();
     creatCron.value = false;
   }
 };
