@@ -56,7 +56,7 @@ func (s *ServerTools) InstallPackageStreamingMessage(_ *tools.InstallPackageReq,
 			s.clientsLock.Unlock()
 			return nil
 		default:
-			global.GVA_LOG.Debug("已连接的客户端", zap.String("clientID", clientID))
+			global.GVA_LOG.Debug("已连接pkg的客户端", zap.String("clientID", clientID))
 			time.Sleep(3 * time.Second)
 		}
 	}
@@ -89,7 +89,7 @@ func (s *ServerTools) SetTaskStreamingMessage(_ *tools.SetTaskReq, stream tools.
 			s.clientsLock.Unlock()
 			return nil
 		default:
-			global.GVA_LOG.Debug("已连接的客户端", zap.String("clientID", clientID))
+			global.GVA_LOG.Debug("已连接TimerTask的客户端", zap.String("clientID", clientID))
 			time.Sleep(3 * time.Second)
 		}
 	}
@@ -142,7 +142,8 @@ func newGrpcServerInstallPackage() *ServerTools {
 		once.Do(func() {
 			if ServerToolsObj == nil {
 				ServerToolsObj = &ServerTools{
-					pkgClients: make(map[string]tools.ToolsServer_InstallPackageStreamingMessageServer),
+					pkgClients:   make(map[string]tools.ToolsServer_InstallPackageStreamingMessageServer),
+					timerClients: make(map[string]tools.ToolsServer_SetTaskStreamingMessageServer),
 				}
 			}
 		})

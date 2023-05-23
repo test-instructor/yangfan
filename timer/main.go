@@ -28,7 +28,8 @@ func RunPkgInstallClient() {
 		global.GVA_LOG.Error("[RunClient]创建客户端失败", zap.Error(err))
 	}
 	p := pkg.NewRunInstallPkg(c)
-	p.RunClient()
+	go p.RunInstallPkg()
+	go p.RunSetTimerTask()
 }
 
 func main() {
