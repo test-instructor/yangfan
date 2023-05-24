@@ -47,6 +47,7 @@ message startReq{
 
 message startResp{
   resp resp = 1;
+  uint64 ReportID = 2;
 }
 
 message rebalanceReq{

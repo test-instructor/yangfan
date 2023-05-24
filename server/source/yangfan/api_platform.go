@@ -232,6 +232,8 @@ func RegisterApis() {
 		{ApiGroup: "运行", Method: "POST", Path: "/case/run/:project/runApiCase", Description: "运行定时任务"},
 		{ApiGroup: "运行", Method: "POST", Path: "/case/run/:project/runBoomerDebug", Description: "性能测试调试运行"},
 		{ApiGroup: "运行", Method: "POST", Path: "/case/run/:project/runBoomer", Description: "运行性能测试"},
+		{ApiGroup: "运行", Method: "POST", Path: "/case/run/:project/rebalance", Description: "调整性能测试参数"},
+		{ApiGroup: "运行", Method: "GET", Path: "/case/run/:project/stop", Description: "停止性能测试"},
 		{ApiGroup: "运行", Method: "POST", Path: "/case/run/:project/runTestCaseStep", Description: "运行测试用例"},
 
 		{ApiGroup: "项目管理", Method: "DELETE", Path: "/project/deleteProject", Description: "删除项目管理"},

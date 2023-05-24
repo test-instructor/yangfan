@@ -20,15 +20,7 @@ var okResp = &master.Resp{Code: 0, Message: "success"}
 var errResp = &master.Resp{Code: 1, Message: "error"}
 
 func (b masterServer) Start(ctx context.Context, request *master.StartReq) (resp *master.StartResp, err error) {
-	defer func() {
-		resp = new(master.StartResp)
-		if err != nil {
-			resp.Resp = errResp
-		} else {
-			resp.Resp = okResp
-			global.IgnoreInstall = true
-		}
-	}()
+
 	req := hrp.StartRequestPlatformBody{
 		Profile: *boomer.NewProfile(),
 	}
@@ -55,6 +47,13 @@ func (b masterServer) Start(ctx context.Context, request *master.StartReq) (resp
 	b.SetTestCasesID(req.ID)
 
 	err = b.StartPlatform(&req.Profile)
+	resp = new(master.StartResp)
+	if err != nil {
+		resp.Resp = errResp
+	} else {
+		resp.Resp = okResp
+		global.IgnoreInstall = true
+	}
 	return
 }
 

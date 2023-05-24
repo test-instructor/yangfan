@@ -20,6 +20,8 @@ func (s *RunCaseRouter) InitRunCaseRouter(Router *gin.RouterGroup) {
 		runCaseRouter.POST("runApiCase", runCaseApi.RunApiCase)
 		runCaseRouter.POST("runBoomerDebug", runCaseApi.RunBoomerDebug)
 		runCaseRouter.POST("runBoomer", runCaseApi.RunBoomer)
+		runCaseRouter.POST("rebalance", runCaseApi.Rebalance)
+		runCaseRouter.POST("stop", runCaseApi.Stop)
 		runCaseRouter.POST("runApi", runCaseApi.RunApi)
 		runCaseRouter.POST("runTimerTask", runCaseApi.RunTimerTask)
 	}

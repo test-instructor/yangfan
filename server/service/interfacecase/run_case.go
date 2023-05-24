@@ -39,7 +39,7 @@ func (r *RunCaseService) RunBoomer(runCase request.RunCaseReq, runType interface
 	return
 }
 
-func (r *RunCaseService) RunMasterBoomer(runCase request.RunCaseReq, runType interfacecase.RunType) (report *interfacecase.ApiReport, err error) {
+func (r *RunCaseService) RunMasterBoomer(runCase request.RunCaseReq, runType interfacecase.RunType) (*interfacecase.ApiReport, error) {
 	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.GrpcServer.Master, global.GVA_CONFIG.GrpcServer.MasterBoomerProt))
 	if err != nil {
 		return nil, err
@@ -51,10 +51,43 @@ func (r *RunCaseService) RunMasterBoomer(runCase request.RunCaseReq, runType int
 			ID:         uint64(runCase.CaseID),
 		},
 	})
+	if err == nil {
+		var report interfacecase.ApiReport
+		global.GVA_DB.Model(&interfacecase.ApiReport{}).Order("id desc").First(&report)
+		if err == nil {
+			return &report, nil
+		}
+	}
+	return nil, nil
+}
+
+func (r *RunCaseService) Rebalance(runCase request.RunCaseReq, runType interfacecase.RunType) (*interfacecase.ApiReport, error) {
+	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.GrpcServer.Master, global.GVA_CONFIG.GrpcServer.MasterBoomerProt))
 	if err != nil {
 		return nil, err
 	}
-	return
+	_, err = c.MasterClient.Rebalance(context.Background(), &master.RebalanceReq{
+		SpawnCount: runCase.Operation.SpawnCount,
+		SpawnRate:  runCase.Operation.SpawnRate,
+	})
+	if err == nil {
+		var report interfacecase.ApiReport
+		global.GVA_DB.Model(&interfacecase.ApiReport{}).Order("id desc").First(&report)
+		if err == nil {
+			return &report, nil
+		}
+	}
+	return nil, nil
+}
+
+func (r *RunCaseService) Stop() error {
+	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.GrpcServer.Master, global.GVA_CONFIG.GrpcServer.MasterBoomerProt))
+	if err != nil {
+		return err
+	}
+	_, err = c.MasterClient.Stop(context.Background(), &master.StopReq{})
+
+	return err
 }
 
 func (r *RunCaseService) RunTimerTask(runCase request.RunCaseReq, runType interfacecase.RunType) {

@@ -56,7 +56,7 @@ func (s *ServerTools) InstallPackageStreamingMessage(_ *tools.InstallPackageReq,
 			s.clientsLock.Unlock()
 			return nil
 		default:
-			global.GVA_LOG.Debug("已连接pkg的客户端", zap.String("clientID", clientID))
+			//global.GVA_LOG.Debug("已连接pkg的客户端", zap.String("clientID", clientID))
 			time.Sleep(3 * time.Second)
 		}
 	}
