@@ -59,11 +59,8 @@ func (runCaseApi *RunCaseApi) RunBoomer(c *gin.Context) {
 	_ = c.ShouldBindJSON(&runApiCase)
 	boomer, err := runCaseService.RunMasterBoomer(runApiCase, interfacecase.RunTypeRuning)
 	if err != nil {
-		return
-	}
-	if err != nil {
 		global.GVA_LOG.Error("运行失败!", zap.Error(err))
-		response.FailWithMessage("运行失败", c)
+		response.FailWithDetailed(err, "运行失败", c)
 	} else {
 		response.OkWithData(gin.H{"id": boomer.ID}, c)
 	}
@@ -72,7 +69,7 @@ func (runCaseApi *RunCaseApi) RunBoomer(c *gin.Context) {
 func (runCaseApi *RunCaseApi) Rebalance(c *gin.Context) {
 	var runApiCase request.RunCaseReq
 	_ = c.ShouldBindJSON(&runApiCase)
-	boomer, err := runCaseService.RunMasterBoomer(runApiCase, interfacecase.RunTypeRuning)
+	boomer, err := runCaseService.Rebalance(runApiCase)
 	if err != nil {
 		return
 	}
@@ -85,8 +82,6 @@ func (runCaseApi *RunCaseApi) Rebalance(c *gin.Context) {
 }
 
 func (runCaseApi *RunCaseApi) Stop(c *gin.Context) {
-	var runApiCase request.RunCaseReq
-	_ = c.ShouldBindJSON(&runApiCase)
 	err := runCaseService.Stop()
 	if err != nil {
 		return

@@ -15,6 +15,12 @@
             :disabled="boomerButton"
             >手动刷新</el-button
           >
+          <el-button
+            @click="resetBoomer"
+            type="success"
+            :disabled="boomerButton"
+            >调整运行参数</el-button
+          >
           <el-button @click="stopBoomer" type="danger" :disabled="boomerButton"
             >停止运行</el-button
           >
@@ -201,6 +207,39 @@
         </el-tab-pane>
       </el-tabs>
     </div>
+    <el-dialog
+      v-model="dialogRunner"
+      :before-close="closeRunner"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      width="400px"
+      title="调整运行参数"
+    >
+      <el-form :model="runnerConfig" label-position="right" label-width="160px">
+        <el-form-item label="并发用户数：">
+          <el-input-number
+            v-model="runnerConfig.spawnCount"
+            :min="1"
+            step-strictly
+          />
+        </el-form-item>
+        <el-form-item label="初始每秒增加用户数：">
+          <el-input-number
+            v-model="runnerConfig.spawnRate"
+            :min="1"
+            step-strictly
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button size="small" @click="closeRunner">取 消</el-button>
+          <el-button size="small" type="primary" @click="updateUser"
+            >调整运行参数</el-button
+          >
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -226,7 +265,7 @@ import {
 import { LineChart } from "echarts/charts";
 import { UniversalTransition } from "echarts/features";
 import { CanvasRenderer } from "echarts/renderers";
-import { runBoomer } from "@/api/runTestCase";
+import { runBoomer, stopBoom, rebalance } from "@/api/runTestCase";
 import { ElMessage } from "element-plus";
 
 echarts.use([
@@ -254,6 +293,11 @@ const errDataKey = ref({});
 const reportName = ref("");
 const PCT95 = ref(0);
 let reportID = 1;
+const dialogRunner = ref(false);
+let runnerConfig = {
+  spawnCount: 1,
+  spawnRate: 1,
+};
 const getTestCaseDetailFunc = async (testCaseID) => {
   const res = await findReport({ ID: testCaseID });
   if (res.code === 0) {
@@ -281,17 +325,27 @@ const updateDetail = async () => {
   }
 };
 
+const resetBoomer = async () => {
+  dialogRunner.value = true;
+};
+
+const closeRunner = () => {
+  runnerConfig = {
+    spawnCount: 1,
+    spawnRate: 1,
+  };
+  dialogRunner.value = false;
+};
+
 const updateUser = async () => {
   let data = {
     caseID: performance_id,
-    run_type: 6,
     operation: {
-      running: 2,
-      spawnCount: 50,
-      spawnRate: 5.0,
+      spawnCount: runnerConfig.spawnCount,
+      spawnRate: runnerConfig.spawnRate,
     },
   };
-  const res = await runBoomer(data);
+  const res = await rebalance(data);
   if (res.code === 0) {
     ElMessage({
       type: "success",
@@ -308,7 +362,7 @@ const stopBoomer = async () => {
       running: 3,
     },
   };
-  const res = await runBoomer(data);
+  const res = await stopBoom();
   if (res.code === 0) {
     ElMessage({
       type: "success",

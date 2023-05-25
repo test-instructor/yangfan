@@ -58,10 +58,10 @@ func (r *RunCaseService) RunMasterBoomer(runCase request.RunCaseReq, runType int
 			return &report, nil
 		}
 	}
-	return nil, nil
+	return nil, err
 }
 
-func (r *RunCaseService) Rebalance(runCase request.RunCaseReq, runType interfacecase.RunType) (*interfacecase.ApiReport, error) {
+func (r *RunCaseService) Rebalance(runCase request.RunCaseReq) (*interfacecase.ApiReport, error) {
 	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.GrpcServer.Master, global.GVA_CONFIG.GrpcServer.MasterBoomerProt))
 	if err != nil {
 		return nil, err

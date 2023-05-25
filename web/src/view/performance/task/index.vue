@@ -420,16 +420,6 @@ const closeRunner = () => {
     spawnRate: 1,
   };
   dialogRunner.value = false;
-  // formData.value = {
-  //   name: '',
-  //   runTime: '',
-  //   nextRunTime: new Date(),
-  //   status: false,
-  //   describe: '',
-  //   runNumber: 0,
-  //   config: {ID: 0},
-  // }
-  // creatCron.value = false
 };
 
 // 更新行
