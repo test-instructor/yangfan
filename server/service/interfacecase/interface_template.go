@@ -105,6 +105,10 @@ func (i *InterfaceTemplateService) GetInterfaceTemplateInfoList(info interfaceca
 		db = db.Where("name LIKE ?", "%"+info.Name+"%")
 	}
 
+	err = db.Count(&total).Error
+	if err != nil {
+		return
+	}
 	err = db.Limit(limit).Offset(offset).Find(&apicases).Error
 	return err, apicases, total
 }
