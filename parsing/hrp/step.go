@@ -2,6 +2,7 @@ package hrp
 
 type StepType string
 
+// 步骤类型常量
 const (
 	stepTypeRequest     StepType = "request"
 	stepTypeAPI         StepType = "api"
@@ -14,6 +15,7 @@ const (
 	stepTypeIOS         StepType = "ios"
 )
 
+// StepResult 测试报告结构体
 type StepResult struct {
 	Name        string                 `json:"name" yaml:"name"`                                   // step name
 	StepType    StepType               `json:"step_type" yaml:"step_type"`                         // step type, testcase/request/transaction/rendezvous
@@ -28,6 +30,7 @@ type StepResult struct {
 
 // TStep represents teststep data structure.
 // Each step maybe three different types: make one request or reference another api/testcase.
+// 测试步骤结构体
 type TStep struct {
 	Name          string                 `json:"name" yaml:"name"` // required
 	Request       *Request               `json:"request,omitempty" yaml:"request,omitempty"`
@@ -52,6 +55,7 @@ type TStep struct {
 // StepRequest, StepRequestWithOptionalArgs, StepRequestValidation, StepRequestExtraction,
 // StepTestCaseWithOptionalArgs,
 // StepTransaction, StepRendezvous, StepWebSocket.
+// 测试步骤接口(类型)
 type IStep interface {
 	Name() string
 	Type() StepType
