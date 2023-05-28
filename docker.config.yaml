@@ -170,3 +170,4 @@ grpc:
   master: "177.7.0.15"
   master-boomer-prot: 9093
   master-server-prot: 7966
+  prometheus-pushgateway-url: http://pushgateway:9091/

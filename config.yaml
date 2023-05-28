@@ -102,8 +102,9 @@ mysql:
   password: 123456
   max-idle-conns: 10
   max-open-conns: 100
-  log-mode: info
+  log-mode: debug
   log-zap: false
+
 pgsql:
   path: ""
   port: ""
@@ -170,4 +171,5 @@ grpc:
   master: "127.0.0.1"
   master-boomer-prot: 9093
   master-server-prot: 7966
+  prometheus-pushgateway-url: http://localhost:9091/
 

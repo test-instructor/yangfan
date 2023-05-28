@@ -46,9 +46,10 @@ func (r *RunCaseService) RunMasterBoomer(runCase request.RunCaseReq, runType int
 	}
 	_, err = c.MasterClient.Start(context.Background(), &master.StartReq{
 		Profile: &master.Profile{
-			SpawnCount: runCase.Operation.SpawnCount,
-			SpawnRate:  runCase.Operation.SpawnRate,
-			ID:         uint64(runCase.CaseID),
+			SpawnCount:               runCase.Operation.SpawnCount,
+			SpawnRate:                runCase.Operation.SpawnRate,
+			ID:                       uint64(runCase.CaseID),
+			PrometheusPushgatewayURL: global.GVA_CONFIG.GrpcServer.PrometheusPushgatewayURL,
 		},
 	})
 	if err == nil {
