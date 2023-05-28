@@ -105,4 +105,8 @@ services:
     volumes:
       - ./data/grafana/data:/var/lib/grafana
       - ./data/grafana/log:/var/log/grafana
-
+      - ./data/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Editor
+      - GF_SECURITY_ALLOW_EMBEDDING=true

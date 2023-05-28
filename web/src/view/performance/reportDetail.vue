@@ -205,6 +205,13 @@
             </el-row>
           </div>
         </el-tab-pane>
+
+        <el-tab-pane label="grafana" name="grafana">
+          <iframe
+            class="grafana-iframe"
+            src="http://localhost:3000/d/Qg44NZgVz/httprunner-for-distributed-load-testing?orgId=1&refresh=30s&kiosk=tv"
+          ></iframe>
+        </el-tab-pane>
       </el-tabs>
     </div>
     <el-dialog
@@ -352,6 +359,7 @@ const updateUser = async () => {
       message: "运行成功",
     });
   }
+  closeRunner();
 };
 
 const stopBoomer = async () => {
@@ -1276,5 +1284,11 @@ p {
   border-style: solid;
   border-width: 1px;
   border-color: #c9cdd4;
+}
+
+.grafana-iframe {
+  width: 100%;
+  height: 100vh; /* 或者使用height: 100%; 来让iframe撑满父容器的高度 */
+  border: none; /* 可选：如果不需要边框的话 */
 }
 </style>
