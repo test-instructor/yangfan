@@ -184,15 +184,6 @@ watch(
   }
 );
 
-watch(
-  () => route.params.id,
-  () => {
-    if (route.params.id) {
-      init();
-    }
-  }
-);
-
 const addApiCaseFunc = async () => {
   taskCaseVisible.value = true;
 };

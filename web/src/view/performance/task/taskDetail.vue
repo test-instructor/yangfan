@@ -360,6 +360,14 @@ const getTaskCaseDetailFunc = async (task_id) => {
   }
 };
 init();
+watch(
+  () => route.params.id,
+  () => {
+    if (route.params.id) {
+      init();
+    }
+  }
+);
 
 const StepType = (row) => {
   let step_type = [];

@@ -286,11 +286,14 @@ const getTestCaseDetailFunc = async (testCaseID) => {
   console.log("=================", api_env_name.value);
 };
 init();
-// watch(() => route.params.id, () => {
-//   if (route.params.id){
-//     init()
-//   }
-// })
+watch(
+  () => route.params.id,
+  () => {
+    if (route.params.id) {
+      init();
+    }
+  }
+);
 
 const addApiCaseFunc = async () => {
   apiCaseVisible.value = true;

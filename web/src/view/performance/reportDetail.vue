@@ -207,10 +207,7 @@
         </el-tab-pane>
 
         <el-tab-pane label="grafana" name="grafana">
-          <iframe
-            class="grafana-iframe"
-            src="http://localhost:3000/d/Qg44NZgVz/httprunner-for-distributed-load-testing?orgId=1&refresh=30s&kiosk=tv"
-          ></iframe>
+          <iframe class="grafana-iframe" :src="grafanaUrl"></iframe>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -259,7 +256,7 @@ export default {
 <script setup>
 import { findReport } from "@/api/performance";
 import { useRoute } from "vue-router";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { Discount } from "@element-plus/icons-vue";
 import * as echarts from "echarts/core";
 import {
@@ -315,7 +312,43 @@ const getTestCaseDetailFunc = async (testCaseID) => {
     reportName.value = res.data.reapicase.name;
     echartData(res.data.reapicase);
     transactionData(res.data.reapicase);
+    getGrafanaUrl();
   }
+};
+
+const removeData = () => {
+  respData.value = {};
+  xTimeData = [];
+  start_time = 0;
+  xTimeNum = 0;
+  maxUser = 0;
+  maxRespTime = 0;
+  maxFailRatio = 0;
+  maxRPS = 0;
+  dataUser = [];
+  dataRespTime = [];
+  dataFailRatio = [];
+  dataRPS = [];
+  state.value = 0;
+  respData.value = {};
+  errData.value = [];
+  errDataKey.value = {};
+  reportName.value = "";
+  PCT95.value = 0;
+};
+
+const getGrafanaUrl = () => {
+  console.log("+++++++++url");
+  let host =
+    "http://localhost:3000/d/ERv3OaBPYe6A/yangfan-for-distributed-load-testing?";
+  let url =
+    host +
+    "orgId=1&refresh=30s&kiosk=tv&var-report=" +
+    reportName.value +
+    "_id_" +
+    reportID;
+  console.log("+++++++++url", url);
+  grafanaUrl.value = url;
 };
 
 const updateDetail = async () => {
@@ -418,6 +451,15 @@ const initData = async () => {
   await getTestCaseDetailFunc(reportID);
 };
 initData();
+watch(
+  () => route.params.id,
+  () => {
+    if (route.params.id) {
+      removeData();
+      initData();
+    }
+  }
+);
 
 let xTimeData = [];
 let start_time = 0;
