@@ -168,6 +168,9 @@ func (b *HRPBoomer) ParseTestCases(testCases []*TestCase) []*TCase {
 			tc.Config.Path = b.debugtalk.FilePath
 			tc.Config.ReportID = b.OutputDB.PReport.ID
 			b.Boomer.SetServerReportID(b.OutputDB.PReport.ID)
+			reportName := fmt.Sprintf("%s_id_%d", b.OutputDB.PReport.Name, b.OutputDB.PReport.ID)
+			stats := boomer.NewPrometheusPusherStats(global.GVA_CONFIG.YangFan.PrometheusPushgatewayURL, "yangfan", "stats", reportName)
+			stats.OnStart()
 		}
 		caseRunner, err := b.hrpRunner.NewCaseRunner(tc)
 		if err != nil {
