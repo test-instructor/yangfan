@@ -21,7 +21,6 @@ const getTableData = async () => {
     show_key: true,
   });
   if (table.code === 0) {
-    console.log("table.data.list", table);
   }
 };
 </script>

@@ -40,7 +40,7 @@ func (r *RunCaseService) RunBoomer(runCase request.RunCaseReq, runType interface
 }
 
 func (r *RunCaseService) RunMasterBoomer(runCase request.RunCaseReq, runType interfacecase.RunType) (*interfacecase.ApiReport, error) {
-	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.GrpcServer.Master, global.GVA_CONFIG.GrpcServer.MasterBoomerProt))
+	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Master, global.GVA_CONFIG.YangFan.MasterBoomerProt))
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (r *RunCaseService) RunMasterBoomer(runCase request.RunCaseReq, runType int
 			SpawnCount:               runCase.Operation.SpawnCount,
 			SpawnRate:                runCase.Operation.SpawnRate,
 			ID:                       uint64(runCase.CaseID),
-			PrometheusPushgatewayURL: global.GVA_CONFIG.GrpcServer.PrometheusPushgatewayURL,
+			PrometheusPushgatewayURL: global.GVA_CONFIG.YangFan.PrometheusPushgatewayURL,
 		},
 	})
 	if err == nil {
@@ -63,7 +63,7 @@ func (r *RunCaseService) RunMasterBoomer(runCase request.RunCaseReq, runType int
 }
 
 func (r *RunCaseService) Rebalance(runCase request.RunCaseReq) (*interfacecase.ApiReport, error) {
-	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.GrpcServer.Master, global.GVA_CONFIG.GrpcServer.MasterBoomerProt))
+	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Master, global.GVA_CONFIG.YangFan.MasterBoomerProt))
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func (r *RunCaseService) Rebalance(runCase request.RunCaseReq) (*interfacecase.A
 }
 
 func (r *RunCaseService) Stop() error {
-	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.GrpcServer.Master, global.GVA_CONFIG.GrpcServer.MasterBoomerProt))
+	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Master, global.GVA_CONFIG.YangFan.MasterBoomerProt))
 	if err != nil {
 		return err
 	}

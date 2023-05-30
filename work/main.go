@@ -54,7 +54,7 @@ func (a *Agent) Work() {
 }
 
 func RunPkgInstallClient() {
-	host := fmt.Sprintf("%s:%s", global.GVA_CONFIG.GrpcServer.Background, global.GVA_CONFIG.GrpcServer.BackgroundGrpcPort)
+	host := fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Background, global.GVA_CONFIG.YangFan.BackgroundGrpcPort)
 	c, err := client.NewClient(host)
 	if err != nil {
 		global.GVA_LOG.Error("[RunClient]创建客户端失败", zap.Error(err))
@@ -77,5 +77,5 @@ func main() {
 	zap.ReplaceGlobals(global.GVA_LOG)
 	yangfan.InitPythonPackage(true)
 	go RunPkgInstallClient()
-	NewAgent(global.GVA_CONFIG.GrpcServer.Master, global.GVA_CONFIG.GrpcServer.MasterServerProt).Work()
+	NewAgent(global.GVA_CONFIG.YangFan.Master, global.GVA_CONFIG.YangFan.MasterServerProt).Work()
 }

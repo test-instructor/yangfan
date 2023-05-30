@@ -148,7 +148,6 @@ const handleSelectionChange = (val) => {
 const router = useRouter();
 
 const runState = (t) => {
-  console.log("---------", t);
   if (t === 1) {
     return ["\xa0准备中\xa0", "warning", false];
   }

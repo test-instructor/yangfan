@@ -282,8 +282,6 @@ const getTestCaseDetailFunc = async (testCaseID) => {
     user_config_show.value = true;
     // dialogFormVisible.value = true
   }
-  console.log("=================", api_config_name.value);
-  console.log("=================", api_env_name.value);
 };
 init();
 watch(
@@ -304,7 +302,6 @@ const updateInterfaceTemplateFunc = async (row) => {
   type.value = "update";
   dialogTitle.value = "编辑套件";
   if (res.code === 0) {
-    console.log("==============", res.data.reapicase);
     if (res.data.reapicase.gRPC) {
       formDatasGrpc.value = res.data.reapicase;
       interfaceTempleFormVisibleGrpc.value = true;

@@ -616,7 +616,6 @@ const getApiEnv = async () => {
   const res = await getEnvList();
   if (res.code === 0) {
     apiEnvData.value = res.data.list;
-    console.log("==========", apiEnvData.value);
   }
 };
 </script>

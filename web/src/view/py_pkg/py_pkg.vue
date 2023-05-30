@@ -264,7 +264,6 @@ init();
 
 const getVersionList = async () => {
   const versions = await getPyPkgVersions({ name: formData.value.name });
-  console.log("getVersionList:", versions.data);
   if (versions.code === 0) {
     versionS.value.versionList = versions.data.version;
   }
@@ -344,7 +343,6 @@ const type = ref("");
 // 更新行
 const updateHrpPyPkgFunc = async (row) => {
   const res = await updateHrpPyPkg({ name: row.name });
-  // console.log(res)
   type.value = "update";
   if (res.code === 0) {
     ElMessage({

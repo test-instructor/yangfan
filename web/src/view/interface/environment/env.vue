@@ -77,7 +77,6 @@ const editEnvRow = ref(0);
 const init = async () => {
   const tables = await getEnvList();
   envTableData.value = tables.data.list;
-  console.log(envTableData.value);
 };
 
 init();
@@ -88,7 +87,6 @@ const onAddItem = () => {
     name: "",
     remarks: "",
   });
-  console.log(envTableData);
 };
 const shouAddBtn = ref(true);
 const showBtn = (row) => {
@@ -116,10 +114,8 @@ const saveEnv = async (index, row) => {
     return;
   }
   let res = await createEnv(row);
-  console.log("res.code", res);
   if (res.code === 0) {
     let message = "变量【" + row.name + "】创建成功";
-    console.log("res.code", message);
     if (row.ID && row.ID > 0) {
       message = "变量【" + row.name + "】编辑成功";
     }
@@ -136,7 +132,6 @@ const deleteEnvs = async (index, row) => {
   if (row.ID && row.ID > 0) {
     let res = await deleteEnv({ ID: row.ID });
     if (res.code === 0) {
-      console.log("================1111");
       ElMessage({
         type: "success",
         message: "标签【" + row.name + "】删除成功",

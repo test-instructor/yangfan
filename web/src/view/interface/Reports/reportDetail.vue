@@ -493,10 +493,6 @@ const openDrawer = (row) => {
         value: row.data.req_resps.request.headers,
         isTable: true,
       });
-      console.log(
-        "row.data.req_resps.request.body || !requestTimeShow",
-        row.data.req_resps.request.body || requestTimeShow
-      );
       if (row.data.req_resps.request.body || requestTimeShow) {
         requestData.push({
           key: "body",

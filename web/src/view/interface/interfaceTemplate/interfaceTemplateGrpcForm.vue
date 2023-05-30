@@ -600,7 +600,6 @@ const runInterfaceTemplateFunc = async (id) => {
     userConfigs.value.api_env_id &&
     userConfigs.value.api_env_id > 0
   ) {
-    console.log("============", userConfigs.value.api_env_id);
     data["env"] = userConfigs.value.api_env_id;
   }
   const res = await runApi(data);
@@ -711,7 +710,6 @@ const getUserConfigs = async () => {
   let res = await getUserConfig();
   if (res.code === 0 && res.data) {
     userConfigs.value = res.data;
-    console.log("============", userConfigs.value);
   }
 };
 getUserConfigs();

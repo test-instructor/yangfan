@@ -298,6 +298,13 @@ const reportName = ref("");
 const PCT95 = ref(0);
 let reportID = 1;
 const dialogRunner = ref(false);
+const grafanaUrl = ref("");
+const grafana_host = ref("");
+const grafana_dashboard = ref("");
+const grafana_dashboard_name = ref("");
+const CreatedAt = ref("");
+const UpdatedAt = ref("");
+
 let runnerConfig = {
   spawnCount: 1,
   spawnRate: 1,
@@ -338,17 +345,102 @@ const removeData = () => {
 };
 
 const getGrafanaUrl = () => {
-  console.log("+++++++++url");
-  let host =
-    "http://localhost:3000/d/ERv3OaBPYe6A/yangfan-for-distributed-load-testing?";
-  let url =
-    host +
-    "orgId=1&refresh=30s&kiosk=tv&var-report=" +
-    reportName.value +
-    "_id_" +
-    reportID;
-  console.log("+++++++++url", url);
+  let url = "";
+  if (
+    grafana_host.value.startsWith("http://") ||
+    grafana_host.value.startsWith("https://")
+  ) {
+    url = grafana_host.value;
+  } else {
+    url = "http://" + grafana_host.value;
+  }
+  if (grafana_host.value.endsWith("/")) {
+    url = url + "d/";
+  } else {
+    url = url + "/d/";
+  }
+  url += grafana_dashboard.value + "/" + grafana_dashboard_name.value;
+  // let url =
+  //   host +
+  //   "orgId=1&refresh=30s&kiosk=tv&var-report=" +
+  //   reportName.value +
+  //   "_id_" +
+  //   reportID;
   grafanaUrl.value = url;
+  let params = {};
+  params["orgId"] = 1;
+  params["var-report"] = reportName.value + "_id_" + reportID;
+  params["kiosk"] = "tv";
+  params["refresh"] = "30s";
+  {
+    if (state.value < 5) {
+      params["from"] = "now-5m";
+      let currentDate = new Date();
+      let date = new Date(CreatedAt.value);
+      let timeDiff = currentDate - date;
+      let minutesDiff = Math.floor(timeDiff / (1000 * 60));
+      // from=now-3h
+
+      let timeIntervals = ["15m", "30m", "1h", "3h", "6h", "12h", "24h"];
+      for (let i = 0; i < timeIntervals.length; i++) {
+        let interval = timeIntervals[i];
+        if (isTimeExpired(interval)) {
+          console.log(interval + " 已经过期");
+          params["from"] = "now-" + interval;
+        }
+      }
+    } else {
+      let startDate = new Date(CreatedAt.value);
+
+      startDate.setSeconds(0);
+
+      let formattedStartDate = startDate
+        .toISOString()
+        .replace("T", " ")
+        .substr(0, 19);
+
+      let date = new Date(UpdatedAt.value);
+      let currentMinute = date.getMinutes();
+      let nextMinute = Math.ceil(currentMinute / 5) * 5;
+      date.setMinutes(nextMinute);
+      date.setSeconds(0);
+      date.setMilliseconds(0);
+      let formattedTime = date.toISOString().replace("T", " ").substr(0, 19);
+    }
+  }
+};
+
+const isTimeExpired = (timeInterval) => {
+  let interval;
+  switch (timeInterval) {
+    case "15m":
+      interval = 5 * 60 * 1000;
+      break;
+    case "30m":
+      interval = 15 * 60 * 1000;
+      break;
+    case "1h":
+      interval = 30 * 60 * 1000;
+      break;
+    case "3h":
+      interval = 60 * 60 * 1000;
+      break;
+    case "6h":
+      interval = 3 * 60 * 60 * 1000;
+      break;
+    case "12h":
+      interval = 6 * 60 * 60 * 1000;
+      break;
+    case "24h":
+      interval = 12 * 60 * 60 * 1000;
+      break;
+    default:
+      // 如果传入的时间间隔无效，可以抛出错误或返回默认值
+      throw new Error("无效的时间间隔");
+  }
+
+  let timeDiff = currentDate - date;
+  return timeDiff > interval;
 };
 
 const updateDetail = async () => {

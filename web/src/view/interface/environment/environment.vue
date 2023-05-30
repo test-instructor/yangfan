@@ -175,7 +175,6 @@ const envTableData = ref([]);
 const init = async () => {
   const tables = await getEnvList();
   envTableData.value = tables.data.list;
-  console.log("envTableData", envTableData.value);
   const res = await getTableData();
 };
 init();
@@ -206,9 +205,7 @@ const getTableData = async () => {
   }
 };
 
-const getVar = (val) => {
-  console.log("=======val", val);
-};
+const getVar = (val) => {};
 
 const onReset = () => {
   searchInfo.value = {};
@@ -260,8 +257,6 @@ const handleSelectionChange = (val) => {
 };
 
 const addEnvVarFunc = async () => {
-  console.log("==============", varForm.value);
-
   if (varForm.value.key === "") {
     ElMessage({
       type: "warning",
@@ -331,7 +326,6 @@ const updateRow = async (row) => {
     envVarDialog.value = true;
     envVarType.value = "更新变量";
     varForm.value = res.data.env;
-    console.log("varForm", varForm.value);
   }
 };
 </script>

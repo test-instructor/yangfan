@@ -52,9 +52,6 @@ const getUserConfigs = async () => {
   }
 };
 const init = () => {
-  console.log("=============1", props);
-  console.log("=============2", props.api_config_name);
-  console.log("=============3", props.api_env_name);
   if (props.api_config_name && props.api_config_name !== "") {
     userConfig.value.api_config.name = props.api_config_name;
     userConfig.value.api_env.name = props.api_env_name;

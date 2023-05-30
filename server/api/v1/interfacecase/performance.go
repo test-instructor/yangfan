@@ -195,6 +195,13 @@ func (apiCase *PerformanceApi) FindReport(c *gin.Context) {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {
-		response.OkWithData(gin.H{"reapicase": reapicase}, c)
+		//grafana-url: http://localhost:3000/
+		//grafana-dashboard: ERv3OaBPYe6A
+		response.OkWithData(gin.H{
+			"reapicase":              reapicase,
+			"grafana_host":           global.GVA_CONFIG.YangFan.GrafanaHost,
+			"grafana_dashboard":      global.GVA_CONFIG.YangFan.GrafanaDashboard,
+			"grafana_dashboard_name": global.GVA_CONFIG.YangFan.GrafanaDashboardName,
+		}, c)
 	}
 }

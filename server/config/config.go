@@ -30,5 +30,5 @@ type Server struct {
 	Cors CORS            `mapstructure:"cors" json:"cors" yaml:"cors"`
 	FS   *config.FsLogin `mapstructure:"fs" json:"fs" yaml:"fs"`
 
-	GrpcServer *Grpc `mapstructure:"grpc" json:"grpc" yaml:"grpc"`
+	YangFan *YangFan `mapstructure:"yang-fan" json:"yang-fan" yaml:"yang-fan"`
 }

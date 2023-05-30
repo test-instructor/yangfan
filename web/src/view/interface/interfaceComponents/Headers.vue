@@ -167,7 +167,6 @@ export default {
       const results = queryString
         ? headerOptions.filter(this.createFilter(queryString))
         : headerOptions;
-      console.log("results", results.value);
       cb(results);
     },
 

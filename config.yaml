@@ -165,11 +165,14 @@ zap:
   max-age: 30
   show-line: true
   log-in-console: true
-grpc:
+yang-fan:
   background: "127.0.0.1"
   background-grpc-port: 7967
   master: "127.0.0.1"
   master-boomer-prot: 9093
   master-server-prot: 7966
   prometheus-pushgateway-url: http://localhost:9091/
+  grafana-url: http://localhost:3000/
+  grafana-dashboard: ERv3OaBPYe6A
+  grafana-dashboard-name: yangfan-for-distributed-load-testing
 

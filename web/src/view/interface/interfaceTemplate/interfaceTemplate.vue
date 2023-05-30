@@ -480,12 +480,10 @@ const reportDetailFunc = (ID) => {
 
 const configIdFun = (id) => {
   configId.value = id;
-  console.log("============", configId.value);
 };
 
 const envIdFun = (id) => {
   apiEnvId.value = id;
-  console.log("============", apiEnvId.value);
 };
 
 const runInterfaceTemplateFunc = async (row) => {
@@ -510,7 +508,6 @@ const runInterfaceTemplateFunc = async (row) => {
     userConfigs.value.api_env_id &&
     userConfigs.value.api_env_id > 0
   ) {
-    console.log("============", userConfigs.value.api_env_id);
     data["env"] = userConfigs.value.api_env_id;
   }
   const res = await runApi(data);
@@ -552,7 +549,6 @@ const openDialog = () => {
 };
 
 const openDialogGrpc = () => {
-  console.log("=======grpc");
   typeGrpc.value = "create";
   dialogTitleGrpc.value = "新增接口Grpc";
   interfaceTempleFormVisibleGrpc.value = true;
@@ -601,7 +597,6 @@ const closeDialogGrpc = () => {
 
 const userConfigDialog = ref(false);
 const setUserConfig = () => {
-  console.log("userconfig", userConfigs.value);
   userConfigDialog.value = true;
 };
 
