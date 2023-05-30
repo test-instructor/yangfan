@@ -205,8 +205,10 @@
             </el-row>
           </div>
         </el-tab-pane>
-
         <el-tab-pane label="grafana" name="grafana">
+          <iframe class="grafana-iframe" :src="grafanaUrl"></iframe>
+        </el-tab-pane>
+        <el-tab-pane label="节点性能指标" name="node">
           <iframe class="grafana-iframe" :src="grafanaUrl"></iframe>
         </el-tab-pane>
       </el-tabs>
@@ -319,6 +321,11 @@ const getTestCaseDetailFunc = async (testCaseID) => {
     reportName.value = res.data.reapicase.name;
     echartData(res.data.reapicase);
     transactionData(res.data.reapicase);
+    CreatedAt.value = res.data.reapicase.CreatedAt;
+    UpdatedAt.value = res.data.reapicase.UpdatedAt;
+    grafana_host.value = res.data.grafana_host;
+    grafana_dashboard.value = res.data.grafana_dashboard;
+    grafana_dashboard_name.value = res.data.grafana_dashboard_name;
     getGrafanaUrl();
   }
 };
@@ -360,44 +367,25 @@ const getGrafanaUrl = () => {
     url = url + "/d/";
   }
   url += grafana_dashboard.value + "/" + grafana_dashboard_name.value;
-  // let url =
-  //   host +
-  //   "orgId=1&refresh=30s&kiosk=tv&var-report=" +
-  //   reportName.value +
-  //   "_id_" +
-  //   reportID;
-  grafanaUrl.value = url;
   let params = {};
   params["orgId"] = 1;
   params["var-report"] = reportName.value + "_id_" + reportID;
   params["kiosk"] = "tv";
-  params["refresh"] = "30s";
   {
     if (state.value < 5) {
+      params["refresh"] = "30s";
       params["from"] = "now-5m";
-      let currentDate = new Date();
-      let date = new Date(CreatedAt.value);
-      let timeDiff = currentDate - date;
-      let minutesDiff = Math.floor(timeDiff / (1000 * 60));
-      // from=now-3h
 
       let timeIntervals = ["15m", "30m", "1h", "3h", "6h", "12h", "24h"];
       for (let i = 0; i < timeIntervals.length; i++) {
         let interval = timeIntervals[i];
-        if (isTimeExpired(interval)) {
-          console.log(interval + " 已经过期");
+        if (isTimeExpired(interval, CreatedAt.value)) {
           params["from"] = "now-" + interval;
         }
       }
     } else {
       let startDate = new Date(CreatedAt.value);
-
       startDate.setSeconds(0);
-
-      let formattedStartDate = startDate
-        .toISOString()
-        .replace("T", " ")
-        .substr(0, 19);
 
       let date = new Date(UpdatedAt.value);
       let currentMinute = date.getMinutes();
@@ -405,12 +393,23 @@ const getGrafanaUrl = () => {
       date.setMinutes(nextMinute);
       date.setSeconds(0);
       date.setMilliseconds(0);
-      let formattedTime = date.toISOString().replace("T", " ").substr(0, 19);
+      params["from"] = startDate.getTime();
+      params["to"] = date.getTime();
     }
   }
+  grafanaUrl.value =
+    url +
+    "?" +
+    Object.keys(params)
+      .map(function (key) {
+        return encodeURIComponent(key) + "=" + encodeURIComponent(params[key]);
+      })
+      .join("&");
 };
 
-const isTimeExpired = (timeInterval) => {
+const isTimeExpired = (timeInterval, CreatedAt) => {
+  let currentDate = new Date();
+  let date = new Date(CreatedAt);
   let interval;
   switch (timeInterval) {
     case "15m":

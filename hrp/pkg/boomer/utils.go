@@ -83,9 +83,14 @@ func startCPUProfile(file string, duration time.Duration) (err error) {
 
 // generate a random nodeID like locust does, using the same algorithm.
 func getNodeID() (nodeID string) {
+	nodeID = TempConfig.GetNodeID()
+	if nodeID != "" {
+		return
+	}
 	hostname, _ := os.Hostname()
 	id := strings.Replace(uuid.NewV4().String(), "-", "", -1)
 	nodeID = fmt.Sprintf("%s_%s", hostname, id)
+	TempConfig.SetNodeID(nodeID)
 	return
 }
 
