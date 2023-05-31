@@ -198,10 +198,12 @@ func (apiCase *PerformanceApi) FindReport(c *gin.Context) {
 		//grafana-url: http://localhost:3000/
 		//grafana-dashboard: ERv3OaBPYe6A
 		response.OkWithData(gin.H{
-			"reapicase":              reapicase,
-			"grafana_host":           global.GVA_CONFIG.YangFan.GrafanaHost,
-			"grafana_dashboard":      global.GVA_CONFIG.YangFan.GrafanaDashboard,
-			"grafana_dashboard_name": global.GVA_CONFIG.YangFan.GrafanaDashboardName,
+			"reapicase":                    reapicase,
+			"grafana_host":                 global.GVA_CONFIG.YangFan.GrafanaHost,
+			"grafana_dashboard":            global.GVA_CONFIG.YangFan.GrafanaDashboard,
+			"grafana_dashboard_name":       global.GVA_CONFIG.YangFan.GrafanaDashboardName,
+			"grafana_dashboard_stats":      global.GVA_CONFIG.YangFan.GrafanaDashboardStats,
+			"grafana_dashboard_stats_name": global.GVA_CONFIG.YangFan.GrafanaDashboardStatsName,
 		}, c)
 	}
 }
