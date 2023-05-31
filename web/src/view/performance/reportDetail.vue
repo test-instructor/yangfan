@@ -52,164 +52,11 @@
         class="demo-tabs"
         @tab-click="handleClick"
       >
-        <el-tab-pane label="压测指标" name="first">
-          <div>
-            <div style="padding-left: 10px; padding-right: 10px">
-              <el-row :gutter="20" class="total">
-                <el-col :span="6">
-                  <div class="grid-content ep-bg-purple total-right">
-                    <div>
-                      <p>平均响应时间(ms)</p>
-                    </div>
-                    <div>
-                      <h1>
-                        {{ (respData.total_avg_response_time * 1).toFixed(2) }}
-                      </h1>
-                    </div>
-                  </div>
-                </el-col>
-                <el-col :span="6">
-                  <div class="grid-content ep-bg-purple total-right">
-                    <div>
-                      <p>响应时间PCT95(ms)</p>
-                    </div>
-                    <div>
-                      <h1>{{ Math.ceil(PCT95) }}</h1>
-                    </div>
-                  </div>
-                </el-col>
-                <el-col :span="6">
-                  <div class="grid-content ep-bg-purple total-right">
-                    <div>
-                      <p>平均RPS</p>
-                    </div>
-                    <div>
-                      <h1>{{ (respData.total_rps * 1).toFixed(2) }}</h1>
-                    </div>
-                  </div>
-                </el-col>
-                <el-col :span="6">
-                  <div class="grid-content ep-bg-purple">
-                    <div>
-                      <p>接口失败率(%)</p>
-                    </div>
-                    <div>
-                      <h1>
-                        {{ (respData.total_fail_ratio * 100).toFixed(2) }}
-                      </h1>
-                    </div>
-                  </div>
-                </el-col>
-              </el-row>
-            </div>
-
-            <el-row :gutter="20">
-              <el-col :span="24">
-                <div id="sequential" class="grid-content ep-bg-purple"></div>
-              </el-col>
-            </el-row>
-            <el-row :gutter="20">
-              <el-col :span="24">
-                <div id="transaction" class="grid-content ep-bg-purple"></div>
-              </el-col>
-            </el-row>
-          </div>
-        </el-tab-pane>
-        <el-tab-pane label="请求日志" name="second">
-          <div style="padding-left: 40px; padding-right: 40px">
-            <el-row :gutter="20">
-              <el-col :span="24">
-                <div class="grid-content ep-bg-purple">
-                  <el-table :data="tableData" style="width: 100%">
-                    <el-table-column
-                      prop="method"
-                      label="类型"
-                      min-width="60"
-                    />
-                    <el-table-column
-                      prop="name"
-                      label="名称"
-                      min-width="200"
-                      max-width="400"
-                    />
-                    <el-table-column label="最小响应时间" min-width="120">
-                      <template #default="scope">
-                        {{ scope.row.min_response_time }} ms
-                      </template>
-                    </el-table-column>
-                    <el-table-column label="最大响应时间" min-width="120">
-                      <template #default="scope">
-                        {{ scope.row.max_response_time }} ms
-                      </template>
-                    </el-table-column>
-                    <el-table-column label="响应时间平均值" min-width="120">
-                      <template #default="scope">
-                        {{ scope.row.total_response_time }} ms
-                      </template>
-                    </el-table-column>
-                    <el-table-column label="响应时间中位数" min-width="120">
-                      <template #default="scope">
-                        {{ scope.row.min_response_time }} ms
-                      </template>
-                    </el-table-column>
-                    <el-table-column
-                      prop="num_failures"
-                      label="错误次数"
-                      min-width="60"
-                    />
-                    <el-table-column label="错误率" min-width="60">
-                      <template #default="scope">
-                        {{
-                          (
-                            (scope.row.num_failures / scope.row.num_requests) *
-                            100
-                          ).toFixed(2)
-                        }}
-                        %
-                      </template>
-                    </el-table-column>
-                    <el-table-column
-                      prop="num_requests"
-                      label="请求次数"
-                      min-width="60"
-                    />
-                  </el-table>
-                </div>
-              </el-col>
-            </el-row>
-          </div>
-        </el-tab-pane>
-        <el-tab-pane label="错误日志" name="third">
-          <div style="padding-left: 40px; padding-right: 40px">
-            <el-row :gutter="20">
-              <el-col :span="24">
-                <el-table :data="errData" style="width: 100%">
-                  <el-table-column
-                    prop="name"
-                    label="名称"
-                    min-width="200"
-                    max-width="200"
-                  />
-                  <el-table-column
-                    prop="occurrences"
-                    label="错误次数"
-                    width="200"
-                  />
-                  <el-table-column
-                    prop="error"
-                    label="错误信息"
-                    min-width="600"
-                  />
-                </el-table>
-              </el-col>
-            </el-row>
-          </div>
-        </el-tab-pane>
-        <el-tab-pane label="grafana" name="grafana">
+        <el-tab-pane label="性能指标" name="grafana">
           <iframe class="grafana-iframe" :src="grafanaUrl"></iframe>
         </el-tab-pane>
         <el-tab-pane label="节点性能指标" name="node">
-          <iframe class="grafana-iframe" :src="grafanaUrl"></iframe>
+          <iframe class="grafana-iframe" :src="grafanaStatsUrl"></iframe>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -285,7 +132,7 @@ echarts.use([
   UniversalTransition,
 ]);
 
-const activeName = ref("first");
+const activeName = ref("grafana");
 let performance_id = 0;
 const handleClick = (Event) => {
   updateDetail();
@@ -301,9 +148,12 @@ const PCT95 = ref(0);
 let reportID = 1;
 const dialogRunner = ref(false);
 const grafanaUrl = ref("");
+const grafanaStatsUrl = ref("");
 const grafana_host = ref("");
 const grafana_dashboard = ref("");
 const grafana_dashboard_name = ref("");
+const grafana_dashboard_stats = ref("");
+const grafana_dashboard_stats_name = ref("");
 const CreatedAt = ref("");
 const UpdatedAt = ref("");
 
@@ -326,6 +176,8 @@ const getTestCaseDetailFunc = async (testCaseID) => {
     grafana_host.value = res.data.grafana_host;
     grafana_dashboard.value = res.data.grafana_dashboard;
     grafana_dashboard_name.value = res.data.grafana_dashboard_name;
+    grafana_dashboard_stats.value = res.data.grafana_dashboard_stats;
+    grafana_dashboard_stats_name.value = res.data.grafana_dashboard_stats_name;
     getGrafanaUrl();
   }
 };
@@ -366,7 +218,13 @@ const getGrafanaUrl = () => {
   } else {
     url = url + "/d/";
   }
-  url += grafana_dashboard.value + "/" + grafana_dashboard_name.value;
+  let grafana_url =
+    url + grafana_dashboard.value + "/" + grafana_dashboard_name.value;
+  let grafana_stats_url =
+    url +
+    grafana_dashboard_stats.value +
+    "/" +
+    grafana_dashboard_stats_name.value;
   let params = {};
   params["orgId"] = 1;
   params["var-report"] = reportName.value + "_id_" + reportID;
@@ -398,7 +256,16 @@ const getGrafanaUrl = () => {
     }
   }
   grafanaUrl.value =
-    url +
+    grafana_url +
+    "?" +
+    Object.keys(params)
+      .map(function (key) {
+        return encodeURIComponent(key) + "=" + encodeURIComponent(params[key]);
+      })
+      .join("&");
+
+  grafanaStatsUrl.value =
+    grafana_stats_url +
     "?" +
     Object.keys(params)
       .map(function (key) {
