@@ -14,14 +14,61 @@ var (
 )
 
 var (
-	masterGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "performance_report_master",
-		Help: "Performance report for master",
-	}, []string{instanceMaster})
-	workGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "performance_report_work",
-		Help: "Performance report for work",
-	}, []string{instanceWorker, "work_id"})
+	stateGauge = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "master_state",
+		Help: "Performance report for master state",
+	})
+
+	workersGauge = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "master_workers",
+		Help: "Performance report for master workers",
+	})
+
+	targetUsersGauge = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "master_target_users",
+		Help: "Performance report for master target users",
+	})
+
+	currentUsersGauge = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "master_current_users",
+		Help: "Performance report for master current users",
+	})
+)
+
+var (
+	stateGaugeWork = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "work_state",
+		Help: "Performance report for work state",
+	}, []string{instanceWorker, "work_id", "ip", "os", "arch"})
+
+	heartbeatGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "work_heartbeat",
+		Help: "Performance report for work heartbeat",
+	}, []string{instanceWorker, "work_id", "ip", "os", "arch"})
+
+	userCountGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "work_user_count",
+		Help: "Performance report for work user count",
+	}, []string{instanceWorker, "work_id", "ip", "os", "arch"})
+
+	workerCpuUsageGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "work_worker_cpu_usage",
+		Help: "Performance report for work worker_cpu_usage",
+	}, []string{instanceWorker, "work_id", "ip", "os", "arch"})
+
+	cpuUsageGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "work_cpu_usage",
+		Help: "Performance report for work cpu usage",
+	}, []string{instanceWorker, "work_id", "ip", "os", "arch"})
+	workerMemoryUsageGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "work_worker_memory_usage",
+		Help: "Performance report for worker_memory usage",
+	}, []string{instanceWorker, "work_id", "ip", "os", "arch"})
+
+	memoryUsageGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "work_memory_usage",
+		Help: "Performance report for memory usage",
+	}, []string{instanceWorker, "work_id", "ip", "os", "arch"})
 )
 
 var prometheusPusherStats *PrometheusPusherStats
@@ -47,30 +94,38 @@ func (p PrometheusPusherStats) OnStart() {
 	resetPrometheusMetrics()
 	log.Info().Msg("register prometheus metric collectors")
 	registry := prometheus.NewRegistry()
-	registry.MustRegister(masterGauge, workGauge)
+	registry.MustRegister(
+		stateGauge,
+		workersGauge,
+		targetUsersGauge,
+		currentUsersGauge,
+		stateGaugeWork,
+		heartbeatGauge,
+		userCountGauge,
+		workerCpuUsageGauge,
+		cpuUsageGauge,
+		workerMemoryUsageGauge,
+		memoryUsageGauge,
+	)
 	p.pusher = p.pusher.Gatherer(registry)
 }
 
 func (p PrometheusPusherStats) OnEvent(masterReport interfacecase.PerformanceReportMaster, workReports []interfacecase.PerformanceReportWork) {
 
-	masterGauge.WithLabelValues(instanceMaster).Set(float64(masterReport.State))
-	masterGauge.WithLabelValues(instanceMaster).Set(float64(masterReport.Workers))
-	masterGauge.WithLabelValues(instanceMaster).Set(float64(masterReport.TargetUsers))
-	masterGauge.WithLabelValues(instanceMaster).Set(float64(masterReport.CurrentUsers))
+	stateGauge.Set(float64(masterReport.State))
+	workersGauge.Set(float64(masterReport.Workers))
+	targetUsersGauge.Set(float64(masterReport.TargetUsers))
+	currentUsersGauge.Set(float64(masterReport.CurrentUsers))
 
-	for _, report := range workReports {
-		workGauge.WithLabelValues(instanceWorker, report.WorkID).Set(float64(report.State))
-		workGauge.WithLabelValues(instanceWorker, report.WorkID).Set(float64(report.Heartbeat))
-		workGauge.WithLabelValues(instanceWorker, report.WorkID).Set(float64(report.UserCount))
-		workGauge.WithLabelValues(instanceWorker, report.WorkID).Set(report.WorkerCpuUsage)
-		workGauge.WithLabelValues(instanceWorker, report.WorkID).Set(report.CpuUsage)
-		if report.CpuWarningEmitted {
-			workGauge.WithLabelValues(instanceWorker, report.WorkID).Set(1)
-		} else {
-			workGauge.WithLabelValues(instanceWorker, report.WorkID).Set(0)
-		}
-		workGauge.WithLabelValues(instanceWorker, report.WorkID).Set(report.WorkerMemoryUsage)
-		workGauge.WithLabelValues(instanceWorker, report.WorkID).Set(report.MemoryUsage)
+	for _, worker := range workReports {
+		userCountGauge.WithLabelValues(instanceWorker, worker.WorkID, worker.IP, worker.OS, worker.Arch).Set(float64(worker.UserCount))
+		stateGaugeWork.WithLabelValues(instanceWorker, worker.WorkID, worker.IP, worker.OS, worker.Arch).Set(float64(worker.State))
+		heartbeatGauge.WithLabelValues(instanceWorker, worker.WorkID, worker.IP, worker.OS, worker.Arch).Set(float64(worker.Heartbeat))
+		workerCpuUsageGauge.WithLabelValues(instanceWorker, worker.WorkID, worker.IP, worker.OS, worker.Arch).Set(worker.WorkerCpuUsage)
+		cpuUsageGauge.WithLabelValues(instanceWorker, worker.WorkID, worker.IP, worker.OS, worker.Arch).Set(worker.CpuUsage)
+		workerMemoryUsageGauge.WithLabelValues(instanceWorker, worker.WorkID, worker.IP, worker.OS, worker.Arch).Set(worker.WorkerMemoryUsage)
+		memoryUsageGauge.WithLabelValues(instanceWorker, worker.WorkID, worker.IP, worker.OS, worker.Arch).Set(worker.MemoryUsage)
+
 	}
 
 	if err := p.pusher.Push(); err != nil {

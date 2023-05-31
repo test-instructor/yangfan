@@ -175,6 +175,6 @@ yang-fan:
   grafana-host: http://localhost:3000/
   grafana-dashboard: ERv3OaBPYe6A
   grafana-dashboard-name: yangfan-for-distributed-load-testing
-  grafana-dashboard-stats: ERv3OaBPYe6A
-  grafana-dashboard-stats-name: yangfan-for-distributed-load-testing
+  grafana-dashboard-stats: WLVhzvOg56Mg
+  grafana-dashboard-stats-name: yangfan-for-node-status
 
