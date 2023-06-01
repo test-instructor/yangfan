@@ -20,7 +20,6 @@ require (
 	github.com/maja42/goval v1.3.1
 	github.com/miekg/dns v1.1.54
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/montanaflynn/stats v0.7.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.15.0
@@ -38,7 +37,6 @@ require (
 	google.golang.org/grpc v1.54.0
 	google.golang.org/protobuf v1.30.0
 	gopkg.in/yaml.v3 v3.0.1
-	gorm.io/datatypes v1.2.0
 	gorm.io/gorm v1.25.1
 	howett.net/plist v1.0.0
 )
@@ -114,5 +112,6 @@ require (
 	google.golang.org/genproto v0.0.0-20230110181048-76db0878b65f // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gorm.io/datatypes v1.2.0 // indirect
 	gorm.io/driver/mysql v1.4.7 // indirect
 )

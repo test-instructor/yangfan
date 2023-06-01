@@ -4,9 +4,9 @@ go 1.19
 
 require (
 	github.com/rs/zerolog v1.29.1
-	github.com/test-instructor/yangfan/hrp v0.0.0-20230515173030-4544ed499044
-	github.com/test-instructor/yangfan/proto v0.0.0-20230515173030-4544ed499044
-	github.com/test-instructor/yangfan/server v0.0.0-20230515173030-4544ed499044
+	github.com/test-instructor/yangfan/hrp v0.0.0-20230521151452-07d562821462
+	github.com/test-instructor/yangfan/proto v0.0.0-20230521151452-07d562821462
+	github.com/test-instructor/yangfan/server v0.0.0-20230521151452-07d562821462
 	go.uber.org/zap v1.24.0
 	google.golang.org/grpc v1.55.0
 )
@@ -84,7 +84,6 @@ require (
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible // indirect
 	github.com/lestrrat-go/strftime v1.0.6 // indirect
-	github.com/lib/pq v1.10.2 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/lunixbochs/struc v0.0.0-20200707160740-784aaebc1d40 // indirect
 	github.com/magiconair/properties v1.8.1 // indirect

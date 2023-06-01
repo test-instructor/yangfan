@@ -720,10 +720,10 @@ github.com/tencentyun/cos-go-sdk-v5 v0.7.19 h1:janAfTO4MglOrUFuKGTQJBuMc66+F7Tgt
 github.com/tencentyun/cos-go-sdk-v5 v0.7.19/go.mod h1:wQBO5HdAkLjj2q6XQiIfDSP8DXDNrppDRw2Kp/1BODA=
 github.com/test-instructor/grpc-plugin v0.1.5 h1:eBdr6SeHKgN2+NlHk4Dwj8ngaLHhVT42Mhn0aQ+EZBI=
 github.com/test-instructor/grpc-plugin v0.1.5/go.mod h1:OC2JlZ9KZFJ+sVISBSj/o3hnRqJmZ48BKasIkPcUJjg=
-github.com/test-instructor/yangfan/hrp v0.0.0-20230515173030-4544ed499044 h1:NoCKuLqYvfRIzYImMILE5vJrEHfo5aLJzHLMnSYQTDk=
-github.com/test-instructor/yangfan/hrp v0.0.0-20230515173030-4544ed499044/go.mod h1:TAMLR3V99aU/ZC0+m+bXGuvxdjd5igrnMIJfp+Vka1M=
-github.com/test-instructor/yangfan/proto v0.0.0-20230515173030-4544ed499044 h1:a0iFMW1Hi8bndk5vvHJnF/20bAx5H/o/pZbDDNZevVY=
-github.com/test-instructor/yangfan/proto v0.0.0-20230515173030-4544ed499044/go.mod h1:6wQfTf6owTqVIiz0dx7H3sxBaH9mIsiQZZcIrnITzew=
+github.com/test-instructor/yangfan/hrp v0.0.0-20230521151452-07d562821462 h1:sk+e2Lk9QwoASUeSz+5UyticQtH4OYcC8eX+gbMa2kc=
+github.com/test-instructor/yangfan/hrp v0.0.0-20230521151452-07d562821462/go.mod h1:TAMLR3V99aU/ZC0+m+bXGuvxdjd5igrnMIJfp+Vka1M=
+github.com/test-instructor/yangfan/proto v0.0.0-20230521151452-07d562821462 h1:qisQTaHMLwx/35MZP1msKp5hFk17IlguCkb+dfWr6zw=
+github.com/test-instructor/yangfan/proto v0.0.0-20230521151452-07d562821462/go.mod h1:6wQfTf6owTqVIiz0dx7H3sxBaH9mIsiQZZcIrnITzew=
 github.com/tklauser/go-sysconf v0.3.10/go.mod h1:C8XykCvCb+Gn0oNCWPIlcb0RuglQTYaQ2hGm7jmxEFk=
 github.com/tklauser/go-sysconf v0.3.11 h1:89WgdJhk5SNwJfu+GKyYveZ4IaJ7xAkecBo+KdJV0CM=
 github.com/tklauser/go-sysconf v0.3.11/go.mod h1:GqXfhXY3kiPa0nAXPDIQIWzJbMCB7AmcWpGR8lSZfqI=

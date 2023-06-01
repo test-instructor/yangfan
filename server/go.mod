@@ -35,8 +35,8 @@ require (
 	github.com/swaggo/swag v1.7.0
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.19
 	github.com/test-instructor/grpc-plugin v0.1.5
-	github.com/test-instructor/yangfan/hrp v0.0.0-20230515173030-4544ed499044
-	github.com/test-instructor/yangfan/proto v0.0.0-20230515173030-4544ed499044
+	github.com/test-instructor/yangfan/hrp v0.0.0-20230521151452-07d562821462
+	github.com/test-instructor/yangfan/proto v0.0.0-20230521151452-07d562821462
 	github.com/unrolled/secure v1.0.7
 	github.com/xuri/excelize/v2 v2.4.1
 	go.uber.org/zap v1.24.0
