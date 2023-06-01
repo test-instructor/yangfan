@@ -2,7 +2,6 @@ package boomer
 
 import (
 	"fmt"
-	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"math/rand"
 	"os"
@@ -1451,8 +1450,6 @@ func (r *masterRunner) reportStats() {
 		reportMaster.CurrentUsers = int32(r.server.getCurrentUsers())
 		reportMaster.PerformanceReportID = *reportID
 		prometheusPusherStats.OnEvent(reportMaster, worker.PerformanceReportWork)
-		global.GVA_DB.Model(interfacecase.PerformanceReportMaster{}).Save(&reportMaster)
-		global.GVA_DB.Model(interfacecase.PerformanceReportWorker{}).Save(&worker)
 	}
 }
 
