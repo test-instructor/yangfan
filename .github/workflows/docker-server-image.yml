@@ -1,23 +1,30 @@
-name: Building a service image
-
+name: Build and Push Docker Image
 
 on:
   push:
-    branches: 
-    - main
-    - dev
+    branches:
+      - main
 
 jobs:
-
-  build:
-
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Print workspace directory
-      run: echo "Workspace directory: $GITHUB_WORKSPACE"
-    - name: Print github sha
-      run: echo "github sha: ${{ github.sha }}"
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker
+        uses: docker/setup-docker@v1
+
+      - name: Login to Docker registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
+          password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t server -f server/Dockerfile .
+          docker tag your-image-name ${{ secrets.ALIYUN_REGISTRY_USERNAME }}/server:v1.${{ github.sha }}
+          docker push ${{ secrets.ALIYUN_REGISTRY_USERNAME }}/serverr:v1.${{ github.sha }}
