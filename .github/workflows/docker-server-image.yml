@@ -1,0 +1,23 @@
+name: Building a service image
+
+
+on:
+  push:
+    branches: 
+    - main
+    - dev
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print workspace directory
+        run: echo "Workspace directory: $GITHUB_WORKSPACE"
+      - name: Print github sha
+        run: echo "github sha: ${{ github.sha }}"
+      - uses: actions/checkout@v3
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
