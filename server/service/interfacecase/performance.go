@@ -196,13 +196,6 @@ func (testCaseService *PerformanceService) FindReport(pReportReq interfacecaseRe
 	// 创建db
 	db := global.GVA_DB.
 		Model(&interfacecase.PerformanceReport{})
-	db.Preload("PerformanceReportDetail.PerformanceReportTotalStats")
-
-	if pReportReq.DetailID == 0 {
-		db.Preload("PerformanceReportDetail")
-	} else {
-		db.Preload("PerformanceReportDetail", "id > ?", pReportReq.DetailID)
-	}
 
 	err = db.Find(&pReport, "id = ?", pReportReq.ID).Error
 
