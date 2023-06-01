@@ -1,10 +1,9 @@
-name: Build and deploy Docker image
+name: Build and deploy web Docker image
 
 on:
   push:
     branches:
       - main
-      - dev
 
 env:
   IMAGE_NAME: yangfan-web
