@@ -3,8 +3,7 @@ name: Build and deploy server Docker image
 on:
   push:
     branches:
-      - main
-      - dev
+      - test
 
 env:
   IMAGE_NAME: yangfan-server
