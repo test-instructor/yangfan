@@ -8,7 +8,6 @@ ENV GOPROXY=https://goproxy.cn
 
 RUN  go build -o ./server ./server
 
-
 FROM python:3.10.10-slim
 
 WORKDIR /yangfan
