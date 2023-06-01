@@ -11,14 +11,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
           registry: registry.cn-hangzhou.aliyuncs.com/test-instructor/yangfan
           username: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
           password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
-
       - name: Build and push Docker image
         run: |
           docker build -t server -f server/Dockerfile .
