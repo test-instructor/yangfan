@@ -17,7 +17,6 @@ RUN python3 -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/si
     && pip3 install  funppy -i https://pypi.tuna.tsinghua.edu.cn/simple/
 
 EXPOSE 8888
-
 ENTRYPOINT ./server -c docker.config.yaml
 
 CMD ["tail", "-f", "/dev/null"]
