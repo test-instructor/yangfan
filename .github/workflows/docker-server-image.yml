@@ -12,8 +12,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Print workspace directory
-        run: echo "Workspace directory: $GITHUB_WORKSPACE"
+      - run: pwd
       - name: Set up Docker
         uses: docker/setup-docker@v1
 
