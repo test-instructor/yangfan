@@ -3,7 +3,6 @@ name: Build and deploy server Docker image
 on:
   push:
     branches:
-      - main
       - dev
 
 env:
@@ -16,7 +15,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
+      - name: Print workspace directory
+        run: echo "Workspace directory: $GITHUB_WORKSPACE"
       - name: Set up Go 1.19
         uses: actions/setup-go@v2
         with:
@@ -36,7 +36,7 @@ jobs:
       - name: Build the Docker image
         uses: docker/build-push-action@v2
         with:
-          context: /home/runner/work/yangfan
+          context: {{ $GITHUB_WORKSPACE}}
           dockerfile: ./server/Dockerfile   # 指定 Dockerfile 的路径
           push: true
           tags: ${{ env.DOCKER_REGISTRY }}/yangfan/${{ env.IMAGE_NAME }}:latest
