@@ -13,8 +13,8 @@ FROM python:3.10.10-slim
 WORKDIR /yangfan
 COPY --from=builder /go/src/yangfan/server .
 RUN python3 -m venv ~/.hrp/venv
-RUN python3 -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple/  \
-    && pip3 install  funppy -i https://pypi.tuna.tsinghua.edu.cn/simple/
+RUN python3 -m pip install --upgrade pip \
+    && pip3 install  funppy
 
 EXPOSE 8888
 ENTRYPOINT ./server -c docker.config.yaml
