@@ -10,9 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - run: pwd
+      - uses: actions/checkout@v2
       - name: Set up Docker
         uses: docker/setup-docker@v1
 
@@ -23,8 +21,12 @@ jobs:
           username: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
           password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
 
-      - name: Build and push Docker image
-        run: |
-          docker build -t server -f server/Dockerfile .
-          docker tag your-image-name ${{ secrets.ALIYUN_REGISTRY_USERNAME }}/server:v1.${{ github.sha }}
-          docker push ${{ secrets.ALIYUN_REGISTRY_USERNAME }}/serverr:v1.${{ github.sha }}
+      - name: Build the Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: $GITHUB_WORKSPACE
+          dockerfile: ./server/Dockerfile
+          push: true
+          tags: ${{ env.DOCKER_REGISTRY }}/yangfan/${{ env.IMAGE_NAME }}:v1.${{ github.sha }}
+          build-args: |
+            APP_NAME=server
