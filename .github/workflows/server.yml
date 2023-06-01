@@ -39,6 +39,6 @@ jobs:
           context: {{ $GITHUB_WORKSPACE}}
           dockerfile: ./server/Dockerfile   # 指定 Dockerfile 的路径
           push: true
-          tags: ${{ env.DOCKER_REGISTRY }}/yangfan/${{ env.IMAGE_NAME }}:latest
+          tags: ${{ env.DOCKER_REGISTRY }}/yangfan/${{ env.IMAGE_NAME }}:v1.${{ github.sha }}
           build-args: |
             APP_NAME=server
