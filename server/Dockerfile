@@ -3,7 +3,6 @@ FROM golang:alpine AS builder
 WORKDIR /go/src/yangfan
 
 COPY . .
-
 ENV GO111MODULE=on
 ENV GOPROXY=https://goproxy.cn
 
