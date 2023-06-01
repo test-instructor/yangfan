@@ -24,4 +24,24 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.19
+      - name: Print current directory
+        run: pwd
+      - name: Print files
+        run: ls -l
+      - name: Login to Aliyun Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
+          password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
 
+
+      - name: Build the Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: $GITHUB_WORKSPACE
+          dockerfile: ./server/Dockerfile
+          push: true
+          tags: ${{ env.DOCKER_REGISTRY }}/yangfan/${{ env.IMAGE_NAME }}:v1.${{ github.sha }}
+          build-args: |
+            APP_NAME=server
