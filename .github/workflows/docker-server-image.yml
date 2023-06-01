@@ -4,8 +4,8 @@ name: Building a service image
 on:
   push:
     branches: 
-    - main
-    - dev
+      - main
+      - dev
 
 jobs:
 
