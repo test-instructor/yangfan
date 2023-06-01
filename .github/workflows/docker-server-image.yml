@@ -24,3 +24,4 @@ jobs:
           docker build -t server -f server/Dockerfile .
           docker tag server ${{ secrets.REGISTRY_USERNAME }}/${{ env.DOCKER_REGISTRY }}:v1.${{ github.sha }}
           docker push ${{ secrets.REGISTRY_USERNAME }}/${{ env.DOCKER_REGISTRY }}:v1.${{ github.sha }}
+
