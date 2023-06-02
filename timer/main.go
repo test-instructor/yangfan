@@ -22,7 +22,7 @@ import (
 )
 
 func RunPkgInstallClient() {
-	host := fmt.Sprintf("%s:%s", global.GVA_CONFIG.GrpcServer.Background, global.GVA_CONFIG.GrpcServer.BackgroundGrpcPort)
+	host := fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Background, global.GVA_CONFIG.YangFan.BackgroundGrpcPort)
 	c, err := client.NewClient(host)
 	if err != nil {
 		global.GVA_LOG.Error("[RunClient]创建客户端失败", zap.Error(err))

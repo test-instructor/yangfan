@@ -12,6 +12,7 @@ RUN  go build -o ./server ./server
 FROM python:3.10.10-slim
 WORKDIR /yangfan
 COPY --from=builder /go/src/yangfan/server .
+COPY --from=builder /go/src/yangfan/docker.config.yaml .
 RUN python3 -m venv ~/.hrp/venv
 RUN python3 -m pip install --upgrade pip \
     && pip3 install  funppy
