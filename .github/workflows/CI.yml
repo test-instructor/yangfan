@@ -118,14 +118,11 @@ jobs:
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
-          context: ./web
           registry: ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WEB }}
           username: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
           password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
       - name: Build and push Docker image
         run: |
-          docker build -t web -f ./Dockerfile .
+          docker build -t web -f ./web/Dockerfile .
           docker tag web ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WEB }}:v1.${{ github.run_number }}
           docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WEB }}:v1.${{ github.run_number }}
-
-
