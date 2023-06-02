@@ -103,7 +103,7 @@ jobs:
           docker tag work ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WORK }}:v1.${{ github.run_number }}
           docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WORK }}:v1.${{ github.run_number }}
   web:
-    name: Building a work image
+    name: Building a web image
     runs-on: ubuntu-latest
     env:
       ALIYUN_REGISTRY: registry.cn-hangzhou.aliyuncs.com/yangfanz/
