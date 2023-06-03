@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Login to Aliyun Container Registry
+      - name: Login to Docker Container Registry
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.REGISTRY_USERNAME }}
@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Login to Aliyun Container Registry
+      - name: Login to Docker Container Registry
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.REGISTRY_USERNAME }}
@@ -65,7 +65,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Login to Aliyun Container Registry
+      - name: Login to Docker Container Registry
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.REGISTRY_USERNAME }}
@@ -88,7 +88,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Login to Aliyun Container Registry
+      - name: Login to Docker Container Registry
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.REGISTRY_USERNAME }}
@@ -111,7 +111,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Login to Aliyun Container Registry
+      - name: Login to Docker Container Registry
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.REGISTRY_USERNAME }}
