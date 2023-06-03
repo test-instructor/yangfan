@@ -22,7 +22,6 @@ jobs:
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
-          registry: ${{ env.REGISTRY }}${{ env.IMAGE_NAME_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: Build and push Docker image
@@ -46,7 +45,6 @@ jobs:
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
-          registry: ${{ env.REGISTRY }}${{ env.IMAGE_NAME_TIMER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: Build and push Docker image
@@ -70,7 +68,6 @@ jobs:
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
-          registry: ${{ env.REGISTRY }}${{ env.IMAGE_NAME_MASTER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: Build and push Docker image
@@ -94,7 +91,6 @@ jobs:
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
-          registry: ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WORK }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: Build and push Docker image
@@ -118,7 +114,6 @@ jobs:
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
-          registry: ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WEB }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: Build and push Docker image
