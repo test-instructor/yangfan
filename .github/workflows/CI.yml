@@ -10,7 +10,7 @@ jobs:
     name: Building a server image
     runs-on: ubuntu-latest
     env:
-      ALIYUN_REGISTRY: registry.cn-hangzhou.aliyuncs.com/yangfanz/
+      REGISTRY: yangfans/
       IMAGE_NAME_SERVER: server
       IMAGE_NAME_TIMER: timer
       IMAGE_NAME_MASTER: master
@@ -22,19 +22,19 @@ jobs:
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
-          registry: ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_SERVER }}
-          username: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
-          password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
+          registry: ${{ env.REGISTRY }}${{ env.IMAGE_NAME_SERVER }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: Build and push Docker image
         run: |
           docker build -t server -f server/Dockerfile .
-          docker tag server ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_SERVER }}:latest
-          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_SERVER }}:latest
+          docker tag server ${{ env.REGISTRY }}${{ env.IMAGE_NAME_SERVER }}:latest
+          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_SERVER }}:latest
   timer:
     name: Building a timer image
     runs-on: ubuntu-latest
     env:
-      ALIYUN_REGISTRY: registry.cn-hangzhou.aliyuncs.com/yangfanz/
+      REGISTRY: yangfans/
       IMAGE_NAME_SERVER: server
       IMAGE_NAME_TIMER: timer
       IMAGE_NAME_MASTER: master
@@ -46,19 +46,19 @@ jobs:
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
-          registry: ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_TIMER }}
-          username: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
-          password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
+          registry: ${{ env.REGISTRY }}${{ env.IMAGE_NAME_TIMER }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: Build and push Docker image
         run: |
           docker build -t timer -f timer/Dockerfile .
-          docker tag timer ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_TIMER }}:latest
-          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_TIMER }}:latest
+          docker tag timer ${{ env.REGISTRY }}${{ env.IMAGE_NAME_TIMER }}:latest
+          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_TIMER }}:latest
   master:
     name: Building a master image
     runs-on: ubuntu-latest
     env:
-      ALIYUN_REGISTRY: registry.cn-hangzhou.aliyuncs.com/yangfanz/
+      REGISTRY: yangfans/
       IMAGE_NAME_SERVER: server
       IMAGE_NAME_TIMER: timer
       IMAGE_NAME_MASTER: master
@@ -70,19 +70,19 @@ jobs:
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
-          registry: ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_MASTER }}
-          username: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
-          password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
+          registry: ${{ env.REGISTRY }}${{ env.IMAGE_NAME_MASTER }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: Build and push Docker image
         run: |
           docker build -t master -f master/Dockerfile .
-          docker tag master ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_MASTER }}:latest
-          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_MASTER }}:latest
+          docker tag master ${{ env.REGISTRY }}${{ env.IMAGE_NAME_MASTER }}:latest
+          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_MASTER }}:latest
   work:
     name: Building a work image
     runs-on: ubuntu-latest
     env:
-      ALIYUN_REGISTRY: registry.cn-hangzhou.aliyuncs.com/yangfanz/
+      REGISTRY: yangfans/
       IMAGE_NAME_SERVER: server
       IMAGE_NAME_TIMER: timer
       IMAGE_NAME_MASTER: master
@@ -94,19 +94,19 @@ jobs:
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
-          registry: ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WORK }}
-          username: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
-          password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
+          registry: ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WORK }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: Build and push Docker image
         run: |
           docker build -t work -f work/Dockerfile .
-          docker tag work ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WORK }}:latest
-          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WORK }}:latest
+          docker tag work ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WORK }}:latest
+          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WORK }}:latest
   web:
     name: Building a web image
     runs-on: ubuntu-latest
     env:
-      ALIYUN_REGISTRY: registry.cn-hangzhou.aliyuncs.com/yangfanz/
+      REGISTRY: yangfans/
       IMAGE_NAME_SERVER: server
       IMAGE_NAME_TIMER: timer
       IMAGE_NAME_MASTER: master
@@ -118,11 +118,11 @@ jobs:
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
-          registry: ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WEB }}
-          username: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
-          password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
+          registry: ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WEB }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: Build and push Docker image
         run: |
           docker build -t web -f ./web/Dockerfile .
-          docker tag web ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WEB }}:latest
-          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WEB }}:latest
+          docker tag web ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WEB }}:latest
+          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WEB }}:latest
