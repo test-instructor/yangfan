@@ -2,6 +2,7 @@ package interfacecase
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/test-instructor/yangfan/proto/master"
 	"github.com/test-instructor/yangfan/server/global"
@@ -41,8 +42,11 @@ func (r *RunCaseService) RunBoomer(runCase request.RunCaseReq, runType interface
 }
 
 func (r *RunCaseService) RunMasterBoomer(runCase request.RunCaseReq, runType interfacecase.RunType) (*interfacecase.ApiReport, error) {
+	global.GVA_LOG.Debug("RunMasterBoomer", zap.Any("master host", fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Master, global.GVA_CONFIG.YangFan.MasterBoomerProt)))
+
 	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Master, global.GVA_CONFIG.YangFan.MasterBoomerProt))
 	if err != nil {
+		global.GVA_LOG.Error("RunMasterBoomer", zap.Any("err host", errors.New(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Master, global.GVA_CONFIG.YangFan.MasterBoomerProt))))
 		return nil, err
 	}
 	_, err = c.MasterClient.Start(context.Background(), &master.StartReq{

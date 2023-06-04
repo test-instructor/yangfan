@@ -7,6 +7,7 @@ import (
 	"github.com/test-instructor/yangfan/proto/master"
 	"github.com/test-instructor/yangfan/proto/tools"
 	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
 	"google.golang.org/grpc/codes"
@@ -57,13 +58,13 @@ func NewClient(host string) (*Client, error) {
 func Reconnect() (*Client, error) {
 	var c *Client
 	var err error
-	initOnce.Do(func() {
-		c, err = newClient(apiClient.host)
-		if err != nil {
-			return
-		}
-		apiClient = c
-	})
+	c, err = newClient(apiClient.host)
+	if err != nil {
+		global.GVA_LOG.Error("[Reconnect]重新连接失败", zap.Error(err))
+		global.GVA_LOG.Error("[Reconnect]重新连接失败", zap.Any("apiClient.host", apiClient.host))
+		return nil, err
+	}
+	apiClient = c
 	return apiClient, nil
 }
 

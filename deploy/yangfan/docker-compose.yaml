@@ -35,40 +35,6 @@ services:
       network:
         ipv4_address: 177.8.0.11
 
-  master:
-    image: yangfanz/master:latest
-    container_name: yangfan-master
-    restart: always
-    volumes:
-      - ./config/docker.config.yaml:/yangfan/docker.config.yaml
-    ports:
-      - '7966:7966'
-      - '9093:9093'
-      - '9092:9092'
-    networks:
-      network:
-        ipv4_address: 177.8.0.15
-
-  work:
-    image: yangfanz/work:latest
-    container_name: yangfan-work
-    restart: always
-    volumes:
-      - ./config/docker.config.yaml:/yangfan/docker.config.yaml
-    networks:
-      network:
-        ipv4_address: 177.8.0.16
-
-  timer:
-    image: yangfanz/timer:latest
-    container_name: yangfan-timer
-    restart: always
-    volumes:
-      - ./config/docker.config.yaml:/yangfan/docker.config.yaml
-    networks:
-      network:
-        ipv4_address: 177.8.0.13
-
   prometheus:
     image: prom/prometheus
     container_name: prometheus
@@ -104,10 +70,56 @@ services:
         ipv4_address: 177.8.0.203
     restart: always
     volumes:
-      - ./data/grafana/data:/var/lib/grafana
-      - ./data/grafana/log:/var/log/grafana
-      - ./data/grafana/provisioning:/etc/grafana/provisioning
+      - ./data/yangfan/grafana/data:/var/lib/grafana
+      - ./data/yangfan/grafana/log:/var/log/grafana
+      - ./data/yangfan/grafana/provisioning:/etc/grafana/provisioning
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Editor
       - GF_SECURITY_ALLOW_EMBEDDING=true
+
+  master:
+    image: yangfanz/master:latest
+    container_name: yangfan-master
+    restart: always
+    volumes:
+      - ./config/docker.config.yaml:/yangfan/docker.config.yaml
+    ports:
+      - '7966:7966'
+      - '9093:9093'
+      - '9092:9092'
+    networks:
+      network:
+        ipv4_address: 177.8.0.15
+
+  work:
+    image: yangfanz/work:latest
+    container_name: yangfan-work
+    restart: always
+    volumes:
+      - ./config/docker.config.yaml:/yangfan/docker.config.yaml
+    networks:
+      network:
+        ipv4_address: 177.8.0.16
+
+  work2:
+    image: yangfanz/work:latest
+    container_name: yangfan-work2
+    restart: always
+    volumes:
+      - ./config/docker.config.yaml:/yangfan/docker.config.yaml
+    networks:
+      network:
+        ipv4_address: 177.8.0.17
+
+  timer:
+    image: yangfanz/timer:latest
+    container_name: yangfan-timer
+    restart: always
+    volumes:
+      - ./config/docker.config.yaml:/yangfan/docker.config.yaml
+    networks:
+      network:
+        ipv4_address: 177.8.0.13
+
+
