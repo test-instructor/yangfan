@@ -84,9 +84,11 @@ func (r *RunCaseService) Rebalance(runCase request.RunCaseReq) (*interfacecase.A
 
 func (r *RunCaseService) Stop(runCase request.RunCaseReq) (err error) {
 	defer func() {
-		err = global.GVA_DB.Model(&interfacecase.PerformanceReport{}).Where("id = ?", runCase.ReportID).Update("state", interfacecase.StateStopped).Error
-		if err != nil {
-			global.GVA_LOG.Error("修改性能测试报告状态失败", zap.Error(err))
+		if err == nil || err.Error() == "rpc error: code = Unknown desc = already stopped" {
+			err = global.GVA_DB.Model(&interfacecase.PerformanceReport{}).Where("id = ?", runCase.ReportID).Update("state", interfacecase.StateStopped).Error
+			if err != nil {
+				global.GVA_LOG.Error("修改性能测试报告状态失败", zap.Error(err))
+			}
 		}
 	}()
 	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Master, global.GVA_CONFIG.YangFan.MasterBoomerProt))
