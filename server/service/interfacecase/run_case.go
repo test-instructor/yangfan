@@ -61,6 +61,7 @@ func (r *RunCaseService) RunMasterBoomer(runCase request.RunCaseReq, runType int
 		var report interfacecase.ApiReport
 		global.GVA_DB.Model(&interfacecase.ApiReport{}).Order("id desc").First(&report)
 		if err == nil {
+			global.GVA_LOG.Error("RunMasterBoomer2", zap.Any("err host", errors.New(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Master, global.GVA_CONFIG.YangFan.MasterBoomerProt))))
 			return &report, nil
 		}
 	}
