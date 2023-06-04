@@ -27,10 +27,11 @@ export const rebalance = (data) => {
   });
 };
 
-export const stopBoom = () => {
+export const stopBoom = (params) => {
   return service({
     url: baseURL + "/stop",
     method: "get",
+    params,
   });
 };
 

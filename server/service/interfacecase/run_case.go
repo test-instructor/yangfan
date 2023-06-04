@@ -9,6 +9,7 @@ import (
 	"github.com/test-instructor/yangfan/server/model/common/request"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"github.com/test-instructor/yangfan/server/service/interfacecase/runTestCase"
+	"go.uber.org/zap"
 )
 
 type RunCaseService struct {
@@ -81,13 +82,18 @@ func (r *RunCaseService) Rebalance(runCase request.RunCaseReq) (*interfacecase.A
 	return nil, nil
 }
 
-func (r *RunCaseService) Stop() error {
+func (r *RunCaseService) Stop(runCase request.RunCaseReq) (err error) {
+	defer func() {
+		err = global.GVA_DB.Model(&interfacecase.PerformanceReport{}).Where("id = ?", runCase.ReportID).Update("state", interfacecase.StateStopped).Error
+		if err != nil {
+			global.GVA_LOG.Error("修改性能测试报告状态失败", zap.Error(err))
+		}
+	}()
 	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Master, global.GVA_CONFIG.YangFan.MasterBoomerProt))
 	if err != nil {
 		return err
 	}
 	_, err = c.MasterClient.Stop(context.Background(), &master.StopReq{})
-
 	return err
 }
 

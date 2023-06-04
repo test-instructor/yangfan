@@ -82,7 +82,9 @@ func (runCaseApi *RunCaseApi) Rebalance(c *gin.Context) {
 }
 
 func (runCaseApi *RunCaseApi) Stop(c *gin.Context) {
-	err := runCaseService.Stop()
+	var runApiCase request.RunCaseReq
+	_ = c.ShouldBindQuery(&runApiCase)
+	err := runCaseService.Stop(runApiCase)
 	if err != nil {
 		return
 	}

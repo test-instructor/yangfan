@@ -56,4 +56,5 @@ type RunCaseReq struct {
 	TagID     uint      `json:"tagID" form:"TagID"`
 	ProjectID uint      `json:"-"`
 	Env       uint      `json:"env" form:"env"`
+	ReportID  uint      `json:"reportID" form:"reportID"`
 }

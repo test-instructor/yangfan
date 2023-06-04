@@ -317,14 +317,11 @@ const updateUser = async () => {
 };
 
 const stopBoomer = async () => {
-  let data = {
+  let params = {
     caseID: performance_id,
-    run_type: 6,
-    operation: {
-      running: 3,
-    },
+    reportID: reportID,
   };
-  const res = await stopBoom();
+  const res = await stopBoom(params);
   if (res.code === 0) {
     ElMessage({
       type: "success",
