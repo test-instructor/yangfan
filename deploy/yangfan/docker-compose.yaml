@@ -18,9 +18,6 @@ services:
     ports:
       - '8888:8888'
       - '7967:7967'
-    networks:
-      network:
-        ipv4_address: 177.8.0.12
 
   web:
     image: yangfanz/web:latest
@@ -30,10 +27,6 @@ services:
       - ./config/my.conf:/etc/nginx/conf.d/my.conf
     ports:
       - '8080:8080'
-    command: [ 'nginx-debug', '-g', 'daemon off;' ]
-    networks:
-      network:
-        ipv4_address: 177.8.0.11
 
   prometheus:
     image: prom/prometheus
@@ -44,9 +37,6 @@ services:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
-    networks:
-      network:
-        ipv4_address: 177.8.0.201
 
   pushgateway:
     container_name: pushgateway
@@ -55,9 +45,6 @@ services:
     restart: always
     ports:
       - '9091:9091'
-    networks:
-      network:
-        ipv4_address: 177.8.0.202
 
   grafana:
     container_name: "grafana"
@@ -65,9 +52,6 @@ services:
     user: root
     ports:
       - '3000:3000'
-    networks:
-      network:
-        ipv4_address: 177.8.0.203
     restart: always
     volumes:
       - ./data/yangfan/grafana/data:/var/lib/grafana
@@ -88,9 +72,6 @@ services:
       - '7966:7966'
       - '9093:9093'
       - '9092:9092'
-    networks:
-      network:
-        ipv4_address: 177.8.0.15
 
   work:
     image: yangfanz/work:latest
@@ -98,9 +79,7 @@ services:
     restart: always
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml
-    networks:
-      network:
-        ipv4_address: 177.8.0.16
+
 
   work2:
     image: yangfanz/work:latest
@@ -108,9 +87,7 @@ services:
     restart: always
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml
-    networks:
-      network:
-        ipv4_address: 177.8.0.17
+
 
   timer:
     image: yangfanz/timer:latest
@@ -118,8 +95,6 @@ services:
     restart: always
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml
-    networks:
-      network:
-        ipv4_address: 177.8.0.13
+
 
 
