@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: yangfan-server
+spec:
+  selector:
+    app: yangfan-server
+  ports:
+    - protocol: TCP
+      port: 30088
+      targetPort: 8888
+  type: ClusterIP
