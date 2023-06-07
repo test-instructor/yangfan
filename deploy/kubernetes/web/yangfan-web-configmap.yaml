@@ -12,7 +12,7 @@ data:
         #access_log  logs/host.access.log  main;
 
         location / {
-            root /usr/share/nginx/html;
+            root /yangfan/web;
             add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
             try_files $uri $uri/ /index.html;
         }

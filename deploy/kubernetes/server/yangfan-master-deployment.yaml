@@ -23,12 +23,10 @@ spec:
             - containerPort: 9092
               protocol: TCP
           volumeMounts:
-            - name: config-volume
-              mountPath: /yangfan
+            - name: docker-config-yaml
+              mountPath: /yangfan/docker.config.yaml
+              subPath: docker.config.yaml
       volumes:
-        - name: config-volume
+        - name: docker-config-yaml
           configMap:
-            name: yangfan-config
-            items:
-              - key: docker.config.yaml
-                path: docker.config.yaml
+            name: docker-config-yaml
