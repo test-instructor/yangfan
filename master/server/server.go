@@ -13,6 +13,7 @@ import (
 var ns *grpc.Server
 
 func StartGrpc(address string) {
+	global.GVA_LOG.Info("grpc server run", zap.String("address", address))
 	lis, err := net.Listen("tcp", address)
 	if err != nil {
 		global.GVA_LOG.Panic("failed to listen", zap.Error(err))
@@ -20,6 +21,7 @@ func StartGrpc(address string) {
 	ns = grpc.NewServer()
 	master.RegisterMasterServer(ns, &masterServer{MasterBoom: NewMasterBoom()})
 	if strings.ToLower(global.GVA_CONFIG.Zap.Level) == "debug" {
+		global.GVA_LOG.Info("grpc server register reflection")
 		reflection.Register(ns)
 	}
 	if err := ns.Serve(lis); err != nil {

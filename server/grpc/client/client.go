@@ -45,6 +45,7 @@ func NewClientMap(host string) (*Client, error) {
 func NewClient(host string) (*Client, error) {
 	var c *Client
 	var err error
+	global.GVA_LOG.Debug("[NewClient]host", zap.Any("host", host))
 	initOnce.Do(func() {
 		c, err = newClient(host)
 		if err != nil {
@@ -59,6 +60,7 @@ func Reconnect() (*Client, error) {
 	var c *Client
 	var err error
 	c, err = newClient(apiClient.host)
+	global.GVA_LOG.Debug("[Reconnect]重新连接", zap.Any("apiClient.host", apiClient.host))
 	if err != nil {
 		global.GVA_LOG.Error("[Reconnect]重新连接失败", zap.Error(err))
 		global.GVA_LOG.Error("[Reconnect]重新连接失败", zap.Any("apiClient.host", apiClient.host))
@@ -69,6 +71,7 @@ func Reconnect() (*Client, error) {
 }
 
 func newClient(host string) (*Client, error) {
+	global.GVA_LOG.Debug("[newClient]host", zap.Any("host", host))
 	retryMiddlewareConfig := []retry.CallOption{
 		retry.WithCodes(codes.Unavailable),
 		retry.WithBackoff(retry.BackoffExponential(100 * time.Millisecond)),
