@@ -7,6 +7,6 @@ spec:
     app: yangfan-server
   ports:
     - protocol: TCP
-      port: 30088
+      port: 8888
       targetPort: 8888
   type: ClusterIP

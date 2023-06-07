@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: docker.config.yaml
+  name: docker-config-yaml
 data:
   docker.config.yaml: |
     aliyun-oss:
@@ -100,7 +100,7 @@ data:
       path: uploads/file
       store-path: uploads/file
     mysql:
-      path: 192.168.0.218
+      path: 192.168.0.222
       port: "3306"
       config: charset=utf8mb4&parseTime=True&loc=Local
       db-name: yangfan

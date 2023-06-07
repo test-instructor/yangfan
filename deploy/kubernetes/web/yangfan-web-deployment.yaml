@@ -35,8 +35,9 @@ spec:
               memory: 100Mi
           volumeMounts:
             - name: nginx-config
-              mountPath: /etc/nginx/conf.d
+              mountPath: /etc/nginx/conf.d/my.conf
+              subPath: my.conf
       volumes:
         - name: nginx-config
           configMap:
-            name: my.conf
+            name: nginx-config
