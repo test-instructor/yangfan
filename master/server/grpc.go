@@ -121,6 +121,7 @@ func (b masterServer) Stop(ctx context.Context, req *master.StopReq) (resp *mast
 			resp.Resp = errResp
 		} else {
 			go func() {
+				time.Sleep(30 * time.Second)
 				os.Exit(0)
 			}()
 			resp.Resp = okResp

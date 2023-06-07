@@ -80,15 +80,6 @@ services:
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml
 
-
-  work2:
-    image: yangfanz/work:latest
-    container_name: yangfan-work2
-    restart: always
-    volumes:
-      - ./config/docker.config.yaml:/yangfan/docker.config.yaml
-
-
   timer:
     image: yangfanz/timer:latest
     container_name: yangfan-timer
