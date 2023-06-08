@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: yangfan-grafana-config
+data:
+  grafana.ini: |
+    [paths]
+    data = /var/lib/grafana
+    logs = /var/log/grafana
+    plugins = /var/lib/grafana/plugins
+
+    [datasource.prometheus]
+    type = prometheus
+    url = http://prometheus:9090
+    access = proxy
+
+    [dashboard.provider]
+    providers = file
+
+    [dashboard]
+    providers = file

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yangfan-grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yangfan-grafana
+  template:
+    metadata:
+      labels:
+        app: yangfan-grafana
+    spec:
+      containers:
+        - name: yangfan-grafana
+          image: grafana/grafana:9.5.1
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: yangfan-grafana-config
+              mountPath: /etc/grafana/grafana.ini
+              subPath: grafana.ini
+            - name: yangfan-grafana-dashboard-config
+              mountPath: /var/lib/grafana/dashboards
+              subPath: dashboards
+          env:
+            - name: GF_AUTH_ANONYMOUS_ENABLED
+              value: "true"
+            - name: GF_AUTH_ANONYMOUS_ORG_ROLE
+              value: "Editor"
+            - name: GF_SECURITY_ALLOW_EMBEDDING
+              value: "true"
+      volumes:
+        - name: yangfan-grafana-config
+          configMap:
+            name: yangfan-grafana-config
+        - name: yangfan-grafana-dashboard-config
+          configMap:
+            name: yangfan-grafana-dashboard-config

@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yangfan-prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yangfan-prometheus
+  template:
+    metadata:
+      labels:
+        app: yangfan-prometheus
+    spec:
+      containers:
+        - name: yangfan-prometheus
+          image: prom/prometheus
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            - name: yangfan-prometheus-config
+              mountPath: /etc/prometheus/prometheus.yml
+              subPath: prometheus.yml
+      volumes:
+        - name: yangfan-prometheus-config
+          configMap:
+            name: yangfan-prometheus-config

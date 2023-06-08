@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: yangfan-pushgateway
+spec:
+  selector:
+    app: yangfan-pushgateway
+  type: NodePort
+  ports:
+    - port: 9091
+      targetPort: 9091
+      nodePort: 31091
+      protocol: TCP

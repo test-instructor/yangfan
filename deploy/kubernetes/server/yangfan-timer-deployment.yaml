@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yangfan-timer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yangfan-timer
+  template:
+    metadata:
+      labels:
+        app: yangfan-timer
+    spec:
+      containers:
+        - name: yangfan-timer
+          image: yangfanz/timer:latest
+          ports:
+            - containerPort: 8888
+              protocol: TCP
+            - containerPort: 7967
+              protocol: TCP
+          volumeMounts:
+            - name: docker-config-yaml
+              mountPath: /yangfan/docker.config.yaml
+              subPath: docker.config.yaml
+      volumes:
+        - name: docker-config-yaml
+          configMap:
+            name: docker-config-yaml
