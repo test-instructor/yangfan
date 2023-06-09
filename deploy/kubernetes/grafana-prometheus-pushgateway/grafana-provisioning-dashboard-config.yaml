@@ -4,7 +4,7 @@ metadata:
   name: yangfan-grafana-provisioning-dashboard-config
   namespace: yangfan
 data:
-  yangfan.prometheus.prometheus.yaml: |
+  yangfan.grafana.dashboard.yaml: |
     apiVersion: 1
     providers:
       - name: yangfan-for-distributed-load-testing

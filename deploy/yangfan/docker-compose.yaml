@@ -54,13 +54,14 @@ services:
       - '3000:3000'
     restart: always
     volumes:
-      - ./data/yangfan/grafana/data:/var/lib/grafana
-      - ./data/yangfan/grafana/log:/var/log/grafana
-      - ./data/yangfan/grafana/provisioning:/etc/grafana/provisioning
+      - ./data/grafana/data:/var/lib/grafana
+      - ./data/grafana/log:/var/log/grafana
+      - ./data/grafana/provisioning:/etc/grafana/provisioning
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
       - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_PATHS_CONFIG=/etc/grafana/provisioning
 
   master:
     image: yangfanz/master:latest
@@ -76,6 +77,13 @@ services:
   work:
     image: yangfanz/work:latest
     container_name: yangfan-work
+    restart: always
+    volumes:
+      - ./config/docker.config.yaml:/yangfan/docker.config.yaml
+
+  run:
+    image: yangfanz/run:latest
+    container_name: yangfan-run
     restart: always
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml

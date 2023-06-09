@@ -90,6 +90,18 @@ services:
       network:
         ipv4_address: 177.7.0.13
 
+  run:
+    build:
+      context: ../../
+      dockerfile: ./run/Dockerfile
+    container_name: yangfan-run
+    restart: always
+    volumes:
+      - ./config/docker.config.yaml:/yangfan/docker.config.yaml
+    networks:
+      network:
+        ipv4_address: 177.7.0.18
+
   prometheus:
     image: prom/prometheus
     container_name: prometheus
@@ -132,3 +144,4 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
       - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_PATHS_CONFIG=/etc/grafana/provisioning
