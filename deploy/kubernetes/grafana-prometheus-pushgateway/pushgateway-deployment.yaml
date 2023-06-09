@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yangfan-pushgateway
+  namespace: yangfan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yangfan-pushgateway
+  template:
+    metadata:
+      labels:
+        app: yangfan-pushgateway
+    spec:
+      containers:
+        - name: yangfan-pushgateway
+          image: prom/pushgateway
+          ports:
+            - containerPort: 9091
