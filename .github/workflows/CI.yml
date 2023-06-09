@@ -137,6 +137,37 @@ jobs:
           docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WORK }}:v1.${{ github.run_number }}
           docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WORK }}:latest
 
+  run:
+    name: Building a run image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Login to Docker Container Registry
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: Build and push Docker image
+        run: |
+          docker build -t work -f work/Dockerfile .
+          docker tag run ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WORK }}:v1.${{ github.run_number }}
+          docker tag run ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WORK }}:latest
+          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WORK }}:v1.${{ github.run_number }}
+          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WORK }}:latest
+      - name: Login to Aliyun Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WORK }}
+          username: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
+          password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
+      - name: Push to Aliyun Docker image
+        run: |
+          docker tag run ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WORK }}:v1.${{ github.run_number }}
+          docker tag run ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WORK }}:latest
+          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WORK }}:v1.${{ github.run_number }}
+          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WORK }}:latest
+
+
   web:
     name: Building a web image
     runs-on: ubuntu-latest
