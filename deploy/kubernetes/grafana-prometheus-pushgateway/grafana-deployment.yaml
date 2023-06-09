@@ -21,9 +21,11 @@ spec:
             - name: yangfan-grafana-config
               mountPath: /etc/grafana
             - name: yangfan-grafana-dashboard-config
-              mountPath: /etc/grafana/provisioning/dashboards
+              mountPath: /etc/grafana/dashboards
             - name: yangfan-grafana-prometheus-config
               mountPath: /etc/grafana/provisioning/datasources
+            - name: yangfan-grafana-provisioning-dashboard-config
+              mountPath: /etc/grafana/provisioning/dashboards
           env:
             - name: GF_AUTH_ANONYMOUS_ENABLED
               value: "true"
@@ -43,3 +45,6 @@ spec:
         - name: yangfan-grafana-prometheus-config
           configMap:
             name: yangfan-grafana-prometheus-config
+        - name: yangfan-grafana-provisioning-dashboard-config
+          configMap:
+            name: yangfan-grafana-provisioning-dashboard-config
