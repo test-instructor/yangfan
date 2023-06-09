@@ -4,18 +4,28 @@ metadata:
   name: yangfan-grafana-config
 data:
   grafana.ini: |
-    [paths]
-    data = /var/lib/grafana
-    logs = /var/log/grafana
-    plugins = /var/lib/grafana/plugins
-
+    [provisioning]
+    enabled = true
+    directory = /etc/grafana/provisioning
+    
     [datasource.prometheus]
     type = prometheus
-    url = http://prometheus:9090
+    url = http://yangfan-prometheus:9090
     access = proxy
-
-    [dashboard.provider]
-    providers = file
-
+    
     [dashboard]
-    providers = file
+    enabled = true
+    default_home_dashboard_path = /etc/grafana/provisioning/yangfan-for-distributed-load-testing.json
+    kiosk = false
+    
+    [dashboard.providers.yangfan-for-distributed-load-testing]
+    enabled = true
+    provider = file
+    path = /etc/grafana/provisioning/yangfan-for-distributed-load-testing.json
+    
+    [dashboard.providers.yangfan-for-node-status.json]
+    enabled = true
+    provider = file
+    path = /etc/grafana/provisioning/yangfan-for-node-status.json
+
+
