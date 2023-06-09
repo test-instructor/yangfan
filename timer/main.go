@@ -44,7 +44,7 @@ func main() {
 		global.GVA_LOG.Error("register db", zap.Error(global.GVA_DB.Error))
 		os.Exit(0)
 	}
-	yangfan.InitPythonPackage(false)
+	yangfan.InitPythonPackage(true)
 	//initialize.TimerTaskCase()
 	go RunPkgInstallClient()
 	s := <-c

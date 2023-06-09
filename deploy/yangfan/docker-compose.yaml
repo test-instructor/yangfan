@@ -59,7 +59,7 @@ services:
       - ./data/yangfan/grafana/provisioning:/etc/grafana/provisioning
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Editor
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
       - GF_SECURITY_ALLOW_EMBEDDING=true
 
   master:
@@ -79,15 +79,6 @@ services:
     restart: always
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml
-
-
-  work2:
-    image: yangfanz/work:latest
-    container_name: yangfan-work2
-    restart: always
-    volumes:
-      - ./config/docker.config.yaml:/yangfan/docker.config.yaml
-
 
   timer:
     image: yangfanz/timer:latest
