@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: yangfan-web
+  namespace: yangfan
 spec:
   selector:
     app: yangfan-web

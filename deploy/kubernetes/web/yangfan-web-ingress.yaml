@@ -2,6 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: yangfan-web
+  namespace: yangfan
   annotations:
     kubernetes.io/ingress.class: "nginx"
 spec:

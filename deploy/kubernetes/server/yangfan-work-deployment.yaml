@@ -1,9 +1,11 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: yangfan-work
+  namespace: yangfan
 spec:
-  replicas: 1
+  replicas: 3
+  serviceName: yangfan-work
   selector:
     matchLabels:
       app: yangfan-work

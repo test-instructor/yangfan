@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: yangfan-prometheus
+  namespace: yangfan
 spec:
   replicas: 1
   selector:
@@ -19,8 +20,7 @@ spec:
             - containerPort: 9090
           volumeMounts:
             - name: yangfan-prometheus-config
-              mountPath: /etc/prometheus/prometheus.yml
-              subPath: prometheus.yml
+              mountPath: /etc/prometheus
       volumes:
         - name: yangfan-prometheus-config
           configMap:
