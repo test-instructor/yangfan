@@ -30,8 +30,8 @@ services:
 
   prometheus:
     image: prom/prometheus
-    container_name: prometheus
-    hostname: prometheus
+    container_name: yangfan-prometheus
+    hostname: yangfan-prometheus
     restart: always
     volumes:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
@@ -39,15 +39,15 @@ services:
       - "9090:9090"
 
   pushgateway:
-    container_name: pushgateway
-    hostname: pushgateway
+    container_name: yangfan-pushgateway
+    hostname: yangfan-pushgateway
     image: prom/pushgateway
     restart: always
     ports:
       - '9091:9091'
 
   grafana:
-    container_name: "grafana"
+    container_name: yangfan-grafana
     image: "grafana/grafana:9.5.1"
     user: root
     ports:
@@ -61,7 +61,7 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
       - GF_SECURITY_ALLOW_EMBEDDING=true
-      - GF_PATHS_CONFIG=/etc/grafana/provisioning
+      - GF_PATHS_CONFIG=/etc/grafana/provisioning/grafana.ini
 
   master:
     image: yangfanz/master:latest
