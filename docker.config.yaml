@@ -176,3 +176,5 @@ yang-fan:
   grafana-dashboard-name: yangfan-for-distributed-load-testing
   grafana-dashboard-stats: WLVhzvOg56Mg
   grafana-dashboard-stats-name: yangfan-for-node-status
+  run-server: yangfan-run
+  run-server-grpc-port: 7968
