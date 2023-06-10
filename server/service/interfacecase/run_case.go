@@ -15,9 +15,19 @@ import (
 )
 
 type RunCaseService struct {
+	c *client.Client
 }
 
 // RunTestCase TestCase排序
+
+func (r *RunCaseService) newClient() error {
+	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.RunServer, global.GVA_CONFIG.YangFan.RunServerGrpcPort))
+	if err != nil {
+		return err
+	}
+	r.c = c
+	return err
+}
 
 func (r *RunCaseService) getRunCase(runCaseReq request.RunCaseReq) (req *run.RunCaseReq) {
 	req = new(run.RunCaseReq)
@@ -34,11 +44,11 @@ func (r *RunCaseService) getRunCase(runCaseReq request.RunCaseReq) (req *run.Run
 }
 
 func (r *RunCaseService) RunTestCaseStep(runCase request.RunCaseReq) (reports *interfacecase.ApiReport, err error) {
-	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.RunServer, global.GVA_CONFIG.YangFan.RunServerGrpcPort))
+	err = r.newClient()
 	if err != nil {
 		return nil, err
 	}
-	step, err := c.RunClient.RunStep(context.Background(), r.getRunCase(runCase))
+	step, err := r.c.RunClient.RunStep(context.Background(), r.getRunCase(runCase))
 	if err != nil {
 		return nil, err
 	}
@@ -48,11 +58,11 @@ func (r *RunCaseService) RunTestCaseStep(runCase request.RunCaseReq) (reports *i
 }
 
 func (r *RunCaseService) RunApiCase(runCase request.RunCaseReq) (report *interfacecase.ApiReport, err error) {
-	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.RunServer, global.GVA_CONFIG.YangFan.RunServerGrpcPort))
+	err = r.newClient()
 	if err != nil {
 		return nil, err
 	}
-	step, err := c.RunClient.RunCase(context.Background(), r.getRunCase(runCase))
+	step, err := r.c.RunClient.RunCase(context.Background(), r.getRunCase(runCase))
 	if err != nil {
 		return nil, err
 	}
@@ -62,11 +72,11 @@ func (r *RunCaseService) RunApiCase(runCase request.RunCaseReq) (report *interfa
 }
 
 func (r *RunCaseService) RunBoomerDebug(runCase request.RunCaseReq) (report *interfacecase.ApiReport, err error) {
-	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.RunServer, global.GVA_CONFIG.YangFan.RunServerGrpcPort))
+	err = r.newClient()
 	if err != nil {
 		return nil, err
 	}
-	step, err := c.RunClient.RunBoomerDebug(context.Background(), r.getRunCase(runCase))
+	step, err := r.c.RunClient.RunBoomerDebug(context.Background(), r.getRunCase(runCase))
 	if err != nil {
 		return nil, err
 	}
@@ -144,17 +154,19 @@ func (r *RunCaseService) Stop(runCase request.RunCaseReq) (err error) {
 }
 
 func (r *RunCaseService) RunTimerTask(runCase request.RunCaseReq) {
-	c, _ := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.RunServer, global.GVA_CONFIG.YangFan.RunServerGrpcPort))
-
+	err := r.newClient()
+	if err != nil {
+		return
+	}
 	if runCase.TaskID > 0 {
-		_, err := c.RunClient.RunTimerTask(context.Background(), r.getRunCase(runCase))
+		_, err := r.c.RunClient.RunTimerTask(context.Background(), r.getRunCase(runCase))
 		if err != nil {
 			return
 		}
 		return
 	}
 	if runCase.TagID > 0 {
-		_, err := c.RunClient.RunTimerTag(context.Background(), r.getRunCase(runCase))
+		_, err := r.c.RunClient.RunTimerTag(context.Background(), r.getRunCase(runCase))
 		if err != nil {
 			return
 		}
@@ -164,11 +176,11 @@ func (r *RunCaseService) RunTimerTask(runCase request.RunCaseReq) {
 }
 
 func (r *RunCaseService) RunApi(runCase request.RunCaseReq) (report *interfacecase.ApiReport, err error) {
-	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.RunServer, global.GVA_CONFIG.YangFan.RunServerGrpcPort))
+	err = r.newClient()
 	if err != nil {
 		return nil, err
 	}
-	step, err := c.RunClient.RunApi(context.Background(), r.getRunCase(runCase))
+	step, err := r.c.RunClient.RunApi(context.Background(), r.getRunCase(runCase))
 	if err != nil {
 		return nil, err
 	}

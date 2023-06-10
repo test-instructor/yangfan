@@ -45,7 +45,7 @@ func main() {
 		os.Exit(0)
 	}
 	yangfan.InitPythonPackage(true)
-	//initialize.TimerTaskCase()
+	initialize.TimerTaskCase()
 	go RunPkgInstallClient()
 	s := <-c
 	fmt.Println("exit", s)

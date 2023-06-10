@@ -1,7 +1,11 @@
 package runTestCase
 
 import (
+	"context"
+	"fmt"
+	"github.com/test-instructor/yangfan/proto/run"
 	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/grpc/client"
 	"github.com/test-instructor/yangfan/server/model/common/request"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
 )
@@ -59,9 +63,18 @@ func RunTimerTag(runCaseReq request.RunCaseReq, runType interfacecase.RunType) (
 
 func RunTimerTaskBack(taskID uint) func() {
 	return func() {
-		var runCaseReq request.RunCaseReq
-		runCaseReq.TaskID = taskID
-		global.GVA_LOG.Debug("执行定时任务")
-		RunTimerTask(runCaseReq, interfacecase.RunTypeRunTimer)
+		//var runCaseReq request.RunCaseReq
+		//runCaseReq.TaskID = taskID
+		//global.GVA_LOG.Debug("执行定时任务")
+		//RunTimerTask(runCaseReq, interfacecase.RunTypeRunTimer)
+		var req *run.RunCaseReq
+		req = new(run.RunCaseReq)
+		req.TaskID = uint32(taskID)
+		req.RunType = run.RunType(interfacecase.RunTypeRunTimer)
+		c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.RunServer, global.GVA_CONFIG.YangFan.RunServerGrpcPort))
+		if err != nil {
+			return
+		}
+		c.RunClient.RunStep(context.Background(), req)
 	}
 }
