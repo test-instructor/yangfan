@@ -75,6 +75,6 @@ func RunTimerTaskBack(taskID uint) func() {
 		if err != nil {
 			return
 		}
-		c.RunClient.RunStep(context.Background(), req)
+		c.RunClient.RunTimerTask(context.Background(), req)
 	}
 }
