@@ -21,6 +21,9 @@ spec:
           volumeMounts:
             - name: yangfan-prometheus-config
               mountPath: /etc/prometheus
+          env:
+            - name: TZ
+              value: Asia/Shanghai
       volumes:
         - name: yangfan-prometheus-config
           configMap:

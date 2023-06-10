@@ -36,6 +36,8 @@ spec:
               value: "true"
             - name: GF_PATHS_CONFIG
               value: /etc/grafana/grafana.ini
+            - name: TZ
+              value: Asia/Shanghai
       volumes:
         - name: yangfan-grafana-config
           configMap:

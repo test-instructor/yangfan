@@ -39,7 +39,7 @@ func (r runServer) RunApi(ctx context.Context, req *run.RunCaseReq) (resp *run.R
 
 func (r runServer) RunStep(ctx context.Context, req *run.RunCaseReq) (resp *run.RunCaseResponse, err error) {
 	runCaseReq := r.getRunCase(req)
-	api := runTestCase.NewRunCase(runCaseReq, interfacecase.RunType(req.RunType))
+	api := runTestCase.NewRunStep(runCaseReq, interfacecase.RunType(req.RunType))
 	report, err := runTestCase.RunTestCase(api)
 	resp = new(run.RunCaseResponse)
 	if err == nil {

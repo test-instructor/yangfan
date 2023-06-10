@@ -94,6 +94,8 @@ services:
     container_name: yangfan-prometheus
     hostname: yangfan-prometheus
     restart: always
+    environment:
+      - TZ=Asia/Shanghai
     volumes:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
@@ -107,6 +109,8 @@ services:
     hostname: yangfan-pushgateway
     image: prom/pushgateway
     restart: always
+    environment:
+      - TZ=Asia/Shanghai
     ports:
       - '9091:9091'
     networks:
@@ -132,3 +136,4 @@ services:
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
       - GF_SECURITY_ALLOW_EMBEDDING=true
       - GF_PATHS_CONFIG=/etc/grafana/provisioning/grafana.ini
+      - TZ=Asia/Shanghai
