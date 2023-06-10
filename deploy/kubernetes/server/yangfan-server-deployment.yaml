@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yangfan-server
+  namespace: yangfan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yangfan-server
+  template:
+    metadata:
+      labels:
+        app: yangfan-server
+    spec:
+      containers:
+        - name: yangfan-server
+          image: yangfanz/server:latest
+          ports:
+            - containerPort: 8888
+              protocol: TCP
+            - containerPort: 7967
+              protocol: TCP
+          volumeMounts:
+            - name: docker-config-yaml
+              mountPath: /yangfan/docker.config.yaml
+              subPath: docker.config.yaml
+      volumes:
+        - name: docker-config-yaml
+          configMap:
+            name: docker-config-yaml

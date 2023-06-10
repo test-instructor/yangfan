@@ -21,14 +21,13 @@ import (
 	"time"
 )
 
-func RunPkgInstallClient() {
+func RunSetTimerTaskClient() {
 	host := fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Background, global.GVA_CONFIG.YangFan.BackgroundGrpcPort)
 	c, err := client.NewClient(host)
 	if err != nil {
 		global.GVA_LOG.Error("[RunClient]创建客户端失败", zap.Error(err))
 	}
 	p := pkg.NewRunInstallPkg(c)
-	go p.RunInstallPkg()
 	go p.RunSetTimerTask()
 }
 
@@ -44,9 +43,9 @@ func main() {
 		global.GVA_LOG.Error("register db", zap.Error(global.GVA_DB.Error))
 		os.Exit(0)
 	}
-	yangfan.InitPythonPackage(false)
-	//initialize.TimerTaskCase()
-	go RunPkgInstallClient()
+	yangfan.InitPythonPackage(true)
+	initialize.TimerTaskCase()
+	go RunSetTimerTaskClient()
 	s := <-c
 	fmt.Println("exit", s)
 }

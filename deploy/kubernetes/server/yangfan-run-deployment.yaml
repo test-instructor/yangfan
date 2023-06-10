@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: yangfan-run
+  namespace: yangfan
+spec:
+  replicas: 3
+  serviceName: yangfan-run
+  selector:
+    matchLabels:
+      app: yangfan-run
+  template:
+    metadata:
+      labels:
+        app: yangfan-run
+    spec:
+      containers:
+        - name: yangfan-run
+          image: yangfanz/run:latest
+          env:
+            - name: MASTER_SERVER
+              value: yangfan-master-service
+          ports:
+            - containerPort: 7968
+              protocol: TCP
+          volumeMounts:
+            - name: docker-config-yaml
+              mountPath: /yangfan/docker.config.yaml
+              subPath: docker.config.yaml
+      volumes:
+        - name: docker-config-yaml
+          configMap:
+            name: docker-config-yaml

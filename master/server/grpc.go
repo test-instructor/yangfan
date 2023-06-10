@@ -7,6 +7,7 @@ import (
 	"github.com/test-instructor/yangfan/hrp/pkg/boomer"
 	"github.com/test-instructor/yangfan/proto/master"
 	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 	"os"
 	"time"
 )
@@ -45,12 +46,14 @@ func (b masterServer) Start(ctx context.Context, request *master.StartReq) (resp
 	}
 
 	b.SetTestCasesID(req.ID)
-
 	err = b.StartPlatform(&req.Profile)
-	resp = new(master.StartResp)
+
 	if err != nil {
+		global.GVA_LOG.Error("start platform error", zap.Error(err))
+		resp = new(master.StartResp)
 		resp.Resp = errResp
 	} else {
+		resp = new(master.StartResp)
 		resp.Resp = okResp
 		global.IgnoreInstall = true
 	}

@@ -1,0 +1,18 @@
+apiVersion: 1
+providers:
+  - name: yangfan-for-distributed-load-testing
+    orgId: 1
+    folder: ''
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/yangfan-json/yangfan-for-distributed-load-testing.json
+  - name: yangfan-for-node-status
+    orgId: 1
+    folder: ''
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/yangfan-json/yangfan-for-node-status.json

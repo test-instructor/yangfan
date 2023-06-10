@@ -4,6 +4,7 @@ use (
 	./hrp
 	./master
 	./proto
+	./run
 	./server
 	./timer
 	./work

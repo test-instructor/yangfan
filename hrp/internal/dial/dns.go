@@ -103,7 +103,7 @@ func localDns(src string, dnsRecordType int, dnsServer string) (dnsResult DnsRes
 
 	_, ipType := ParseIP(dnsServer)
 	if ipType == 4 {
-		dnsServer += ":53"
+		dnsServer = "127.0.0.1:53"
 	}
 
 	c := dns.Client{
