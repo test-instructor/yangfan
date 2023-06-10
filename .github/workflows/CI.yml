@@ -150,7 +150,7 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: Build and push Docker image
         run: |
-          docker build -t work -f work/Dockerfile .
+          docker build -t run -f run/Dockerfile .
           docker tag run ${{ env.REGISTRY }}${{ env.IMAGE_NAME_RUN }}:v1.${{ github.run_number }}
           docker tag run ${{ env.REGISTRY }}${{ env.IMAGE_NAME_RUN }}:latest
           docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_RUN }}:v1.${{ github.run_number }}
