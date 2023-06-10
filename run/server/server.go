@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net"
 	"strings"
 
@@ -13,8 +14,10 @@ import (
 
 var ns *grpc.Server
 
-func StartRunServer(address string) {
-	lis, err := net.Listen("tcp", address)
+func StartRunServer() {
+	url := fmt.Sprintf("0.0.0.0:%s", global.GVA_CONFIG.YangFan.RunServerGrpcPort)
+	global.GVA_LOG.Debug("启动grpc服务", zap.String("url", url))
+	lis, err := net.Listen("tcp", url)
 	if err != nil {
 		global.GVA_LOG.Panic("failed to listen", zap.Error(err))
 	}

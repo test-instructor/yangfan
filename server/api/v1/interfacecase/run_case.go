@@ -20,7 +20,8 @@ func (runCaseApi *RunCaseApi) RunTestCaseStep(c *gin.Context) {
 	var runCase request.RunCaseReq
 	_ = c.ShouldBindJSON(&runCase)
 	if runCase.RunType == 1 {
-		reports, err := runCaseService.RunTestCaseStep(runCase, interfacecase.RunTypeDebug)
+		runCase.RunType = uint(interfacecase.RunTypeDebug)
+		reports, err := runCaseService.RunTestCaseStep(runCase)
 		if err != nil {
 			global.GVA_LOG.Error("运行失败!", zap.Error(err))
 			response.FailWithMessage(err.Error(), c)
@@ -28,7 +29,8 @@ func (runCaseApi *RunCaseApi) RunTestCaseStep(c *gin.Context) {
 			response.OkWithData(gin.H{"id": reports.ID}, c)
 		}
 	} else {
-		go runCaseService.RunTestCaseStep(runCase, interfacecase.RunTypeRunBack)
+		runCase.RunType = uint(interfacecase.RunTypeRunBack)
+		go runCaseService.RunTestCaseStep(runCase)
 		response.OkWithData("运行成功", c)
 	}
 
@@ -37,15 +39,16 @@ func (runCaseApi *RunCaseApi) RunTestCaseStep(c *gin.Context) {
 func (runCaseApi *RunCaseApi) RunApiCase(c *gin.Context) {
 	var runApiCase request.RunCaseReq
 	_ = c.ShouldBindJSON(&runApiCase)
-	go runCaseService.RunApiCase(runApiCase, interfacecase.RunTypeRunBack)
+	runApiCase.RunType = uint(interfacecase.RunTypeRunBack)
+	go runCaseService.RunApiCase(runApiCase)
 	response.OkWithData("运行成功", c)
 }
 
 func (runCaseApi *RunCaseApi) RunBoomerDebug(c *gin.Context) {
 	var runApiCase request.RunCaseReq
 	_ = c.ShouldBindJSON(&runApiCase)
-
-	reports, err := runCaseService.RunBoomerDebug(runApiCase, interfacecase.RunTypeDebug)
+	runApiCase.RunType = uint(interfacecase.RunTypeDebug)
+	reports, err := runCaseService.RunBoomerDebug(runApiCase)
 	if err != nil {
 		global.GVA_LOG.Error("运行失败!", zap.Error(err))
 		response.FailWithMessage("运行失败", c)
@@ -100,13 +103,15 @@ func (runCaseApi *RunCaseApi) RunTimerTask(c *gin.Context) {
 	var runApiCase request.RunCaseReq
 	_ = c.ShouldBindJSON(&runApiCase)
 	runApiCase.ProjectID = utils.GetUserProject(c)
-	go runCaseService.RunTimerTask(runApiCase, interfacecase.RunTypeRunBack)
+	runApiCase.RunType = uint(interfacecase.RunTypeRunBack)
+	go runCaseService.RunTimerTask(runApiCase)
 	response.OkWithData("运行成功", c)
 }
 
 func (runCaseApi *RunCaseApi) RunApi(c *gin.Context) {
 	var runCase request.RunCaseReq
 	_ = c.ShouldBindJSON(&runCase)
+	runCase.RunType = uint(interfacecase.RunTypeRunSave)
 	reports, err := runCaseService.RunApi(runCase)
 	if err != nil {
 		global.GVA_LOG.Error("运行失败!", zap.Error(err))

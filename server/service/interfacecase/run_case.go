@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/test-instructor/yangfan/proto/master"
+	"github.com/test-instructor/yangfan/proto/run"
 	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/grpc/client"
 	"github.com/test-instructor/yangfan/server/model/common/request"
@@ -18,21 +19,59 @@ type RunCaseService struct {
 
 // RunTestCase TestCase排序
 
-func (r *RunCaseService) RunTestCaseStep(runCase request.RunCaseReq, runType interfacecase.RunType) (reports *interfacecase.ApiReport, err error) {
-	reports, err = runTestCase.RunStep(runCase, runType)
+func (r *RunCaseService) getRunCase(runCaseReq request.RunCaseReq) (req *run.RunCaseReq) {
+	req = new(run.RunCaseReq)
+	req.ApiID = uint32(runCaseReq.ApiID)
+	req.ConfigID = uint32(runCaseReq.ConfigID)
+	req.CaseID = uint32(runCaseReq.CaseID)
+	req.RunType = run.RunType(runCaseReq.RunType)
+	req.TaskID = uint32(runCaseReq.TaskID)
+	req.TagID = uint32(runCaseReq.TagID)
+	req.ProjectID = uint32(runCaseReq.ProjectID)
+	req.TaskID = uint32(runCaseReq.TaskID)
+	req.Env = uint32(runCaseReq.Env)
 	return
 }
 
-func (r *RunCaseService) RunApiCase(runCase request.RunCaseReq, runType interfacecase.RunType) (report *interfacecase.ApiReport, err error) {
-	report, err = runTestCase.RunCase(runCase, runType)
+func (r *RunCaseService) RunTestCaseStep(runCase request.RunCaseReq) (reports *interfacecase.ApiReport, err error) {
+	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.RunServer, global.GVA_CONFIG.YangFan.RunServerGrpcPort))
 	if err != nil {
-		return
+		return nil, err
 	}
+	step, err := c.RunClient.RunStep(context.Background(), r.getRunCase(runCase))
+	if err != nil {
+		return nil, err
+	}
+	reports = new(interfacecase.ApiReport)
+	reports.ID = uint(step.ReportID)
 	return
 }
 
-func (r *RunCaseService) RunBoomerDebug(runCase request.RunCaseReq, runType interfacecase.RunType) (report *interfacecase.ApiReport, err error) {
-	report, err = runTestCase.RunBoomerDebug(runCase, runType)
+func (r *RunCaseService) RunApiCase(runCase request.RunCaseReq) (report *interfacecase.ApiReport, err error) {
+	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.RunServer, global.GVA_CONFIG.YangFan.RunServerGrpcPort))
+	if err != nil {
+		return nil, err
+	}
+	step, err := c.RunClient.RunCase(context.Background(), r.getRunCase(runCase))
+	if err != nil {
+		return nil, err
+	}
+	report = new(interfacecase.ApiReport)
+	report.ID = uint(step.ReportID)
+	return
+}
+
+func (r *RunCaseService) RunBoomerDebug(runCase request.RunCaseReq) (report *interfacecase.ApiReport, err error) {
+	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.RunServer, global.GVA_CONFIG.YangFan.RunServerGrpcPort))
+	if err != nil {
+		return nil, err
+	}
+	step, err := c.RunClient.RunBoomerDebug(context.Background(), r.getRunCase(runCase))
+	if err != nil {
+		return nil, err
+	}
+	report = new(interfacecase.ApiReport)
+	report.ID = uint(step.ReportID)
 	return
 }
 
@@ -104,16 +143,18 @@ func (r *RunCaseService) Stop(runCase request.RunCaseReq) (err error) {
 	return err
 }
 
-func (r *RunCaseService) RunTimerTask(runCase request.RunCaseReq, runType interfacecase.RunType) {
+func (r *RunCaseService) RunTimerTask(runCase request.RunCaseReq) {
+	c, _ := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.RunServer, global.GVA_CONFIG.YangFan.RunServerGrpcPort))
+
 	if runCase.TaskID > 0 {
-		_, err := runTestCase.RunTimerTask(runCase, runType)
+		_, err := c.RunClient.RunTimerTask(context.Background(), r.getRunCase(runCase))
 		if err != nil {
 			return
 		}
 		return
 	}
 	if runCase.TagID > 0 {
-		_, err := runTestCase.RunTimerTag(runCase, runType)
+		_, err := c.RunClient.RunTimerTag(context.Background(), r.getRunCase(runCase))
 		if err != nil {
 			return
 		}
@@ -122,10 +163,16 @@ func (r *RunCaseService) RunTimerTask(runCase request.RunCaseReq, runType interf
 	return
 }
 
-func (r *RunCaseService) RunApi(runCase request.RunCaseReq) (reports *interfacecase.ApiReport, err error) {
-	report, err := runTestCase.RunApi(runCase, interfacecase.RunType(runCase.RunType))
+func (r *RunCaseService) RunApi(runCase request.RunCaseReq) (report *interfacecase.ApiReport, err error) {
+	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.RunServer, global.GVA_CONFIG.YangFan.RunServerGrpcPort))
 	if err != nil {
 		return nil, err
 	}
+	step, err := c.RunClient.RunApi(context.Background(), r.getRunCase(runCase))
+	if err != nil {
+		return nil, err
+	}
+	report = new(interfacecase.ApiReport)
+	report.ID = uint(step.ReportID)
 	return report, nil
 }

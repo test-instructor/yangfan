@@ -12,4 +12,6 @@ type YangFan struct {
 	GrafanaDashboardName      string `mapstructure:"grafana-dashboard-name" json:"grafana_dashboard_name" yaml:"grafana_dashboard_name"`
 	GrafanaDashboardStats     string `mapstructure:"grafana-dashboard-stats" json:"grafana_dashboard_stats" yaml:"grafana_dashboard_stats"`
 	GrafanaDashboardStatsName string `mapstructure:"grafana-dashboard-stats-name" json:"grafana_dashboard_stats_name" yaml:"grafana_dashboard_stats_name"`
+	RunServer                 string `mapstructure:"run-server" json:"run_server" yaml:"run_server"`
+	RunServerGrpcPort         string `mapstructure:"run-server-grpc-port" json:"run_server_grpc_port" yaml:"run_server_grpc_port"`
 }

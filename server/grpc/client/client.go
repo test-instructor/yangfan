@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
 	"github.com/test-instructor/yangfan/proto/master"
+	"github.com/test-instructor/yangfan/proto/run"
 	"github.com/test-instructor/yangfan/proto/tools"
 	"github.com/test-instructor/yangfan/server/global"
 	"go.uber.org/zap"
@@ -19,12 +20,12 @@ type Client struct {
 	host              string
 	MasterClient      master.MasterClient
 	ToolsServerClient tools.ToolsServerClient
+	RunClient         run.RunCaseClient
 }
 
 var clientMap sync.Map
 var clientLock sync.Mutex
 var apiClient *Client
-var initOnce sync.Once
 
 func NewClientMap(host string) (*Client, error) {
 	var c *Client
@@ -46,14 +47,12 @@ func NewClient(host string) (*Client, error) {
 	var c *Client
 	var err error
 	global.GVA_LOG.Debug("[NewClient]host", zap.Any("host", host))
-	initOnce.Do(func() {
-		c, err = newClient(host)
-		if err != nil {
-			return
-		}
-		apiClient = c
-	})
-	return apiClient, nil
+
+	c, err = newClient(host)
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
 }
 
 func Reconnect() (*Client, error) {
@@ -101,5 +100,6 @@ func newClient(host string) (*Client, error) {
 		host:              host,
 		MasterClient:      master.NewMasterClient(c),
 		ToolsServerClient: tools.NewToolsServerClient(c),
+		RunClient:         run.NewRunCaseClient(c),
 	}, nil
 }

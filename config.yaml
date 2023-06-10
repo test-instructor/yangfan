@@ -169,6 +169,8 @@ yang-fan:
   background: "127.0.0.1"
   background-grpc-port: 7967
   master: "127.0.0.1"
+  run-server: localhost
+  run-server-grpc-port: 7968
   master-boomer-prot: 9093
   master-server-prot: 7966
   prometheus-pushgateway-url: http://localhost:9091/

@@ -19,10 +19,10 @@ func (r runServer) getRunCase(req *run.RunCaseReq) (runCaseReq request.RunCaseRe
 	runCaseReq.CaseID = uint(req.CaseID)
 	runCaseReq.RunType = uint(req.RunType)
 	runCaseReq.TaskID = uint(req.TaskID)
+	runCaseReq.TagID = uint(req.TagID)
 	runCaseReq.ProjectID = uint(req.ProjectID)
 	runCaseReq.TagID = uint(req.TagID)
 	runCaseReq.Env = uint(req.Env)
-	runCaseReq.RunType = uint(req.RunType)
 	return
 }
 

@@ -42,5 +42,5 @@ func main() {
 	}
 	//yangfan.InitPythonPackage(true)
 	//go RunPkgInstallClient()
-	server.StartRunServer(":9099")
+	server.StartRunServer()
 }
