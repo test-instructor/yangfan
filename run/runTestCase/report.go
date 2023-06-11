@@ -2,6 +2,7 @@ package runTestCase
 
 import (
 	"encoding/json"
+	"os"
 
 	"github.com/test-instructor/yangfan/hrp"
 	"github.com/test-instructor/yangfan/server/global"
@@ -78,6 +79,7 @@ func (r *ReportOperation) UpdateReport(reports *interfacecase.ApiReport) {
 	reports.SetupCase = r.report.SetupCase
 	reports.ApiEnvName = r.report.ApiEnvName
 	reports.ApiEnvID = r.report.ApiEnvID
+	reports.Hostname = r.report.Hostname
 	for i, v := range reports.Details {
 		if v.Name == "" {
 			testCase := interfacecase.ApiCase{
@@ -91,7 +93,9 @@ func (r *ReportOperation) UpdateReport(reports *interfacecase.ApiReport) {
 }
 
 func (r *ReportOperation) Recover(msg string) {
+	hostname, _ := os.Hostname()
 	r.report.Status = 2
 	r.report.Describe = msg
+	r.report.Hostname = hostname
 	global.GVA_DB.Save(&r.report)
 }

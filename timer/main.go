@@ -13,7 +13,6 @@ import (
 	"github.com/test-instructor/yangfan/server/core"
 	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/initialize"
-	"github.com/test-instructor/yangfan/server/source/yangfan"
 	"go.uber.org/zap"
 	"math/rand"
 	"os"
@@ -43,7 +42,6 @@ func main() {
 		global.GVA_LOG.Error("register db", zap.Error(global.GVA_DB.Error))
 		os.Exit(0)
 	}
-	yangfan.InitPythonPackage(true)
 	initialize.TimerTaskCase()
 	go RunSetTimerTaskClient()
 	s := <-c

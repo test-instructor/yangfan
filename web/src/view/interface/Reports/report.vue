@@ -47,12 +47,12 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" />
-        <el-table-column align="left" label="执行时间" width="180">
+        <el-table-column align="left" label="执行时间" width="170">
           <template #default="scope">{{
             formatDate(scope.row.CreatedAt)
           }}</template>
         </el-table-column>
-        <el-table-column align="left" label="用例类型" width="120">
+        <el-table-column align="left" label="用例类型" width="100">
           <template #default="scope">
             <el-tag
               :style="{
@@ -65,7 +65,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column align="left" label="执行类型" width="120">
+        <el-table-column align="left" label="执行类型" width="100">
           <template #default="scope">
             <el-tag
               :style="{
@@ -82,13 +82,19 @@
           align="left"
           label="报告名称"
           prop="name"
-          width="260"
+          width="220"
+        />
+        <el-table-column
+          align="left"
+          label="运行节点"
+          prop="hostname"
+          width="120"
         />
         <el-table-column
           align="left"
           label="运行环境"
           prop="api_env_name"
-          width="200"
+          width="190"
         />
         <el-table-column align="left" label="用例总数" width="100">
           <template #default="scope">

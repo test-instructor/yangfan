@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/test-instructor/yangfan/hrp"
@@ -99,6 +100,7 @@ func (r *runTag) LoadCase() (err error) {
 	if err != nil {
 		return errors.New("用例转换失败")
 	}
+	hostname, _ := os.Hostname()
 	r.reportOperation = &ReportOperation{
 		report: &interfacecase.ApiReport{
 			Name:      reportName,
@@ -110,6 +112,7 @@ func (r *runTag) LoadCase() (err error) {
 			},
 			ApiEnvName: envName,
 			ApiEnvID:   r.runCaseReq.Env,
+			Hostname:   hostname,
 		},
 	}
 	r.reportOperation.CreateReport()

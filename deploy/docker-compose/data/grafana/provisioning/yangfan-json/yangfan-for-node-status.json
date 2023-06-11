@@ -1,7 +1,7 @@
 {
   "__inputs": [
     {
-      "name": "DS_PROMETHEUS",
+      "name": "yangfan_prometheus",
       "label": "Prometheus",
       "description": "",
       "type": "datasource",
@@ -62,7 +62,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "yangfan-prometheus-6a65cy2u"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -103,7 +103,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "yangfan-prometheus-6a65cy2u"
           },
           "editorMode": "code",
           "expr": "master_workers{mode=\"stats\",report=\"$report\"}",
@@ -156,7 +156,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "yangfan-prometheus-6a65cy2u"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -197,7 +197,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "yangfan-prometheus-6a65cy2u"
           },
           "editorMode": "code",
           "expr": "sum(work_user_count{mode=\"stats\", report=\"$report\"}) by (ip)",
@@ -250,7 +250,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "yangfan-prometheus-6a65cy2u"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -291,7 +291,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "yangfan-prometheus-6a65cy2u"
           },
           "editorMode": "code",
           "expr": "master_target_users{mode=\"stats\",report=\"$report\"}",
@@ -344,7 +344,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "yangfan-prometheus-6a65cy2u"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -385,7 +385,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "yangfan-prometheus-6a65cy2u"
           },
           "editorMode": "code",
           "expr": "sum(work_cpu_usage{mode=\"stats\", report=\"$report\"}) by (ip)",
@@ -439,7 +439,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "yangfan-prometheus-6a65cy2u"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -480,7 +480,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "yangfan-prometheus-6a65cy2u"
           },
           "editorMode": "code",
           "expr": "sum(work_memory_usage{mode=\"stats\", report=\"$report\"}) by (ip)",
@@ -537,7 +537,7 @@
         "current": {},
         "datasource": {
           "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
+          "uid": "yangfan-prometheus-6a65cy2u"
         },
         "definition": "label_values(report)",
         "hide": 0,

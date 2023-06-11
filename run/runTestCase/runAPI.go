@@ -3,6 +3,7 @@ package runTestCase
 import (
 	"encoding/json"
 	"errors"
+	"os"
 	"testing"
 
 	"github.com/test-instructor/yangfan/hrp"
@@ -87,6 +88,7 @@ func (r *runAPI) LoadCase() (err error) {
 	if err != nil {
 		return errors.New("用例转换失败")
 	}
+	hostname, _ := os.Hostname()
 	r.reportOperation = &ReportOperation{
 		report: &interfacecase.ApiReport{
 			Name:      apiStep.Name,
@@ -98,6 +100,7 @@ func (r *runAPI) LoadCase() (err error) {
 			},
 			ApiEnvName: envName,
 			ApiEnvID:   r.runCaseReq.Env,
+			Hostname:   hostname,
 		},
 	}
 	r.reportOperation.CreateReport()

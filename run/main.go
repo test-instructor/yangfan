@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/test-instructor/yangfan/server/source/yangfan"
 	"math/rand"
 	"os"
 	"time"
@@ -40,7 +41,7 @@ func main() {
 		global.GVA_LOG.Error("register db", zap.Error(global.GVA_DB.Error))
 		os.Exit(0)
 	}
-	//yangfan.InitPythonPackage(true)
-	//go RunPkgInstallClient()
+	yangfan.InitPythonPackage(true)
+	go RunPkgInstallClient()
 	server.StartRunServer()
 }

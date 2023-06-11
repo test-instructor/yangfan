@@ -1,7 +1,7 @@
 {
     "__inputs": [
         {
-            "name": "DS_PROMETHEUS",
+            "name": "yangfan_prometheus",
             "label": "Prometheus",
             "description": "",
             "type": "datasource",
@@ -91,7 +91,7 @@
         {
             "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "yangfan-prometheus-6a65cy2u"
             },
             "fieldConfig": {
                 "defaults": {
@@ -155,7 +155,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "expr": "sum(users{mode=\"worker\", report=\"$report\"})",
                     "interval": "",
@@ -171,7 +171,7 @@
         {
             "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "yangfan-prometheus-6a65cy2u"
             },
             "fieldConfig": {
                 "defaults": {
@@ -235,7 +235,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "expr": "count(users{mode=\"worker\", report=\"$report\"})",
                     "interval": "",
@@ -251,7 +251,7 @@
         {
             "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "yangfan-prometheus-6a65cy2u"
             },
             "fieldConfig": {
                 "defaults": {
@@ -316,7 +316,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "expr": "sum(total_rps{mode=\"worker\", report=\"$report\"})",
                     "intervalFactor": 2,
@@ -334,7 +334,7 @@
             "dashes": false,
             "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "yangfan-prometheus-6a65cy2u"
             },
             "fieldConfig": {
                 "defaults": {
@@ -380,7 +380,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "editorMode": "code",
                     "expr": "sum(total_num_failures{mode=\"worker\", report=\"$report\",method!~\"transation|testcase\"}) / sum(total_num_requests{mode=\"worker\", report=\"$report\",method!~\"transation|testcase\"})",
@@ -429,7 +429,7 @@
             "dashes": false,
             "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "yangfan-prometheus-6a65cy2u"
             },
             "description": "",
             "fill": 1,
@@ -470,7 +470,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "editorMode": "code",
                     "expr": "sum(total_fail_per_sec{mode=\"worker\", report=\"$report\"})",
@@ -514,7 +514,7 @@
         {
             "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "yangfan-prometheus-6a65cy2u"
             },
             "fieldConfig": {
                 "defaults": {
@@ -560,7 +560,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "expr": "sum(total_num_requests{mode=\"worker\", report=\"$report\",method!~\"transaction|testcase\"})",
                     "interval": "",
@@ -574,7 +574,7 @@
         {
             "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "yangfan-prometheus-6a65cy2u"
             },
             "fieldConfig": {
                 "defaults": {
@@ -620,7 +620,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "expr": "sum(total_num_failures{mode=\"worker\", report=\"$report\",method!~\"transaction|testcsae\"})",
                     "interval": "",
@@ -638,7 +638,7 @@
             "dashes": false,
             "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "yangfan-prometheus-6a65cy2u"
             },
             "decimals": 0,
             "editable": true,
@@ -695,7 +695,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "editorMode": "code",
                     "expr": "avg(response_time{mode=\"worker\", report=\"$report\",quantile=\"0.95\", method!~\"transaction|testcase\"}) by (name,method)",
@@ -709,7 +709,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "editorMode": "code",
                     "expr": "avg(response_time{mode=\"worker\", report=\"$report\",quantile=\"0.5\", method!~\"transaction|testcase\"}) by (name,method)",
@@ -761,7 +761,7 @@
             "dashes": false,
             "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "yangfan-prometheus-6a65cy2u"
             },
             "decimals": 0,
             "editable": true,
@@ -817,7 +817,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "editorMode": "code",
                     "expr": "total_max_response_time{name!~\"Total\",mode=\"worker\", report=\"$report\",method!~\"transaction|testcase\"}",
@@ -830,7 +830,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "editorMode": "code",
                     "expr": "total_min_response_time{name!~\"Total\",mode=\"worker\", report=\"$report\",method!~\"transaction|testcase\"}",
@@ -844,7 +844,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "editorMode": "code",
                     "expr": "response_time_sum{mode=\"worker\", report=\"$report\",method!=\"transaction\"} / response_time_count{mode=\"standalone\",method!~\"transaction|testcase\"}",
@@ -858,7 +858,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "editorMode": "code",
                     "expr": "response_time{quantile=\"0.5\", mode=\"worker\", report=\"$report\",method!~\"transaction|testcase\"}",
@@ -908,7 +908,7 @@
             "columns": [],
             "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "yangfan-prometheus-6a65cy2u"
             },
             "fontSize": "100%",
             "gridPos": {
@@ -1021,7 +1021,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "expr": "sum(errors{mode=\"worker\", report=\"$report\"}) by (method, name, error)",
                     "format": "table",
@@ -1041,7 +1041,7 @@
             "columns": [],
             "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "yangfan-prometheus-6a65cy2u"
             },
             "fontSize": "100%",
             "gridPos": {
@@ -1239,7 +1239,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "expr": "min(min_response_time{mode=\"worker\", report=\"$report\"}) by (method, name)",
                     "format": "table",
@@ -1251,7 +1251,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "expr": "max(max_response_time{mode=\"worker\", report=\"$report\"}) by (method, name)",
                     "format": "table",
@@ -1263,7 +1263,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "expr": "avg(average_response_time{mode=\"worker\", report=\"$report\"}) by (method, name)",
                     "format": "table",
@@ -1275,7 +1275,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "expr": "avg(median_response_time{mode=\"worker\", report=\"$report\"}) by (method, name)",
                     "format": "table",
@@ -1287,7 +1287,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "expr": "sum(current_rps{mode=\"worker\", report=\"$report\"}) by (method, name)",
                     "format": "table",
@@ -1299,7 +1299,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "expr": "sum(num_failures{mode=\"worker\", report=\"$report\"}) by (method, name)",
                     "format": "table",
@@ -1311,7 +1311,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "expr": "sum(num_requests{mode=\"worker\", report=\"$report\"}) by (method, name)",
                     "format": "table",
@@ -1323,7 +1323,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "expr": "sum(num_failures{mode=\"worker\", report=\"$report\"}) by (method, name) / sum(num_requests{mode=\"worker\", report=\"$report\"}) by (method, name)",
                     "format": "table",
@@ -1344,7 +1344,7 @@
             "dashes": false,
             "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "yangfan-prometheus-6a65cy2u"
             },
             "decimals": 0,
             "editable": true,
@@ -1400,7 +1400,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "editorMode": "code",
                     "expr": "max(max_response_time{mode=\"worker\", report=\"$report\",method!~\"transaction|testcase\"})",
@@ -1413,7 +1413,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "editorMode": "code",
                     "expr": "min(min_response_time{mode=\"worker\", report=\"$report\",method!~\"transaction|testcase\"})",
@@ -1427,7 +1427,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "editorMode": "code",
                     "expr": "avg(average_response_time{mode=\"worker\", report=\"$report\",method!~\"transaction|testcase\"})",
@@ -1441,7 +1441,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "editorMode": "code",
                     "expr": "avg(median_response_time{mode=\"worker\", report=\"$report\",method!~\"transaction|testcase\"})",
@@ -1494,7 +1494,7 @@
             "dashes": false,
             "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "yangfan-prometheus-6a65cy2u"
             },
             "editable": true,
             "error": false,
@@ -1549,7 +1549,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "editorMode": "code",
                     "expr": "sum(current_rps{mode=\"worker\", report=\"$report\",method!~\"transaction|testcase\"})",
@@ -1603,7 +1603,7 @@
             "dashes": false,
             "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "yangfan-prometheus-6a65cy2u"
             },
             "description": "",
             "fill": 1,
@@ -1644,7 +1644,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "editorMode": "code",
                     "expr": "sum(num_failures{mode=\"worker\", report=\"$report\",method!~\"transaction|testcase\"}) / sum(num_requests{mode=\"worker\", report=\"$report\",method!~\"transaction|testcase\"})",
@@ -1692,7 +1692,7 @@
             "dashes": false,
             "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "yangfan-prometheus-6a65cy2u"
             },
             "fill": 1,
             "fillGradient": 0,
@@ -1732,7 +1732,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "editorMode": "code",
                     "expr": "sum(total_num_requests{mode=\"worker\", report=\"$report\",method=\"transaction\", name!=\"Action\"})",
@@ -1744,7 +1744,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "editorMode": "code",
                     "expr": "sum(total_num_requests{mode=\"worker\", report=\"$report\",method=\"transaction\", name!=\"Action\"}) by (name)",
@@ -1793,7 +1793,7 @@
             "dashes": false,
             "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "yangfan-prometheus-6a65cy2u"
             },
             "fill": 1,
             "fillGradient": 0,
@@ -1833,7 +1833,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "editorMode": "code",
                     "expr": "sum(total_num_requests{mode=\"worker\", report=\"$report\",method=\"transaction\", name!=\"Action\"} - total_num_failures{mode=\"worker\", report=\"$report\",method=\"transaction\", name!=\"Action\"})",
@@ -1845,7 +1845,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "editorMode": "code",
                     "expr": "sum(total_num_requests{mode=\"worker\", report=\"$report\",method=\"transaction\", name!=\"Action\"}) by (name, method) - sum(total_num_failures{mode=\"worker\", report=\"$report\",method=\"transaction\", name!=\"Action\"}) by (name, method)",
@@ -1894,7 +1894,7 @@
             "dashes": false,
             "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "yangfan-prometheus-6a65cy2u"
             },
             "fieldConfig": {
                 "defaults": {
@@ -1940,7 +1940,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "editorMode": "code",
                     "expr": "sum(total_num_requests{mode=\"worker\", report=\"$report\",method=\"transaction\", name!=\"Action\"} - total_num_failures{mode=\"worker\", report=\"$report\",method=\"transaction\", name!=\"Action\"}) / sum(total_num_requests{mode=\"worker\", report=\"$report\",method=\"transaction\", name!=\"Action\"})",
@@ -1952,7 +1952,7 @@
                 {
                     "datasource": {
                         "type": "prometheus",
-                        "uid": "${DS_PROMETHEUS}"
+                        "uid": "yangfan-prometheus-6a65cy2u"
                     },
                     "editorMode": "code",
                     "expr": "(sum(total_num_requests{mode=\"worker\", report=\"$report\",method=\"transaction\", name!=\"Action\"}) by (method, name) - sum(total_num_failures{mode=\"worker\", report=\"$report\",method=\"transaction\", name!=\"Action\"}) by (method, name)) / sum(total_num_requests{mode=\"worker\", report=\"$report\",method=\"transaction\", name!=\"Action\"}) by (method, name)",
@@ -2005,7 +2005,7 @@
                 "current": {},
                 "datasource": {
                     "type": "prometheus",
-                    "uid": "${DS_PROMETHEUS}"
+                    "uid": "yangfan-prometheus-6a65cy2u"
                 },
                 "definition": "label_values(report)",
                 "hide": 0,
