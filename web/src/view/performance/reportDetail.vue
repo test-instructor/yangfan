@@ -240,6 +240,8 @@ const getGrafanaUrl = () => {
         return encodeURIComponent(key) + "=" + encodeURIComponent(params[key]);
       })
       .join("&");
+  console.log("-------grafanaStatsUrl:", grafanaStatsUrl.value);
+  console.log("-------grafanaUrl:", grafanaUrl.value);
 };
 
 const isTimeExpired = (timeInterval, CreatedAt) => {
