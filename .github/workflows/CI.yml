@@ -56,7 +56,6 @@ jobs:
         run: |
           echo "Using modified IMAGE_NAME_SERVER1: ${{ env.IMAGE_NAME_SERVER }}"
           echo "Using modified IMAGE_NAME_SERVER2: ${{ IMAGE_NAME_SERVER }}"
-          echo "Using modified IMAGE_NAME_SERVER3: $IMAGE_NAME_SERVER"
   server:
     needs: set-image-tag
     name: Building a server image
