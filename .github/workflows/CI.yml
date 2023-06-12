@@ -47,7 +47,7 @@ jobs:
           echo "::set-output IMAGE_NAME_RUN=${{ env.IMAGE_NAME_RUN }}-debug" 
 
   server:
-    needs: set_image_tag
+    needs: set-image-tag
     name: Building a server image
     runs-on: ubuntu-latest
     env:
@@ -81,7 +81,7 @@ jobs:
           docker push ${{ env.ALIYUN_REGISTRY }}$IMAGE_NAME_SERVER:latest
 
   timer:
-    needs: set_image_tag
+    needs: set-image-tag
     name: Building a timer image
     runs-on: ubuntu-latest
     env:
@@ -114,7 +114,7 @@ jobs:
           docker push ${{ env.ALIYUN_REGISTRY }}$IMAGE_NAME_TIMER:latest
 
   master:
-    needs: set_image_tag
+    needs: set-image-tag
     name: Building a master image
     runs-on: ubuntu-latest
     env:
@@ -147,7 +147,7 @@ jobs:
           docker push ${{ env.ALIYUN_REGISTRY }}$IMAGE_NAME_MASTER:latest
 
   work:
-    needs: set_image_tag
+    needs: set-image-tag
     name: Building a work image
     runs-on: ubuntu-latest
     env:
@@ -180,7 +180,7 @@ jobs:
           docker push ${{ env.ALIYUN_REGISTRY }}$IMAGE_NAME_WORK:latest
 
   run:
-    needs: set_image_tag
+    needs: set-image-tag
     name: Building a run image
     runs-on: ubuntu-latest
     env:
@@ -214,7 +214,7 @@ jobs:
 
 
   web:
-    needs: set_image_tag
+    needs: set-image-tag
     name: Building a web image
     runs-on: ubuntu-latest
     env:
