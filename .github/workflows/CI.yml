@@ -38,6 +38,7 @@ jobs:
 
       - name: Modify env variables
         if: steps.check_tag.outputs.is_tag != 'true'
+        id: outputs
         run: |
           echo "::set-output image_name_server=${{ env.IMAGE_NAME_SERVER }}-debug" 
           echo "::set-output IMAGE_NAME_TIMER=${{ env.IMAGE_NAME_TIMER }}-debug" 
