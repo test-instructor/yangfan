@@ -178,7 +178,7 @@ data:
       master-boomer-prot: 9093
       master-server-prot: 7966
       prometheus-pushgateway-url: http://yangfan-pushgateway:9091/
-      grafana-url: http://192.168.0.180:31030/
+      grafana-host: http://192.168.0.180:31030/
       grafana-dashboard: ERv3OaBPYe6A
       grafana-dashboard-name: yangfan-for-distributed-load-testing
       grafana-dashboard-stats: WLVhzvOg56Mg

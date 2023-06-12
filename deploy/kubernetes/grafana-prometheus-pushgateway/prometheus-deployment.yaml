@@ -4,7 +4,7 @@ metadata:
   name: yangfan-prometheus
   namespace: yangfan
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: yangfan-prometheus
