@@ -20,7 +20,7 @@ env:
   IMAGE_TAG: v1.${{ github.run_number }}
 
 jobs:
-  set_image_tag:
+  set-image-tag:
     runs-on: ubuntu-latest
     steps:
       - name: Check if tag event
@@ -50,6 +50,8 @@ jobs:
     needs: set_image_tag
     name: Building a server image
     runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME_SERVER: ${{ needs.set-image-tag.outputs.IMAGE_NAME_SERVER }}
     steps:
       - uses: actions/checkout@v3
       - name: Login to Docker Container Registry
@@ -60,28 +62,30 @@ jobs:
       - name: Build and push Docker image
         run: |
           docker build -t server -f server/Dockerfile .
-          docker tag server ${{ env.REGISTRY }}$MAGE_NAME_SERVER:$TAG
-          docker tag server ${{ env.REGISTRY }}$MAGE_NAME_SERVER :latest
-          docker push ${{ env.REGISTRY }}$MAGE_NAME_SERVER:$TAG
-          docker push ${{ env.REGISTRY }}$MAGE_NAME_SERVER :latest
+          docker tag server ${{ env.REGISTRY }}$IMAGE_NAME_SERVER:$TAG
+          docker tag server ${{ env.REGISTRY }}$IMAGE_NAME_SERVER :latest
+          docker push ${{ env.REGISTRY }}$IMAGE_NAME_SERVER:$TAG
+          docker push ${{ env.REGISTRY }}$IMAGE_NAME_SERVER :latest
 
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
-          registry: ${{ env.ALIYUN_REGISTRY }}$MAGE_NAME_SERVER
+          registry: ${{ env.ALIYUN_REGISTRY }}$IMAGE_NAME_SERVER
           username: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
           password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
       - name: Push to Aliyun Docker image
         run: |
-          docker tag server ${{ env.ALIYUN_REGISTRY }}$MAGE_NAME_SERVER:$TAG
-          docker tag server ${{ env.ALIYUN_REGISTRY }}$MAGE_NAME_SERVER:latest
-          docker push ${{ env.ALIYUN_REGISTRY }}$MAGE_NAME_SERVER:$TAG
-          docker push ${{ env.ALIYUN_REGISTRY }}$MAGE_NAME_SERVER:latest
+          docker tag server ${{ env.ALIYUN_REGISTRY }}$IMAGE_NAME_SERVER:$TAG
+          docker tag server ${{ env.ALIYUN_REGISTRY }}$IMAGE_NAME_SERVER:latest
+          docker push ${{ env.ALIYUN_REGISTRY }}$IMAGE_NAME_SERVER:$TAG
+          docker push ${{ env.ALIYUN_REGISTRY }}$IMAGE_NAME_SERVER:latest
 
   timer:
     needs: set_image_tag
     name: Building a timer image
     runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME_TIMER: ${{ needs.set-image-tag.outputs.IMAGE_NAME_TIMER }}
     steps:
       - uses: actions/checkout@v3
       - name: Login to Docker Container Registry
@@ -113,6 +117,8 @@ jobs:
     needs: set_image_tag
     name: Building a master image
     runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME_MASTER: ${{ needs.set-image-tag.outputs.IMAGE_NAME_MASTER }}
     steps:
       - uses: actions/checkout@v3
       - name: Login to Docker Container Registry
@@ -123,27 +129,29 @@ jobs:
       - name: Build and push Docker image
         run: |
           docker build -t master -f master/Dockerfile .
-          docker tag master ${{ env.REGISTRY }}$MAGE_NAME_MASTER:$TAG
-          docker tag master ${{ env.REGISTRY }}$MAGE_NAME_MASTER:latest
-          docker push ${{ env.REGISTRY }}$MAGE_NAME_MASTER:$TAG
-          docker push ${{ env.REGISTRY }}$MAGE_NAME_MASTER:latest
+          docker tag master ${{ env.REGISTRY }}$IMAGE_NAME_MASTER:$TAG
+          docker tag master ${{ env.REGISTRY }}$IMAGE_NAME_MASTER:latest
+          docker push ${{ env.REGISTRY }}$IMAGE_NAME_MASTER:$TAG
+          docker push ${{ env.REGISTRY }}$IMAGE_NAME_MASTER:latest
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
-          registry: ${{ env.ALIYUN_REGISTRY }}$MAGE_NAME_MASTER
+          registry: ${{ env.ALIYUN_REGISTRY }}$IMAGE_NAME_MASTER
           username: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
           password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
       - name: Push to Aliyun Docker image
         run: |
-          docker tag master ${{ env.ALIYUN_REGISTRY }}$MAGE_NAME_MASTER:$TAG
-          docker tag master ${{ env.ALIYUN_REGISTRY }}$MAGE_NAME_MASTER:latest
-          docker push ${{ env.ALIYUN_REGISTRY }}$MAGE_NAME_MASTER:$TAG
-          docker push ${{ env.ALIYUN_REGISTRY }}$MAGE_NAME_MASTER:latest
+          docker tag master ${{ env.ALIYUN_REGISTRY }}$IMAGE_NAME_MASTER:$TAG
+          docker tag master ${{ env.ALIYUN_REGISTRY }}$IMAGE_NAME_MASTER:latest
+          docker push ${{ env.ALIYUN_REGISTRY }}$IMAGE_NAME_MASTER:$TAG
+          docker push ${{ env.ALIYUN_REGISTRY }}$IMAGE_NAME_MASTER:latest
 
   work:
     needs: set_image_tag
     name: Building a work image
     runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME_WORK: ${{ needs.set-image-tag.outputs.IMAGE_NAME_WORK }}
     steps:
       - uses: actions/checkout@v3
       - name: Login to Docker Container Registry
@@ -175,6 +183,8 @@ jobs:
     needs: set_image_tag
     name: Building a run image
     runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME_RUN: ${{ needs.set-image-tag.outputs.IMAGE_NAME_RUN }}
     steps:
       - uses: actions/checkout@v3
       - name: Login to Docker Container Registry
@@ -185,28 +195,30 @@ jobs:
       - name: Build and push Docker image
         run: |
           docker build -t run -f run/Dockerfile .
-          docker tag run ${{ env.REGISTRY }}$MAGE_NAME_RUN:$TAG
-          docker tag run ${{ env.REGISTRY }}$MAGE_NAME_RUN:latest
-          docker push ${{ env.REGISTRY }}$MAGE_NAME_RUN:$TAG
-          docker push ${{ env.REGISTRY }}$MAGE_NAME_RUN:latest
+          docker tag run ${{ env.REGISTRY }}$IMAGE_NAME_RUN:$TAG
+          docker tag run ${{ env.REGISTRY }}$IMAGE_NAME_RUN:latest
+          docker push ${{ env.REGISTRY }}$IMAGE_NAME_RUN:$TAG
+          docker push ${{ env.REGISTRY }}$IMAGE_NAME_RUN:latest
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
-          registry: ${{ env.ALIYUN_REGISTRY }}$MAGE_NAME_RUN
+          registry: ${{ env.ALIYUN_REGISTRY }}$IMAGE_NAME_RUN
           username: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
           password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
       - name: Push to Aliyun Docker image
         run: |
-          docker tag run ${{ env.ALIYUN_REGISTRY }}$MAGE_NAME_RUN:$TAG
-          docker tag run ${{ env.ALIYUN_REGISTRY }}$MAGE_NAME_RUN:latest
-          docker push ${{ env.ALIYUN_REGISTRY }}$MAGE_NAME_RUN:$TAG
-          docker push ${{ env.ALIYUN_REGISTRY }}$MAGE_NAME_RUN:latest
+          docker tag run ${{ env.ALIYUN_REGISTRY }}$IMAGE_NAME_RUN:$TAG
+          docker tag run ${{ env.ALIYUN_REGISTRY }}$IMAGE_NAME_RUN:latest
+          docker push ${{ env.ALIYUN_REGISTRY }}$IMAGE_NAME_RUN:$TAG
+          docker push ${{ env.ALIYUN_REGISTRY }}$IMAGE_NAME_RUN:latest
 
 
   web:
     needs: set_image_tag
     name: Building a web image
     runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME_WEB: ${{ needs.set-image-tag.outputs.IMAGE_NAME_WEB }}
     steps:
       - uses: actions/checkout@v3
       - name: Login to Docker Container Registry
