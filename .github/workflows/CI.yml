@@ -36,12 +36,8 @@ jobs:
       - name: Show IMAGE_TAG
         run: echo "IMAGE_TAG is ${{ env.IMAGE_TAG }}"
 
-      - name: Check if it's a tag run
-        id: check_image_name
-        run: echo "TAG_RUN=${GITHUB_REF##*/}"
-
       - name: Modify env variables
-        if: steps.check_tag.outputs.TAG_RUN == ''
+        if: steps.check_tag.outputs.is_tag != 'true'
         run: |
           echo "IMAGE_NAME_SERVER=${{ env.IMAGE_NAME_SERVER }}-debug" >> $GITHUB_ENV
           echo "IMAGE_NAME_TIMER=${{ env.IMAGE_NAME_TIMER }}-debug" >> $GITHUB_ENV
