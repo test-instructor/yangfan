@@ -39,13 +39,21 @@ jobs:
       - name: Modify env variables
         if: steps.check_tag.outputs.is_tag != 'true'
         run: |
-          echo "::set-output IMAGE_NAME_SERVER=${{ env.IMAGE_NAME_SERVER }}-debug" 
+          echo "::set-output image_name_server=${{ env.IMAGE_NAME_SERVER }}-debug" 
           echo "::set-output IMAGE_NAME_TIMER=${{ env.IMAGE_NAME_TIMER }}-debug" 
           echo "::set-output IMAGE_NAME_MASTER=${{ env.IMAGE_NAME_MASTER }}-debug" 
           echo "::set-output IMAGE_NAME_WORK=${{ env.IMAGE_NAME_WORK }}-debug" 
           echo "::set-output IMAGE_NAME_WEB=${{ env.IMAGE_NAME_WEB }}-debug" 
           echo "::set-output IMAGE_NAME_RUN=${{ env.IMAGE_NAME_RUN }}-debug" 
-
+  test-name:
+    needs: set-image-tag
+    name: Building a server image
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME_SERVER: ${{ needs.set-image-tag.outputs.image_name_server }}
+    steps:
+      - name: Use modified IMAGE_NAME_SERVER
+        run: echo "Using modified IMAGE_NAME_SERVER: $IMAGE_NAME_SERVER"
   server:
     needs: set-image-tag
     name: Building a server image
