@@ -5,6 +5,8 @@ on:
     branches:
       - main
       - dev
+    tags:
+      - '*'
 
 env:
   REGISTRY: yangfanz/
@@ -15,9 +17,41 @@ env:
   IMAGE_NAME_WORK: work
   IMAGE_NAME_WEB: web
   IMAGE_NAME_RUN: run
+  IMAGE_TAG: v1.${{ github.run_number }}
 
 jobs:
+  set_image_tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if tag event
+        id: check_tag
+        run: echo ::set-output name=is_tag::$(echo "${{ github.ref }}" | grep -E '^refs/tags/')
+
+      - name: Set IMAGE_TAG
+        if: steps.check_tag.outputs.is_tag == 'true'
+        run: |
+          TAG=$(echo "${{ github.ref }}" | sed -e 's|^refs/tags/||')
+          echo "::set-env name=IMAGE_TAG::${TAG}"
+
+      - name: Show IMAGE_TAG
+        run: echo "IMAGE_TAG is ${{ env.IMAGE_TAG }}"
+
+      - name: Check if it's a tag run
+        id: check_image_name
+        run: echo "TAG_RUN=${GITHUB_REF##*/}"
+
+      - name: Modify env variables
+        if: steps.check_tag.outputs.TAG_RUN == ''
+        run: |
+          echo "IMAGE_NAME_SERVER=${{ env.IMAGE_NAME_SERVER }}-debug" >> $GITHUB_ENV
+          echo "IMAGE_NAME_TIMER=${{ env.IMAGE_NAME_TIMER }}-debug" >> $GITHUB_ENV
+          echo "IMAGE_NAME_MASTER=${{ env.IMAGE_NAME_MASTER }}-debug" >> $GITHUB_ENV
+          echo "IMAGE_NAME_WORK=${{ env.IMAGE_NAME_WORK }}-debug" >> $GITHUB_ENV
+          echo "IMAGE_NAME_WEB=${{ env.IMAGE_NAME_WEB }}-debug" >> $GITHUB_ENV
+          echo "IMAGE_NAME_RUN=${{ env.IMAGE_NAME_RUN }}-debug" >> $GITHUB_ENV
+
   server:
+    needs: set_image_tag
     name: Building a server image
     runs-on: ubuntu-latest
     steps:
@@ -49,6 +83,7 @@ jobs:
           docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_SERVER }}:latest
 
   timer:
+    needs: set_image_tag
     name: Building a timer image
     runs-on: ubuntu-latest
     steps:
@@ -79,6 +114,7 @@ jobs:
           docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_TIMER }}:latest
 
   master:
+    needs: set_image_tag
     name: Building a master image
     runs-on: ubuntu-latest
     steps:
@@ -109,6 +145,7 @@ jobs:
           docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_MASTER }}:latest
 
   work:
+    needs: set_image_tag
     name: Building a work image
     runs-on: ubuntu-latest
     steps:
@@ -139,6 +176,7 @@ jobs:
           docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WORK }}:latest
 
   run:
+    needs: set_image_tag
     name: Building a run image
     runs-on: ubuntu-latest
     steps:
@@ -170,6 +208,7 @@ jobs:
 
 
   web:
+    needs: set_image_tag
     name: Building a web image
     runs-on: ubuntu-latest
     steps:
