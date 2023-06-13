@@ -78,6 +78,7 @@ func (r *ReportOperation) UpdateReport(reports *interfacecase.ApiReport) {
 	reports.SetupCase = r.report.SetupCase
 	reports.ApiEnvName = r.report.ApiEnvName
 	reports.ApiEnvID = r.report.ApiEnvID
+	reports.Hostname = r.report.Hostname
 	for i, v := range reports.Details {
 		if v.Name == "" {
 			testCase := interfacecase.ApiCase{

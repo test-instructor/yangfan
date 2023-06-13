@@ -11,4 +11,5 @@ data:
         type: prometheus
         access: proxy
         url: http://yangfan-prometheus:9090
+        uid: yangfan-prometheus-6a65cy2u
 

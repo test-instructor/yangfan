@@ -21,6 +21,7 @@ RUN yarn && yarn build
 
 # 声明镜像来源为nginx:alpine, alpine 镜像小
 FROM nginx:alpine
+ENV TZ=Asia/Shanghai
 
 WORKDIR /yangfan/web/
 

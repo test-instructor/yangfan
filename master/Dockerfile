@@ -9,6 +9,7 @@ RUN go build -o ./master ./master
 
 
 FROM yangfanz/python:3.10.0
+ENV TZ=Asia/Shanghai
 WORKDIR /yangfan
 COPY --from=builder /go/src/yangfan/master .
 COPY --from=builder /go/src/yangfan/docker.config.yaml .

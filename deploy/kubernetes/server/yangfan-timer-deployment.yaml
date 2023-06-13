@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: yangfan-timer
-          image: yangfanz/timer:latest
+          image: yangfanz/timerserver{{ if or (eq .Values.IMAGE_DEBUG_SUFFIX "true") (eq .Values.IMAGE_DEBUG_SUFFIX "debug") }}debug{{end | default "" }}:{{ if .Values.IMAGE_TAG }}{{ .Values.IMAGE_TAG }}{{ else }}latest{{ end | default "latest" }}
           ports:
             - containerPort: 8888
               protocol: TCP

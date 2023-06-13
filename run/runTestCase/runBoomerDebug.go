@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"testing"
 
 	"gorm.io/gorm"
@@ -109,6 +110,7 @@ func (r *runBoomerDebug) LoadCase() (err error) {
 	if err != nil {
 		return errors.New("用例转换失败")
 	}
+	hostname, _ := os.Hostname()
 	r.reportOperation = &ReportOperation{
 		report: &interfacecase.ApiReport{
 			Name:      apiCase.Name,
@@ -120,6 +122,7 @@ func (r *runBoomerDebug) LoadCase() (err error) {
 			},
 			ApiEnvName: envName,
 			ApiEnvID:   r.runCaseReq.Env,
+			Hostname:   hostname,
 		},
 	}
 	r.reportOperation.CreateReport()

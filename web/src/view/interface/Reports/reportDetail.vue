@@ -694,6 +694,12 @@ const initData = async () => {
     str: "str",
   });
   testCaseSimple.value.push({
+    label: "运行节点",
+    name: reportData.value.hostname,
+    key: "hostname",
+    str: "str",
+  });
+  testCaseSimple.value.push({
     label: "运行状态",
     name: reportData.value.success,
     key: "success",

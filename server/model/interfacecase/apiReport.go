@@ -47,6 +47,7 @@ type ApiReport struct {
 	Describe   string             `json:"describe" form:"describe" gorm:"column:describe;comment:;"`
 	ApiEnvName string             `json:"api_env_name" gorm:"comment:所属环境名称;"`
 	ApiEnvID   uint               `json:"api_env_id" gorm:"comment:所属环境;"`
+	Hostname   string             `json:"hostname" gorm:"comment:主机名;"`
 }
 
 type ApiReportTime struct {

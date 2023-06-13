@@ -10,6 +10,7 @@ RUN go build -o ./work ./work
 
 
 FROM yangfanz/python:3.10.0
+ENV TZ=Asia/Shanghai
 WORKDIR /yangfan
 COPY --from=builder /go/src/yangfan/work .
 COPY --from=builder /go/src/yangfan/docker.config.yaml .

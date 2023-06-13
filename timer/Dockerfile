@@ -9,6 +9,7 @@ RUN go build -o ./timer ./timer
 
 
 FROM yangfanz/python:3.10.0
+ENV TZ=Asia/Shanghai
 WORKDIR /yangfan
 COPY --from=builder /go/src/yangfan/timer .
 COPY --from=builder /go/src/yangfan/docker.config.yaml .

@@ -3,6 +3,7 @@ package runTestCase
 import (
 	"encoding/json"
 	"errors"
+	"os"
 	"testing"
 
 	"gorm.io/gorm"
@@ -105,6 +106,7 @@ func (r *runCase) LoadCase() (err error) {
 	if err != nil {
 		return errors.New("用例转换失败")
 	}
+	hostname, _ := os.Hostname()
 	r.reportOperation = &ReportOperation{
 		report: &interfacecase.ApiReport{
 			Name:      apiCase.Name,
@@ -116,6 +118,7 @@ func (r *runCase) LoadCase() (err error) {
 			},
 			ApiEnvName: envName,
 			ApiEnvID:   r.runCaseReq.Env,
+			Hostname:   hostname,
 		},
 	}
 	r.reportOperation.CreateReport()
