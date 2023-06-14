@@ -3,9 +3,10 @@ package boomer
 import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/push"
-	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
+	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	"go.uber.org/zap"
 )
 
 var (
@@ -92,7 +93,7 @@ type PrometheusPusherStats struct {
 
 func (p PrometheusPusherStats) OnStart() {
 	resetPrometheusMetrics()
-	log.Info().Msg("register prometheus metric collectors")
+	global.GVA_LOG.Info("register prometheus metric collectors")
 	registry := prometheus.NewRegistry()
 	registry.MustRegister(
 		stateGauge,
@@ -129,7 +130,7 @@ func (p PrometheusPusherStats) OnEvent(masterReport interfacecase.PerformanceRep
 	}
 
 	if err := p.pusher.Push(); err != nil {
-		log.Error().Err(err).Msg("push to Pushgateway failed")
+		global.GVA_LOG.Error("push to Pushgateway failed", zap.Error(err))
 	}
 }
 

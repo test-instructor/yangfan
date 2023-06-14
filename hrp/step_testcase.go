@@ -6,7 +6,8 @@ import (
 
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 )
 
 // StepTestCaseWithOptionalArgs implements IStep interface.
@@ -71,7 +72,7 @@ func (s *StepTestCaseWithOptionalArgs) Run(r *SessionRunner) (stepResult *StepRe
 	// copy testcase to avoid data racing
 	copiedTestCase := &TestCase{}
 	if err := copier.Copy(copiedTestCase, stepTestCase); err != nil {
-		log.Error().Err(err).Msg("copy step testcase failed")
+		global.GVA_LOG.Error("copy step testcase failed", zap.Error(err))
 		return stepResult, err
 	}
 
@@ -85,7 +86,7 @@ func (s *StepTestCaseWithOptionalArgs) Run(r *SessionRunner) (stepResult *StepRe
 
 	caseRunner, err := r.caseRunner.hrpRunner.NewCaseRunner(copiedTestCase)
 	if err != nil {
-		log.Error().Err(err).Msg("create case runner failed")
+		global.GVA_LOG.Error("create case runner failed", zap.Error(err))
 		return stepResult, err
 	}
 	sessionRunner := caseRunner.NewSession()
@@ -97,7 +98,7 @@ func (s *StepTestCaseWithOptionalArgs) Run(r *SessionRunner) (stepResult *StepRe
 
 	summary, err2 := sessionRunner.GetSummary()
 	if err2 != nil {
-		log.Error().Err(err2).Msg("get summary failed")
+		global.GVA_LOG.Error("get summary failed", zap.Error(err2))
 		if err != nil {
 			err = errors.Wrap(err, err2.Error())
 		} else {

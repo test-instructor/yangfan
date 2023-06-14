@@ -3,10 +3,10 @@
 package boomer
 
 import (
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
 )
 
 // set resource limit
 func SetUlimit(limit uint64) {
-	log.Warn().Msg("windows does not support setting ulimit")
+	global.GVA_LOG.Warn("windows does not support setting ulimit")
 }

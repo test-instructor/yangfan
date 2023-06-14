@@ -16,12 +16,12 @@ import (
 	"github.com/httprunner/funplugin"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 	"golang.org/x/net/http2"
 
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
 	"github.com/test-instructor/yangfan/hrp/internal/sdk"
-	"github.com/test-instructor/yangfan/hrp/internal/version"
 	"github.com/test-instructor/yangfan/hrp/pkg/uixt"
 )
 
@@ -79,11 +79,7 @@ type HRPRunner struct {
 
 // SetClientTransport configures transport of http client for high concurrency load testing
 func (r *HRPRunner) SetClientTransport(maxConns int, disableKeepAlive bool, disableCompression bool) *HRPRunner {
-	log.Info().
-		Int("maxConns", maxConns).
-		Bool("disableKeepAlive", disableKeepAlive).
-		Bool("disableCompression", disableCompression).
-		Msg("[init] SetClientTransport")
+	global.GVA_LOG.Info("[init] SetClientTransport", zap.Int("maxConns", maxConns), zap.Bool("disableKeepAlive", disableKeepAlive), zap.Bool("disableCompression", disableCompression))
 	r.httpClient.Transport = &http.Transport{
 		TLSClientConfig:     &tls.Config{InsecureSkipVerify: true},
 		DialContext:         (&net.Dialer{}).DialContext,
@@ -102,45 +98,45 @@ func (r *HRPRunner) SetClientTransport(maxConns int, disableKeepAlive bool, disa
 
 // SetFailfast configures whether to stop running when one step fails.
 func (r *HRPRunner) SetFailfast(failfast bool) *HRPRunner {
-	log.Info().Bool("failfast", failfast).Msg("[init] SetFailfast")
+	global.GVA_LOG.Info("[init] SetFailfast", zap.Bool("failfast", failfast))
 	r.failfast = failfast
 	return r
 }
 
 // SetRequestsLogOn turns on request & response details logging.
 func (r *HRPRunner) SetRequestsLogOn() *HRPRunner {
-	log.Info().Msg("[init] SetRequestsLogOn")
+	global.GVA_LOG.Info("[init] SetRequestsLogOn")
 	r.requestsLogOn = true
 	return r
 }
 
 // SetHTTPStatOn turns on HTTP latency stat.
 func (r *HRPRunner) SetHTTPStatOn() *HRPRunner {
-	log.Info().Msg("[init] SetHTTPStatOn")
+	global.GVA_LOG.Info("[init] SetHTTPStatOn")
 	r.httpStatOn = true
 	return r
 }
 
 // SetPluginLogOn turns on plugin logging.
 func (r *HRPRunner) SetPluginLogOn() *HRPRunner {
-	log.Info().Msg("[init] SetPluginLogOn")
+	global.GVA_LOG.Info("[init] SetPluginLogOn")
 	r.pluginLogOn = true
 	return r
 }
 
 // SetPython3Venv specifies python3 venv.
 func (r *HRPRunner) SetPython3Venv(venv string) *HRPRunner {
-	log.Info().Str("venv", venv).Msg("[init] SetPython3Venv")
+	global.GVA_LOG.Info("[init] SetPython3Venv", zap.String("venv", venv))
 	r.venv = venv
 	return r
 }
 
 // SetProxyUrl configures the proxy URL, which is usually used to capture HTTP packets for debugging.
 func (r *HRPRunner) SetProxyUrl(proxyUrl string) *HRPRunner {
-	log.Info().Str("proxyUrl", proxyUrl).Msg("[init] SetProxyUrl")
+	global.GVA_LOG.Info("[init] SetProxyUrl", zap.String("proxyUrl", proxyUrl))
 	p, err := url.Parse(proxyUrl)
 	if err != nil {
-		log.Error().Err(err).Str("proxyUrl", proxyUrl).Msg("[init] invalid proxyUrl")
+		global.GVA_LOG.Error("[init] invalid proxyUrl", zap.String("proxyUrl", proxyUrl), zap.Error(err))
 		return r
 	}
 	r.httpClient.Transport = &http.Transport{
@@ -153,28 +149,28 @@ func (r *HRPRunner) SetProxyUrl(proxyUrl string) *HRPRunner {
 
 // SetTimeout configures global timeout in seconds.
 func (r *HRPRunner) SetTimeout(timeout time.Duration) *HRPRunner {
-	log.Info().Float64("timeout(seconds)", timeout.Seconds()).Msg("[init] SetTimeout")
+	global.GVA_LOG.Info("[init] SetTimeout", zap.Float64("timeout(seconds)", timeout.Seconds()))
 	r.httpClient.Timeout = timeout
 	return r
 }
 
 // SetSaveTests configures whether to save summary of tests.
 func (r *HRPRunner) SetSaveTests(saveTests bool) *HRPRunner {
-	log.Info().Bool("saveTests", saveTests).Msg("[init] SetSaveTests")
+	global.GVA_LOG.Info("[init] SetSaveTests", zap.Bool("saveTests", saveTests))
 	r.saveTests = saveTests
 	return r
 }
 
 // GenHTMLReport configures whether to gen html report of api tests.
 func (r *HRPRunner) GenHTMLReport() *HRPRunner {
-	log.Info().Bool("genHTMLReport", true).Msg("[init] SetgenHTMLReport")
+	global.GVA_LOG.Info("[init] SetgenHTMLReport", zap.Bool("genHTMLReport", true))
 	r.genHTMLReport = true
 	return r
 }
 
 // Run starts to execute one or multiple testcases.
 func (r *HRPRunner) Run(testcases ...ITestCase) error {
-	log.Info().Str("hrp_version", version.VERSION).Msg("start running")
+	global.GVA_LOG.Info("[init] Run", zap.Int("testcases", len(testcases)))
 	event := sdk.EventTracking{
 		Category: "RunAPITests",
 		Action:   "hrp run",
@@ -189,7 +185,7 @@ func (r *HRPRunner) Run(testcases ...ITestCase) error {
 	// load all testcases
 	testCases, err := LoadTestCases(testcases...)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to load testcases")
+		global.GVA_LOG.Info("[init] Run", zap.Error(err))
 		return err
 	}
 
@@ -209,7 +205,7 @@ func (r *HRPRunner) Run(testcases ...ITestCase) error {
 		// each testcase has its own case runner
 		caseRunner, err := r.NewCaseRunner(testcase)
 		if err != nil {
-			log.Error().Err(err).Msg("[Run] init case runner failed")
+			global.GVA_LOG.Error("[init] Run", zap.Error(err))
 			return err
 		}
 
@@ -226,13 +222,13 @@ func (r *HRPRunner) Run(testcases ...ITestCase) error {
 			sessionRunner := caseRunner.NewSession()
 			err1 := sessionRunner.Start(it.Next())
 			if err1 != nil {
-				log.Error().Err(err1).Msg("[Run] run testcase failed")
+				global.GVA_LOG.Error("[init] Run", zap.Error(err1))
 				runErr = err1
 			}
 			caseSummary, err2 := sessionRunner.GetSummary()
 			s.appendCaseSummary(caseSummary)
 			if err2 != nil {
-				log.Error().Err(err2).Msg("[Run] get summary failed")
+				global.GVA_LOG.Error("[init] Run", zap.Error(err2))
 				if err1 != nil {
 					runErr = errors.Wrap(err1, err2.Error())
 				} else {
@@ -336,14 +332,14 @@ func (r *CaseRunner) parseConfig() error {
 	r.parsedConfig = &TConfig{}
 	// deep copy config to avoid data racing
 	if err := copier.Copy(r.parsedConfig, cfg); err != nil {
-		log.Error().Err(err).Msg("copy testcase config failed")
+		global.GVA_LOG.Error("[init] Run", zap.Error(err))
 		return err
 	}
 
 	// parse config variables
 	parsedVariables, err := r.parser.ParseVariables(cfg.Variables)
 	if err != nil {
-		log.Error().Interface("variables", cfg.Variables).Err(err).Msg("parse config variables failed")
+		global.GVA_LOG.Error("[init] Run", zap.Any("variables", cfg.Variables), zap.Error(err))
 		return err
 	}
 	r.parsedConfig.Variables = parsedVariables
@@ -394,10 +390,7 @@ func (r *CaseRunner) parseConfig() error {
 	// parse testcase config parameters
 	parametersIterator, err := initParametersIterator(r.parsedConfig)
 	if err != nil {
-		log.Error().Err(err).
-			Interface("parameters", r.parsedConfig.Parameters).
-			Interface("parametersSetting", r.parsedConfig.ParametersSetting).
-			Msg("parse config parameters failed")
+		global.GVA_LOG.Error("[init] Run", zap.Any("parameters", r.parsedConfig.Parameters), zap.Any("parametersSetting", r.parsedConfig.ParametersSetting), zap.Error(err))
 		return errors.Wrap(err, "parse testcase config parameters failed")
 	}
 	r.parametersIterator = parametersIterator
@@ -472,7 +465,7 @@ type SessionRunner struct {
 }
 
 func (r *SessionRunner) resetSession() {
-	log.Info().Msg("reset session runner")
+	global.GVA_LOG.Info("reset session runner")
 	r.sessionVariables = make(map[string]interface{})
 	r.transactions = make(map[string]map[transactionType]time.Time)
 	r.startTime = time.Now()
@@ -486,7 +479,7 @@ func (r *SessionRunner) resetSession() {
 // givenVars is used for data driven
 func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 	config := r.caseRunner.testCase.Config
-	log.Info().Str("testcase", config.Name).Msg("run testcase start")
+	global.GVA_LOG.Info("run testcase start", zap.String("testcase", config.Name))
 
 	// reset session runner
 	r.resetSession()
@@ -503,8 +496,7 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 			parsedName = step.Name()
 		}
 		stepName := convertString(parsedName)
-		log.Info().Str("step", stepName).
-			Str("type", string(step.Type())).Msg("run step start")
+		global.GVA_LOG.Info("run step start", zap.String("step", stepName), zap.String("type", string(step.Type())))
 
 		// run step
 		stepResult, err := step.Run(r)
@@ -538,19 +530,14 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 		//}
 
 		if err == nil {
-			log.Info().Str("step", stepResult.Name).
-				Str("type", string(stepResult.StepType)).
-				Bool("success", true).
-				Interface("exportVars", stepResult.ExportVars).
-				Msg("run step end")
+			global.GVA_LOG.Error("run step end",
+				zap.String("step", stepResult.Name), zap.String("type", string(stepResult.StepType)),
+				zap.Bool("success", true), zap.Any("exportVars", stepResult.ExportVars))
 			continue
 		}
 
 		// failed
-		log.Error().Err(err).Str("step", stepResult.Name).
-			Str("type", string(stepResult.StepType)).
-			Bool("success", false).
-			Msg("run step end")
+		global.GVA_LOG.Error("run step end", zap.String("step", stepResult.Name), zap.String("type", string(stepResult.StepType)), zap.Bool("success", false))
 		// check if failfast
 		if r.caseRunner.hrpRunner.failfast {
 			return errors.Wrap(err, "abort running due to failfast setting")
@@ -561,16 +548,16 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 	defer func() {
 		for _, wsConn := range r.wsConnMap {
 			if wsConn != nil {
-				log.Info().Str("testcase", config.Name).Msg("websocket disconnected")
+				global.GVA_LOG.Info("websocket disconnected", zap.String("testcase", config.Name))
 				err := wsConn.Close()
 				if err != nil {
-					log.Error().Err(err).Msg("websocket disconnection failed")
+					global.GVA_LOG.Error("websocket disconnection failed", zap.Error(err), zap.String("testcase", config.Name))
 				}
 			}
 		}
 	}()
 
-	log.Info().Str("testcase", config.Name).Msg("run testcase end")
+	global.GVA_LOG.Error("run testcase end", zap.String("testcase", config.Name))
 	return nil
 }
 
@@ -585,8 +572,8 @@ func (r *SessionRunner) ParseStepVariables(stepVariables map[string]interface{})
 	// parse step variables
 	parsedVariables, err := r.caseRunner.parser.ParseVariables(overrideVars)
 	if err != nil {
-		log.Error().Interface("variables", r.caseRunner.parsedConfig.Variables).
-			Err(err).Msg("parse step variables failed")
+
+		global.GVA_LOG.Error("parse step variables failed", zap.Any("variables", r.caseRunner.parsedConfig.Variables), zap.Error(err))
 		return nil, errors.Wrap(err, "parse step variables failed")
 	}
 	return parsedVariables, nil
@@ -599,7 +586,7 @@ func (r *SessionRunner) InitWithParameters(parameters map[string]interface{}) {
 		return
 	}
 
-	log.Info().Interface("parameters", parameters).Msg("update session variables")
+	global.GVA_LOG.Info("update session variables", zap.Any("parameters", parameters))
 	for k, v := range parameters {
 		r.sessionVariables[k] = v
 	}
@@ -619,13 +606,13 @@ func (r *SessionRunner) GetSummary() (*TestCaseSummary, error) {
 
 	for uuid, client := range r.caseRunner.hrpRunner.uiClients {
 		// add WDA/UIA logs to summary
-		log, err := client.Driver.StopCaptureLog()
+		Log, err := client.Driver.StopCaptureLog()
 		if err != nil {
 			return caseSummary, err
 		}
 		logs := map[string]interface{}{
 			"uuid":    uuid,
-			"content": log,
+			"content": Log,
 		}
 
 		// stop performance monitor

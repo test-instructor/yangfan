@@ -10,7 +10,8 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
 	"github.com/test-instructor/yangfan/hrp/internal/version"
@@ -75,7 +76,7 @@ func (s *Summary) genHTMLReport() error {
 	reportPath := filepath.Join(reportsDir, fmt.Sprintf("report-%v.html", s.Time.StartAt.Unix()))
 	file, err := os.OpenFile(reportPath, os.O_WRONLY|os.O_CREATE, 0o666)
 	if err != nil {
-		log.Error().Err(err).Msg("open file failed")
+		global.GVA_LOG.Error("open file failed", zap.Any("err", err))
 		return err
 	}
 	defer file.Close()
@@ -83,14 +84,14 @@ func (s *Summary) genHTMLReport() error {
 	tmpl := template.Must(template.New("report").Parse(reportTemplate))
 	err = tmpl.Execute(writer, s)
 	if err != nil {
-		log.Error().Err(err).Msg("execute applies a parsed template to the specified data object failed")
+		global.GVA_LOG.Error("execute applies a parsed template to the specified data object failed")
 		return err
 	}
 	err = writer.Flush()
 	if err == nil {
-		log.Info().Str("path", reportPath).Msg("generate HTML report")
+		global.GVA_LOG.Info("generate HTML report", zap.String("path", reportPath))
 	} else {
-		log.Error().Str("path", reportPath).Msg("generate HTML report failed")
+		global.GVA_LOG.Error("generate HTML report failed", zap.Any("err", err))
 	}
 	return err
 }

@@ -9,7 +9,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp"
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
@@ -66,7 +67,7 @@ func Run(outputType OutputType, outputDir, profilePath string, args []string) {
 		// loads source file and convert to TCase format
 		tCase, err := LoadTCase(inputSample)
 		if err != nil {
-			log.Warn().Err(err).Str("input sample", inputSample).Msg("convert input sample failed")
+			global.GVA_LOG.Warn("convert input sample failed", zap.String("input sample", inputSample), zap.Error(err))
 			continue
 		}
 
@@ -94,14 +95,12 @@ func Run(outputType OutputType, outputDir, profilePath string, args []string) {
 			outputFile, err = caseConverter.ToJSON()
 		}
 		if err != nil {
-			log.Error().Err(err).
-				Str("input sample", caseConverter.InputSample).
-				Msg("convert case failed")
+			global.GVA_LOG.Error("convert case failed", zap.String("input sample", caseConverter.InputSample), zap.Error(err))
 			continue
 		}
 		outputFiles = append(outputFiles, outputFile)
 	}
-	log.Info().Strs("output files", outputFiles).Msg("conversion completed")
+	global.GVA_LOG.Info("conversion completed", zap.Strings("output files", outputFiles))
 }
 
 // LoadTCase loads source file and convert to TCase type
@@ -246,16 +245,15 @@ func (c *TCaseConverter) ToYAML() (string, error) {
 }
 
 func (c *TCaseConverter) overrideWithProfile(path string) error {
-	log.Info().Str("path", path).Msg("load profile")
+	global.GVA_LOG.Info("load profile", zap.String("path", path))
 	profile := new(Profile)
 	err := builtin.LoadFile(path, profile)
 	if err != nil {
-		log.Warn().Str("path", path).
-			Msg("failed to load profile, ignore!")
+		global.GVA_LOG.Warn("failed to load profile, ignore!", zap.String("path", path))
 		return err
 	}
 
-	log.Info().Interface("profile", profile).Msg("override with profile")
+	global.GVA_LOG.Info("override with profile", zap.Any("profile", profile))
 	for _, step := range c.TCase.TestSteps {
 		// override original headers and cookies
 		if profile.Override {
