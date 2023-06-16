@@ -180,6 +180,7 @@ func RegisterApis() {
 		{ApiGroup: "性能测试", Method: "GET", Path: "/performance/:project/findPerformanceStep", Description: "查看性能测试步骤"},
 		{ApiGroup: "性能测试", Method: "GET", Path: "/performance/:project/getReportList", Description: "性能测试报告列表"},
 		{ApiGroup: "性能测试", Method: "GET", Path: "/performance/:project/findReport", Description: "性能测试报告详情"},
+		{ApiGroup: "性能测试", Method: "DELETE", Path: "/performance/:project/deleteReport", Description: "删除性能测试报告"},
 		{ApiGroup: "性能测试", Method: "POST", Path: "/performance/:project/createPerformance", Description: "创建性能测试任务"},
 		{ApiGroup: "性能测试", Method: "GET", Path: "/performance/:project/getPerformanceList", Description: "获取性能任务列表"},
 		{ApiGroup: "性能测试", Method: "DELETE", Path: "/performance/:project/deletePerformance", Description: "删除性能任务"},

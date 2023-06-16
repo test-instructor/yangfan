@@ -75,7 +75,24 @@
             <el-button type="primary" @click="setUserConfig"
               >调试配置</el-button
             >
-            <user-config />
+            <el-form :inline="true" style="margin-left: 20px">
+              <el-form-item
+                v-if="userConfigs && userConfigs.api_config_id"
+                label="环境配置："
+              >
+                <el-tag class="mx-1" size="large" type="success">
+                  {{ userConfigs.api_config.name }}
+                </el-tag>
+              </el-form-item>
+              <el-form-item
+                v-if="userConfigs && userConfigs.api_env_id"
+                label="环境变量："
+              >
+                <el-tag class="mx-1" size="large" type="success">
+                  {{ userConfigs.api_env.name }}
+                </el-tag>
+              </el-form-item>
+            </el-form>
           </div>
           <el-table
             ref="multipleTable"
@@ -207,7 +224,7 @@
       top="30px"
     >
       <InterfaceTempleForm
-        @close="closeDialog"
+        @close="closeDialog('update')"
         v-if="interfaceTempleFormVisible"
         :heights="heightDiv"
         :eventType="type"
@@ -555,7 +572,7 @@ const openDialogGrpc = () => {
 };
 
 // 关闭弹窗
-const closeDialog = () => {
+const closeDialog = (is_update) => {
   interfaceTempleFormVisible.value = false;
   formDatas.value = reactive({
     name: "",
@@ -574,6 +591,9 @@ const closeDialog = () => {
     hooks: "",
     apiMenuID: "",
   });
+  if (is_update === "update") {
+    getTableData();
+  }
 };
 
 const closeDialogGrpc = () => {
@@ -597,8 +617,23 @@ const closeDialogGrpc = () => {
 
 const userConfigDialog = ref(false);
 const setUserConfig = () => {
+  getUserConfigs();
   userConfigDialog.value = true;
 };
+
+// const getUserConfigs = async () => {
+//     let res = await getUserConfig();
+//     if (res.code === 0 && res.data) {
+//         if (res.data.api_env_id > 0) {
+//             userConfig.value.api_env_id = res.data.api_env_id;
+//             userConfig.value.api_env.name = res.data.api_env.name;
+//         }
+//         if (res.data.api_config_id > 0) {
+//             userConfig.value.api_config_id = res.data.api_config_id;
+//             userConfig.value.api_config.name = res.data.api_config.name;
+//         }
+//     }
+// };
 
 const closeDialogUserConfig = () => {
   userConfigDialog.value = false;
@@ -612,30 +647,46 @@ const saveUserConfig = async () => {
     });
     return;
   }
-  const res = await createUserConfig({
+  let data = {
     api_config_id: configId.value,
     api_env_id: apiEnvId.value,
-  });
+  };
+  if (userConfigs.value.id > 0) {
+    data["ID"] = userConfigs.value.id;
+  }
+  const res = await createUserConfig(data);
   if (res.code === 0) {
     ElMessage({
       type: "success",
       message: "保存成功",
     });
     userConfigDialog.value = false;
+    getUserConfigs();
   }
 };
 const userConfigs = ref({
+  api_config: { name: "" },
+  api_env: { name: "" },
   api_config_id: "",
   api_env_id: "",
+  id: "",
 });
 const getUserConfigs = async () => {
   let res = await getUserConfig();
   if (res.code === 0 && res.data) {
+    console.log("========", res.data);
     if (res.data.api_env_id > 0) {
       userConfigs.value.api_env_id = res.data.api_env_id;
+      userConfigs.value.api_env.name = res.data.api_env.name;
+      apiEnvId.value = res.data.api_env_id;
     }
     if (res.data.api_config_id > 0) {
       userConfigs.value.api_config_id = res.data.api_config_id;
+      userConfigs.value.api_config.name = res.data.api_config.name;
+      configId.value = res.data.api_config_id;
+    }
+    if (res.data.ID > 0) {
+      userConfigs.value.id = res.data.ID;
     }
   }
 };

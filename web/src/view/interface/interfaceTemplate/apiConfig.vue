@@ -325,7 +325,7 @@ const dialogFormVisible = ref(false);
 const dialogTitle = ref(false);
 const heightDiv = ref();
 heightDiv.value =
-  window.screen.height - 480 > 600 ? 600 : window.screen.height - 480;
+  window.screen.height - 480 > 530 ? 530 : window.screen.height - 480;
 
 // 打开弹窗
 const openDialog = () => {

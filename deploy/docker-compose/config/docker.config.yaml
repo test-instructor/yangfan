@@ -40,14 +40,12 @@ cors:
     - allow-origin: example1.com
       allow-methods: GET, POST
       allow-headers: content-type
-      expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers,
-        Content-Type
+      expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers,Content-Type
       allow-credentials: true
     - allow-origin: example2.com
       allow-methods: GET, POST
       allow-headers: content-type
-      expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers,
-        Content-Type
+      expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers,Content-Type
       allow-credentials: true
 db-list:
   - disable: false
@@ -176,3 +174,5 @@ yang-fan:
   grafana-dashboard-name: yangfan-for-distributed-load-testing
   grafana-dashboard-stats: WLVhzvOg56Mg
   grafana-dashboard-stats-name: yangfan-for-node-status
+  run-server: yangfan-run
+  run-server-grpc-port: 7968

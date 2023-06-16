@@ -187,6 +187,17 @@ func (apiCase *PerformanceApi) GetReportList(c *gin.Context) {
 	}
 }
 
+func (apiCase *PerformanceApi) DeleteReport(c *gin.Context) {
+	var report interfacecase.PerformanceReport
+	_ = c.ShouldBindJSON(&report)
+	if err := performanceService.DeleteReport(report); err != nil {
+		global.GVA_LOG.Error("删除测试报告失败!", zap.Error(err))
+		response.FailWithMessage("删除测试报告失败", c)
+	} else {
+		response.OkWithDetailed(response.PageResult{}, "删除测试报告成功", c)
+	}
+}
+
 func (apiCase *PerformanceApi) FindReport(c *gin.Context) {
 	var pReport interfacecaseReq.PReportDetail
 	_ = c.ShouldBindQuery(&pReport)

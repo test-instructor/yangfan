@@ -491,6 +491,5 @@ getUserConfigs();
 .request {
   margin-top: 15px;
   border: 1px solid #ddd;
-  height: 600px;
 }
 </style>

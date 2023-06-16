@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpdemo-deployment
+  labels:
+    app: httpdemo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpdemo
+  template:
+    metadata:
+      labels:
+        app: httpdemo
+    spec:
+      containers:
+        - name: httpdemo
+          image: yangfanz/httpdemo
+          ports:
+            - containerPort: 8080

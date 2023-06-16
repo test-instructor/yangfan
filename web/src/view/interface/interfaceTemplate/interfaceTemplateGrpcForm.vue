@@ -719,7 +719,6 @@ getUserConfigs();
 .request {
   margin-top: 15px;
   border: 1px solid #ddd;
-  height: 520px;
 }
 .lefts {
   float: left;

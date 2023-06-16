@@ -192,8 +192,9 @@ func (i *InterfaceTemplateService) CreateUserConfig(userConfig interfacecase.Api
 			return err
 		}
 	}
-	userConfig.ID = userConfigOld.ID
-	err = global.GVA_DB.Where("id = ?", userConfig.ID).Save(&userConfig).Error
+	userConfigOld.ApiConfigID = userConfig.ApiConfigID
+	userConfigOld.ApiEnvID = userConfig.ApiEnvID
+	err = global.GVA_DB.Where("id = ?", userConfig.ID).Save(&userConfigOld).Error
 	return err
 }
 

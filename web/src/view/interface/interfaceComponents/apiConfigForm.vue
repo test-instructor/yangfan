@@ -42,7 +42,11 @@
     </div>
 
     <div class="request">
-      <el-tabs style="margin-left: 20px" v-model="activeTag">
+      <el-tabs
+        style="margin-left: 20px"
+        v-model="activeTag"
+        :heights="heightDiv"
+      >
         <el-tab-pane label="Header" name="Header">
           <headers
             @headerData="handleHeader"
@@ -142,7 +146,8 @@ const props = defineProps({
 
 const heightDiv = ref(false);
 const eventType = ref("");
-heightDiv.value = props.heights;
+heightDiv.value =
+  window.screen.height - 480 > 530 ? 530 : window.screen.height - 480;
 eventType.value = props.eventType;
 
 const getTableData = async () => {
@@ -337,6 +342,5 @@ const back = () => {
 .request {
   margin-top: 15px;
   border: 1px solid #ddd;
-  height: 600px;
 }
 </style>

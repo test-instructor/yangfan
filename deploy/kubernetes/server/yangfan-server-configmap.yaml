@@ -47,14 +47,12 @@ data:
         - allow-origin: example1.com
           allow-methods: GET, POST
           allow-headers: content-type
-          expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers,
-            Content-Type
+          expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers,Content-Type
           allow-credentials: true
         - allow-origin: example2.com
           allow-methods: GET, POST
           allow-headers: content-type
-          expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers,
-            Content-Type
+          expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers,Content-Type
           allow-credentials: true
     db-list:
       - disable: false
@@ -177,8 +175,8 @@ data:
       master: "yangfan-master"
       master-boomer-prot: 9093
       master-server-prot: 7966
-      prometheus-pushgateway-url: http://yangfan-pushgateway:9091/
-      grafana-host: http://192.168.0.180:31030/
+      prometheus-pushgateway-url: http://192.168.0.222:9091/
+      grafana-host: http://192.168.0.222:3000/
       grafana-dashboard: ERv3OaBPYe6A
       grafana-dashboard-name: yangfan-for-distributed-load-testing
       grafana-dashboard-stats: WLVhzvOg56Mg
