@@ -357,7 +357,7 @@ import { BarChart } from "echarts/charts";
 import { CanvasRenderer } from "echarts/renderers";
 import { useRoute } from "vue-router";
 import { getCurrentInstance } from "vue";
-import { ElMessageBox } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { formatDate } from "@/utils/format";
 import { Discount } from "@element-plus/icons-vue";
 
@@ -399,7 +399,25 @@ const exportFunc = () => {
 
 const copy = (row) => {
   let last = JSON.stringify(row);
-  navigator.clipboard.writeText(last);
+  console.log(last);
+  copyToClipboard(last);
+};
+
+const copyToClipboard = (text) => {
+  navigator.clipboard
+    .writeText(text)
+    .then(() => {
+      ElMessage({
+        type: "success",
+        message: "复制成功",
+      });
+    })
+    .catch((error) => {
+      ElMessage({
+        type: "error",
+        message: "复制失败",
+      });
+    });
 };
 
 let currentInstance;
