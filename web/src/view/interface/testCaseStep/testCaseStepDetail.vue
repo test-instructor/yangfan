@@ -110,6 +110,14 @@
             >
             <el-button
               type="text"
+              icon="copy-document"
+              size="small"
+              class="table-button"
+              @click="copyStep(scope.row)"
+              >复制</el-button
+            >
+            <el-button
+              type="text"
               icon="delete"
               size="mini"
               @click="deleteRow(scope.row)"
@@ -311,6 +319,21 @@ const updateInterfaceTemplateFunc = async (row) => {
       interfaceTempleFormVisible.value = true;
     }
     // interfaceTempleFormVisible.value = true
+  }
+};
+
+const copyStep = async (row) => {
+  const res = await addTestCase({
+    apiID: row.ID,
+    caseID: Number(testCaseID.value),
+    type: "copy",
+  });
+  if (res.code === 0) {
+    ElMessage({
+      type: "success",
+      message: "复制步骤成功",
+    });
+    await getTestCaseDetailFunc(testCaseID.value);
   }
 };
 

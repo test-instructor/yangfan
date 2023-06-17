@@ -75,6 +75,9 @@ func (t *TestCaseService) AddTestCaseStep(apiCaseID request.ApiCaseIdReq) (caseA
 	if caseApiDetail.Request != nil {
 		caseApiDetail.Request.ID = 0
 	}
+	if apiCaseID.Type == "copy" {
+		caseApiDetail.Name = caseApiDetail.Name + "_copy"
+	}
 	if caseApiDetail.Grpc != nil {
 		caseApiDetail.Grpc.ID = 0
 	}
