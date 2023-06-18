@@ -21,10 +21,13 @@ type InterfaceTemplateService struct {
 
 // CreateInterfaceTemplate 创建InterfaceTemplate记录
 
-func (i *InterfaceTemplateService) CreateInterfaceTemplate(apicase interfacecase.ApiStep) (err error) {
+func (i *InterfaceTemplateService) CreateInterfaceTemplate(apicase interfacecase.ApiStep) (id *uint, err error) {
 	apicase.ValidateNumber = uint(len(apicase.Validate))
 	err = global.GVA_DB.Create(&apicase).Error
-	return err
+	if err != nil {
+		return nil, err
+	}
+	return &apicase.ID, nil
 }
 
 // DeleteInterfaceTemplate 删除InterfaceTemplate记录
