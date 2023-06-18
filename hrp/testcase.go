@@ -230,10 +230,12 @@ func (tc *TCase) toTestCase() (*TestCase, error) {
 				if err != nil {
 					return nil, err
 				}
+				tCase.Config = tc.Config
 				tc, err := tCase.toTestCase()
 				if err != nil {
 					return nil, err
 				}
+				//tc.Config = step.TestCase.(*TestCase).Config
 				step.TestCase = tc
 			}
 			_, ok = step.TestCase.(*TestCase)

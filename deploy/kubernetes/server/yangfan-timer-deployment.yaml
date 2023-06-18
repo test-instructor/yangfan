@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: yangfan-timer
-          image: yangfanz/timer:latest
+          image: registry.cn-hangzhou.aliyuncs.com/yangfanz/timer:latest
           ports:
             - containerPort: 8888
               protocol: TCP

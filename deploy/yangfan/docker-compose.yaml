@@ -10,7 +10,7 @@ networks:
 
 services:
   server:
-    image: yangfanz/server:latest
+    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/server:latest
     container_name: yangfan-server
     restart: always
     volumes:
@@ -20,7 +20,7 @@ services:
       - '7967:7967'
 
   web:
-    image: yangfanz/web:latest
+    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/web:latest
     container_name: yangfan-web
     restart: always
     volumes:
@@ -69,7 +69,7 @@ services:
       - TZ=Asia/Shanghai
 
   master:
-    image: yangfanz/master:latest
+    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/master:latest
     container_name: yangfan-master
     restart: always
     volumes:
@@ -80,21 +80,21 @@ services:
       - '9092:9092'
 
   work:
-    image: yangfanz/work:latest
+    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/work:latest
     container_name: yangfan-work
     restart: always
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml
 
   run:
-    image: yangfanz/run:latest
+    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/run:latest
     container_name: yangfan-run
     restart: always
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml
 
   timer:
-    image: yangfanz/timer:latest
+    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/timer:latest
     container_name: yangfan-timer
     restart: always
     volumes:

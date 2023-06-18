@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: yangfan-work
-          image: yangfanz/work:latest
+          image: registry.cn-hangzhou.aliyuncs.com/yangfanz/work:latest
           env:
             - name: MASTER_SERVER
               value: yangfan-master-service

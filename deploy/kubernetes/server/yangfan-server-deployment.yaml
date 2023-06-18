@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: yangfan-server
-          image: yangfanz/server:latest
+          image: registry.cn-hangzhou.aliyuncs.com/yangfanz/server:latest
           ports:
             - containerPort: 8888
               protocol: TCP

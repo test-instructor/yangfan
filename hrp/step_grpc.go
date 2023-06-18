@@ -363,7 +363,7 @@ func (r *grpcBuilder) prepareBody(stepVariables map[string]interface{}) error {
 	}
 
 	r.requestMap["body"] = data
-	r.stepGrpc.Body = io.NopCloser(bytes.NewReader(dataBytes))
+	//r.stepGrpc.Body = io.NopCloser(bytes.NewReader(dataBytes))
 	r.body = io.NopCloser(bytes.NewReader(dataBytes))
 	return nil
 }

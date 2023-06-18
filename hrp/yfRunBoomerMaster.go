@@ -82,6 +82,7 @@ func (r *RunBoomerMaster) LoadCase() (err error) {
 			return db2.Order("Sort")
 		}).
 		Preload("ApiCaseStep.TStep.Request").
+		Preload("ApiCaseStep.TStep.Grpc").
 		Where("performance_id = ?", r.runCaseReq.CaseID).
 		Order("Sort")
 	caseDB.Find(&apiCaseCase)

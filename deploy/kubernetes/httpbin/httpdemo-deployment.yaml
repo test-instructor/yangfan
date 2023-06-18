@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: httpdemo
-          image: yangfanz/httpdemo
+          image: registry.cn-hangzhou.aliyuncs.com/yangfanz/httpdemo
           ports:
             - containerPort: 8080

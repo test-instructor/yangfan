@@ -6,6 +6,8 @@ WORKDIR /app
 
 # 将代码复制到容器中
 COPY . .
+ENV GO111MODULE=on
+ENV GOPROXY=https://goproxy.cn
 
 # 编译 Go 代码
 RUN go build -o main .

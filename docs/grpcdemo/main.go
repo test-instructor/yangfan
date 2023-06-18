@@ -43,7 +43,7 @@ func main() {
 	reflection.Register(server)
 
 	// 监听服务器端口
-	listener, err := net.Listen("tcp", ":8080")
+	listener, err := net.Listen("tcp", ":7967")
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
