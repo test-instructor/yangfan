@@ -13,7 +13,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 )
 
 type Driver struct {
@@ -51,7 +52,7 @@ func (wd *Driver) httpDELETE(pathElem ...string) (rawResp rawResponse, err error
 }
 
 func (wd *Driver) httpRequest(method string, rawURL string, rawBody []byte) (rawResp rawResponse, err error) {
-	log.Debug().Str("method", method).Str("url", rawURL).Str("body", string(rawBody)).Msg("request driver agent")
+	global.GVA_LOG.Debug("request driver agent", zap.String("method", method), zap.String("url", rawURL), zap.String("body", string(rawBody)))
 
 	var req *http.Request
 	if req, err = http.NewRequest(method, rawURL, bytes.NewBuffer(rawBody)); err != nil {
@@ -72,12 +73,12 @@ func (wd *Driver) httpRequest(method string, rawURL string, rawBody []byte) (raw
 	}()
 
 	rawResp, err = ioutil.ReadAll(resp.Body)
-	logger := log.Debug().Int("statusCode", resp.StatusCode).Str("duration", time.Since(start).String())
+	global.GVA_LOG.Debug("get driver agent response", zap.Int("statusCode", resp.StatusCode), zap.String("duration", time.Since(start).String()))
 	if !strings.HasSuffix(rawURL, "screenshot") {
 		// avoid printing screenshot data
-		logger.Str("response", string(rawResp))
+		global.GVA_LOG.Debug("get driver agent response", zap.String("response", string(rawResp)))
 	}
-	logger.Msg("get driver agent response")
+	global.GVA_LOG.Debug("get driver agent response", zap.String("response", string(rawResp)))
 	if err != nil {
 		return nil, err
 	}

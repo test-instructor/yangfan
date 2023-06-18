@@ -12,7 +12,8 @@ import (
 
 	"github.com/jmespath/go-jmespath"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
 	"github.com/test-instructor/yangfan/hrp/internal/json"
@@ -102,10 +103,7 @@ func convertToResponseObject(t *testing.T, parser *Parser, respObjMeta interface
 	decoder := json.NewDecoder(bytes.NewReader(respObjMetaBytes))
 	decoder.UseNumber()
 	if err := decoder.Decode(&data); err != nil {
-		log.Error().
-			Str("respObjectMeta", string(respObjMetaBytes)).
-			Err(err).
-			Msg("[convertToResponseObject] convert respObjectMeta to interface{} failed")
+		global.GVA_LOG.Error("[convertToResponseObject] convert respObjectMeta to interface{} failed", zap.String("respObjectMeta", string(respObjMetaBytes)), zap.Error(err))
 		return nil, err
 	}
 	return &responseObject{
@@ -131,7 +129,7 @@ func (v *responseObject) searchField(field string, variablesMapping map[string]i
 		var err error
 		result, err = v.parser.Parse(field, variablesMapping)
 		if err != nil {
-			log.Error().Str("field name", field).Err(err).Msg("fail to parse field before search")
+			global.GVA_LOG.Error("[searchField] fail to parse field before search", zap.String("field", field), zap.Error(err))
 		}
 	}
 	// search field using jmespath or regex if parsed field is still string and contains specified fieldTags
@@ -153,8 +151,8 @@ func (v *responseObject) Extract(extractors map[string]string, variablesMapping 
 	extractMapping := make(map[string]interface{})
 	for key, value := range extractors {
 		extractedValue := v.searchField(value, variablesMapping)
-		log.Info().Str("from", value).Interface("value", extractedValue).Msg("extract value")
-		log.Info().Str("variable", key).Interface("value", extractedValue).Msg("set variable")
+		global.GVA_LOG.Info("[Extract] extract value", zap.String("from", value), zap.Any("value", extractedValue))
+		global.GVA_LOG.Info("[Extract] set variable", zap.String("variable", key), zap.Any("value", extractedValue))
 		extractMapping[key] = extractedValue
 	}
 
@@ -200,25 +198,27 @@ func (v *responseObject) Validate(iValidators []interface{}, variablesMapping ma
 			validResult.CheckResult = "pass"
 		}
 		v.validationResults = append(v.validationResults, validResult)
-		log.Info().
-			Str("checkExpr", validator.Check).
-			Str("assertMethod", assertMethod).
-			Interface("expectValue", expectValue).
-			Str("expectValueType", builtin.InterfaceType(expectValue)).
-			Interface("checkValue", checkValue).
-			Str("checkValueType", builtin.InterfaceType(checkValue)).
-			Bool("result", result).
-			Msgf("validate %s", checkItem)
+		global.GVA_LOG.Info("[Validate] validate result",
+			zap.String("checkExpr", validator.Check),
+			zap.String("assertMethod", assertMethod),
+			zap.Any("expectValue", expectValue),
+			zap.Any("expectValueType", builtin.InterfaceType(expectValue)),
+			zap.Any("checkValue", checkValue),
+			zap.Any("checkValueType", builtin.InterfaceType(checkValue)),
+			zap.Bool("result", result),
+			zap.String("validate", checkItem),
+		)
 		if !result {
-			v.t.Fail()
-			log.Error().
-				Str("checkExpr", validator.Check).
-				Str("assertMethod", assertMethod).
-				Interface("checkValue", checkValue).
-				Str("checkValueType", builtin.InterfaceType(checkValue)).
-				Interface("expectValue", expectValue).
-				Str("expectValueType", builtin.InterfaceType(expectValue)).
-				Msg("assert failed")
+			global.GVA_LOG.Error("[Validate] assert failed",
+				zap.String("checkExpr", validator.Check),
+				zap.String("assertMethod", assertMethod),
+				zap.Any("expectValue", expectValue),
+				zap.Any("expectValueType", builtin.InterfaceType(expectValue)),
+				zap.Any("checkValue", checkValue),
+				zap.Any("checkValueType", builtin.InterfaceType(checkValue)),
+				zap.Bool("result", result),
+				zap.String("validate", checkItem),
+			)
 			return errors.New("step validation failed")
 		}
 	}
@@ -237,13 +237,13 @@ func checkSearchField(expr string) bool {
 func (v *responseObject) searchJmespath(expr string) interface{} {
 	checkValue, err := jmespath.Search(expr, v.respObjMeta)
 	if err != nil {
-		log.Error().Str("expr", expr).Err(err).Msg("search jmespath failed")
+		global.GVA_LOG.Error("[searchJmespath] search jmespath failed", zap.String("expr", expr), zap.Error(err))
 		return expr // jmespath not found, return the expression
 	}
 	if number, ok := checkValue.(builtinJSON.Number); ok {
 		checkNumber, err := parseJSONNumber(number)
 		if err != nil {
-			log.Error().Interface("json number", number).Err(err).Msg("convert json number failed")
+			global.GVA_LOG.Error("[searchJmespath] convert json number failed", zap.String("expr", expr), zap.Error(err))
 		}
 		return checkNumber
 	}
@@ -253,24 +253,24 @@ func (v *responseObject) searchJmespath(expr string) interface{} {
 func (v *responseObject) searchRegexp(expr string) interface{} {
 	respMap, ok := v.respObjMeta.(map[string]interface{})
 	if !ok {
-		log.Error().Interface("resp", v.respObjMeta).Msg("convert respObjMeta to map failed")
+		global.GVA_LOG.Error("[searchRegexp] convert respObjMeta to map failed", zap.Any("resp", v.respObjMeta))
 		return expr
 	}
 	bodyStr, ok := respMap["body"].(string)
 	if !ok {
-		log.Error().Interface("resp", respMap).Msg("convert body to string failed")
+		global.GVA_LOG.Error("[searchRegexp] convert body to string failed", zap.Any("resp", respMap))
 		return expr
 	}
 	regexpCompile, err := regexp.Compile(expr)
 	if err != nil {
-		log.Error().Str("expr", expr).Err(err).Msg("compile expr failed")
+		global.GVA_LOG.Error("[searchRegexp] compile regexp failed", zap.String("expr", expr), zap.Error(err))
 		return expr
 	}
 	match := regexpCompile.FindStringSubmatch(bodyStr)
 	if len(match) > 1 {
 		return match[1] // return first matched result in parentheses
 	}
-	log.Error().Str("expr", expr).Msg("search regexp failed")
+	global.GVA_LOG.Error("[searchRegexp] search regexp failed", zap.String("expr", expr), zap.Any("match", match), zap.Any("resp", respMap))
 	return expr
 }
 
@@ -289,7 +289,7 @@ func validateUI(ud *uixt.DriverExt, iValidators []interface{}) (validateResults 
 		// parse check value
 		if !strings.HasPrefix(validator.Check, "ui_") {
 			validataResult.CheckResult = "skip"
-			log.Warn().Interface("validator", validator).Msg("skip validator")
+			global.GVA_LOG.Warn("[Validate] skip validator", zap.Any("validator", validator))
 			validateResults = append(validateResults, validataResult)
 			continue
 		}

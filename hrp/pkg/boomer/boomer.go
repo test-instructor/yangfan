@@ -8,7 +8,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 	"golang.org/x/net/context"
 
 	"github.com/test-instructor/yangfan/hrp/internal/json"
@@ -114,7 +115,7 @@ func (b *Boomer) SetMode(mode Mode) {
 	case StandaloneMode:
 		b.mode = StandaloneMode
 	default:
-		log.Error().Err(errors.New("Invalid mode, ignored!"))
+		global.GVA_LOG.Error("Invalid mode, ignored!")
 	}
 }
 
@@ -128,7 +129,7 @@ func (b *Boomer) GetMode() string {
 	case StandaloneMode:
 		return "standalone"
 	default:
-		log.Error().Err(errors.New("Invalid mode, ignored!"))
+		global.GVA_LOG.Error("Invalid mode, ignored!")
 		return ""
 	}
 }
@@ -193,7 +194,7 @@ func (b *Boomer) GetTestCaseBytes() []byte {
 func ProfileToBytes(profile *Profile) []byte {
 	profileBytes, err := json.Marshal(profile)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to marshal testcases")
+		global.GVA_LOG.Error("failed to marshal testcases", zap.Any("err", err))
 		return nil
 	}
 	return profileBytes
@@ -203,7 +204,7 @@ func BytesToProfile(profileBytes []byte) *Profile {
 	var profile *Profile
 	err := json.Unmarshal(profileBytes, &profile)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to unmarshal testcases")
+		global.GVA_LOG.Error("failed to unmarshal testcases", zap.Any("err", err))
 	}
 	return profile
 }
@@ -305,16 +306,16 @@ func (b *Boomer) SetRateLimiter(maxRPS int64, requestIncreaseRate string) {
 		if maxRPS <= 0 {
 			maxRPS = math.MaxInt64
 		}
-		log.Warn().Int64("maxRPS", maxRPS).Str("increaseRate", requestIncreaseRate).Msg("set ramp up rate limiter")
+		global.GVA_LOG.Warn("set ramp up rate limiter", zap.Int64("maxRPS", maxRPS), zap.String("increaseRate", requestIncreaseRate))
 		rateLimiter, err = NewRampUpRateLimiter(maxRPS, requestIncreaseRate, time.Second)
 	} else {
 		if maxRPS > 0 {
-			log.Warn().Int64("maxRPS", maxRPS).Msg("set stable rate limiter")
+			global.GVA_LOG.Warn("set stable rate limiter", zap.Int64("maxRPS", maxRPS))
 			rateLimiter = NewStableRateLimiter(maxRPS, time.Second)
 		}
 	}
 	if err != nil {
-		log.Error().Err(err).Msg("failed to create rate limiter")
+		global.GVA_LOG.Error("failed to create rate limiter", zap.Any("err", err))
 		return
 	}
 
@@ -408,40 +409,40 @@ func (b *Boomer) Run(tasks ...*Task) {
 	if b.cpuProfile != "" {
 		err := startCPUProfile(b.cpuProfile, b.cpuProfileDuration)
 		if err != nil {
-			log.Error().Err(err).Msg("failed to start cpu profiling")
+			global.GVA_LOG.Error("failed to start cpu profiling", zap.Any("err", err))
 		}
 	}
 	if b.memoryProfile != "" {
 		err := startMemoryProfile(b.memoryProfile, b.memoryProfileDuration)
 		if err != nil {
-			log.Error().Err(err).Msg("failed to start memory profiling")
+			global.GVA_LOG.Error("failed to start memory profiling", zap.Any("err", err))
 		}
 	}
 
 	switch b.mode {
 	case DistributedWorkerMode:
-		log.Info().Msg("running in worker mode")
+		global.GVA_LOG.Info("running in worker mode")
 		b.workerRunner.setTasks(tasks)
 		b.workerRunner.start()
 	case StandaloneMode:
-		log.Info().Msg("running in standalone mode")
+		global.GVA_LOG.Info("running in standalone mode")
 		b.localRunner.setTasks(tasks)
 		b.localRunner.start()
 	default:
-		log.Error().Err(errors.New("Invalid mode, expected boomer.DistributedMode or boomer.StandaloneMode"))
+		global.GVA_LOG.Error("Invalid mode, expected boomer.DistributedMode or boomer.StandaloneMode")
 	}
 }
 
 func (b *Boomer) SetTasks(tasks ...*Task) {
 	switch b.mode {
 	case DistributedWorkerMode:
-		log.Info().Msg("set tasks to worker")
+		global.GVA_LOG.Info("set tasks to worker")
 		b.workerRunner.setTasks(tasks)
 	case StandaloneMode:
-		log.Info().Msg("set tasks to standalone")
+		global.GVA_LOG.Info("set tasks to standalone")
 		b.localRunner.setTasks(tasks)
 	default:
-		log.Error().Err(errors.New("Invalid mode, expected boomer.DistributedMode or boomer.StandaloneMode"))
+		global.GVA_LOG.Error("Invalid mode, expected boomer.DistributedMode or boomer.StandaloneMode")
 	}
 }
 
@@ -511,6 +512,7 @@ func (b *Boomer) Start(Args *Profile) error {
 		return errors.New("Please wait for all workers to finish")
 	}
 	if int(Args.SpawnCount) < b.masterRunner.server.getAvailableClientsLength() {
+		global.GVA_LOG.Error("spawn count should be greater than available worker count", zap.Any("spawn count", Args.SpawnCount), zap.Any("available worker count", b.masterRunner.server.getAvailableClientsLength()))
 		return errors.New("spawn count should be greater than available worker count")
 	}
 	b.SetSpawnCount(Args.SpawnCount)
@@ -535,7 +537,7 @@ func (b *Boomer) ReBalance(Args *Profile) error {
 	b.SetProfile(Args)
 	err := b.masterRunner.rebalance()
 	if err != nil {
-		log.Error().Err(err).Msg("failed to rebalance")
+		global.GVA_LOG.Error("failed to rebalance", zap.Any("err", err))
 	}
 	return err
 }

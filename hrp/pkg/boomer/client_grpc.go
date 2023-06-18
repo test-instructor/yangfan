@@ -9,7 +9,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
@@ -136,7 +137,7 @@ func (c *grpcClientConfig) setBiStreamClient(s messager.Message_BidirectionalStr
 }
 
 func newClient(masterHost string, masterPort int, identity string) (client *grpcClient) {
-	log.Info().Msg("Boomer is built with grpc support.")
+	global.GVA_LOG.Info("Boomer is built with grpc support.")
 	// Initiate the stream with a context that supports cancellation.
 	ctx, cancel := context.WithCancel(context.Background())
 	client = &grpcClient{
@@ -161,7 +162,7 @@ func (c *grpcClient) start() (err error) {
 	// Create tls based credential.
 	creds, err := credentials.NewClientTLSFromFile(data.Path("x509/ca_cert.pem"), "www.httprunner.com")
 	if err != nil {
-		log.Fatal().Msg(fmt.Sprintf("failed to load credentials: %v", err))
+		global.GVA_LOG.Fatal(fmt.Sprintf("failed to load credentials: %v", err))
 	}
 	opts := []grpc.DialOption{
 		// oauth.NewOauthAccess requires the configuration of transport
@@ -181,7 +182,7 @@ func (c *grpcClient) start() (err error) {
 	}
 	c.config.conn, err = grpc.Dial(addr, opts...)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to connect")
+		global.GVA_LOG.Error(fmt.Sprintf("failed to connect: %v", err))
 		return err
 	}
 	c.MessageClient = messager.NewMessageClient(c.config.conn)
@@ -196,6 +197,7 @@ func (c *grpcClient) register(ctx context.Context) error {
 		return err
 	}
 	if res.Code != "0" {
+		global.GVA_LOG.Error(fmt.Sprintf("failed to register: %v", res.Message))
 		return errors.New(res.Message)
 	}
 	return nil
@@ -210,6 +212,7 @@ func (c *grpcClient) signOut(ctx context.Context) error {
 		return err
 	}
 	if res.Code != "0" {
+		global.GVA_LOG.Error(fmt.Sprintf("failed to sign out: %v", res.Message))
 		return errors.New(res.Message)
 	}
 	return nil
@@ -247,7 +250,7 @@ func (c *grpcClient) recv() {
 			msg, err := c.config.getBiStreamClient().Recv()
 			if err != nil {
 				time.Sleep(1 * time.Second)
-				// log.Error().Err(err).Msg("failed to get message")
+				global.GVA_LOG.Error(fmt.Sprintf("failed to get message: %v", err))
 				continue
 			}
 			if msg == nil {
@@ -255,11 +258,7 @@ func (c *grpcClient) recv() {
 			}
 
 			if msg.NodeID != c.identity {
-				log.Info().
-					Str("nodeID", msg.NodeID).
-					Str("type", msg.Type).
-					Interface("data", msg.Data).
-					Msg(fmt.Sprintf("not for me(%s)", c.identity))
+				global.GVA_LOG.Info(fmt.Sprintf("not for me(%s)", c.identity), zap.String("nodeID", msg.NodeID), zap.String("type", msg.Type), zap.Any("data", msg.Data))
 				continue
 			}
 
@@ -271,12 +270,7 @@ func (c *grpcClient) recv() {
 				Tasks:   msg.Tasks,
 			}
 
-			log.Info().
-				Str("nodeID", msg.NodeID).
-				Str("type", msg.Type).
-				Interface("data", msg.Data).
-				Interface("tasks", msg.Tasks).
-				Msg("receive data from master")
+			global.GVA_LOG.Info("receive data from master", zap.String("nodeID", msg.NodeID), zap.String("type", msg.Type), zap.Any("data", msg.Data), zap.Any("tasks", msg.Tasks))
 		}
 	}
 }
@@ -303,11 +297,7 @@ func (c *grpcClient) send() {
 }
 
 func (c *grpcClient) sendMessage(msg *genericMessage) {
-	log.Info().
-		Str("nodeID", msg.NodeID).
-		Str("type", msg.Type).
-		Interface("data", msg.Data).
-		Msg("send data to server")
+	global.GVA_LOG.Info("send data to server", zap.String("nodeID", msg.NodeID), zap.String("type", msg.Type), zap.Any("data", msg.Data))
 	if c.config.getBiStreamClient() == nil {
 		atomic.AddInt32(&c.failCount, 1)
 		return
@@ -315,9 +305,9 @@ func (c *grpcClient) sendMessage(msg *genericMessage) {
 	err := c.config.getBiStreamClient().Send(&messager.StreamRequest{Type: msg.Type, Data: msg.Data, NodeID: msg.NodeID})
 	if err == nil {
 		atomic.StoreInt32(&c.failCount, 0)
+		global.GVA_LOG.Error(fmt.Sprintf("failed to send message: %v", err))
 		return
 	}
-	// log.Error().Err(err).Interface("genericMessage", *msg).Msg("failed to send message")
 	if msg.Type == "heartbeat" {
 		atomic.AddInt32(&c.failCount, 1)
 	}

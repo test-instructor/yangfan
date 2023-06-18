@@ -8,39 +8,40 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/test-instructor/yangfan/hrp/internal/code"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 )
 
 func buildHashicorpGoPlugin() {
-	log.Info().Msg("[init] build hashicorp go plugin")
+	global.GVA_LOG.Info("build hashicorp go plugin")
 	err := BuildPlugin(tmpl("plugin/debugtalk.go"), tmpl("debugtalk.bin"))
 	if err != nil {
-		log.Error().Err(err).Msg("build hashicorp go plugin failed")
+		global.GVA_LOG.Error("build hashicorp go plugin failed", zap.Error(err))
 		os.Exit(code.GetErrorCode(err))
 	}
 }
 
 func removeHashicorpGoPlugin() {
-	log.Info().Msg("[teardown] remove hashicorp go plugin")
+	global.GVA_LOG.Info("remove hashicorp go plugin")
 	os.Remove(tmpl("debugtalk.bin"))
 	pluginPath, _ := filepath.Abs(tmpl("debugtalk.bin"))
 	pluginMap.Delete(pluginPath)
 }
 
 func buildHashicorpPyPlugin() {
-	log.Info().Msg("[init] prepare hashicorp python plugin")
+	global.GVA_LOG.Info("build hashicorp python plugin")
 	src, _ := ioutil.ReadFile(tmpl("plugin/debugtalk.py"))
 	err := ioutil.WriteFile(tmpl("debugtalk.py"), src, 0o644)
 	if err != nil {
-		log.Error().Err(err).Msg("copy hashicorp python plugin failed")
+		global.GVA_LOG.Error("copy hashicorp python plugin failed", zap.Error(err))
 		os.Exit(code.GetErrorCode(err))
 	}
 }
 
 func removeHashicorpPyPlugin() {
-	log.Info().Msg("[teardown] remove hashicorp python plugin")
+	global.GVA_LOG.Info("remove hashicorp python plugin")
 	// on v4.1^, running case will generate .debugtalk_gen.py used by python plugin
 	os.Remove(tmpl(PluginPySourceFile))
 	os.Remove(tmpl(PluginPySourceGenFile))

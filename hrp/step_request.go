@@ -18,7 +18,8 @@ import (
 	"github.com/andybalholm/brotli"
 	"github.com/fatih/color"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
 	"github.com/test-instructor/yangfan/hrp/internal/code"
@@ -144,7 +145,7 @@ func (r *requestBuilder) prepareUrlParams(stepVariables map[string]interface{}) 
 	// parse step request url
 	requestUrl, err := r.parser.ParseString(r.stepRequest.URL, stepVariables)
 	if err != nil {
-		log.Error().Err(err).Msg("parse request url failed")
+		global.GVA_LOG.Error("parse request url failed", zap.Any("err", err))
 		return err
 	}
 	var baseURL string
@@ -364,7 +365,7 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 			rb.stepRequest.Params = requestParams
 			err = rb.prepareUrlParams(stepVariables)
 			if err != nil {
-				log.Error().Err(err)
+				global.GVA_LOG.Error("prepareUrlParams failed", zap.Error(err))
 			}
 		}
 		requestHeaders, ok := rb.requestMap["headers"].(map[string]interface{})
@@ -385,6 +386,7 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 	// log & print request
 	if r.caseRunner.hrpRunner.requestsLogOn {
 		if err := printRequest(rb.req); err != nil {
+			global.GVA_LOG.Error("print request failed", zap.Error(err))
 			return stepResult, err
 		}
 	}
@@ -429,6 +431,7 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 	// log & print response
 	if r.caseRunner.hrpRunner.requestsLogOn {
 		if err := printResponse(resp); err != nil {
+			global.GVA_LOG.Error("printResponse err", zap.Any("err", err))
 			return stepResult, err
 		}
 	}
@@ -725,7 +728,7 @@ func (s *StepRequest) CallRefCase(tc ITestCase) *StepTestCaseWithOptionalArgs {
 	var err error
 	s.step.TestCase, err = tc.ToTestCase()
 	if err != nil {
-		log.Error().Err(err).Msg("failed to load testcase")
+		global.GVA_LOG.Error("failed to load testcase", zap.Any("err", err))
 		os.Exit(code.GetErrorCode(err))
 	}
 	return &StepTestCaseWithOptionalArgs{
@@ -738,7 +741,7 @@ func (s *StepRequest) CallRefAPI(api IAPI) *StepAPIWithOptionalArgs {
 	var err error
 	s.step.API, err = api.ToAPI()
 	if err != nil {
-		log.Error().Err(err).Msg("failed to load api")
+		global.GVA_LOG.Error("failed to load api", zap.Any("err", err))
 		os.Exit(code.GetErrorCode(err))
 	}
 	return &StepAPIWithOptionalArgs{
@@ -819,35 +822,35 @@ type StepRequestWithOptionalArgs struct {
 
 // SetVerify sets whether to verify SSL for current HTTP request.
 func (s *StepRequestWithOptionalArgs) SetVerify(verify bool) *StepRequestWithOptionalArgs {
-	log.Info().Bool("verify", verify).Msg("set step request verify")
+	global.GVA_LOG.Info("set step request verify", zap.Bool("verify", verify))
 	s.step.Request.Verify = verify
 	return s
 }
 
 // SetTimeout sets timeout for current HTTP request.
 func (s *StepRequestWithOptionalArgs) SetTimeout(timeout time.Duration) *StepRequestWithOptionalArgs {
-	log.Info().Float64("timeout(seconds)", timeout.Seconds()).Msg("set step request timeout")
+	global.GVA_LOG.Info("set step request timeout", zap.Float64("timeout(seconds)", timeout.Seconds()))
 	s.step.Request.Timeout = timeout.Seconds()
 	return s
 }
 
 // SetProxies sets proxies for current HTTP request.
 func (s *StepRequestWithOptionalArgs) SetProxies(proxies map[string]string) *StepRequestWithOptionalArgs {
-	log.Info().Interface("proxies", proxies).Msg("set step request proxies")
+	global.GVA_LOG.Info("set step request proxies", zap.Any("proxies", proxies))
 	// TODO
 	return s
 }
 
 // SetAllowRedirects sets whether to allow redirects for current HTTP request.
 func (s *StepRequestWithOptionalArgs) SetAllowRedirects(allowRedirects bool) *StepRequestWithOptionalArgs {
-	log.Info().Bool("allowRedirects", allowRedirects).Msg("set step request allowRedirects")
+	global.GVA_LOG.Info("set step request allowRedirects", zap.Bool("allowRedirects", allowRedirects))
 	s.step.Request.AllowRedirects = allowRedirects
 	return s
 }
 
 // SetAuth sets auth for current HTTP request.
 func (s *StepRequestWithOptionalArgs) SetAuth(auth map[string]string) *StepRequestWithOptionalArgs {
-	log.Info().Interface("auth", auth).Msg("set step request auth")
+	global.GVA_LOG.Info("set step request auth", zap.Any("auth", auth))
 	// TODO
 	return s
 }

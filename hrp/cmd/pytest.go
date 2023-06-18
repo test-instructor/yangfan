@@ -3,8 +3,9 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/myexec"
 	"github.com/test-instructor/yangfan/hrp/internal/pytest"
@@ -25,7 +26,7 @@ var pytestCmd = &cobra.Command{
 		}
 		_, err := myexec.EnsurePython3Venv(venv, packages...)
 		if err != nil {
-			log.Error().Err(err).Msg("python3 venv is not ready")
+			global.GVA_LOG.Error("python3 venv is not ready", zap.Error(err))
 			return err
 		}
 		return pytest.RunPytest(args)

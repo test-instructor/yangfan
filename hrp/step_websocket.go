@@ -10,7 +10,8 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
 	"github.com/test-instructor/yangfan/hrp/internal/json"
@@ -133,7 +134,7 @@ func (s *StepWebSocket) withUrl(url ...string) *StepWebSocket {
 		return s
 	}
 	if len(url) > 1 {
-		log.Warn().Msg("too many WebSocket step URL specified, using first URL")
+		global.GVA_LOG.Warn("too many WebSocket step URL specified, using first URL")
 	}
 	s.step.WebSocket.URL = url[0]
 	return s
@@ -312,7 +313,7 @@ func runStepWebSocket(r *SessionRunner, step *TStep) (stepResult *StepResult, er
 	}
 	switch step.WebSocket.Type {
 	case wsOpen:
-		log.Info().Int64("timeout(ms)", step.WebSocket.GetTimeout()).Str("url", parsedURL).Msg("open websocket connection")
+		global.GVA_LOG.Info("open websocket connection", zap.Int64("timeout(ms)", step.WebSocket.GetTimeout()), zap.String("url", parsedURL))
 		// use the current websocket connection if existed
 		if r.wsConnMap[parsedURL] != nil {
 			break
@@ -322,7 +323,7 @@ func runStepWebSocket(r *SessionRunner, step *TStep) (stepResult *StepResult, er
 			return stepResult, errors.Wrap(err, "open connection failed")
 		}
 	case wsPing:
-		log.Info().Int64("timeout(ms)", step.WebSocket.GetTimeout()).Str("url", parsedURL).Msg("send ping and expect pong")
+		global.GVA_LOG.Info("send ping and expect pong", zap.Int64("timeout(ms)", step.WebSocket.GetTimeout()), zap.String("url", parsedURL))
 		err = writeWebSocket(parsedURL, r, step, stepVariables)
 		if err != nil {
 			return stepResult, errors.Wrap(err, "send ping message failed")
@@ -333,14 +334,14 @@ func runStepWebSocket(r *SessionRunner, step *TStep) (stepResult *StepResult, er
 			select {
 			case <-timer.C:
 				timer.Stop()
-				log.Warn().Msg("pong timeout")
+				global.GVA_LOG.Warn("pong timeout")
 			case pongResponse := <-r.pongResponseChan:
 				resp = pongResponse
-				log.Info().Msg("pong message arrives")
+				global.GVA_LOG.Info("pong message arrives")
 			}
 		}()
 	case wsWriteAndRead:
-		log.Info().Int64("timeout(ms)", step.WebSocket.GetTimeout()).Str("url", parsedURL).Msg("write a message and read response")
+		global.GVA_LOG.Info("write a message and read response", zap.Int64("timeout(ms)", step.WebSocket.GetTimeout()), zap.String("url", parsedURL))
 		err = writeWebSocket(parsedURL, r, step, stepVariables)
 		if err != nil {
 			return stepResult, errors.Wrap(err, "write message failed")
@@ -350,19 +351,19 @@ func runStepWebSocket(r *SessionRunner, step *TStep) (stepResult *StepResult, er
 			return stepResult, errors.Wrap(err, "read message failed")
 		}
 	case wsRead:
-		log.Info().Int64("timeout(ms)", step.WebSocket.GetTimeout()).Str("url", parsedURL).Msg("read only")
+		global.GVA_LOG.Info("read message", zap.Int64("timeout(ms)", step.WebSocket.GetTimeout()), zap.String("url", parsedURL))
 		resp, err = readMessageWithTimeout(parsedURL, r, step)
 		if err != nil {
 			return stepResult, errors.Wrap(err, "read message failed")
 		}
 	case wsWrite:
-		log.Info().Str("url", parsedURL).Msg("write only")
+		global.GVA_LOG.Info("write a message", zap.Int64("timeout(ms)", step.WebSocket.GetTimeout()), zap.String("url", parsedURL))
 		err = writeWebSocket(parsedURL, r, step, stepVariables)
 		if err != nil {
 			return stepResult, errors.Wrap(err, "write message failed")
 		}
 	case wsClose:
-		log.Info().Int64("timeout(ms)", step.WebSocket.GetTimeout()).Str("url", parsedURL).Msg("close webSocket connection")
+		global.GVA_LOG.Info("close websocket connection", zap.Int64("timeout(ms)", step.WebSocket.GetTimeout()), zap.String("url", parsedURL))
 		resp, err = closeWithTimeout(parsedURL, r, step, stepVariables)
 		if err != nil {
 			return stepResult, errors.Wrap(err, "close connection failed")
@@ -553,7 +554,7 @@ func writeWebSocket(urlString string, r *SessionRunner, step *TStep, stepVariabl
 			return writeErr
 		}
 	} else {
-		log.Info().Msg("step with empty message")
+		global.GVA_LOG.Info("step with empty message")
 		err := writeWithAction(wsConn, step, websocket.BinaryMessage, []byte{})
 		if err != nil {
 			return err
@@ -613,10 +614,7 @@ func closeWithTimeout(urlString string, r *SessionRunner, step *TStep, stepVaria
 		for readErr == nil {
 			mt, message, readErr = wsConn.ReadMessage()
 			if readErr == nil {
-				log.Info().
-					Str("type", MessageType(mt).toString()).
-					Str("msg", string(message)).
-					Msg("discard redundant message")
+				global.GVA_LOG.Info("discard redundant message", zap.String("type", MessageType(mt).toString()), zap.String("msg", string(message)))
 				continue
 			}
 			if e, ok := readErr.(*websocket.CloseError); !ok {
@@ -625,7 +623,7 @@ func closeWithTimeout(urlString string, r *SessionRunner, step *TStep, stepVaria
 			}
 		}
 		// r.wsConn.Close() will be called at the end of current session, so no need to Close here
-		log.Info().Str("msg", readErr.Error()).Msg("connection closed")
+		global.GVA_LOG.Info("connection closed", zap.String("msg", readErr.Error()))
 	}()
 	timer := time.NewTimer(time.Duration(step.WebSocket.GetTimeout()) * time.Millisecond)
 	select {

@@ -7,7 +7,8 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
 	"github.com/test-instructor/yangfan/hrp/internal/code"
@@ -283,7 +284,7 @@ func (tc *TCase) toTestCase() (*TestCase, error) {
 				step: step,
 			})
 		} else {
-			log.Warn().Interface("step", step).Msg("[convertTestCase] unexpected step")
+			global.GVA_LOG.Warn("[convertTestCase] unexpected step", zap.Any("step", step))
 		}
 	}
 	return testCase, nil

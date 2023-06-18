@@ -1,6 +1,8 @@
 package gadb
 
-import "log"
+import (
+	"github.com/test-instructor/yangfan/server/global"
+)
 
 var debugFlag = false
 
@@ -13,5 +15,5 @@ func debugLog(msg string) {
 	if !debugFlag {
 		return
 	}
-	log.Println("[DEBUG] [gadb] " + msg)
+	global.GVA_LOG.Info("[DEBUG] [gadb] " + msg)
 }

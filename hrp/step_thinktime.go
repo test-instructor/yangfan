@@ -3,7 +3,8 @@ package hrp
 import (
 	"time"
 
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
 )
@@ -31,7 +32,7 @@ func (s *StepThinkTime) Struct() *TStep {
 
 func (s *StepThinkTime) Run(r *SessionRunner) (*StepResult, error) {
 	thinkTime := s.step.ThinkTime
-	log.Info().Float64("time", thinkTime.Time).Msg("think time")
+	global.GVA_LOG.Info("think time", zap.Float64("time", thinkTime.Time))
 
 	stepResult := &StepResult{
 		Name:     s.step.Name,

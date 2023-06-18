@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
 
 	"github.com/test-instructor/yangfan/hrp/internal/code"
 	"github.com/test-instructor/yangfan/hrp/pkg/gadb"
@@ -963,7 +963,7 @@ func (ud *uiaDriver) Wait(condition Condition) error {
 }
 
 func (ud *uiaDriver) StartCaptureLog(identifier ...string) (err error) {
-	log.Info().Msg("start adb log recording")
+	global.GVA_LOG.Info("start adb log recording")
 	err = ud.logcat.CatchLogcat()
 	if err != nil {
 		err = errors.Wrap(code.AndroidCaptureLogError,
@@ -974,10 +974,10 @@ func (ud *uiaDriver) StartCaptureLog(identifier ...string) (err error) {
 }
 
 func (ud *uiaDriver) StopCaptureLog() (result interface{}, err error) {
-	log.Info().Msg("stop adb log recording")
+	global.GVA_LOG.Info("stop adb log recording")
 	err = ud.logcat.Stop()
 	if err != nil {
-		log.Error().Err(err).Msg("failed to get adb log recording")
+		global.GVA_LOG.Error("failed to get adb log recording")
 		err = errors.Wrap(code.AndroidCaptureLogError,
 			fmt.Sprintf("get adb log recording failed: %v", err))
 		return "", err

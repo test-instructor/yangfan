@@ -12,7 +12,8 @@ import (
 
 	"github.com/httprunner/funplugin/shared"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
 	"github.com/test-instructor/yangfan/hrp/internal/code"
@@ -58,7 +59,7 @@ func (r *regexFunctions) findAllFunctionNames(content string) ([]string, error) 
 		// filter main and init function
 		for _, name := range functionNames {
 			if name == "main" {
-				log.Warn().Msg("plugin debugtalk.go should not define main() function !!!")
+				global.GVA_LOG.Warn("plugin debugtalk.go should not define main() function !!!")
 				return nil, errors.New("debugtalk.go should not contain main() function")
 			}
 			if name == "init" {
@@ -68,7 +69,7 @@ func (r *regexFunctions) findAllFunctionNames(content string) ([]string, error) 
 		}
 	}
 
-	log.Info().Strs("functionNames", filteredFunctionNames).Msg("find all function names")
+	global.GVA_LOG.Info("find all function names", zap.Strings("functionNames", filteredFunctionNames))
 	return filteredFunctionNames, nil
 }
 
@@ -81,7 +82,7 @@ type pluginTemplate struct {
 func (pt *pluginTemplate) generate(tmpl, output string) error {
 	file, err := os.Create(output)
 	if err != nil {
-		log.Error().Err(err).Msg("open output file failed")
+		global.GVA_LOG.Error("open output file failed", zap.Error(err))
 		return err
 	}
 	defer file.Close()
@@ -89,15 +90,15 @@ func (pt *pluginTemplate) generate(tmpl, output string) error {
 	writer := bufio.NewWriter(file)
 	err = template.Must(template.New("debugtalk").Parse(tmpl)).Execute(writer, pt)
 	if err != nil {
-		log.Error().Err(err).Msg("execute template parsing failed")
+		global.GVA_LOG.Error("execute template parsing failed", zap.Error(err))
 		return err
 	}
 
 	err = writer.Flush()
 	if err == nil {
-		log.Info().Str("output", output).Msg("generate debugtalk success")
+		global.GVA_LOG.Info("generate debugtalk success", zap.String("output", output))
 	} else {
-		log.Error().Str("output", output).Msg("generate debugtalk failed")
+		global.GVA_LOG.Info("generate debugtalk failed", zap.Error(err))
 	}
 	return err
 }
@@ -117,7 +118,7 @@ func (pt *pluginTemplate) generatePy(output string) error {
 		return err
 	}
 
-	log.Info().Str("output", output).Str("plugin", pt.path).Msg("build python plugin successfully")
+	global.GVA_LOG.Info("build python plugin successfully", zap.String("output", output), zap.String("plugin", pt.path))
 	return nil
 }
 
@@ -166,16 +167,16 @@ func (pt *pluginTemplate) generateGo(output string) error {
 	if err := myexec.ExecCommandInDir(cmd, pluginDir); err != nil {
 		return errors.Wrap(err, "go build plugin failed")
 	}
-	log.Info().Str("output", outputPath).Str("plugin", pt.path).Msg("build go plugin successfully")
+	global.GVA_LOG.Info("build go plugin successfully", zap.String("output", outputPath), zap.String("plugin", pt.path))
 	return nil
 }
 
 // buildGo builds debugtalk.go to debugtalk.bin
 func buildGo(path string, output string) error {
-	log.Info().Str("path", path).Str("output", output).Msg("start to build go plugin")
+	global.GVA_LOG.Info("start to build go plugin", zap.String("path", path), zap.String("output", output))
 	content, err := os.ReadFile(path)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to read file")
+		global.GVA_LOG.Error("failed to read file", zap.Error(err))
 		return errors.Wrap(code.LoadFileError, err.Error())
 	}
 	functionNames, err := regexGoFunctionName.findAllFunctionNames(string(content))
@@ -197,7 +198,7 @@ func buildGo(path string, output string) error {
 
 // buildPy completes funppy information in debugtalk.py
 func buildPy(path string, output string) error {
-	log.Info().Str("path", path).Str("output", output).Msg("start to prepare python plugin")
+	global.GVA_LOG.Info("start to build python plugin", zap.String("path", path), zap.String("output", output))
 	// check the syntax of debugtalk.py
 	err := myexec.ExecPython3Command("py_compile", path)
 	if err != nil {
@@ -207,7 +208,7 @@ func buildPy(path string, output string) error {
 
 	content, err := os.ReadFile(path)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to read file")
+		global.GVA_LOG.Error("failed to read file", zap.Error(err))
 		return errors.Wrap(code.LoadFileError, err.Error())
 	}
 	functionNames, err := regexPyFunctionName.findAllFunctionNames(string(content))
@@ -239,7 +240,7 @@ func BuildPlugin(path string, output string) (err error) {
 			"type error, expected .py or .go")
 	}
 	if err != nil {
-		log.Error().Err(err).Str("path", path).Msg("build plugin failed")
+		global.GVA_LOG.Error("build plugin failed", zap.Error(err))
 		return err
 	}
 	return nil

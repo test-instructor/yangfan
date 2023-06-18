@@ -2,7 +2,7 @@ package boomer
 
 import (
 	"encoding/json"
-	"github.com/rs/zerolog/log"
+
 	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"go.uber.org/zap"
@@ -58,7 +58,7 @@ func (o *DbOutput) updateReport(data map[string]interface{}) {
 	var reportDetail interfacecase.PerformanceReportDetail
 	output, err := convertData(data)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to convert data")
+		global.GVA_LOG.Error("failed to convert data", zap.Error(err))
 		return
 	}
 

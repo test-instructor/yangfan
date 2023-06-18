@@ -9,7 +9,8 @@ import (
 
 	"github.com/httprunner/funplugin/fungo"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp"
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
@@ -38,7 +39,7 @@ var templatesDir embed.FS
 
 // CopyFile copies a file from templates dir to scaffold project
 func CopyFile(templateFile, targetFile string) error {
-	log.Info().Str("path", targetFile).Msg("create file")
+	global.GVA_LOG.Info("create file", zap.String("path", targetFile))
 	content, err := templatesDir.ReadFile(templateFile)
 	if err != nil {
 		return errors.Wrap(err, "template file not found")
@@ -46,7 +47,7 @@ func CopyFile(templateFile, targetFile string) error {
 
 	err = os.WriteFile(targetFile, content, 0o644)
 	if err != nil {
-		log.Error().Err(err).Msg("create file failed")
+		global.GVA_LOG.Error("create file failed", zap.Error(err))
 		return err
 	}
 	return nil
@@ -59,22 +60,16 @@ func CreateScaffold(projectName string, pluginType PluginType, venv string, forc
 		Action:   "hrp startproject",
 	})
 
-	log.Info().
-		Str("projectName", projectName).
-		Str("pluginType", string(pluginType)).
-		Bool("force", force).
-		Msg("create new scaffold project")
+	global.GVA_LOG.Info("create new scaffold project", zap.String("projectName", projectName), zap.String("pluginType", string(pluginType)), zap.Bool("force", force))
 
 	// check if projectName exists
 	if _, err := os.Stat(projectName); err == nil {
 		if !force {
-			log.Warn().Str("projectName", projectName).
-				Msg("project name already exists, please specify a new one.")
+			global.GVA_LOG.Warn("project name already exists, please specify a new one.", zap.String("projectName", projectName))
 			return fmt.Errorf("project name already exists")
 		}
 
-		log.Warn().Str("projectName", projectName).
-			Msg("project name already exists, remove first !!!")
+		global.GVA_LOG.Warn("project name already exists, remove first !!!", zap.String("projectName", projectName))
 		os.RemoveAll(projectName)
 	}
 
@@ -137,7 +132,7 @@ func CreateScaffold(projectName string, pluginType PluginType, venv string, forc
 		if err != nil {
 			return err
 		}
-		log.Info().Msg("skip creating function plugin")
+		global.GVA_LOG.Info("skip creating function plugin")
 		return nil
 	}
 
@@ -175,7 +170,7 @@ func CreateScaffold(projectName string, pluginType PluginType, venv string, forc
 }
 
 func createGoPlugin(projectName string) error {
-	log.Info().Msg("start to create hashicorp go plugin")
+	global.GVA_LOG.Info("start to create hashicorp go plugin")
 	// check go sdk
 	if err := myexec.RunCommand("go", "version"); err != nil {
 		return errors.Wrap(err, "go sdk not installed")
@@ -196,7 +191,7 @@ func createGoPlugin(projectName string) error {
 }
 
 func createPythonPlugin(projectName, venv string) error {
-	log.Info().Msg("start to create hashicorp python plugin")
+	global.GVA_LOG.Info("start to create hashicorp python plugin")
 
 	// create debugtalk.py
 	pluginFile := filepath.Join(projectName, hrp.PluginPySourceFile)

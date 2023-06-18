@@ -8,6 +8,9 @@ import (
 	"io"
 	"net"
 	"time"
+
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 )
 
 type syncTransport struct {
@@ -85,13 +88,13 @@ func (sync syncTransport) VerifyStatus() (err error) {
 	if tmpUint32, err = sync.ReadUint32(); err != nil {
 		return fmt.Errorf("sync transport read (status): %w", err)
 	}
-	log.WriteString(fmt.Sprintf(" %d\t", tmpUint32))
+	global.GVA_LOG.Info("sync transport read (status): ", zap.Uint32("tmpUint32", tmpUint32))
 
 	var msg string
 	if msg, err = sync.ReadStringN(int(tmpUint32)); err != nil {
 		return err
 	}
-	log.WriteString(msg)
+	global.GVA_LOG.Info("sync transport read (msg): ", zap.String("msg", msg))
 
 	if status == "FAIL" {
 		err = fmt.Errorf("sync verify status (fail): %s", msg)
@@ -148,32 +151,32 @@ func (sync syncTransport) readChunk() (chunk []byte, err error) {
 	}
 
 	if status == "FAIL" {
-		log.WriteString(fmt.Sprintf("<-- %s\t%d\t", status, tmpUint32))
+		global.GVA_LOG.Info("read chunk (error message): ", zap.Uint32("tmpUint32", tmpUint32))
 		var sError string
 		if sError, err = sync.ReadStringN(int(tmpUint32)); err != nil {
 			return nil, fmt.Errorf("read chunk (error message): %w", err)
 		}
 		err = fmt.Errorf("status (fail): %s", sError)
-		log.WriteString(sError)
+		global.GVA_LOG.Error("read chunk (error message): ", zap.String("sError", sError))
 		return
 	}
 
 	switch status {
 	case "DONE":
-		log.WriteString(fmt.Sprintf("<-- %s", status))
+		global.GVA_LOG.Info("read chunk (done): ", zap.Uint32("tmpUint32", tmpUint32))
 		err = syncReadChunkDone
 		return
 	case "DATA":
-		log.WriteString(fmt.Sprintf("<-- %s\t%d\t", status, tmpUint32))
+		global.GVA_LOG.Info("read chunk (data): ", zap.Uint32("tmpUint32", tmpUint32))
 		if chunk, err = sync.ReadBytesN(int(tmpUint32)); err != nil {
 			return nil, err
 		}
 	default:
-		log.WriteString(fmt.Sprintf("<-- %s\t%d\t", status, tmpUint32))
+		global.GVA_LOG.Info("read chunk (default): ", zap.Uint32("tmpUint32", tmpUint32))
 		err = errors.New("unknown error")
 	}
 
-	log.WriteString("......")
+	global.GVA_LOG.Info("read chunk (log): ", zap.String("log", log.String()))
 
 	return
 
@@ -199,29 +202,29 @@ func (sync syncTransport) ReadDirectoryEntry() (entry DeviceFileInfo, err error)
 	if err = binary.Read(sync.sock, binary.LittleEndian, &entry.Mode); err != nil {
 		return DeviceFileInfo{}, fmt.Errorf("sync transport read (mode): %w", err)
 	}
-	log.WriteString(entry.Mode.String() + "\t")
+	global.GVA_LOG.Info("sync transport read (mode): ", zap.String("entry.Mode", entry.Mode.String()))
 
 	if entry.Size, err = sync.ReadUint32(); err != nil {
 		return DeviceFileInfo{}, fmt.Errorf("sync transport read (size): %w", err)
 	}
-	log.WriteString(fmt.Sprintf("%10d", entry.Size) + "\t")
+	global.GVA_LOG.Info("sync transport read (size): ", zap.Uint32("entry.Size", entry.Size))
 
 	var tmpUint32 uint32
 	if tmpUint32, err = sync.ReadUint32(); err != nil {
 		return DeviceFileInfo{}, fmt.Errorf("sync transport read (time): %w", err)
 	}
 	entry.LastModified = time.Unix(int64(tmpUint32), 0)
-	log.WriteString(entry.LastModified.String() + "\t")
+	global.GVA_LOG.Info("sync transport read (time): ", zap.Uint32("tmpUint32", tmpUint32))
 
 	if tmpUint32, err = sync.ReadUint32(); err != nil {
 		return DeviceFileInfo{}, fmt.Errorf("sync transport read (file name length): %w", err)
 	}
-	log.WriteString(fmt.Sprintf("%d\t", tmpUint32))
+	global.GVA_LOG.Info("sync transport read (file name length): ", zap.Uint32("tmpUint32", tmpUint32))
 
 	if entry.Name, err = sync.ReadStringN(int(tmpUint32)); err != nil {
 		return DeviceFileInfo{}, fmt.Errorf("sync transport read (file name): %w", err)
 	}
-	log.WriteString(entry.Name + "\t")
+	global.GVA_LOG.Info("sync transport read (file name): ", zap.String("entry.Name", entry.Name))
 
 	return
 }

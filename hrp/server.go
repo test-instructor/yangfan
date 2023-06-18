@@ -5,11 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/json"
 	"github.com/test-instructor/yangfan/hrp/pkg/boomer"
@@ -373,17 +374,17 @@ func (b *HRPBoomer) StartServer(ctx context.Context, addr string) {
 		case <-b.GetCloseChan():
 		}
 		if err := server.Shutdown(context.Background()); err != nil {
-			log.Fatal("shutdown server:", err)
+			global.GVA_LOG.Fatal("shutdown server:", zap.Error(err))
 		}
 	}()
 
-	log.Printf("starting HTTP server (%v), please use the API to control master", server.Addr)
+	global.GVA_LOG.Info("starting HTTP server Addr, please use the API to control master", zap.String("addr", server.Addr))
 	err := server.ListenAndServe()
 	if err != nil {
 		if err == http.ErrServerClosed {
-			log.Print("server closed under request")
+			global.GVA_LOG.Info("server closed under request")
 		} else {
-			log.Fatal("server closed unexpected")
+			global.GVA_LOG.Fatal("server closed unexpected")
 		}
 	}
 }
