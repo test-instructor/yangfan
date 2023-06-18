@@ -700,8 +700,8 @@ const initData = async () => {
   testStepsData.value = [];
   testStepsData.value = [];
   testCaseSimple.value = [];
-  if (route.params.id > 0) {
-    reportID = route.params.id;
+  if (route.params.report_id > 0) {
+    reportID = route.params.report_id;
   }
   tableDdata.value = reportData.value.details;
   await getTestCaseDetailFunc(reportID);
@@ -813,9 +813,9 @@ const columns = reactive([
 
 initData();
 watch(
-  () => route.params.id,
+  () => route.params.report_id,
   () => {
-    if (route.params.id) {
+    if (route.params.report_id) {
       initData();
     }
   }

@@ -303,7 +303,7 @@ const reportDetailFunc = (row) => {
     router.push({
       name: "reportDetail",
       params: {
-        id: row.ID,
+        report_id: row.ID,
       },
     });
   }
