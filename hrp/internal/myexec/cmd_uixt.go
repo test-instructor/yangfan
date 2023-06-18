@@ -4,6 +4,8 @@ package myexec
 
 import (
 	"fmt"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 	"os"
 	"os/exec"
 	"path/filepath"
