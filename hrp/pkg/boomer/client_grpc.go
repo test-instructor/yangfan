@@ -269,6 +269,9 @@ func (c *grpcClient) recv() {
 				NodeID:  msg.NodeID,
 				Tasks:   msg.Tasks,
 			}
+			if msg.Type == "stop" {
+				global.GVA_LOG.Panic("receive stop message from master, exit.")
+			}
 
 			global.GVA_LOG.Info("receive data from master", zap.String("nodeID", msg.NodeID), zap.String("type", msg.Type), zap.Any("data", msg.Data), zap.Any("tasks", msg.Tasks))
 		}

@@ -12,6 +12,7 @@ FROM yangfanz/python:3.10.0
 ENV TZ=Asia/Shanghai
 WORKDIR /yangfan
 COPY --from=builder /go/src/yangfan/master .
+COPY --from=builder /go/src/yangfan/get-pip.py .
 COPY --from=builder /go/src/yangfan/deploy/docker-compose/config/docker.config.yaml .
 
 EXPOSE 7966
