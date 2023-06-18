@@ -65,7 +65,7 @@
         <el-table-column property="name" label="用例名称" width="390">
           <template #default="scope">
             <el-tag type="danger" v-if="setupCaseShow(scope.row)">{{
-              "前置套件"
+              "前置步骤"
             }}</el-tag>
             {{ scope.row.name }}
           </template>

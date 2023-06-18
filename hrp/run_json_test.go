@@ -197,7 +197,7 @@ import (
 func TestJsonRunnerCase(t *testing.T) {
 	jsonString := `{
   "ID": 2,
-  "Name": "httpbin 套件1",
+  "Name": "httpbin 步骤1",
   "config": {
     "ID": 1,
     "CreatedAt": "2022-08-22T19:40:06.294+08:00",
@@ -218,10 +218,10 @@ func TestJsonRunnerCase(t *testing.T) {
   "teststeps": [
     {
       "ID": 1,
-      "Name": "httpbin 套件2",
+      "Name": "httpbin 步骤2",
       "testcase": {
         "ID": 1,
-        "Name": "httpbin 套件2",
+        "Name": "httpbin 步骤2",
         "config": {
           "ID": 1,
           "CreatedAt": "2022-08-22T19:40:06.294+08:00",
@@ -538,10 +538,10 @@ func TestJsonRunnerCase(t *testing.T) {
     },
     {
       "ID": 2,
-      "Name": "httpbin 套件1",
+      "Name": "httpbin 步骤1",
       "testcase": {
         "ID": 2,
-        "Name": "httpbin 套件1",
+        "Name": "httpbin 步骤1",
         "config": {
           "ID": 1,
           "CreatedAt": "2022-08-22T19:40:06.294+08:00",

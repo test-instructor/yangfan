@@ -42,7 +42,7 @@ message RunCaseReq{
 enum CaseType{
   CaseTypeDefault = 0; // 默认
   CaseTypeApi = 1; // api 运行
-  CaseTypeStep = 2; // 套件运行
+  CaseTypeStep = 2; // 步骤运行
   CaseTypeCases = 3; // 用例运行
   CaseTypeTask = 4; // 定时任务运行
   CaseTypeBoomerDebug = 5; // 性能任务调试

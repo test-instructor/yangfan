@@ -298,7 +298,7 @@ const addEnvVarFunc = async () => {
 
 const deleteRow = (row) => {
   ElMessageBox.confirm(
-    "删除变量会导致被应用的测试套件、测试用例、定时任务、性能测试任务无法正常运行，确定要删除吗?",
+    "删除变量会导致被应用的测试步骤、测试用例、定时任务、性能测试任务无法正常运行，确定要删除吗?",
     "提示",
     {
       confirmButtonText: "确定",

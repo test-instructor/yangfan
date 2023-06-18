@@ -50,7 +50,7 @@ func (r *runAPI) LoadCase() (err error) {
 		return errors.New("获取环境变量失败")
 	}
 	apiConfig.Environs = r.envVars
-	//设置前置套件
+	//设置前置步骤
 	if apiConfig.SetupCaseID != nil && *apiConfig.SetupCaseID != 0 {
 		hrpCaseStep, err := getCaseStepHrp(*apiConfig.SetupCaseID)
 		if err != nil {

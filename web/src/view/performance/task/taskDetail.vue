@@ -117,7 +117,7 @@
       :visible.sync="taskCaseVisible"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
-      title="添加测试套件"
+      title="添加测试步骤"
       width="1250px"
       top="30px"
     >

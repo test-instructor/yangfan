@@ -13,7 +13,7 @@ type RunType int
 
 const (
 	CaseTypeApi         CaseType = 1 // api 运行
-	CaseTypeStep        CaseType = 2 // 套件运行
+	CaseTypeStep        CaseType = 2 // 步骤运行
 	CaseTypeCases       CaseType = 3 // 用例运行
 	CaseTypeTask        CaseType = 4 // 定时任务运行
 	CaseTypeBoomerDebug CaseType = 5 // 性能任务调试

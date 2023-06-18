@@ -311,7 +311,7 @@ const addApiCaseFunc = async () => {
 const updateInterfaceTemplateFunc = async (row) => {
   const res = await findInterfaceTemplate({ ID: row.ID });
   type.value = "update";
-  dialogTitle.value = "编辑套件";
+  dialogTitle.value = "编辑步骤";
   if (res.code === 0) {
     if (res.data.reapicase.gRPC) {
       formDatasGrpc.value = res.data.reapicase;

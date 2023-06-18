@@ -9,14 +9,14 @@ type ApiCaseStepRelationship struct {
 	ApiStep       ApiStep
 	ApiStepId     uint `gorm:"comment:测试步骤"`
 	ApiCaseStep   ApiCaseStep
-	ApiCaseStepId uint `gorm:"comment:测试套件"`
+	ApiCaseStepId uint `gorm:"comment:测试步骤"`
 	Sort          uint `gorm:"comment:排序"`
 }
 
 type ApiCaseRelationship struct {
 	global.GVA_MODEL
 	ApiCaseStep   ApiCaseStep
-	ApiCaseStepId uint `gorm:"comment:测试套件"`
+	ApiCaseStepId uint `gorm:"comment:测试步骤"`
 	ApiCase       ApiCase
 	ApiCaseId     uint `gorm:"comment:测试用例"`
 	Sort          uint `gorm:"comment:排序"`
@@ -29,7 +29,7 @@ type PerformanceRelationship struct {
 	//ApiCase       *ApiCase
 	//ApiCaseId     uint `gorm:"comment:测试用例"`
 	ApiCaseStep   *ApiCaseStep
-	ApiCaseStepId uint `json:"ApiCaseStepId" gorm:"comment:测试套件"`
+	ApiCaseStepId uint `json:"ApiCaseStepId" gorm:"comment:测试步骤"`
 	Sort          uint `gorm:"comment:排序"`
 }
 

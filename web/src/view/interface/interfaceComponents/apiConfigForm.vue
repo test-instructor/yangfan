@@ -2,7 +2,7 @@
   <div>
     <div style="display: flex">
       <div>
-        <span>前置套件: </span>
+        <span>前置步骤: </span>
         <el-select
           v-model="reqData.setup_case_id"
           class="m-2"

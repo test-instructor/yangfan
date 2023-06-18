@@ -65,18 +65,18 @@ func (r *RunBoomerMaster) LoadCase() (err error) {
 	apiConfig.Environs = r.envVars
 	global.GVA_LOG.Debug(fmt.Sprintf("boomer debug 1 apiConfig:%d", apiConfig.ID))
 
-	//设置前置套件
+	//设置前置步骤
 	if apiConfig.SetupCaseID != nil && *apiConfig.SetupCaseID != 0 {
 		global.GVA_LOG.Debug(fmt.Sprintf("boomer debug 2 apiConfig.SetupCaseID %d", *apiConfig.SetupCaseID))
 		hrpCaseStep, err := getCaseStepHrp(*apiConfig.SetupCaseID)
 		if err != nil {
-			global.GVA_LOG.Debug(fmt.Sprintf("boomer debug 8 已设置前置套件，%s", err))
+			global.GVA_LOG.Debug(fmt.Sprintf("boomer debug 8 已设置前置步骤，%s", err))
 		}
 		testCase.Confing = *apiConfig
 		testCase.TestSteps = append(testCase.TestSteps, hrpCaseStep)
 	}
 
-	global.GVA_LOG.Debug(fmt.Sprintf("boomer debug 3 已设置前置套件，%d", apiConfig.ID))
+	global.GVA_LOG.Debug(fmt.Sprintf("boomer debug 3 已设置前置步骤，%d", apiConfig.ID))
 	r.TCM.Config = *apiConfig
 
 	//读取用例信息

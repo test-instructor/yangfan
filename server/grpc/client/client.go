@@ -95,11 +95,11 @@ func newClient(host string) (*Client, error) {
 		global.GVA_LOG.Error(fmt.Sprintf("dial remote server fail %v", err))
 		return nil, err
 	}
-
-	return &Client{
+	apiClient = &Client{
 		host:              host,
 		MasterClient:      master.NewMasterClient(c),
 		ToolsServerClient: tools.NewToolsServerClient(c),
 		RunClient:         run.NewRunCaseClient(c),
-	}, nil
+	}
+	return apiClient, nil
 }
