@@ -12,7 +12,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/code"
 	"github.com/test-instructor/yangfan/hrp/internal/json"
@@ -558,10 +559,10 @@ func (wd *wdaDriver) StopCamera() (err error) {
 	// stop camera, alias for app_terminate com.apple.camera
 	success, err := wd.AppTerminate("com.apple.camera")
 	if err != nil {
-		return errors.Wrap(err, "failed to terminate camera")
+		global.GVA_LOG.Error("failed to terminate camera", zap.Any("err", err))
 	}
 	if !success {
-		log.Warn().Msg("camera was not running")
+		global.GVA_LOG.Warn("camera was not running")
 	}
 	return nil
 }
@@ -851,7 +852,7 @@ func (wd *wdaDriver) triggerWDALog(data map[string]interface{}) (rawResp []byte,
 }
 
 func (wd *wdaDriver) StartCaptureLog(identifier ...string) error {
-	log.Info().Msg("start WDA log recording")
+	global.GVA_LOG.Info("start WDA log recording")
 	if identifier == nil {
 		identifier = []string{""}
 	}
@@ -871,20 +872,20 @@ type wdaResponse struct {
 }
 
 func (wd *wdaDriver) StopCaptureLog() (result interface{}, err error) {
-	log.Info().Msg("stop log recording")
+	global.GVA_LOG.Info("stop WDA log recording")
 	data := map[string]interface{}{"action": "stop"}
 	rawResp, err := wd.triggerWDALog(data)
 	if err != nil {
-		log.Error().Err(err).Bytes("rawResp", rawResp).Msg("failed to get WDA logs")
+		global.GVA_LOG.Error("stop WDA log recording failed", zap.Error(err), zap.ByteString("rawResp", rawResp))
 		return "", errors.Wrap(code.IOSCaptureLogError,
 			fmt.Sprintf("get WDA logs failed: %v", err))
 	}
 	reply := new(wdaResponse)
 	if err = json.Unmarshal(rawResp, reply); err != nil {
-		log.Error().Err(err).Bytes("rawResp", rawResp).Msg("failed to json.Unmarshal WDA logs")
+		global.GVA_LOG.Error("failed to json.Unmarshal WDA logs", zap.Error(err), zap.ByteString("rawResp", rawResp))
 		return reply, errors.Wrap(code.IOSCaptureLogError,
 			fmt.Sprintf("json.Unmarshal WDA logs failed: %v", err))
 	}
-	log.Info().Interface("value", reply.Value).Msg("get WDA log response")
+	global.GVA_LOG.Info("get WDA log response", zap.Any("value", reply.Value))
 	return reply.Value, nil
 }

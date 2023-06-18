@@ -2,7 +2,9 @@ package libimobiledevice
 
 import (
 	"bytes"
-	"log"
+	"fmt"
+
+	"github.com/test-instructor/yangfan/server/global"
 )
 
 type Packet interface {
@@ -24,5 +26,5 @@ func debugLog(msg string) {
 	if !debugFlag {
 		return
 	}
-	log.Printf("[%s-debug] %s\n", ProgramName, msg)
+	global.GVA_LOG.Info(fmt.Sprintf("[%s-debug] %s\n", ProgramName, msg))
 }

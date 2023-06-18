@@ -15,7 +15,8 @@ import (
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 )
 
 const (
@@ -171,9 +172,7 @@ func (s *Stat) Print() {
 			fmtb(s.Total),            // total
 		)
 	}
-	log.Info().
-		Interface("httpstat(ms)", s.Durations()).
-		Msg("HTTP latency statistics")
+	global.GVA_LOG.Info("HTTP latency statistics", zap.Any("httpstat(ms)", s.Durations()))
 }
 
 // WithHTTPStat is a wrapper of httptrace.WithClientTrace.

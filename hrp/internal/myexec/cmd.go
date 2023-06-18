@@ -8,7 +8,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/code"
 	"github.com/test-instructor/yangfan/hrp/internal/env"
@@ -43,7 +44,7 @@ func EnsurePython3Venv(venv string, packages ...string) (python3 string, err err
 		return "", errors.Wrap(code.InvalidPython3Venv, err.Error())
 	}
 	python3Executable = python3
-	log.Info().Str("Python3Executable", python3Executable).Msg("set python3 executable path")
+	global.GVA_LOG.Info("set python3 executable path", zap.String("Python3Executable", python3Executable))
 	return python3, nil
 }
 
@@ -62,7 +63,7 @@ func AssertPythonPackage(python3 string, pkgName, pkgVersion string) error {
 
 	// do not check version if pkgVersion is empty
 	if pkgVersion == "" {
-		log.Info().Str("name", pkgName).Msg("python package is ready")
+		global.GVA_LOG.Info("python package is ready", zap.String("name", pkgName))
 		return nil
 	}
 
@@ -73,7 +74,7 @@ func AssertPythonPackage(python3 string, pkgName, pkgVersion string) error {
 			pkgName, version, pkgVersion)
 	}
 
-	log.Info().Str("name", pkgName).Str("version", pkgVersion).Msg("python package is ready")
+	global.GVA_LOG.Info("python package is ready", zap.String("name", pkgName), zap.String("version", pkgVersion))
 	return nil
 }
 
@@ -98,11 +99,11 @@ func InstallPythonPackage(python3 string, pkg string) (err error) {
 	// check if pip available
 	err = RunCommand(python3, "-m", "pip", "--version")
 	if err != nil {
-		log.Warn().Msg("pip is not available")
+		global.GVA_LOG.Warn("pip is not available")
 		return errors.Wrap(err, "pip is not available")
 	}
 
-	log.Info().Str("pkgName", pkgName).Str("pkgVersion", pkgVersion).Msg("installing python package")
+	global.GVA_LOG.Info("installing python package", zap.String("pkgName", pkgName), zap.String("pkgVersion", pkgVersion))
 
 	// install package
 	pypiIndexURL := env.PYPI_INDEX_URL
@@ -121,13 +122,13 @@ func InstallPythonPackage(python3 string, pkg string) (err error) {
 
 func RunCommand(cmdName string, args ...string) error {
 	cmd := Command(cmdName, args...)
-	log.Info().Str("cmd", cmd.String()).Msg("exec command")
+	global.GVA_LOG.Info("exec command", zap.String("cmd", cmd.String()))
 
 	// add cmd dir path to $PATH
 	if cmdDir := filepath.Dir(cmdName); cmdDir != "" {
 		path := fmt.Sprintf("%s:%s", cmdDir, env.PATH)
 		if err := os.Setenv("PATH", path); err != nil {
-			log.Error().Err(err).Msg("set env $PATH failed")
+			global.GVA_LOG.Error("set env $PATH failed", zap.Error(err))
 			return err
 		}
 	}
@@ -138,7 +139,7 @@ func RunCommand(cmdName string, args ...string) error {
 
 	err := cmd.Run()
 	if err != nil {
-		log.Error().Err(err).Msg("exec command failed")
+		global.GVA_LOG.Error("exec command failed", zap.Error(err))
 		return err
 	}
 
@@ -146,7 +147,7 @@ func RunCommand(cmdName string, args ...string) error {
 }
 
 func ExecCommandInDir(cmd *exec.Cmd, dir string) error {
-	log.Info().Str("cmd", cmd.String()).Str("dir", dir).Msg("exec command")
+	global.GVA_LOG.Info("exec command", zap.String("cmd", cmd.String()), zap.String("dir", dir))
 	cmd.Dir = dir
 
 	// print output with colors
@@ -155,7 +156,7 @@ func ExecCommandInDir(cmd *exec.Cmd, dir string) error {
 
 	err := cmd.Run()
 	if err != nil {
-		log.Error().Err(err).Msg("exec command failed")
+		global.GVA_LOG.Error("exec command failed", zap.Error(err))
 		return err
 	}
 

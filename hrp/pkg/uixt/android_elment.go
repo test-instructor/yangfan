@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
 )
 
 var errElementNotImplemented = errors.New("element method not implemented")
@@ -68,7 +68,7 @@ func (ue uiaElement) TwoFingerTap() (err error) {
 
 func (ue uiaElement) TapWithNumberOfTaps(numberOfTaps, numberOfTouches int) (err error) {
 	// Todo: implement
-	log.Fatal().Msg("not support")
+	global.GVA_LOG.Fatal("not support")
 	return
 }
 

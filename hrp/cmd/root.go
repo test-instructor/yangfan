@@ -8,6 +8,8 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/cmd/adb"
 	"github.com/test-instructor/yangfan/hrp/cmd/ios"
@@ -42,7 +44,7 @@ Copyright 2017 debugtalk`,
 		}
 		if !logJSON {
 			log.Logger = zerolog.New(zerolog.ConsoleWriter{NoColor: noColor, Out: os.Stderr}).With().Timestamp().Logger()
-			log.Info().Msg("Set log to color console")
+			global.GVA_LOG.Info("Set log to color console", zap.String("level", logLevel))
 		}
 	},
 	Version:          version.VERSION,
@@ -72,7 +74,7 @@ func Execute() int {
 
 func setLogLevel(level string) {
 	level = strings.ToUpper(level)
-	log.Info().Str("level", level).Msg("Set log level")
+	global.GVA_LOG.Info("Set log level", zap.String("level", level))
 	switch level {
 	case "DEBUG":
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)

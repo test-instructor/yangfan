@@ -1,11 +1,12 @@
 package main
 
 import (
-	"log"
 	"os"
 	"strings"
 
 	"github.com/test-instructor/yangfan/hrp/pkg/gadb"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -16,7 +17,7 @@ func main() {
 	checkErr(err)
 
 	if len(devices) == 0 {
-		log.Fatalln("list of devices is empty")
+		global.GVA_LOG.Fatal("list of devices is empty")
 	}
 
 	dev := devices[0]
@@ -25,23 +26,21 @@ func main() {
 	apk, err := os.Open(userHomeDir + "/Desktop/xuexi_android_10002068.apk")
 	checkErr(err)
 
-	log.Println("starting to push apk")
+	global.GVA_LOG.Info("starting to push apk")
 
 	remotePath := "/data/local/tmp/xuexi_android_10002068.apk"
 	err = dev.PushFile(apk, remotePath)
 	checkErr(err, "adb push")
 
-	log.Println("push completed")
-
-	log.Println("starting to install apk")
+	global.GVA_LOG.Info("starting to install apk")
 
 	shellOutput, err := dev.RunShellCommand("pm install", remotePath)
 	checkErr(err, "pm install")
 	if !strings.Contains(shellOutput, "Success") {
-		log.Fatalln("fail to install: ", shellOutput)
+		global.GVA_LOG.Fatal("fail to install", zap.String("output", shellOutput))
 	}
 
-	log.Println("install completed")
+	global.GVA_LOG.Info("install completed")
 
 }
 
@@ -55,5 +54,5 @@ func checkErr(err error, msg ...string) {
 		output = msg[0] + " "
 	}
 	output += err.Error()
-	log.Fatalln(output)
+	global.GVA_LOG.Fatal(output)
 }

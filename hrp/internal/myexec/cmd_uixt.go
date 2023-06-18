@@ -10,7 +10,6 @@ import (
 	"syscall"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 )
 
 func getPython3Executable(venvDir string) string {
@@ -20,11 +19,7 @@ func getPython3Executable(venvDir string) string {
 func ensurePython3Venv(venv string, packages ...string) (python3 string, err error) {
 	python3 = getPython3Executable(venv)
 
-	log.Info().
-		Str("python3", python3).
-		Interface("packages", packages).
-		Msg("ensure python3 venv")
-
+	global.GVA_LOG.Info("ensure python3 venv", zap.String("python3", python3), zap.Any("packages", packages))
 	// check if python3 venv is available
 	if !isPython3(python3) {
 		// python3 venv not available, create one

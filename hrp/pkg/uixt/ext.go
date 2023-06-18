@@ -14,7 +14,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 )
 
 type MobileMethod string
@@ -233,7 +234,7 @@ func (dExt *DriverExt) takeScreenShot() (raw *bytes.Buffer, err error) {
 		return dExt.frame, nil
 	}
 	if raw, err = dExt.Driver.Screenshot(); err != nil {
-		log.Error().Err(err).Msg("takeScreenShot failed")
+		global.GVA_LOG.Error("takeScreenShot failed", zap.Any("err", err))
 		return nil, err
 	}
 	return raw, nil
@@ -373,7 +374,7 @@ func (dExt *DriverExt) IsImageExist(text string) bool {
 var errActionNotImplemented = errors.New("UI action not implemented")
 
 func (dExt *DriverExt) DoAction(action MobileAction) error {
-	log.Info().Str("method", string(action.Method)).Interface("params", action.Params).Msg("start UI action")
+	global.GVA_LOG.Info("start UI action", zap.String("method", string(action.Method)), zap.Any("params", action.Params))
 
 	switch action.Method {
 	case AppInstall:
@@ -507,7 +508,7 @@ func (dExt *DriverExt) DoAction(action MobileAction) error {
 				return errors.Wrap(err, "failed to terminate app")
 			}
 			if !success {
-				log.Warn().Str("bundleId", bundleId).Msg("app was not running")
+				global.GVA_LOG.Warn("app was not running", zap.String("bundleId", bundleId))
 			}
 			return nil
 		}
@@ -633,13 +634,13 @@ func (dExt *DriverExt) DoAction(action MobileAction) error {
 		return fmt.Errorf("invalid sleep params: %v(%T)", action.Params, action.Params)
 	case CtlScreenShot:
 		// take snapshot
-		log.Info().Msg("take snapshot for current screen")
+		global.GVA_LOG.Info("take snapshot for current screen")
 		screenshotPath, err := dExt.ScreenShot(fmt.Sprintf("%d_screenshot_%d",
 			dExt.StartTime.Unix(), time.Now().Unix()))
 		if err != nil {
 			return errors.Wrap(err, "take screenshot failed")
 		}
-		log.Info().Str("path", screenshotPath).Msg("take screenshot")
+		global.GVA_LOG.Info("take screenshot", zap.String("path", screenshotPath))
 		dExt.ScreenShots = append(dExt.ScreenShots, screenshotPath)
 		return err
 	case CtlStartCamera:
@@ -680,18 +681,11 @@ func (dExt *DriverExt) DoValidation(check, assert, expected string, message ...s
 		if message == nil {
 			message = []string{""}
 		}
-		log.Error().
-			Str("assert", assert).
-			Str("expect", expected).
-			Str("msg", message[0]).
-			Msg("validate UI failed")
+		global.GVA_LOG.Error("validate UI failed", zap.String("assert", assert), zap.String("expect", expected), zap.String("msg", message[0]))
 		return false
 	}
 
-	log.Info().
-		Str("assert", assert).
-		Str("expect", expected).
-		Msg("validate UI success")
+	global.GVA_LOG.Info("validate UI success", zap.String("assert", assert), zap.String("expect", expected))
 	return true
 }
 

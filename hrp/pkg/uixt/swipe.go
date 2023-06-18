@@ -5,7 +5,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
 	"github.com/test-instructor/yangfan/hrp/internal/code"
@@ -80,11 +81,11 @@ func (dExt *DriverExt) SwipeUntil(direction interface{}, findCondition Action, f
 		}
 		if d, ok := direction.(string); ok {
 			if err := dExt.SwipeTo(d); err != nil {
-				log.Error().Err(err).Msgf("swipe %s failed", d)
+				global.GVA_LOG.Error("swipe %s failed", zap.String("err", err.Error()), zap.String("d", d))
 			}
 		} else if d, ok := direction.([]float64); ok {
 			if err := dExt.SwipeRelative(d[0], d[1], d[2], d[3]); err != nil {
-				log.Error().Err(err).Msgf("swipe %v failed", d)
+				global.GVA_LOG.Error("swipe %v failed", zap.String("err", err.Error()), zap.Any("d", d))
 			}
 		} else if d, ok := direction.([]interface{}); ok {
 			sx, _ := builtin.Interface2Float64(d[0])
@@ -92,7 +93,7 @@ func (dExt *DriverExt) SwipeUntil(direction interface{}, findCondition Action, f
 			ex, _ := builtin.Interface2Float64(d[2])
 			ey, _ := builtin.Interface2Float64(d[3])
 			if err := dExt.SwipeRelative(sx, sy, ex, ey); err != nil {
-				log.Error().Err(err).Msgf("swipe (%v, %v) to (%v, %v) failed", sx, sy, ex, ey)
+				global.GVA_LOG.Error(fmt.Sprintf("swipe (%v, %v) to (%v, %v) failed", sx, sy, ex, ey), zap.String("err", err.Error()))
 			}
 		}
 		// wait for swipe action to completed and content to load completely
@@ -114,7 +115,7 @@ func (dExt *DriverExt) LoopUntil(findAction, findCondition, foundAction Action, 
 		}
 
 		if err := findAction(dExt); err != nil {
-			log.Error().Err(err).Msgf("find action failed")
+			global.GVA_LOG.Error("find action failed", zap.String("err", err.Error()))
 		}
 
 		// wait interval between each findAction

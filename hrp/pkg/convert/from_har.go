@@ -10,7 +10,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp"
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
@@ -418,11 +419,8 @@ func (c *CaseHar) prepareTestSteps() ([]*hrp.TStep, error) {
 }
 
 func (c *CaseHar) prepareTestStep(entry *Entry) (*hrp.TStep, error) {
-	log.Info().
-		Str("method", entry.Request.Method).
-		Str("url", entry.Request.URL).
-		Msg("convert teststep")
 
+	global.GVA_LOG.Info("convert teststep", zap.String("method", entry.Request.Method), zap.String("url", entry.Request.URL))
 	step := &stepFromHAR{
 		TStep: hrp.TStep{
 			Request:    &hrp.Request{},
@@ -465,7 +463,7 @@ func (s *stepFromHAR) makeRequestMethod(entry *Entry) error {
 func (s *stepFromHAR) makeRequestURL(entry *Entry) error {
 	u, err := url.Parse(entry.Request.URL)
 	if err != nil {
-		log.Error().Err(err).Msg("make request url failed")
+		global.GVA_LOG.Error("make request url failed", zap.Error(err))
 		return err
 	}
 	s.Request.URL = fmt.Sprintf("%s://%s", u.Scheme, u.Host+u.Path)
@@ -517,7 +515,7 @@ func (s *stepFromHAR) makeRequestBody(entry *Entry) error {
 		} else {
 			err := json.Unmarshal([]byte(entry.Request.PostData.Text), &body)
 			if err != nil {
-				log.Error().Err(err).Msg("make request body failed")
+				global.GVA_LOG.Error("make request body failed", zap.Error(err))
 				return err
 			}
 		}
@@ -534,7 +532,7 @@ func (s *stepFromHAR) makeRequestBody(entry *Entry) error {
 		s.Request.Body = entry.Request.PostData.Text
 	} else {
 		// TODO
-		log.Error().Msgf("makeRequestBody: Not implemented for mimeType %s", mimeType)
+		global.GVA_LOG.Error("makeRequestBody: Not implemented for mimeType", zap.String("mimeType", mimeType))
 	}
 	return nil
 }

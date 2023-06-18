@@ -5,8 +5,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp"
 	"github.com/test-instructor/yangfan/hrp/pkg/boomer"
@@ -73,13 +74,13 @@ func makeCurlTestCase(args []string) *hrp.TestCase {
 	curlCommand := makeCurlCommand(args)
 	tCase, err := convert.LoadSingleCurlCase(curlCommand)
 	if err != nil {
-		log.Error().Err(err).Msg("convert curl command failed")
+		global.GVA_LOG.Error("convert curl command failed", zap.Error(err))
 		os.Exit(1)
 	}
 	casePath, _ := os.Getwd()
 	testCase, err := tCase.ToTestCase(casePath)
 	if err != nil {
-		log.Error().Err(err).Msg("convert testcase to failed")
+		global.GVA_LOG.Error("convert testcase to failed", zap.Error(err))
 		os.Exit(1)
 	}
 	return testCase

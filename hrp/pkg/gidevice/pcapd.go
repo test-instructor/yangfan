@@ -1,9 +1,8 @@
 package gidevice
 
 import (
-	"log"
-
 	"github.com/test-instructor/yangfan/hrp/pkg/gidevice/pkg/libimobiledevice"
+	"github.com/test-instructor/yangfan/server/global"
 )
 
 type pcapdClient struct {
@@ -40,7 +39,7 @@ func (c *pcapdClient) Packet() <-chan []byte {
 				}
 				res, err := c.c.CreatePacket(raw)
 				if err != nil {
-					log.Println("failed to create packet")
+					global.GVA_LOG.Info("failed to create packet")
 					return
 				}
 				packetCh <- res

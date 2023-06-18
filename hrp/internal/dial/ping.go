@@ -10,7 +10,8 @@ import (
 
 	"github.com/go-ping/ping"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
 )
@@ -51,7 +52,7 @@ func DoPing(pingOptions *PingOptions, args []string) (err error) {
 			pingResultPath := filepath.Join(dir, pingResultName)
 			err = builtin.Dump2JSON(pingResult, pingResultPath)
 			if err != nil {
-				log.Error().Err(err).Msg("save ping result failed")
+				global.GVA_LOG.Error("save ping result failed", zap.Error(err))
 			}
 		}
 	}()
@@ -60,14 +61,14 @@ func DoPing(pingOptions *PingOptions, args []string) (err error) {
 
 	parsedURL, err := url.Parse(pingTarget)
 	if err == nil && parsedURL.Host != "" {
-		log.Info().Msgf("parse input url %v and extract host %v", pingTarget, parsedURL.Host)
+		global.GVA_LOG.Info("parse input url", zap.String("url", pingTarget), zap.String("host", parsedURL.Host))
 		pingTarget = strings.Split(parsedURL.Host, ":")[0]
 	}
 
-	log.Info().Msgf("ping host %v", pingTarget)
+	global.GVA_LOG.Info("ping host", zap.String("host", pingTarget))
 	pinger, err := ping.NewPinger(pingTarget)
 	if err != nil {
-		log.Error().Err(err).Msgf("fail to get pinger for %s", pingTarget)
+		global.GVA_LOG.Error("fail to get pinger", zap.Error(err))
 		pingResult.Suc = false
 		pingResult.ErrMsg = err.Error()
 		pingResult.DebugLog = err.Error()
@@ -92,7 +93,7 @@ func DoPing(pingOptions *PingOptions, args []string) (err error) {
 
 	err = pinger.Run() // blocks until finished
 	if err != nil {
-		log.Error().Err(err).Msgf("fail to run ping for %s", parsedURL)
+		global.GVA_LOG.Error("fail to run ping", zap.Error(err))
 		pingResult.Suc = false
 		pingResult.ErrMsg = err.Error()
 		pingResult.DebugLog = err.Error()

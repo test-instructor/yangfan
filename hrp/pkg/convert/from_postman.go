@@ -7,7 +7,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp"
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
@@ -193,10 +194,7 @@ func extractItemList(item TItem, itemList *[]TItem) {
 }
 
 func (c *CasePostman) prepareTestStep(item *TItem) (*hrp.TStep, error) {
-	log.Info().
-		Str("method", item.Request.Method).
-		Str("url", item.Request.URL.Raw).
-		Msg("convert teststep")
+	global.GVA_LOG.Info("convert teststep", zap.String("method", item.Request.Method), zap.String("url", item.Request.URL.Raw))
 
 	step := &stepFromPostman{
 		TStep: hrp.TStep{
@@ -298,7 +296,7 @@ func (s *stepFromPostman) parseRequestCookiesMap(cookies string) {
 		cookie = strings.TrimSpace(cookie)
 		index := strings.Index(cookie, "=")
 		if index == -1 {
-			log.Warn().Str("cookie", cookie).Msg("cookie format invalid")
+			global.GVA_LOG.Warn("cookie format invalid", zap.String("cookie", cookie))
 			continue
 		}
 		s.Request.Cookies[cookie[:index]] = cookie[index+1:]
