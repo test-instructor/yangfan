@@ -1,0 +1,854 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: yangfan
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: docker-config-yaml
+  namespace: yangfan
+data:
+  docker.config.yaml: |
+    captcha:
+      key-long: 1
+      img-width: 240
+      img-height: 80
+    cors:
+      mode: whitelist
+      whitelist:
+        - allow-origin: example1.com
+          allow-methods: GET, POST
+          allow-headers: content-type
+          expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers,Content-Type
+          allow-credentials: true
+        - allow-origin: example2.com
+          allow-methods: GET, POST
+          allow-headers: content-type
+          expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers,Content-Type
+          allow-credentials: true
+    db-list:
+      - disable: false
+        type: ""
+        alias-name: ""
+        path: ""
+        port: ""
+        config: ""
+        db-name: ""
+        username: ""
+        password: ""
+        max-idle-conns: 10
+        max-open-conns: 100
+        log-mode: ""
+        log-zap: false
+    fs:
+      appID:
+      appSecret:
+      redirectUri: http://127.0.0.1:8080/api/fsLogin/login
+      authorityID: 666
+      projectID: 1
+    jwt:
+      signing-key: 6c8c168a-d00b-4929-a4cd-75ede0ad8cce
+      expires-time: 604800
+      buffer-time: 86400
+      issuer: qmPlus
+    local:
+      path: uploads/file
+      store-path: uploads/file
+    mysql:
+      path: 192.168.0.222
+      port: "3306"
+      config: charset=utf8mb4&parseTime=True&loc=Local
+      db-name: yangfan
+      username: root
+      password: 123456
+      max-idle-conns: 10
+      max-open-conns: 100
+      log-mode: error
+      log-zap: false
+    redis:
+      db: 0
+      addr: 127.0.0.1:6378
+      password: "nYhjtZ2vri6KDl7Z"
+    system:
+      env: public
+      addr: 8888
+      db-type: mysql
+      oss-type: local
+      use-multipoint: false
+      use-redis: false
+      iplimit-count: 15000
+      iplimit-time: 3600
+    timer:
+      start: true
+      spec: '@daily'
+      with_seconds: false
+      detail:
+        - tableName: sys_operation_records
+          compareField: created_at
+          interval: 2160h
+        - tableName: jwt_blacklists
+          compareField: created_at
+          interval: 168h
+    zap:
+      level: error
+      prefix: '[yangfan]'
+      format: console
+      director: log
+      encode-level: LowercaseColorLevelEncoder
+      stacktrace-key: stacktrace
+      max-age: 30
+      show-line: true
+      log-in-console: true
+    yang-fan:
+      background: "yangfan-server"
+      background-grpc-port: 7967
+      master: "yangfan-master"
+      master-boomer-prot: 9093
+      master-server-prot: 7966
+      prometheus-pushgateway-url: http://yangfan-pushgateway:9091/
+      grafana-host: http://192.168.0.184:31030/
+      grafana-dashboard: ERv3OaBPYe6A
+      grafana-dashboard-name: yangfan-for-distributed-load-testing
+      grafana-dashboard-stats: WLVhzvOg56Mg
+      grafana-dashboard-stats-name: yangfan-for-node-status
+      run-server: yangfan-run
+      run-server-grpc-port: 7968
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: yangfan
+data:
+  my.conf: |
+    server {
+        listen       8080;
+        server_name localhost;
+
+        #charset koi8-r;
+        #access_log  logs/host.access.log  main;
+
+        location / {
+            root /yangfan/web;
+            add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
+            try_files $uri $uri/ /index.html;
+        }
+
+        location /api {
+            proxy_set_header Host $http_host;
+            proxy_set_header  X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            rewrite ^/api/(.*)$ /$1 break;         #��д
+            proxy_pass http://yangfan-server:8888;     # ���ô����������Э��͵�ַ
+         }
+
+        location /api/swagger/index.html {
+            proxy_pass http://yangfan-server:8888/swagger/index.html;
+         }
+     }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: yangfan-grafana-config
+  namespace: yangfan
+data:
+  grafana.ini: |
+    [provisioning]
+    enabled = true
+    directory = /etc/grafana/provisioning
+    
+    [datasource.prometheus]
+    type = prometheus
+    url = http://yangfan-prometheus:9090
+    access = proxy
+    
+    [dashboard]
+    enabled = true
+    default_home_dashboard_path = /etc/grafana/provisioning/yangfan-for-distributed-load-testing.json
+    kiosk = false
+    
+    [dashboard.providers.yangfan-for-distributed-load-testing]
+    enabled = true
+    provider = file
+    path = /etc/grafana/provisioning/yangfan-for-distributed-load-testing.json
+    
+    [dashboard.providers.yangfan-for-node-status.json]
+    enabled = true
+    provider = file
+    path = /etc/grafana/provisioning/yangfan-for-node-status.json
+
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: yangfan-grafana-dashboard-config
+  namespace: yangfan
+data:
+  yangfan-for-distributed-load-testing.json: |
+    {"__inputs":[{"name":"yangfan-prometheus","label":"Prometheus","description":"","type":"datasource","pluginId":"prometheus","pluginName":"Prometheus"}],"__elements":{},"__requires":[{"type":"grafana","id":"grafana","name":"Grafana","version":"9.5.1"},{"type":"panel","id":"graph","name":"Graph(old)","version":""},{"type":"datasource","id":"prometheus","name":"Prometheus","version":"1.0.0"},{"type":"panel","id":"stat","name":"Stat","version":""},{"type":"panel","id":"table-old","name":"Table(old)","version":""}],"annotations":{"list":[{"builtIn":1,"datasource":{"type":"datasource","uid":"grafana"},"enable":true,"hide":true,"iconColor":"rgba(0,211,255,1)","limit":100,"name":"Annotations&Alerts","showIn":0,"target":{"limit":100,"matchAny":false,"tags":[],"type":"dashboard"},"type":"dashboard"}]},"description":"YangfanforDistributedLoadTesting","editable":true,"fiscalYearStartMonth":0,"gnetId":11985,"graphTooltip":0,"id":null,"links":[{"asDropdown":false,"icon":"externallink","includeVars":false,"keepTime":false,"tags":[],"targetBlank":false,"title":"Newlink","tooltip":"","type":"dashboards","url":""}],"liveNow":false,"panels":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"fieldConfig":{"defaults":{"color":{"fixedColor":"rgb(31,120,193)","mode":"fixed"},"mappings":[{"options":{"match":"null","result":{"text":"N/A"}},"type":"special"}],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null},{"color":"red","value":80}]},"unit":"none"},"overrides":[]},"gridPos":{"h":4,"w":2,"x":0,"y":0},"id":2,"links":[],"maxDataPoints":100,"options":{"colorMode":"none","graphMode":"area","justifyMode":"auto","orientation":"horizontal","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"textMode":"auto"},"pluginVersion":"9.5.1","targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"expr":"sum(users{mode=\"worker\",report=\"$report\"})","interval":"","intervalFactor":2,"legendFormat":"","refId":"A","step":20}],"title":"Users","type":"stat"},{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"fieldConfig":{"defaults":{"color":{"fixedColor":"rgb(31,120,193)","mode":"fixed"},"mappings":[{"options":{"match":"null","result":{"text":"N/A"}},"type":"special"}],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null},{"color":"red","value":80}]},"unit":"none"},"overrides":[]},"gridPos":{"h":4,"w":2,"x":2,"y":0},"id":33,"links":[],"maxDataPoints":100,"options":{"colorMode":"none","graphMode":"area","justifyMode":"auto","orientation":"horizontal","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"textMode":"auto"},"pluginVersion":"9.5.1","targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"expr":"count(users{mode=\"worker\",report=\"$report\"})","interval":"","intervalFactor":2,"legendFormat":"","refId":"A","step":20}],"title":"Workers","type":"stat"},{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"fieldConfig":{"defaults":{"color":{"fixedColor":"rgb(31,120,193)","mode":"fixed"},"decimals":2,"mappings":[{"options":{"match":"null","result":{"text":"N/A"}},"type":"special"}],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null},{"color":"red","value":80}]},"unit":"short"},"overrides":[]},"gridPos":{"h":4,"w":4,"x":4,"y":0},"id":4,"links":[],"maxDataPoints":100,"options":{"colorMode":"none","graphMode":"area","justifyMode":"auto","orientation":"horizontal","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"textMode":"auto"},"pluginVersion":"9.5.1","targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"expr":"sum(total_rps{mode=\"worker\",report=\"$report\"})","intervalFactor":2,"refId":"A","step":20}],"title":"TotalRPS","type":"stat"},{"aliasColors":{},"bars":false,"dashLength":10,"dashes":false,"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"fieldConfig":{"defaults":{"unit":"percentunit"},"overrides":[]},"fill":1,"fillGradient":0,"gridPos":{"h":7,"w":8,"x":8,"y":0},"hiddenSeries":false,"id":21,"legend":{"avg":false,"current":false,"max":false,"min":false,"show":true,"total":false,"values":false},"lines":true,"linewidth":1,"nullPointMode":"null","options":{"alertThreshold":true},"percentage":false,"pluginVersion":"9.5.1","pointradius":2,"points":false,"renderer":"flot","seriesOverrides":[],"spaceLength":10,"stack":false,"steppedLine":false,"targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"sum(total_num_failures{mode=\"worker\",report=\"$report\",method!~\"transation|testcase\"})/sum(total_num_requests{mode=\"worker\",report=\"$report\",method!~\"transation|testcase\"})","interval":"","legendFormat":"total","range":true,"refId":"A"}],"thresholds":[],"timeRegions":[],"title":"TotalFailRatio","tooltip":{"shared":true,"sort":0,"value_type":"individual"},"type":"graph","xaxis":{"mode":"time","show":true,"values":[]},"yaxes":[{"$$hashKey":"object:16153","format":"percentunit","logBase":1,"show":true},{"$$hashKey":"object:16154","format":"short","logBase":1,"show":true}],"yaxis":{"align":false}},{"aliasColors":{},"bars":false,"dashLength":10,"dashes":false,"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"description":"","fill":1,"fillGradient":0,"gridPos":{"h":7,"w":8,"x":16,"y":0},"hiddenSeries":false,"id":23,"legend":{"avg":false,"current":false,"max":false,"min":false,"show":true,"total":false,"values":false},"lines":true,"linewidth":1,"nullPointMode":"null","options":{"alertThreshold":true},"percentage":false,"pluginVersion":"9.5.1","pointradius":2,"points":false,"renderer":"flot","seriesOverrides":[],"spaceLength":10,"stack":false,"steppedLine":false,"targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"sum(total_fail_per_sec{mode=\"worker\",report=\"$report\"})","legendFormat":"total","range":true,"refId":"A"}],"thresholds":[],"timeRegions":[],"title":"TotalFailsPerSecond","tooltip":{"shared":true,"sort":0,"value_type":"individual"},"type":"graph","xaxis":{"mode":"time","show":true,"values":[]},"yaxes":[{"$$hashKey":"object:2350","format":"short","logBase":1,"show":true},{"$$hashKey":"object:2351","format":"short","logBase":1,"show":true}],"yaxis":{"align":false}},{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"fieldConfig":{"defaults":{"color":{"mode":"thresholds"},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null}]}},"overrides":[]},"gridPos":{"h":3,"w":4,"x":0,"y":4},"id":18,"options":{"colorMode":"value","graphMode":"area","justifyMode":"auto","orientation":"auto","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"textMode":"auto"},"pluginVersion":"9.5.1","targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"expr":"sum(total_num_requests{mode=\"worker\",report=\"$report\",method!~\"transaction|testcase\"})","interval":"","legendFormat":"","refId":"A"}],"title":"TotalRequests","type":"stat"},{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"fieldConfig":{"defaults":{"color":{"mode":"thresholds"},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"orange","value":null}]}},"overrides":[]},"gridPos":{"h":3,"w":4,"x":4,"y":4},"id":19,"options":{"colorMode":"value","graphMode":"area","justifyMode":"auto","orientation":"auto","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"textMode":"auto"},"pluginVersion":"9.5.1","targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"expr":"sum(total_num_failures{mode=\"worker\",report=\"$report\",method!~\"transaction|testcsae\"})","interval":"","legendFormat":"","refId":"A"}],"title":"TotalFailures","type":"stat"},{"aliasColors":{},"bars":false,"dashLength":10,"dashes":false,"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"decimals":0,"editable":true,"error":false,"fieldConfig":{"defaults":{"links":[]},"overrides":[]},"fill":1,"fillGradient":0,"gridPos":{"h":8,"w":8,"x":0,"y":7},"hiddenSeries":false,"id":15,"interval":"","legend":{"avg":false,"current":false,"max":false,"min":false,"show":true,"total":false,"values":false},"lines":true,"linewidth":1,"links":[],"nullPointMode":"connected","options":{"alertThreshold":true},"paceLength":10,"percentage":false,"pluginVersion":"9.5.1","pointradius":5,"points":false,"renderer":"flot","seriesOverrides":[{"alias":"AVGMAX","yaxis":2}],"spaceLength":10,"stack":false,"steppedLine":false,"targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"avg(response_time{mode=\"worker\",report=\"$report\",quantile=\"0.95\",method!~\"transaction|testcase\"})by(name,method)","interval":"","intervalFactor":2,"legendFormat":"{{method}}-{{name}}PCT95","range":true,"refId":"D","step":2},{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"avg(response_time{mode=\"worker\",report=\"$report\",quantile=\"0.5\",method!~\"transaction|testcase\"})by(name,method)","interval":"","legendFormat":"{{method}}-{{name}}PCT50","range":true,"refId":"A"}],"thresholds":[],"timeRegions":[],"title":"TotalResponseTimes(PCT95/PCT50)","tooltip":{"msResolution":false,"shared":true,"sort":0,"value_type":"individual"},"type":"graph","xaxis":{"mode":"time","show":true,"values":[]},"yaxes":[{"$$hashKey":"object:2433","decimals":0,"format":"ms","logBase":1,"show":true},{"$$hashKey":"object:2434","decimals":0,"format":"ms","logBase":1,"show":true}],"yaxis":{"align":false}},{"aliasColors":{},"bars":false,"dashLength":10,"dashes":false,"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"decimals":0,"editable":true,"error":false,"fieldConfig":{"defaults":{"links":[]},"overrides":[]},"fill":1,"fillGradient":0,"gridPos":{"h":8,"w":8,"x":8,"y":7},"hiddenSeries":false,"id":28,"legend":{"avg":false,"current":false,"max":false,"min":false,"show":true,"total":false,"values":false},"lines":true,"linewidth":1,"links":[],"nullPointMode":"connected","options":{"alertThreshold":true},"paceLength":10,"percentage":false,"pluginVersion":"9.5.1","pointradius":5,"points":false,"renderer":"flot","seriesOverrides":[{"alias":"AVGMAX","yaxis":2}],"spaceLength":10,"stack":false,"steppedLine":false,"targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"total_max_response_time{name!~\"Total\",mode=\"worker\",report=\"$report\",method!~\"transaction|testcase\"}","intervalFactor":2,"legendFormat":"{{method}}-{{name}}MAX","range":true,"refId":"A","step":2},{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"total_min_response_time{name!~\"Total\",mode=\"worker\",report=\"$report\",method!~\"transaction|testcase\"}","intervalFactor":2,"legendFormat":"{{method}}-{{name}}MIN","metric":"","range":true,"refId":"B","step":2},{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"response_time_sum{mode=\"worker\",report=\"$report\",method!=\"transaction\"}/response_time_count{mode=\"standalone\",method!~\"transaction|testcase\"}","intervalFactor":2,"legendFormat":"{{method}}-{{name}}AVG","metric":"","range":true,"refId":"C","step":2},{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"response_time{quantile=\"0.5\",mode=\"worker\",report=\"$report\",method!~\"transaction|testcase\"}","intervalFactor":2,"legendFormat":"{{method}}-{{name}}MEDIAN","range":true,"refId":"D","step":2}],"thresholds":[],"timeRegions":[],"title":"TotalResponseTimes","tooltip":{"msResolution":false,"shared":true,"sort":0,"value_type":"individual"},"type":"graph","xaxis":{"mode":"time","show":true,"values":[]},"yaxes":[{"$$hashKey":"object:2517","decimals":0,"format":"ms","logBase":1,"show":true},{"$$hashKey":"object:2518","decimals":0,"format":"ms","logBase":1,"show":true}],"yaxis":{"align":false}},{"columns":[],"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"fontSize":"100%","gridPos":{"h":8,"w":8,"x":16,"y":7},"id":16,"showHeader":true,"sort":{"col":0,"desc":true},"styles":[{"$$hashKey":"object:3452","alias":"Time","align":"auto","dateFormat":"YYYY-MM-DDHH:mm:ss","pattern":"Time","type":"hidden"},{"$$hashKey":"object:3453","alias":"Requests","align":"auto","colors":["rgba(245,54,54,0.9)","rgba(237,129,40,0.89)","rgba(50,172,45,0.97)"],"dateFormat":"YYYY-MM-DDHH:mm:ss","decimals":0,"mappingType":1,"pattern":"Value","thresholds":[],"type":"number","unit":"none"},{"$$hashKey":"object:3454","alias":"Method","align":"auto","colors":["rgba(245,54,54,0.9)","rgba(237,129,40,0.89)","rgba(50,172,45,0.97)"],"dateFormat":"YYYY-MM-DDHH:mm:ss","decimals":2,"mappingType":1,"pattern":"method","thresholds":[],"type":"string","unit":"short"},{"$$hashKey":"object:3455","alias":"URL","align":"auto","colors":["rgba(245,54,54,0.9)","rgba(237,129,40,0.89)","rgba(50,172,45,0.97)"],"dateFormat":"YYYY-MM-DDHH:mm:ss","decimals":2,"mappingType":1,"pattern":"name","thresholds":[],"type":"string","unit":"short"},{"$$hashKey":"object:3456","alias":"Error","align":"auto","colors":["rgba(245,54,54,0.9)","rgba(237,129,40,0.89)","rgba(50,172,45,0.97)"],"dateFormat":"YYYY-MM-DDHH:mm:ss","decimals":2,"link":false,"mappingType":1,"pattern":"error","thresholds":[],"type":"string","unit":"short"},{"$$hashKey":"object:3457","alias":"","align":"left","colors":["rgba(245,54,54,0.9)","rgba(237,129,40,0.89)","rgba(50,172,45,0.97)"],"decimals":2,"pattern":"/.*/","thresholds":[],"type":"number","unit":"short"}],"targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"expr":"sum(errors{mode=\"worker\",report=\"$report\"})by(method,name,error)","format":"table","hide":false,"instant":true,"interval":"","intervalFactor":1,"legendFormat":"","refId":"A"}],"title":"Errors","transform":"table","type":"table-old"},{"columns":[],"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"fontSize":"100%","gridPos":{"h":6,"w":24,"x":0,"y":15},"id":32,"showHeader":true,"sort":{"col":0,"desc":true},"styles":[{"$$hashKey":"object:115","alias":"Time","align":"auto","dateFormat":"YYYY-MM-DDHH:mm:ss","pattern":"Time","type":"hidden"},{"$$hashKey":"object:116","alias":"Method","align":"auto","colors":["rgba(245,54,54,0.9)","rgba(237,129,40,0.89)","rgba(50,172,45,0.97)"],"dateFormat":"YYYY-MM-DDHH:mm:ss","decimals":2,"mappingType":1,"pattern":"method","preserveFormat":false,"thresholds":[],"type":"string","unit":"short"},{"$$hashKey":"object:117","alias":"URL","align":"auto","colors":["rgba(245,54,54,0.9)","rgba(237,129,40,0.89)","rgba(50,172,45,0.97)"],"dateFormat":"YYYY-MM-DDHH:mm:ss","decimals":2,"mappingType":1,"pattern":"name","thresholds":[],"type":"string","unit":"short"},{"$$hashKey":"object:118","alias":"MINRT","align":"","colors":["rgba(245,54,54,0.9)","rgba(237,129,40,0.89)","rgba(50,172,45,0.97)"],"dateFormat":"YYYY-MM-DDHH:mm:ss","decimals":0,"mappingType":1,"pattern":"Value#A","thresholds":[],"type":"number","unit":"ms"},{"$$hashKey":"object:119","alias":"Errors","align":"","colors":["rgba(245,54,54,0.9)","rgba(237,129,40,0.89)","rgba(50,172,45,0.97)"],"decimals":0,"pattern":"Value#B","thresholds":[],"type":"number","unit":"none"},{"$$hashKey":"object:120","alias":"MAXRT","align":"","colors":["rgba(245,54,54,0.9)","rgba(237,129,40,0.89)","rgba(50,172,45,0.97)"],"dateFormat":"YYYY-MM-DDHH:mm:ss","decimals":0,"mappingType":1,"pattern":"Value#C","thresholds":[],"type":"number","unit":"ms"},{"$$hashKey":"object:121","alias":"MEDIANRT","align":"auto","colors":["rgba(245,54,54,0.9)","rgba(237,129,40,0.89)","rgba(50,172,45,0.97)"],"dateFormat":"YYYY-MM-DDHH:mm:ss","decimals":0,"mappingType":1,"pattern":"Value#D","thresholds":[],"type":"number","unit":"ms"},{"$$hashKey":"object:122","alias":"AVGRT","align":"auto","colors":["rgba(245,54,54,0.9)","rgba(237,129,40,0.89)","rgba(50,172,45,0.97)"],"dateFormat":"YYYY-MM-DDHH:mm:ss","decimals":2,"mappingType":1,"pattern":"Value#E","thresholds":[],"type":"number","unit":"ms"},{"$$hashKey":"object:123","alias":"ErrorsRatio","align":"auto","colors":["rgba(245,54,54,0.9)","rgba(237,129,40,0.89)","rgba(50,172,45,0.97)"],"dateFormat":"YYYY-MM-DDHH:mm:ss","decimals":2,"mappingType":1,"pattern":"Value#H","thresholds":[],"type":"number","unit":"reqps"},{"$$hashKey":"object:124","alias":"Requests","align":"auto","colors":["rgba(245,54,54,0.9)","rgba(237,129,40,0.89)","rgba(50,172,45,0.97)"],"dateFormat":"YYYY-MM-DDHH:mm:ss","decimals":0,"mappingType":1,"pattern":"Value#F","thresholds":[],"type":"number","unit":"none"},{"$$hashKey":"object:125","alias":"RequestsRatio","align":"auto","colors":["rgba(245,54,54,0.9)","rgba(237,129,40,0.89)","rgba(50,172,45,0.97)"],"dateFormat":"YYYY-MM-DDHH:mm:ss","decimals":2,"mappingType":1,"pattern":"Value#G","thresholds":[],"type":"number","unit":"reqps"}],"targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"expr":"min(min_response_time{mode=\"worker\",report=\"$report\"})by(method,name)","format":"table","instant":true,"interval":"","legendFormat":"","refId":"A"},{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"expr":"max(max_response_time{mode=\"worker\",report=\"$report\"})by(method,name)","format":"table","instant":true,"interval":"","legendFormat":"","refId":"C"},{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"expr":"avg(average_response_time{mode=\"worker\",report=\"$report\"})by(method,name)","format":"table","instant":true,"interval":"","legendFormat":"","refId":"E"},{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"expr":"avg(median_response_time{mode=\"worker\",report=\"$report\"})by(method,name)","format":"table","instant":true,"interval":"","legendFormat":"","refId":"D"},{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"expr":"sum(current_rps{mode=\"worker\",report=\"$report\"})by(method,name)","format":"table","instant":true,"interval":"","legendFormat":"","refId":"G"},{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"expr":"sum(num_failures{mode=\"worker\",report=\"$report\"})by(method,name)","format":"table","instant":true,"interval":"","legendFormat":"","refId":"B"},{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"expr":"sum(num_requests{mode=\"worker\",report=\"$report\"})by(method,name)","format":"table","instant":true,"interval":"","legendFormat":"","refId":"F"},{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"expr":"sum(num_failures{mode=\"worker\",report=\"$report\"})by(method,name)/sum(num_requests{mode=\"worker\",report=\"$report\"})by(method,name)","format":"table","instant":true,"interval":"","legendFormat":"","refId":"H"}],"title":"Endpoints","transform":"table","type":"table-old"},{"aliasColors":{},"bars":false,"dashLength":10,"dashes":false,"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"decimals":0,"editable":true,"error":false,"fieldConfig":{"defaults":{"links":[]},"overrides":[]},"fill":1,"fillGradient":0,"gridPos":{"h":8,"w":8,"x":0,"y":21},"hiddenSeries":false,"id":6,"legend":{"avg":false,"current":false,"max":false,"min":false,"show":true,"total":false,"values":false},"lines":true,"linewidth":1,"links":[],"nullPointMode":"connected","options":{"alertThreshold":true},"paceLength":10,"percentage":false,"pluginVersion":"9.5.1","pointradius":5,"points":false,"renderer":"flot","seriesOverrides":[{"alias":"AVGMAX","yaxis":2}],"spaceLength":10,"stack":false,"steppedLine":false,"targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"max(max_response_time{mode=\"worker\",report=\"$report\",method!~\"transaction|testcase\"})","intervalFactor":2,"legendFormat":"{{method}}-{{name}}MAX","range":true,"refId":"A","step":2},{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"min(min_response_time{mode=\"worker\",report=\"$report\",method!~\"transaction|testcase\"})","intervalFactor":2,"legendFormat":"{{method}}-{{name}}MIN","metric":"","range":true,"refId":"B","step":2},{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"avg(average_response_time{mode=\"worker\",report=\"$report\",method!~\"transaction|testcase\"})","intervalFactor":2,"legendFormat":"{{method}}-{{name}}AVG","metric":"","range":true,"refId":"C","step":2},{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"avg(median_response_time{mode=\"worker\",report=\"$report\",method!~\"transaction|testcase\"})","intervalFactor":2,"legendFormat":"{{method}}-{{name}}MEDIAN","range":true,"refId":"D","step":2}],"thresholds":[],"timeRegions":[],"title":"ResponseTimes(3s)","tooltip":{"msResolution":false,"shared":true,"sort":0,"value_type":"individual"},"type":"graph","xaxis":{"mode":"time","show":true,"values":[]},"yaxes":[{"$$hashKey":"object:1312","decimals":0,"format":"ms","logBase":1,"show":true},{"$$hashKey":"object:1313","decimals":0,"format":"ms","logBase":1,"show":true}],"yaxis":{"align":false}},{"aliasColors":{},"bars":false,"dashLength":10,"dashes":false,"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editable":true,"error":false,"fieldConfig":{"defaults":{"links":[]},"overrides":[]},"fill":1,"fillGradient":0,"gridPos":{"h":8,"w":8,"x":8,"y":21},"hiddenSeries":false,"id":7,"legend":{"avg":false,"current":false,"max":false,"min":false,"show":true,"total":false,"values":false},"lines":true,"linewidth":1,"links":[],"nullPointMode":"connected","options":{"alertThreshold":true},"paceLength":10,"percentage":false,"pluginVersion":"9.5.1","pointradius":5,"points":false,"renderer":"flot","seriesOverrides":[{"alias":"fail_ratio[%]","yaxis":2}],"spaceLength":10,"stack":false,"steppedLine":false,"targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"sum(current_rps{mode=\"worker\",report=\"$report\",method!~\"transaction|testcase\"})","format":"time_series","interval":"","intervalFactor":2,"legendFormat":"total","range":true,"refId":"A","step":2}],"thresholds":[],"timeRegions":[],"title":"RequestsPerEndpoint/s(3s)","tooltip":{"msResolution":false,"shared":true,"sort":0,"value_type":"individual"},"type":"graph","xaxis":{"mode":"time","show":true,"values":[]},"yaxes":[{"$$hashKey":"object:1229","format":"reqps","logBase":1,"show":true},{"$$hashKey":"object:1230","format":"percent","logBase":1,"min":"0","show":true}],"yaxis":{"align":false}},{"aliasColors":{},"bars":false,"dashLength":10,"dashes":false,"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"description":"","fill":1,"fillGradient":0,"gridPos":{"h":8,"w":8,"x":16,"y":21},"hiddenSeries":false,"id":26,"legend":{"avg":false,"current":false,"max":false,"min":false,"show":true,"total":false,"values":false},"lines":true,"linewidth":1,"nullPointMode":"null","options":{"alertThreshold":true},"percentage":false,"pluginVersion":"9.5.1","pointradius":2,"points":false,"renderer":"flot","seriesOverrides":[],"spaceLength":10,"stack":false,"steppedLine":false,"targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"sum(num_failures{mode=\"worker\",report=\"$report\",method!~\"transaction|testcase\"})/sum(num_requests{mode=\"worker\",report=\"$report\",method!~\"transaction|testcase\"})","legendFormat":"total","range":true,"refId":"A"}],"thresholds":[],"timeRegions":[],"title":"FailsPerEndpoint/s(3s)","tooltip":{"shared":true,"sort":0,"value_type":"individual"},"type":"graph","xaxis":{"mode":"time","show":true,"values":[]},"yaxes":[{"$$hashKey":"object:1146","format":"short","logBase":1,"show":true},{"$$hashKey":"object:1147","format":"short","logBase":1,"show":true}],"yaxis":{"align":false}},{"aliasColors":{},"bars":false,"dashLength":10,"dashes":false,"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"fill":1,"fillGradient":0,"gridPos":{"h":9,"w":8,"x":0,"y":29},"hiddenSeries":false,"id":29,"legend":{"avg":false,"current":false,"max":false,"min":false,"show":true,"total":false,"values":false},"lines":true,"linewidth":1,"nullPointMode":"null","options":{"alertThreshold":true},"percentage":false,"pluginVersion":"8.5.2","pointradius":2,"points":false,"renderer":"flot","seriesOverrides":[],"spaceLength":10,"stack":false,"steppedLine":false,"targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"sum(total_num_requests{mode=\"worker\",report=\"$report\",method=\"transaction\",name!=\"Action\"})","interval":"","legendFormat":"total","range":true,"refId":"A"},{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"sum(total_num_requests{mode=\"worker\",report=\"$report\",method=\"transaction\",name!=\"Action\"})by(name)","hide":false,"legendFormat":"{{method}}-{{name}}","range":true,"refId":"B"}],"thresholds":[],"timeRegions":[],"title":"Transations","tooltip":{"shared":true,"sort":0,"value_type":"individual"},"type":"graph","xaxis":{"mode":"time","show":true,"values":[]},"yaxes":[{"$$hashKey":"object:1063","format":"short","logBase":1,"show":true},{"$$hashKey":"object:1064","format":"short","logBase":1,"show":true}],"yaxis":{"align":false}},{"aliasColors":{},"bars":false,"dashLength":10,"dashes":false,"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"fill":1,"fillGradient":0,"gridPos":{"h":9,"w":8,"x":8,"y":29},"hiddenSeries":false,"id":30,"legend":{"avg":false,"current":false,"max":false,"min":false,"show":true,"total":false,"values":false},"lines":true,"linewidth":1,"nullPointMode":"null","options":{"alertThreshold":true},"percentage":false,"pluginVersion":"8.5.2","pointradius":2,"points":false,"renderer":"flot","seriesOverrides":[],"spaceLength":10,"stack":false,"steppedLine":false,"targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"sum(total_num_requests{mode=\"worker\",report=\"$report\",method=\"transaction\",name!=\"Action\"}-total_num_failures{mode=\"worker\",report=\"$report\",method=\"transaction\",name!=\"Action\"})","interval":"","legendFormat":"total","range":true,"refId":"A"},{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"sum(total_num_requests{mode=\"worker\",report=\"$report\",method=\"transaction\",name!=\"Action\"})by(name,method)-sum(total_num_failures{mode=\"worker\",report=\"$report\",method=\"transaction\",name!=\"Action\"})by(name,method)","hide":false,"legendFormat":"{{method}}-{{name}}","range":true,"refId":"B"}],"thresholds":[],"timeRegions":[],"title":"TransationsPassed","tooltip":{"shared":true,"sort":0,"value_type":"individual"},"type":"graph","xaxis":{"mode":"time","show":true,"values":[]},"yaxes":[{"$$hashKey":"object:980","format":"short","logBase":1,"show":true},{"$$hashKey":"object:981","format":"short","logBase":1,"show":true}],"yaxis":{"align":false}},{"aliasColors":{},"bars":false,"dashLength":10,"dashes":false,"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"fieldConfig":{"defaults":{"unit":"short"},"overrides":[]},"fill":1,"fillGradient":0,"gridPos":{"h":9,"w":8,"x":16,"y":29},"hiddenSeries":false,"id":31,"legend":{"avg":false,"current":false,"max":false,"min":false,"show":true,"total":false,"values":false},"lines":true,"linewidth":1,"nullPointMode":"null","options":{"alertThreshold":true},"percentage":false,"pluginVersion":"8.5.2","pointradius":2,"points":false,"renderer":"flot","seriesOverrides":[],"spaceLength":10,"stack":false,"steppedLine":false,"targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"sum(total_num_requests{mode=\"worker\",report=\"$report\",method=\"transaction\",name!=\"Action\"}-total_num_failures{mode=\"worker\",report=\"$report\",method=\"transaction\",name!=\"Action\"})/sum(total_num_requests{mode=\"worker\",report=\"$report\",method=\"transaction\",name!=\"Action\"})","interval":"","legendFormat":"total","range":true,"refId":"A"},{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"(sum(total_num_requests{mode=\"worker\",report=\"$report\",method=\"transaction\",name!=\"Action\"})by(method,name)-sum(total_num_failures{mode=\"worker\",report=\"$report\",method=\"transaction\",name!=\"Action\"})by(method,name))/sum(total_num_requests{mode=\"worker\",report=\"$report\",method=\"transaction\",name!=\"Action\"})by(method,name)","hide":false,"legendFormat":"{{method}}-{{name}}","range":true,"refId":"B"}],"thresholds":[],"timeRegions":[],"title":"TransationsSuccessRate","tooltip":{"shared":true,"sort":0,"value_type":"individual"},"type":"graph","xaxis":{"mode":"time","show":true,"values":[]},"yaxes":[{"$$hashKey":"object:816","format":"short","logBase":1,"show":true},{"$$hashKey":"object:817","format":"short","logBase":1,"show":true}],"yaxis":{"align":false}}],"refresh":"30s","schemaVersion":38,"style":"dark","tags":[],"templating":{"list":[{"current":{},"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"definition":"label_values(report)","hide":0,"includeAll":false,"label":"reportname","multi":false,"name":"report","options":[],"query":{"query":"label_values(report)","refId":"PrometheusVariableQueryEditor-VariableQuery"},"refresh":1,"regex":"","skipUrlSync":false,"sort":0,"type":"query"}]},"time":{"from":"now-30s","to":"now"},"timepicker":{"refresh_intervals":["30s","1m","5m","15m","30m","1h","2h","1d"],"time_options":["5m","15m","1h","6h","12h","24h","2d","7d","30d"]},"timezone":"browser","title":"YangfanforDistributedLoadTesting","uid":"ERv3OaBPYe6A","version":2,"weekStart":""}
+  yangfan-for-node-status.json: |
+    {"__inputs":[{"name":"yangfan-prometheus","label":"Prometheus","description":"","type":"datasource","pluginId":"prometheus","pluginName":"Prometheus"}],"__elements":{},"__requires":[{"type":"grafana","id":"grafana","name":"Grafana","version":"9.5.1"},{"type":"panel","id":"graph","name":"Graph(old)","version":""},{"type":"datasource","id":"prometheus","name":"Prometheus","version":"1.0.0"}],"annotations":{"list":[{"builtIn":1,"datasource":{"type":"grafana","uid":"--Grafana--"},"enable":true,"hide":true,"iconColor":"rgba(0,211,255,1)","name":"Annotations&Alerts","type":"dashboard"}]},"description":"yangfanfornodestatus","editable":true,"fiscalYearStartMonth":0,"gnetId":3662,"graphTooltip":0,"id":null,"links":[],"liveNow":false,"panels":[{"aliasColors":{},"bars":false,"dashLength":10,"dashes":false,"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"fill":1,"fillGradient":0,"gridPos":{"h":7,"w":8,"x":0,"y":0},"hiddenSeries":false,"id":3,"legend":{"avg":false,"current":false,"max":false,"min":false,"show":true,"total":false,"values":false},"lines":true,"linewidth":1,"links":[],"nullPointMode":"null","options":{"alertThreshold":true},"percentage":false,"pluginVersion":"9.5.1","pointradius":5,"points":false,"renderer":"flot","seriesOverrides":[],"spaceLength":10,"stack":false,"steppedLine":false,"targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"master_workers{mode=\"stats\",report=\"$report\"}","format":"time_series","intervalFactor":2,"legendFormat":"{{instance}}","range":true,"refId":"A","step":4}],"thresholds":[],"timeRegions":[],"title":"numberofworknodes","tooltip":{"shared":true,"sort":0,"value_type":"individual"},"type":"graph","xaxis":{"mode":"time","show":true,"values":[]},"yaxes":[{"$$hashKey":"object:273","format":"short","label":"Number","logBase":1,"min":"0","show":true},{"$$hashKey":"object:274","format":"short","logBase":1,"show":true}],"yaxis":{"align":false}},{"aliasColors":{},"bars":false,"dashLength":10,"dashes":false,"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"fill":1,"fillGradient":0,"gridPos":{"h":7,"w":8,"x":8,"y":0},"hiddenSeries":false,"id":7,"legend":{"avg":false,"current":false,"max":false,"min":false,"show":true,"total":false,"values":false},"lines":true,"linewidth":1,"links":[],"nullPointMode":"null","options":{"alertThreshold":true},"percentage":false,"pluginVersion":"9.5.1","pointradius":5,"points":false,"renderer":"flot","seriesOverrides":[],"spaceLength":10,"stack":false,"steppedLine":false,"targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"sum(work_user_count{mode=\"stats\",report=\"$report\"})by(ip)","format":"time_series","intervalFactor":2,"legendFormat":"{{interval}}","range":true,"refId":"A","step":20}],"thresholds":[],"timeRegions":[],"title":"workusercount","tooltip":{"shared":true,"sort":0,"value_type":"individual"},"type":"graph","xaxis":{"mode":"time","show":true,"values":[]},"yaxes":[{"$$hashKey":"object:330","format":"short","label":"Number","logBase":1,"min":"0","show":true},{"$$hashKey":"object:331","format":"short","logBase":1,"show":true}],"yaxis":{"align":false}},{"aliasColors":{},"bars":false,"dashLength":10,"dashes":false,"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"fill":1,"fillGradient":0,"gridPos":{"h":7,"w":8,"x":16,"y":0},"hiddenSeries":false,"id":5,"legend":{"avg":false,"current":false,"max":false,"min":false,"show":true,"total":false,"values":false},"lines":true,"linewidth":1,"links":[],"nullPointMode":"null","options":{"alertThreshold":true},"percentage":false,"pluginVersion":"9.5.1","pointradius":5,"points":false,"renderer":"flot","seriesOverrides":[],"spaceLength":10,"stack":false,"steppedLine":false,"targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"master_target_users{mode=\"stats\",report=\"$report\"}","format":"time_series","intervalFactor":2,"legendFormat":"{{instance}}","range":true,"refId":"A","step":4}],"thresholds":[],"timeRegions":[],"title":"numberofconcurrentusers","tooltip":{"shared":true,"sort":0,"value_type":"individual"},"type":"graph","xaxis":{"mode":"time","show":true,"values":[]},"yaxes":[{"$$hashKey":"object:387","format":"short","label":"Number","logBase":1,"min":"0","show":true},{"$$hashKey":"object:388","format":"short","logBase":1,"show":true}],"yaxis":{"align":false}},{"aliasColors":{},"bars":false,"dashLength":10,"dashes":false,"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"fill":1,"fillGradient":0,"gridPos":{"h":13,"w":12,"x":0,"y":7},"hiddenSeries":false,"id":15,"legend":{"avg":false,"current":false,"max":false,"min":false,"show":true,"total":false,"values":false},"lines":true,"linewidth":1,"links":[],"nullPointMode":"null","options":{"alertThreshold":true},"percentage":false,"pluginVersion":"9.5.1","pointradius":5,"points":false,"renderer":"flot","seriesOverrides":[],"spaceLength":10,"stack":false,"steppedLine":false,"targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"sum(work_cpu_usage{mode=\"stats\",report=\"$report\"})by(ip)","format":"time_series","intervalFactor":2,"legendFormat":"{{slice}}","range":true,"refId":"A","step":4}],"thresholds":[],"timeRegions":[],"title":"workcpuusage","tooltip":{"shared":true,"sort":0,"value_type":"individual"},"type":"graph","xaxis":{"mode":"time","show":true,"values":[]},"yaxes":[{"$$hashKey":"object:112","format":"short","label":"%","logBase":1,"min":"0","show":true},{"$$hashKey":"object:113","format":"short","label":"","logBase":1,"show":true}],"yaxis":{"align":false}},{"aliasColors":{},"bars":false,"dashLength":10,"dashes":false,"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"fill":1,"fillGradient":0,"gridPos":{"h":13,"w":12,"x":12,"y":7},"hiddenSeries":false,"id":1,"legend":{"avg":false,"current":false,"max":false,"min":false,"show":true,"total":false,"values":false},"lines":true,"linewidth":1,"links":[],"nullPointMode":"null","options":{"alertThreshold":true},"percentage":false,"pluginVersion":"9.5.1","pointradius":5,"points":false,"renderer":"flot","seriesOverrides":[],"spaceLength":10,"stack":false,"steppedLine":false,"targets":[{"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"editorMode":"code","expr":"sum(work_memory_usage{mode=\"stats\",report=\"$report\"})by(ip)","format":"time_series","intervalFactor":2,"legendFormat":"{{instance}}","range":true,"refId":"A","step":4}],"thresholds":[],"timeRegions":[],"title":"workmemoryusage","tooltip":{"shared":true,"sort":0,"value_type":"individual"},"type":"graph","xaxis":{"mode":"time","show":true,"values":[]},"yaxes":[{"$$hashKey":"object:169","format":"short","label":"%","logBase":1,"min":"0","show":true},{"$$hashKey":"object:170","format":"short","logBase":1,"show":true}],"yaxis":{"align":false}}],"refresh":"30s","schemaVersion":38,"style":"dark","tags":[],"templating":{"list":[{"current":{},"datasource":{"type":"prometheus","uid":"yangfan-prometheus-6a65cy2u"},"definition":"label_values(report)","hide":0,"includeAll":false,"label":"reportname","multi":false,"name":"report","options":[],"query":{"query":"label_values(report)","refId":"PrometheusVariableQueryEditor-VariableQuery"},"refresh":1,"regex":"","skipUrlSync":false,"sort":0,"type":"query"}]},"time":{"from":"now-30m","to":"now"},"timepicker":{"refresh_intervals":["30s","1m","5m","15m","30m","1h","2h","1d"],"time_options":["5m","15m","1h","6h","12h","24h","2d","7d","30d"]},"timezone":"browser","title":"yangfanfornodestatus","uid":"WLVhzvOg56Mg","version":6,"weekStart":""}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yangfan-grafana
+  namespace: yangfan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yangfan-grafana
+  template:
+    metadata:
+      labels:
+        app: yangfan-grafana
+    spec:
+      containers:
+        - name: yangfan-grafana
+          image: grafana/grafana:9.5.1
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: yangfan-grafana-config
+              mountPath: /etc/grafana
+            - name: yangfan-grafana-dashboard-config
+              mountPath: /etc/grafana/dashboards
+            - name: yangfan-grafana-prometheus-config
+              mountPath: /etc/grafana/provisioning/datasources
+            - name: yangfan-grafana-provisioning-dashboard-config
+              mountPath: /etc/grafana/provisioning/dashboards
+          env:
+            - name: GF_AUTH_ANONYMOUS_ENABLED
+              value: "true"
+            - name: GF_AUTH_ANONYMOUS_ORG_ROLE
+              value: "Viewer"
+            - name: GF_SECURITY_ALLOW_EMBEDDING
+              value: "true"
+            - name: GF_PATHS_CONFIG
+              value: /etc/grafana/grafana.ini
+            - name: TZ
+              value: Asia/Shanghai
+      volumes:
+        - name: yangfan-grafana-config
+          configMap:
+            name: yangfan-grafana-config
+        - name: yangfan-grafana-dashboard-config
+          configMap:
+            name: yangfan-grafana-dashboard-config
+        - name: yangfan-grafana-prometheus-config
+          configMap:
+            name: yangfan-grafana-prometheus-config
+        - name: yangfan-grafana-provisioning-dashboard-config
+          configMap:
+            name: yangfan-grafana-provisioning-dashboard-config
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: yangfan-grafana-prometheus-config
+  namespace: yangfan
+data:
+  yangfan.grafana.prometheus.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://yangfan-prometheus:9090
+        uid: yangfan-prometheus-6a65cy2u
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: yangfan-prometheus-config
+  namespace: yangfan
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval:     3s # By default, scrape targets every 15 seconds.
+      evaluation_interval: 3s # Evaluate rules every 15 seconds.
+      # Attach these extra labels to all timeseries collected by this Prometheus instance.
+      external_labels:
+        monitor: 'codelab-monitor'
+    
+    rule_files:
+      - 'prometheus.rules.yml'
+    
+    scrape_configs:
+      - job_name: 'prometheus'
+        # Override the global default and scrape targets from this job every 5 seconds.
+        scrape_interval: 3s
+        static_configs:
+          - targets: ['yangfan-prometheus:9090']
+      
+      - job_name: 'pushgateway'  # metrics_path defaults to '/metrics'  # scheme defaults to 'http'.
+        scrape_interval: 3s
+        static_configs:
+          - targets: ['yangfan-pushgateway:9091']
+            labels:
+              instance: yangfan
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: yangfan-grafana-provisioning-dashboard-config
+  namespace: yangfan
+data:
+  yangfan.grafana.dashboard.yaml: |
+    apiVersion: 1
+    providers:
+      - name: yangfan-for-distributed-load-testing
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /etc/grafana/dashboards/yangfan-for-distributed-load-testing.json
+      - name: yangfan-for-node-status
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /etc/grafana/dashboards/yangfan-for-node-status.json
+
+
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: yangfan-grafana-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs
+  hostPath:
+    path: /var/lib/grafana
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: yangfan-grafana-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yangfan-grafana
+  namespace: yangfan
+spec:
+  selector:
+    app: yangfan-grafana
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+      nodePort: 31030
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yangfan-prometheus
+  namespace: yangfan
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: yangfan-prometheus
+  template:
+    metadata:
+      labels:
+        app: yangfan-prometheus
+    spec:
+      containers:
+        - name: yangfan-prometheus
+          image: prom/prometheus
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            - name: yangfan-prometheus-config
+              mountPath: /etc/prometheus
+            - name: yangfan-prometheus-storage
+              mountPath: /prometheus/data
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+      volumes:
+        - name: yangfan-prometheus-config
+          configMap:
+            name: yangfan-prometheus-config
+        - name: yangfan-prometheus-storage
+          persistentVolumeClaim:
+            claimName: yangfan-prometheus-pvc
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: yangfan-prometheus-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs
+  hostPath:
+    path: /data/prometheus
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: yangfan-prometheus-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: nfs
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yangfan-prometheus
+  namespace: yangfan
+spec:
+  selector:
+    app: yangfan-prometheus
+  type: NodePort
+  ports:
+    - port: 9090
+      targetPort: 9090
+      nodePort: 31090
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yangfan-pushgateway
+  namespace: yangfan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yangfan-pushgateway
+  template:
+    metadata:
+      labels:
+        app: yangfan-pushgateway
+    spec:
+      containers:
+        - name: yangfan-pushgateway
+          image: prom/pushgateway
+          ports:
+            - containerPort: 9091
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yangfan-pushgateway
+  namespace: yangfan
+spec:
+  selector:
+    app: yangfan-pushgateway
+  type: NodePort
+  ports:
+    - port: 9091
+      targetPort: 9091
+      nodePort: 31091
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yangfan-grpcdemo
+  labels:
+    app: yangfan-grpcdemo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yangfan-grpcdemo
+  template:
+    metadata:
+      labels:
+        app: yangfan-grpcdemo
+    spec:
+      containers:
+        - name: yangfan-grpcdemo
+          image: registry.cn-hangzhou.aliyuncs.com/yangfanz/grpcdemo
+          ports:
+            - containerPort: 7967
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yangfan-grpcdemo
+spec:
+  selector:
+    app: yangfan-grpcdemo
+  ports:
+    - protocol: TCP
+      port: 7967
+      targetPort: 7967
+      nodePort: 31967
+  type: NodePort
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yangfan-httpdemo
+  labels:
+    app: yangfan-httpdemo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yangfan-httpdemo
+  template:
+    metadata:
+      labels:
+        app: yangfan-httpdemo
+    spec:
+      containers:
+        - name: yangfan-httpdemo
+          image: registry.cn-hangzhou.aliyuncs.com/yangfanz/httpdemo
+          ports:
+            - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yangfan-httpdemo-service
+spec:
+  selector:
+    app: yangfan-httpdemo
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+      nodePort: 31888
+  type: NodePort
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yangfan-master
+  namespace: yangfan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yangfan-master
+  template:
+    metadata:
+      labels:
+        app: yangfan-master
+    spec:
+      containers:
+        - name: yangfan-master
+          image: registry.cn-hangzhou.aliyuncs.com/yangfanz/master:latest
+          ports:
+            - containerPort: 7966
+              protocol: TCP
+            - containerPort: 9093
+              protocol: TCP
+            - containerPort: 9092
+              protocol: TCP
+          volumeMounts:
+            - name: docker-config-yaml
+              mountPath: /yangfan/docker.config.yaml
+              subPath: docker.config.yaml
+      volumes:
+        - name: docker-config-yaml
+          configMap:
+            name: docker-config-yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yangfan-master
+  namespace: yangfan
+spec:
+  selector:
+    app: yangfan-master
+  ports:
+    - protocol: TCP
+      port: 7966
+      targetPort: 7966
+      name: master-server
+    - protocol: TCP
+      port: 9093
+      targetPort: 9093
+      name: master-boomer
+    - protocol: TCP
+      port: 9092
+      targetPort: 9092
+      name: master-default
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yangfan-run
+  namespace: yangfan
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: yangfan-run
+  template:
+    metadata:
+      labels:
+        app: yangfan-run
+    spec:
+      containers:
+        - name: yangfan-run
+          image: registry.cn-hangzhou.aliyuncs.com/yangfanz/run:latest
+          env:
+            - name: MASTER_SERVER
+              value: yangfan-master-service
+          ports:
+            - containerPort: 7968
+              protocol: TCP
+          volumeMounts:
+            - name: docker-config-yaml
+              mountPath: /yangfan/docker.config.yaml
+              subPath: docker.config.yaml
+      volumes:
+        - name: docker-config-yaml
+          configMap:
+            name: docker-config-yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yangfan-run
+  namespace: yangfan
+spec:
+  selector:
+    app: yangfan-run
+  ports:
+    - protocol: TCP
+      port: 7968
+      targetPort: 7968
+      name: grpc
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yangfan-server
+  namespace: yangfan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yangfan-server
+  template:
+    metadata:
+      labels:
+        app: yangfan-server
+    spec:
+      containers:
+        - name: yangfan-server
+          image: registry.cn-hangzhou.aliyuncs.com/yangfanz/server:latest
+          ports:
+            - containerPort: 8888
+              protocol: TCP
+            - containerPort: 7967
+              protocol: TCP
+          volumeMounts:
+            - name: docker-config-yaml
+              mountPath: /yangfan/docker.config.yaml
+              subPath: docker.config.yaml
+      volumes:
+        - name: docker-config-yaml
+          configMap:
+            name: docker-config-yaml
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yangfan-server
+  namespace: yangfan
+spec:
+  selector:
+    app: yangfan-server
+  ports:
+    - protocol: TCP
+      port: 8888
+      targetPort: 8888
+      name: http
+    - protocol: TCP
+      port: 7967
+      targetPort: 7967
+      name: grpc
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yangfan-timer
+  namespace: yangfan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yangfan-timer
+  template:
+    metadata:
+      labels:
+        app: yangfan-timer
+    spec:
+      containers:
+        - name: yangfan-timer
+          image: registry.cn-hangzhou.aliyuncs.com/yangfanz/timer:latest
+          ports:
+            - containerPort: 8888
+              protocol: TCP
+            - containerPort: 7967
+              protocol: TCP
+          volumeMounts:
+            - name: docker-config-yaml
+              mountPath: /yangfan/docker.config.yaml
+              subPath: docker.config.yaml
+      volumes:
+        - name: docker-config-yaml
+          configMap:
+            name: docker-config-yaml
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yangfan-work
+  namespace: yangfan
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: yangfan-work
+  template:
+    metadata:
+      labels:
+        app: yangfan-work
+    spec:
+      containers:
+        - name: yangfan-work
+          image: registry.cn-hangzhou.aliyuncs.com/yangfanz/work:latest
+          env:
+            - name: MASTER_SERVER
+              value: yangfan-master-service
+          ports:
+            - containerPort: 7966
+              protocol: TCP
+          volumeMounts:
+            - name: docker-config-yaml
+              mountPath: /yangfan/docker.config.yaml
+              subPath: docker.config.yaml
+      volumes:
+        - name: docker-config-yaml
+          configMap:
+            name: docker-config-yaml
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yangfan-web
+  namespace: yangfan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yangfan-web
+  template:
+    metadata:
+      labels:
+        app: yangfan-web
+    spec:
+      containers:
+        - name: yangfan-web
+          image: registry.cn-hangzhou.aliyuncs.com/yangfanz/web:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1000Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/my.conf
+              subPath: my.conf
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yangfan-web
+  namespace: yangfan
+spec:
+  selector:
+    app: yangfan-web
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 31080
+      protocol: TCP

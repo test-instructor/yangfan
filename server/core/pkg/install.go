@@ -29,6 +29,7 @@ func PyPkgInstallServiceV2(pyPkg request.HrpPyPkgRequest) (err error) {
 	if !strings.Contains(string(outputUpdatePip), "Successfully installed") && !strings.Contains(string(outputUpdatePip), "Successfully uninstalled") {
 		global.GVA_LOG.Warn("更新pip失败", zap.String("output", string(outputUpdatePip)))
 	}
+	global.GVA_LOG.Debug("更新pip信息", zap.String("output", string(outputUpdatePip)))
 	output, _ := exec.Command(PipEnvPath, installArgs...).Output()
 	global.GVA_LOG.Debug("安装Python包", zap.String("output", string(output)))
 	if !strings.Contains(string(output), "Successfully installed") && !strings.Contains(string(output), "Successfully uninstalled") {

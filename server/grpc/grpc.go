@@ -144,6 +144,7 @@ func newGrpcServerInstallPackage() *ServerTools {
 				ServerToolsObj = &ServerTools{
 					pkgClients:   make(map[string]tools.ToolsServer_InstallPackageStreamingMessageServer),
 					timerClients: make(map[string]tools.ToolsServer_SetTaskStreamingMessageServer),
+					clientsLock:  sync.RWMutex{},
 				}
 			}
 		})

@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: httpdemo-deployment
+  name: yangfan-httpdemo
   labels:
-    app: httpdemo
+    app: yangfan-httpdemo
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: httpdemo
+      app: yangfan-httpdemo
   template:
     metadata:
       labels:
-        app: httpdemo
+        app: yangfan-httpdemo
     spec:
       containers:
-        - name: httpdemo
+        - name: yangfan-httpdemo
           image: registry.cn-hangzhou.aliyuncs.com/yangfanz/httpdemo
           ports:
             - containerPort: 8080

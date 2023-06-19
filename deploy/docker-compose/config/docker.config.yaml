@@ -65,7 +65,7 @@ timer:
       compareField: created_at
       interval: 168h
 zap:
-  level: debug
+  level: error
   prefix: '[yangfan]'
   format: console
   director: log

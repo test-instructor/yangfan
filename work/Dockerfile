@@ -14,6 +14,7 @@ ENV TZ=Asia/Shanghai
 WORKDIR /yangfan
 COPY --from=builder /go/src/yangfan/work .
 COPY --from=builder /go/src/yangfan/get-pip.py .
+COPY --from=builder /go/src/yangfan/hrp/pkg/boomer/data/x509 /root/.hrp/x509
 COPY --from=builder /go/src/yangfan/deploy/docker-compose/config/docker.config.yaml .
 
 EXPOSE 8888

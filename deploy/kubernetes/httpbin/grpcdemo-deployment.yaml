@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: grpcdemo-deployment
+  name: yangfan-grpcdemo
   labels:
-    app: grpcdemo
+    app: yangfan-grpcdemo
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: grpcdemo
+      app: yangfan-grpcdemo
   template:
     metadata:
       labels:
-        app: grpcdemo
+        app: yangfan-grpcdemo
     spec:
       containers:
-        - name: grpcdemo
+        - name: yangfan-grpcdemo
           image: registry.cn-hangzhou.aliyuncs.com/yangfanz/grpcdemo
           ports:
             - containerPort: 7967
