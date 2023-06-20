@@ -308,7 +308,7 @@ func (c *grpcClient) sendMessage(msg *genericMessage) {
 	err := c.config.getBiStreamClient().Send(&messager.StreamRequest{Type: msg.Type, Data: msg.Data, NodeID: msg.NodeID})
 	if err == nil {
 		atomic.StoreInt32(&c.failCount, 0)
-		global.GVA_LOG.Error(fmt.Sprintf("failed to send message: %v", err))
+		global.GVA_LOG.Info("failed to send message: %v", zap.Int32("failCount", c.failCount))
 		return
 	}
 	if msg.Type == "heartbeat" {
