@@ -28,6 +28,7 @@ import (
 
 type HTTPMethod string
 
+// 定义请求方法常量
 const (
 	httpGET     HTTPMethod = "GET"
 	httpHEAD    HTTPMethod = "HEAD"
@@ -40,6 +41,7 @@ const (
 
 // Request represents HTTP request data structure.
 // This is used for teststep.
+// 请求结构体
 type Request struct {
 	Method         HTTPMethod             `json:"method" yaml:"method"` // required
 	URL            string                 `json:"url" yaml:"url"`       // required
@@ -56,15 +58,18 @@ type Request struct {
 	Upload         map[string]interface{} `json:"upload,omitempty" yaml:"upload,omitempty"`
 }
 
+// 创建requestBuilder对象，初始化数据
 func newRequestBuilder(parser *Parser, config *TConfig, stepRequest *Request) *requestBuilder {
 	// convert request struct to map
+	// 将request对象转换为map
 	jsonRequest, _ := json.Marshal(stepRequest)
 	var requestMap map[string]interface{}
 	_ = json.Unmarshal(jsonRequest, &requestMap)
-
+	// 创建http.Request对象
 	request := &http.Request{
 		Header: make(http.Header),
 	}
+	// 设置http版本
 	if stepRequest.HTTP2 {
 		request.ProtoMajor = 2
 		request.ProtoMinor = 0
@@ -72,7 +77,7 @@ func newRequestBuilder(parser *Parser, config *TConfig, stepRequest *Request) *r
 		request.ProtoMajor = 1
 		request.ProtoMinor = 1
 	}
-
+	// 返回requestBuilder对象
 	return &requestBuilder{
 		stepRequest: stepRequest,
 		req:         request,
@@ -82,6 +87,11 @@ func newRequestBuilder(parser *Parser, config *TConfig, stepRequest *Request) *r
 	}
 }
 
+// requestBuilder 结构体
+// stepRequest Request 对象
+// req 用http.Request 对象做http操作
+// parser 解析器，存放plugin
+// config 配置文件
 type requestBuilder struct {
 	stepRequest *Request
 	req         *http.Request
@@ -90,19 +100,25 @@ type requestBuilder struct {
 	requestMap  map[string]interface{}
 }
 
+// prepareHeaders 获取请求头内容
 func (r *requestBuilder) prepareHeaders(stepVariables map[string]interface{}) error {
 	// prepare request headers
+	// 创建stepHeaders临时对象，并将request和config中的headers合并
 	stepHeaders := r.stepRequest.Headers
 	if r.config.Headers != nil {
 		// override headers
 		stepHeaders = mergeMap(stepHeaders, r.config.Headers)
 	}
 
+	// header 参数化设置，如果没有设置请求头则跳过
 	if len(stepHeaders) > 0 {
+		//获取header中参数化的值
 		headers, err := r.parser.ParseHeaders(stepHeaders, stepVariables)
 		if err != nil {
+			// 错误日志
 			return errors.Wrap(err, "parse headers failed")
 		}
+		//将header转换成http.Header对象
 		for key, value := range headers {
 			// omit pseudo header names for HTTP/1, e.g. :authority, :method, :path, :scheme
 			if strings.HasPrefix(key, ":") {
@@ -111,6 +127,7 @@ func (r *requestBuilder) prepareHeaders(stepVariables map[string]interface{}) er
 			r.req.Header.Add(key, value)
 
 			// prepare content length
+			// 设置 content length 大小
 			if strings.EqualFold(key, "Content-Length") && value != "" {
 				if l, err := strconv.ParseInt(value, 10, 64); err == nil {
 					r.req.ContentLength = l
@@ -120,6 +137,7 @@ func (r *requestBuilder) prepareHeaders(stepVariables map[string]interface{}) er
 	}
 
 	// prepare request cookies
+	// 获取cookie内容并设置到http.Request对象中
 	for cookieName, cookieValue := range r.stepRequest.Cookies {
 		value, err := r.parser.Parse(cookieValue, stepVariables)
 		if err != nil {
@@ -132,6 +150,7 @@ func (r *requestBuilder) prepareHeaders(stepVariables map[string]interface{}) er
 	}
 
 	// update header
+	// 将header设置到requestMap中，requestMap主要用于测试报告中的展示
 	headers := make(map[string]string)
 	for key, value := range r.req.Header {
 		headers[key] = value[0]
