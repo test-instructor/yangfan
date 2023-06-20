@@ -19,7 +19,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
 
 	"github.com/test-instructor/yangfan/hrp/internal/code"
@@ -29,10 +30,10 @@ import (
 func Dump2JSON(data interface{}, path string) error {
 	path, err := filepath.Abs(path)
 	if err != nil {
-		log.Error().Err(err).Msg("convert absolute path failed")
+		global.GVA_LOG.Error("convert absolute path failed", zap.Error(err))
 		return err
 	}
-	log.Info().Str("path", path).Msg("dump data to json")
+	global.GVA_LOG.Info("dump data to json", zap.String("path", path))
 
 	// init json encoder
 	buffer := new(bytes.Buffer)
@@ -47,7 +48,7 @@ func Dump2JSON(data interface{}, path string) error {
 
 	err = os.WriteFile(path, buffer.Bytes(), 0o644)
 	if err != nil {
-		log.Error().Err(err).Msg("dump json path failed")
+		global.GVA_LOG.Error("dump json path failed", zap.Error(err))
 		return err
 	}
 	return nil
@@ -56,10 +57,10 @@ func Dump2JSON(data interface{}, path string) error {
 func Dump2YAML(data interface{}, path string) error {
 	path, err := filepath.Abs(path)
 	if err != nil {
-		log.Error().Err(err).Msg("convert absolute path failed")
+		global.GVA_LOG.Error("convert absolute path failed", zap.Error(err))
 		return err
 	}
-	log.Info().Str("path", path).Msg("dump data to yaml")
+	global.GVA_LOG.Info("dump data to yaml", zap.String("path", path))
 
 	// init yaml encoder
 	buffer := new(bytes.Buffer)
@@ -74,7 +75,7 @@ func Dump2YAML(data interface{}, path string) error {
 
 	err = os.WriteFile(path, buffer.Bytes(), 0o644)
 	if err != nil {
-		log.Error().Err(err).Msg("dump yaml path failed")
+		global.GVA_LOG.Error("dump yaml path failed", zap.Error(err))
 		return err
 	}
 	return nil
@@ -94,20 +95,20 @@ func FormatResponse(raw interface{}) interface{} {
 }
 
 func CreateFolder(folderPath string) error {
-	log.Info().Str("path", folderPath).Msg("create folder")
+	global.GVA_LOG.Info("create folder", zap.String("path", folderPath))
 	err := os.MkdirAll(folderPath, os.ModePerm)
 	if err != nil {
-		log.Error().Err(err).Msg("create folder failed")
+		global.GVA_LOG.Error("create folder failed", zap.Error(err))
 		return err
 	}
 	return nil
 }
 
 func CreateFile(filePath string, data string) error {
-	log.Info().Str("path", filePath).Msg("create file")
+	global.GVA_LOG.Info("create file", zap.String("path", filePath))
 	err := os.WriteFile(filePath, []byte(data), 0o644)
 	if err != nil {
-		log.Error().Err(err).Msg("create file failed")
+		global.GVA_LOG.Error("create file failed", zap.Error(err))
 		return err
 	}
 	return nil
@@ -238,7 +239,7 @@ func InterfaceType(raw interface{}) string {
 
 // LoadFile loads file content with file extension and assigns to structObj
 func LoadFile(path string, structObj interface{}) (err error) {
-	log.Info().Str("path", path).Msg("load file")
+	global.GVA_LOG.Info("load file", zap.String("path", path))
 	file, err := ReadFile(path)
 	if err != nil {
 		return errors.Wrap(err, "read file failed")
@@ -294,24 +295,24 @@ func parseEnvContent(file []byte, obj interface{}) error {
 		envMap[key] = value
 
 		// set env
-		log.Info().Str("key", key).Msg("set env")
+		global.GVA_LOG.Info("set env", zap.String("key", key), zap.String("value", value))
 		os.Setenv(key, value)
 	}
 	return nil
 }
 
 func loadFromCSV(path string) []map[string]interface{} {
-	log.Info().Str("path", path).Msg("load csv file")
+	global.GVA_LOG.Info("load csv file", zap.String("path", path))
 	file, err := ReadFile(path)
 	if err != nil {
-		log.Error().Err(err).Msg("read csv file failed")
+		global.GVA_LOG.Error("read csv file failed", zap.Error(err))
 		os.Exit(code.GetErrorCode(err))
 	}
 
 	r := csv.NewReader(strings.NewReader(string(file)))
 	content, err := r.ReadAll()
 	if err != nil {
-		log.Error().Err(err).Msg("parse csv file failed")
+		global.GVA_LOG.Error("parse csv file failed", zap.Error(err))
 		os.Exit(code.GetErrorCode(err))
 	}
 	firstLine := content[0] // parameter names
@@ -327,10 +328,10 @@ func loadFromCSV(path string) []map[string]interface{} {
 }
 
 func loadMessage(path string) []byte {
-	log.Info().Str("path", path).Msg("load message file")
+	global.GVA_LOG.Info("load message file", zap.String("path", path))
 	file, err := ReadFile(path)
 	if err != nil {
-		log.Error().Err(err).Msg("read message file failed")
+		global.GVA_LOG.Error("read message file failed", zap.Error(err))
 		os.Exit(code.GetErrorCode(err))
 	}
 	return file
@@ -340,13 +341,13 @@ func ReadFile(path string) ([]byte, error) {
 	var err error
 	path, err = filepath.Abs(path)
 	if err != nil {
-		log.Error().Err(err).Str("path", path).Msg("convert absolute path failed")
+		global.GVA_LOG.Error("convert absolute path failed", zap.Error(err))
 		return nil, errors.Wrap(code.LoadFileError, err.Error())
 	}
 
 	file, err := os.ReadFile(path)
 	if err != nil {
-		log.Error().Err(err).Msg("read file failed")
+		global.GVA_LOG.Error("read file failed", zap.Error(err))
 		return nil, errors.Wrap(code.LoadFileError, err.Error())
 	}
 	return file, nil
@@ -356,12 +357,12 @@ func ReadCmdLines(path string) ([]string, error) {
 	var err error
 	path, err = filepath.Abs(path)
 	if err != nil {
-		log.Error().Err(err).Str("path", path).Msg("convert absolute path failed")
+		global.GVA_LOG.Error("convert absolute path failed", zap.Error(err))
 		return nil, err
 	}
 	file, err := os.Open(path)
 	if err != nil {
-		log.Error().Err(err).Str("path", path).Msg("open file failed")
+		global.GVA_LOG.Error("open file failed", zap.Error(err))
 		return nil, err
 	}
 	defer file.Close()
@@ -396,13 +397,13 @@ func Bytes2File(data []byte, filename string) error {
 	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0o755)
 	defer file.Close()
 	if err != nil {
-		log.Error().Err(err).Msg("failed to generate file")
+		global.GVA_LOG.Error("failed to generate file", zap.Error(err))
 	}
 	count, err := file.Write(data)
 	if err != nil {
 		return err
 	}
-	log.Info().Msg(fmt.Sprintf("write file %s len: %d \n", filename, count))
+	global.GVA_LOG.Info("write file", zap.String("filename", filename), zap.Int("len", count))
 	return nil
 }
 

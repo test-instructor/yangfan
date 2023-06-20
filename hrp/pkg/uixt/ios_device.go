@@ -18,7 +18,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/code"
 	"github.com/test-instructor/yangfan/hrp/internal/env"
@@ -184,7 +185,7 @@ func NewIOSDevice(options ...IOSDeviceOption) (device *IOSDevice, err error) {
 
 	if len(deviceList) > 0 {
 		device.UDID = deviceList[0].Properties().SerialNumber
-		log.Info().Str("udid", device.UDID).Msg("select device")
+		global.GVA_LOG.Info("select device")
 		device.d = deviceList[0]
 		return device, nil
 	}
@@ -233,7 +234,7 @@ func (dev *IOSDevice) NewDriver(capabilities Capabilities) (driverExt *DriverExt
 	}
 
 	if dev.ResetHomeOnStartup {
-		log.Info().Msg("go back to home screen")
+		global.GVA_LOG.Info("go back to home screen")
 		if err = driver.Homescreen(); err != nil {
 			return nil, errors.Wrap(code.MobileUIDriverError,
 				fmt.Sprintf("go back to home screen failed: %v", err))
@@ -252,7 +253,7 @@ func (dev *IOSDevice) NewDriver(capabilities Capabilities) (driverExt *DriverExt
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to set appium WDA settings")
 	}
-	log.Info().Interface("appiumWDASettings", settings).Msg("set appium WDA settings")
+	global.GVA_LOG.Info("set appium WDA settings", zap.Any("appiumWDASettings", settings))
 
 	if dev.LogOn {
 		err = driverExt.Driver.StartCaptureLog("hrp_wda_log")
@@ -288,12 +289,10 @@ func (dev *IOSDevice) NewDriver(capabilities Capabilities) (driverExt *DriverExt
 }
 
 func (dev *IOSDevice) forward(localPort, remotePort int) error {
-	log.Info().Int("localPort", localPort).Int("remotePort", remotePort).
-		Str("udid", dev.UDID).Msg("forward tcp port")
-
+	global.GVA_LOG.Info("forward tcp port", zap.Int("localPort", localPort), zap.String("udid", dev.UDID), zap.Int("remotePort", remotePort))
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", localPort))
 	if err != nil {
-		log.Error().Err(err).Msg("listen tcp error")
+		global.GVA_LOG.Error("listen tcp error", zap.Error(err))
 		return err
 	}
 
@@ -301,13 +300,13 @@ func (dev *IOSDevice) forward(localPort, remotePort int) error {
 		for {
 			accept, err := listener.Accept()
 			if err != nil {
-				log.Error().Err(err).Msg("accept error")
+				global.GVA_LOG.Error("accept error", zap.Error(err))
 				continue
 			}
 
 			rInnerConn, err := device.NewConnect(remotePort)
 			if err != nil {
-				log.Error().Err(err).Msg("connect to ios device failed")
+				global.GVA_LOG.Error("connect to ios device failed", zap.Error(err))
 				os.Exit(code.GetErrorCode(code.IOSDeviceConnectionError))
 			}
 
@@ -317,12 +316,12 @@ func (dev *IOSDevice) forward(localPort, remotePort int) error {
 			go func(lConn net.Conn) {
 				go func(lConn, rConn net.Conn) {
 					if _, err := io.Copy(lConn, rConn); err != nil {
-						log.Error().Err(err).Msg("copy local -> remote")
+						global.GVA_LOG.Error("copy local -> remote", zap.Error(err))
 					}
 				}(lConn, rConn)
 				go func(lConn, rConn net.Conn) {
 					if _, err := io.Copy(rConn, lConn); err != nil {
-						log.Error().Err(err).Msg("copy local <- remote")
+						global.GVA_LOG.Error("copy local <- remote", zap.Error(err))
 					}
 				}(lConn, rConn)
 			}(accept)
@@ -399,7 +398,7 @@ func (dev *IOSDevice) NewHTTPDriver(capabilities Capabilities) (driver WebDriver
 				fmt.Sprintf("forward tcp port failed: %v", err))
 		}
 	} else {
-		log.Info().Int("WDA_LOCAL_PORT", localPort).Msg("reuse WDA local port")
+		global.GVA_LOG.Info("reuse WDA local port", zap.Int("WDA_LOCAL_PORT", localPort))
 	}
 
 	var localMjpegPort int
@@ -415,14 +414,10 @@ func (dev *IOSDevice) NewHTTPDriver(capabilities Capabilities) (driver WebDriver
 				fmt.Sprintf("forward tcp port failed: %v", err))
 		}
 	} else {
-		log.Info().Int("WDA_LOCAL_MJPEG_PORT", localMjpegPort).
-			Msg("reuse WDA local mjpeg port")
+		global.GVA_LOG.Info("reuse WDA local mjpeg port", zap.Int("WDA_LOCAL_MJPEG_PORT", localMjpegPort))
 	}
 
-	log.Info().Interface("capabilities", capabilities).
-		Int("localPort", localPort).Int("localMjpegPort", localMjpegPort).
-		Msg("init WDA HTTP driver")
-
+	global.GVA_LOG.Info("init WDA HTTP driver", zap.Int("localPort", localPort), zap.Int("localMjpegPort", localMjpegPort))
 	wd := new(wdaDriver)
 	wd.client = http.DefaultClient
 
@@ -449,9 +444,7 @@ func (dev *IOSDevice) NewHTTPDriver(capabilities Capabilities) (driver WebDriver
 
 // NewUSBDriver creates new client via USB connected device, this will also start a new session.
 func (dev *IOSDevice) NewUSBDriver(capabilities Capabilities) (driver WebDriver, err error) {
-	log.Info().Interface("capabilities", capabilities).
-		Str("udid", dev.UDID).Msg("init WDA USB driver")
-
+	global.GVA_LOG.Info("init WDA USB driver", zap.String("udid", dev.UDID), zap.Any("capabilities", capabilities))
 	wd := new(wdaDriver)
 	if wd.defaultConn, err = dev.d.NewConnect(dev.Port, 0); err != nil {
 		return nil, errors.Wrap(code.IOSDeviceUSBDriverError,

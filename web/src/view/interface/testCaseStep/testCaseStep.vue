@@ -11,7 +11,7 @@
       <div class="right2">
         <div class="gva-search-box" style="display: flex">
           <el-form :inline="true" :model="searchInfo" class="demo-form-inline">
-            <el-form-item label="套件名称">
+            <el-form-item label="步骤名称">
               <el-input v-model="searchInfo.name" placeholder="搜索条件" />
             </el-form-item>
             <el-form-item>
@@ -82,7 +82,7 @@
             </el-table-column>
             <el-table-column
               align="left"
-              label="套件名称"
+              label="步骤名称"
               prop="name"
               width="200"
             />
@@ -162,7 +162,7 @@
       title="弹窗操作"
     >
       <el-form :model="formData" label-position="right" label-width="120px">
-        <el-form-item label="套件名称:">
+        <el-form-item label="步骤名称:">
           <el-input v-model="formData.name" clearable placeholder="请输入" />
         </el-form-item>
         <el-form-item label="调试运行配置:">
@@ -193,7 +193,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="前置套件:">
+        <el-form-item label="前置步骤:">
           <el-switch v-model="formData.front_case" />
         </el-form-item>
       </el-form>
@@ -420,12 +420,12 @@ const detailTestCaseFunc = (row) => {
   }
 };
 
-const reportDetailFunc = (ID) => {
-  if (ID) {
+const reportDetailFunc = (report_id) => {
+  if (report_id) {
     router.push({
       name: "reportDetail",
       params: {
-        id: ID,
+        report_id: report_id,
       },
     });
   } else {
@@ -493,7 +493,7 @@ const enterDialog = async () => {
   if (formData.value.name === "") {
     ElMessage({
       type: "error",
-      message: "套件名称不能为空",
+      message: "步骤名称不能为空",
     });
     return;
   }

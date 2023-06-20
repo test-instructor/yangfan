@@ -65,7 +65,7 @@
         <el-table-column property="name" label="用例名称" width="390">
           <template #default="scope">
             <el-tag type="danger" v-if="setupCaseShow(scope.row)">{{
-              "前置套件"
+              "前置步骤"
             }}</el-tag>
             {{ scope.row.name }}
           </template>
@@ -357,7 +357,7 @@ import { BarChart } from "echarts/charts";
 import { CanvasRenderer } from "echarts/renderers";
 import { useRoute } from "vue-router";
 import { getCurrentInstance } from "vue";
-import { ElMessageBox } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { formatDate } from "@/utils/format";
 import { Discount } from "@element-plus/icons-vue";
 
@@ -399,7 +399,57 @@ const exportFunc = () => {
 
 const copy = (row) => {
   let last = JSON.stringify(row);
-  navigator.clipboard.writeText(last);
+  console.log(last);
+
+  try {
+    navigator.clipboard.writeText(last);
+  } catch (error) {
+    let element = createElement(last);
+    element.select();
+    element.setSelectionRange(0, element.value.length);
+    document.execCommand("copy");
+    element.remove();
+    alert("已复制到剪切板");
+  }
+};
+
+const createElement = (text) => {
+  let isRTL = document.documentElement.getAttribute("dir") === "rtl";
+  let element = document.createElement("textarea");
+  // 防止在ios中产生缩放效果
+  element.style.fontSize = "12pt";
+  // 重置盒模型
+  element.style.border = "0";
+  element.style.padding = "0";
+  element.style.margin = "0";
+  // 将元素移到屏幕外
+  element.style.position = "absolute";
+  element.style[isRTL ? "right" : "left"] = "-9999px";
+  // 移动元素到页面底部
+  let yPosition = window.pageYOffset || document.documentElement.scrollTop;
+  element.style.top = `${yPosition}px`;
+  //设置元素只读
+  element.setAttribute("readonly", "");
+  element.value = text;
+  document.body.appendChild(element);
+  return element;
+};
+
+const copyToClipboard = (text) => {
+  navigator.clipboard
+    .writeText(text)
+    .then(() => {
+      ElMessage({
+        type: "success",
+        message: "复制成功",
+      });
+    })
+    .catch((error) => {
+      ElMessage({
+        type: "error",
+        message: "复制失败",
+      });
+    });
 };
 
 let currentInstance;
@@ -682,8 +732,8 @@ const initData = async () => {
   testStepsData.value = [];
   testStepsData.value = [];
   testCaseSimple.value = [];
-  if (route.params.id > 0) {
-    reportID = route.params.id;
+  if (route.params.report_id > 0) {
+    reportID = route.params.report_id;
   }
   tableDdata.value = reportData.value.details;
   await getTestCaseDetailFunc(reportID);
@@ -795,9 +845,9 @@ const columns = reactive([
 
 initData();
 watch(
-  () => route.params.id,
+  () => route.params.report_id,
   () => {
-    if (route.params.id) {
+    if (route.params.report_id) {
       initData();
     }
   }

@@ -1,6 +1,7 @@
 go 1.19
 
 use (
+	./docs/grpcdemo
 	./hrp
 	./master
 	./proto

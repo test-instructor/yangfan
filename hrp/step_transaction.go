@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 )
 
 type Transaction struct {
@@ -41,11 +42,7 @@ func (s *StepTransaction) Struct() *TStep {
 
 func (s *StepTransaction) Run(r *SessionRunner) (*StepResult, error) {
 	transaction := s.step.Transaction
-	log.Info().
-		Str("name", transaction.Name).
-		Str("type", string(transaction.Type)).
-		Msg("transaction")
-
+	global.GVA_LOG.Info("transaction", zap.String("name", transaction.Name), zap.String("type", string(transaction.Type)))
 	stepResult := &StepResult{
 		Name:        transaction.Name,
 		StepType:    stepTypeTransaction,
@@ -76,7 +73,7 @@ func (s *StepTransaction) Run(r *SessionRunner) (*StepResult, error) {
 		duration := r.transactions[transaction.Name][transactionEnd].Sub(
 			r.transactions[transaction.Name][transactionStart])
 		stepResult.Elapsed = duration.Milliseconds()
-		log.Info().Str("name", transaction.Name).Dur("elapsed", duration).Msg("transaction")
+		global.GVA_LOG.Info("transaction", zap.String("name", transaction.Name), zap.Duration("elapsed", duration))
 	}
 
 	return stepResult, nil

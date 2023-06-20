@@ -2,7 +2,7 @@
   <div>
     <div class="gva-form-box">
       <el-form :model="formData" label-position="right" label-width="80px">
-        <el-form-item label="套件名称:">
+        <el-form-item label="步骤名称:">
           <el-input v-model="formData.name" clearable placeholder="请输入" />
         </el-form-item>
         <el-form-item>

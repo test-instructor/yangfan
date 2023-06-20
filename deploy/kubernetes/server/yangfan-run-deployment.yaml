@@ -1,11 +1,10 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: yangfan-run
   namespace: yangfan
 spec:
   replicas: 3
-  serviceName: yangfan-run
   selector:
     matchLabels:
       app: yangfan-run
@@ -16,7 +15,7 @@ spec:
     spec:
       containers:
         - name: yangfan-run
-          image: yangfanz/runserver{{ if or (eq .Values.IMAGE_DEBUG_SUFFIX "true") (eq .Values.IMAGE_DEBUG_SUFFIX "debug") }}debug{{end | default "" }}:{{ if .Values.IMAGE_TAG }}{{ .Values.IMAGE_TAG }}{{ else }}latest{{ end | default "latest" }}
+          image: registry.cn-hangzhou.aliyuncs.com/yangfanz/run:latest
           env:
             - name: MASTER_SERVER
               value: yangfan-master-service

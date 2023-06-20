@@ -2,7 +2,6 @@ package boomer
 
 import (
 	"fmt"
-	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"math/rand"
 	"os"
 	"runtime/debug"
@@ -11,11 +10,13 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	"go.uber.org/zap"
+
 	"github.com/jinzhu/copier"
 	"github.com/olekukonko/tablewriter"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
-
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
 	"github.com/test-instructor/yangfan/hrp/pkg/boomer/grpc/messager"
 )
@@ -401,18 +402,14 @@ func (r *runner) runTimeCheck(runTime int64) {
 
 func (r *runner) spawnWorkers(spawnCount int64, spawnRate float64, quit chan bool, spawnCompleteFunc func()) {
 	r.updateState(StateSpawning)
-	log.Info().
-		Int64("spawnCount", spawnCount).
-		Float64("spawnRate", spawnRate).
-		Msg("Spawning workers")
-
+	global.GVA_LOG.Info("Spawning workers", zap.String("spawnCount", strconv.FormatInt(spawnCount, 10)), zap.String("spawnRate", strconv.FormatFloat(spawnRate, 'f', 2, 64)))
 	r.controller.setSpawn(spawnCount, spawnRate)
 
 	for {
 		select {
 		case <-quit:
 			// quit spawning goroutine
-			log.Info().Msg("Quitting spawning workers")
+			global.GVA_LOG.Info("Quitting spawning workers")
 			return
 		default:
 			if r.isStarting() && r.controller.acquire() {
@@ -493,7 +490,7 @@ func (r *runner) goAttach(f func()) {
 	defer r.wgMu.RUnlock()
 	select {
 	case <-r.stoppingChan:
-		log.Warn().Msg("runner has stopped; skipping GoAttach")
+		global.GVA_LOG.Warn("runner has stopped; skipping GoAttach")
 		return
 	default:
 	}
@@ -525,7 +522,7 @@ func (r *runner) getTask() *Task {
 	defer r.mutex.RUnlock()
 	tasksCount := len(r.tasks)
 	if tasksCount == 0 {
-		log.Error().Msg("no valid testcase found")
+		global.GVA_LOG.Error("no valid testcase found")
 		os.Exit(1)
 	} else if tasksCount == 1 {
 		// Fast path
@@ -571,7 +568,7 @@ func (r *runner) statsStart() {
 			// close reportedChan and return if the last stats is reported successfully
 			if !r.isStarting() && !r.isStopping() {
 				close(r.reportedChan)
-				log.Info().Msg("Quitting statsStart")
+				global.GVA_LOG.Info("Quitting statsStart")
 				return
 			}
 		}
@@ -612,7 +609,7 @@ func (r *runner) getState() int32 {
 }
 
 func (r *runner) updateState(state int32) {
-	log.Debug().Int32("from", atomic.LoadInt32(&r.state)).Int32("to", state).Msg("update runner state")
+	global.GVA_LOG.Debug("update runner state", zap.Int32("from", atomic.LoadInt32(&r.state)), zap.Int32("to", state))
 	atomic.StoreInt32(&r.state, state)
 }
 
@@ -744,25 +741,25 @@ func (r *workerRunner) spawnComplete() {
 func (r *workerRunner) onSpawnMessage(msg *genericMessage) {
 	r.client.sendChannel() <- newGenericMessage("spawning", nil, r.nodeID)
 	if msg.Profile == nil {
-		log.Error().Msg("miss profile")
+		global.GVA_LOG.Error("miss profile")
 	}
 	profile := BytesToProfile(msg.Profile)
 	r.setSpawnCount(profile.SpawnCount)
 	r.setSpawnRate(profile.SpawnRate)
 
 	if msg.Tasks == nil && len(r.tasks) == 0 {
-		log.Error().Msg("miss tasks")
+		global.GVA_LOG.Error("miss tasks")
 	}
 	r.tasksChan <- &task{
 		Profile:        profile,
 		TestCasesBytes: msg.Tasks,
 	}
-	log.Info().Msg("on spawn message successfully")
+	global.GVA_LOG.Info("on spawn message successfully")
 }
 
 func (r *workerRunner) onRebalanceMessage(msg *genericMessage) {
 	if msg.Profile == nil {
-		log.Error().Msg("miss profile")
+		global.GVA_LOG.Error("miss profile")
 	}
 	profile := BytesToProfile(msg.Profile)
 	r.setSpawnCount(profile.SpawnCount)
@@ -771,7 +768,7 @@ func (r *workerRunner) onRebalanceMessage(msg *genericMessage) {
 	r.tasksChan <- &task{
 		Profile: profile,
 	}
-	log.Info().Msg("on rebalance message successfully")
+	global.GVA_LOG.Info("on rebalance message successfully")
 }
 
 // Runner acts as a state machine.
@@ -783,7 +780,7 @@ func (r *workerRunner) onMessage(msg *genericMessage) {
 			r.onSpawnMessage(msg)
 		case "quit":
 			if r.ignoreQuit {
-				log.Warn().Msg("master already quit, waiting to reconnect master.")
+				global.GVA_LOG.Warn("master already quit, waiting to reconnect master.")
 				break
 			}
 			r.close()
@@ -801,11 +798,11 @@ func (r *workerRunner) onMessage(msg *genericMessage) {
 		case "quit":
 			r.stop()
 			if r.ignoreQuit {
-				log.Warn().Msg("master already quit, waiting to reconnect master.")
+				global.GVA_LOG.Warn("master already quit, waiting to reconnect master.")
 				break
 			}
 			r.close()
-			log.Info().Msg("Recv quit message from master, all the goroutines are stopped")
+			global.GVA_LOG.Info("Recv quit message from master, all the goroutines are stopped")
 		}
 	case StateStopped:
 		switch msg.Type {
@@ -813,7 +810,7 @@ func (r *workerRunner) onMessage(msg *genericMessage) {
 			r.onSpawnMessage(msg)
 		case "quit":
 			if r.ignoreQuit {
-				log.Warn().Msg("master already quit, waiting to reconnect master.")
+				global.GVA_LOG.Warn("master already quit, waiting to reconnect master.")
 				break
 			}
 			r.close()
@@ -851,17 +848,17 @@ func (r *workerRunner) run() {
 	println(fmt.Sprintf("ready to connect master to %s:%d", r.masterHost, r.masterPort))
 	err := r.client.start()
 	if err != nil {
-		log.Error().Err(err).Msg(fmt.Sprintf("failed to connect to master(%s:%d)", r.masterHost, r.masterPort))
+		global.GVA_LOG.Error(fmt.Sprintf("failed to connect to master(%s:%d)", r.masterHost, r.masterPort), zap.Error(err))
 	}
 
 	// register worker information to master
 	if err = r.client.register(r.client.config.ctx); err != nil {
-		log.Error().Err(err).Msg("failed to register")
+		global.GVA_LOG.Error("failed to register")
 	}
 
 	err = r.client.newBiStreamClient()
 	if err != nil {
-		log.Error().Err(err).Msg("failed to establish bidirectional stream, waiting master launched")
+		global.GVA_LOG.Error("failed to establish bidirectional stream, waiting master launched")
 	}
 
 	go r.client.recv()
@@ -880,12 +877,12 @@ func (r *workerRunner) run() {
 			select {
 			case <-r.client.disconnectedChannel():
 			case <-ticker.C:
-				log.Warn().Msg("timeout waiting for sending quit message to master, boomer will quit any way.")
+				global.GVA_LOG.Warn("timeout waiting for sending quit message to master, boomer will quit any way.")
 			}
 
 			// sign out from master
 			if err = r.client.signOut(r.client.config.ctx); err != nil {
-				log.Info().Err(err).Msg("failed to sign out")
+				global.GVA_LOG.Error("failed to sign out", zap.Error(err))
 			}
 
 			// close grpc client
@@ -897,7 +894,7 @@ func (r *workerRunner) run() {
 	go r.startListener()
 
 	// tell master, I'm ready
-	log.Info().Msg("send client ready signal")
+	global.GVA_LOG.Info("send client ready signal")
 	r.client.sendChannel() <- newClientReadyMessageToMaster(r.nodeID)
 
 	// heartbeat
@@ -1052,7 +1049,7 @@ func (r *masterRunner) setExpectWorkers(expectWorkers int, expectWorkersMaxWait 
 }
 
 func (r *masterRunner) heartbeatWorker() {
-	log.Info().Msg("heartbeatWorker, listen and record heartbeat from worker")
+	global.GVA_LOG.Info("heartbeatWorker, listen and record heartbeat from worker")
 	heartBeatTicker := time.NewTicker(heartbeatInterval)
 	reportTicker := time.NewTicker(heartbeatLiveness)
 	for {
@@ -1063,7 +1060,7 @@ func (r *masterRunner) heartbeatWorker() {
 			r.server.clients.Range(func(key, value interface{}) bool {
 				workerInfo, ok := value.(*WorkerNode)
 				if !ok {
-					log.Error().Msg("failed to get worker information")
+					global.GVA_LOG.Error("failed to get worker information")
 				}
 				go func() {
 					if atomic.LoadInt32(&workerInfo.Heartbeat) < 0 {
@@ -1083,7 +1080,7 @@ func (r *masterRunner) heartbeatWorker() {
 }
 
 func (r *masterRunner) clientListener() {
-	log.Info().Msg("clientListener, start to deal message from worker")
+	global.GVA_LOG.Info("clientListener, start to deal message from worker")
 	for {
 		select {
 		case <-r.closeChan:
@@ -1156,7 +1153,7 @@ func (r *masterRunner) stateMachine() {
 			switch r.getState() {
 			case StateSpawning:
 				if r.server.getCurrentUsers() == int(r.getSpawnCount()) {
-					log.Warn().Msg("all workers spawn done, setting state as running")
+					global.GVA_LOG.Warn("all workers spawn done, setting state as running")
 					r.updateState(StateRunning)
 				}
 			case StateRunning:
@@ -1167,7 +1164,7 @@ func (r *masterRunner) stateMachine() {
 				if r.server.getWorkersLengthByState(StateInit) != 0 {
 					err := r.rebalance()
 					if err != nil {
-						log.Error().Err(err).Msg("failed to rebalance")
+						global.GVA_LOG.Error("failed to rebalance", zap.Error(err))
 					}
 				}
 			case StateStopping:
@@ -1186,7 +1183,7 @@ func (r *masterRunner) run() {
 	// start grpc server
 	err := r.server.start()
 	if err != nil {
-		log.Error().Err(err).Msg("failed to start grpc server")
+		global.GVA_LOG.Error("failed to start grpc server", zap.Error(err))
 		return
 	}
 
@@ -1197,7 +1194,7 @@ func (r *masterRunner) run() {
 
 	if r.autoStart {
 		go func() {
-			log.Info().Msg("auto start, waiting expected workers joined")
+			global.GVA_LOG.Info(fmt.Sprintf("waiting %v seconds for workers to join", r.expectWorkersMaxWait))
 			ticker := time.NewTicker(1 * time.Second)
 			tickerMaxWait := time.NewTicker(time.Duration(r.expectWorkersMaxWait) * time.Second)
 			for {
@@ -1206,17 +1203,17 @@ func (r *masterRunner) run() {
 					return
 				case <-ticker.C:
 					c := r.server.getAvailableClientsLength()
-					log.Info().Msg(fmt.Sprintf("expected worker number: %v, current worker count: %v", r.expectWorkers, c))
+					global.GVA_LOG.Info(fmt.Sprintf("expected worker number: %v, current worker count: %v", r.expectWorkers, c))
 					if c >= r.expectWorkers {
 						err = r.start()
 						if err != nil {
-							log.Error().Err(err).Msg("failed to run")
+							global.GVA_LOG.Error("failed to run", zap.Error(err))
 							os.Exit(1)
 						}
 						return
 					}
 				case <-tickerMaxWait.C:
-					log.Warn().Msg("reached max wait time, quiting")
+					global.GVA_LOG.Warn("reached max wait time, quiting")
 					r.onQuiting()
 					os.Exit(1)
 				}
@@ -1249,7 +1246,7 @@ func (r *masterRunner) start() error {
 
 	workerProfile := &Profile{}
 	if err := copier.Copy(workerProfile, r.profile); err != nil {
-		log.Error().Err(err).Msg("copy workerProfile failed")
+		global.GVA_LOG.Error("copy workerProfile failed", zap.Error(err))
 		return err
 	}
 
@@ -1266,7 +1263,7 @@ func (r *masterRunner) start() error {
 	maxRPSs := builtin.SplitInteger(int(workerProfile.MaxRPS), numWorkers)
 
 	r.updateState(StateSpawning)
-	log.Info().Msg("send spawn data to worker")
+	global.GVA_LOG.Info("send spawn data to worker", zap.Any("spawnCounts", spawnCounts), zap.Any("maxRPSs", maxRPSs), zap.Any("spawnRate", spawnRate), zap.Any("testCasesBytes", testCasesBytes))
 
 	cur := 0
 	r.server.clients.Range(func(key, value interface{}) bool {
@@ -1292,7 +1289,7 @@ func (r *masterRunner) start() error {
 		return true
 	})
 
-	log.Warn().Interface("profile", r.profile).Msg("send spawn data to worker successfully")
+	global.GVA_LOG.Warn("send spawn data to worker successfully", zap.Any("profile", r.profile))
 	return nil
 }
 
@@ -1303,7 +1300,7 @@ func (r *masterRunner) rebalance() error {
 	}
 	workerProfile := &Profile{}
 	if err := copier.Copy(workerProfile, r.profile); err != nil {
-		log.Error().Err(err).Msg("copy workerProfile failed")
+		global.GVA_LOG.Error("copy workerProfile failed", zap.Error(err))
 		return err
 	}
 
@@ -1320,7 +1317,7 @@ func (r *masterRunner) rebalance() error {
 	maxRPSs := builtin.SplitInteger(int(workerProfile.MaxRPS), numWorkers)
 
 	cur := 0
-	log.Info().Msg("send spawn data to worker")
+	global.GVA_LOG.Info("send spawn data to worker", zap.Any("spawnCounts", spawnCounts), zap.Any("maxRPSs", maxRPSs), zap.Any("spawnRate", spawnRate), zap.Any("testCasesBytes", r.testCasesBytes))
 	r.server.clients.Range(func(key, value interface{}) bool {
 		if workerInfo, ok := value.(*WorkerNode); ok {
 			if workerInfo.getState() == StateQuitting || workerInfo.getState() == StateMissing {
@@ -1352,7 +1349,7 @@ func (r *masterRunner) rebalance() error {
 		return true
 	})
 
-	log.Warn().Msg("send rebalance data to worker successfully")
+	global.GVA_LOG.Warn("send rebalance data to worker successfully", zap.Any("profile", r.profile))
 	return nil
 }
 
@@ -1467,7 +1464,7 @@ func (r *masterRunner) startPlatform() error {
 
 	workerProfile := &Profile{}
 	if err := copier.Copy(workerProfile, r.profile); err != nil {
-		log.Error().Err(err).Msg("copy workerProfile failed")
+		global.GVA_LOG.Error("copy workerProfile failed", zap.Any("err", err))
 		return err
 	}
 
@@ -1484,7 +1481,7 @@ func (r *masterRunner) startPlatform() error {
 	maxRPSs := builtin.SplitInteger(int(workerProfile.MaxRPS), numWorkers)
 
 	r.updateState(StateSpawning)
-	log.Info().Msg("send spawn data to worker")
+	global.GVA_LOG.Info("send spawn data to worker", zap.Any("spawnCounts", spawnCounts), zap.Any("spawnRate", spawnRate), zap.Any("maxRPSs", maxRPSs))
 
 	cur := 0
 	r.server.clients.Range(func(key, value interface{}) bool {
@@ -1510,6 +1507,6 @@ func (r *masterRunner) startPlatform() error {
 		return true
 	})
 
-	log.Warn().Interface("profile", r.profile).Msg("send spawn data to worker successfully")
+	global.GVA_LOG.Warn("start platform successfully", zap.Any("profile", r.profile))
 	return nil
 }

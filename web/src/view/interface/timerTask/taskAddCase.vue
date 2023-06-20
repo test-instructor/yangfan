@@ -83,9 +83,7 @@ import { getInterfaceTemplateList } from "@/api/interfaceTemplate";
 
 import Sortable from "sortablejs";
 import { defineEmits, ref } from "vue";
-import { findTestCase, addTestCase, sortTestCase } from "@/api/testCase";
 import { ElMessage } from "element-plus";
-import { getApiConfigList } from "@/api/apiConfig";
 
 import { getApiCaseList } from "@/api/apiCase";
 

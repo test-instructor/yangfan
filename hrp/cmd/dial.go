@@ -4,8 +4,8 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+	"github.com/test-instructor/yangfan/server/global"
 
 	"github.com/test-instructor/yangfan/hrp/internal/dial"
 )
@@ -37,10 +37,10 @@ var dnsCmd = &cobra.Command{
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if dnsOptions.DnsSourceType != dial.DnsSourceTypeLocal && dnsOptions.DnsServer != "" {
-			log.Warn().Msg("DNS server not supported for non-local DNS source, ignored")
+			global.GVA_LOG.Warn("DNS server not supported for non-local DNS source, ignored")
 		}
 		if dnsOptions.DnsSourceType == dial.DnsSourceTypeHttp && dnsOptions.DnsRecordType == dial.DnsRecordTypeCNAME {
-			log.Warn().Msg("CNAME record not supported for http DNS source, using default record type(A)")
+			global.GVA_LOG.Warn("CNAME record not supported for http DNS source, using default record type(A)")
 		}
 		return dial.DoDns(&dnsOptions, args)
 	},
@@ -55,7 +55,7 @@ var traceRouteCmd = &cobra.Command{
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if runtime.GOOS == "windows" {
-			log.Info().Msg("using default probe number (3) on Windows")
+			global.GVA_LOG.Warn("traceroute is not supported on Windows")
 		}
 		return dial.DoTraceRoute(&traceRouteOptions, args)
 	},

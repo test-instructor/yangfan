@@ -19,6 +19,10 @@ func Zap() (logger *zap.Logger) {
 		fmt.Printf("create %v directory\n", global.GVA_CONFIG.Zap.Director)
 		_ = os.Mkdir(global.GVA_CONFIG.Zap.Director, os.ModePerm)
 	}
+	hostname, err := os.Hostname()
+	if err == nil {
+		global.GVA_CONFIG.Zap.Prefix = fmt.Sprintf("[%s]", hostname)
+	}
 
 	cores := internal.Zap.GetZapCores()
 	logger = zap.New(zapcore.NewTee(cores...))

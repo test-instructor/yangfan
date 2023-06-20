@@ -122,7 +122,11 @@ func (p *PyPkgService) PyPkgInstallServiceV2(pyPkg request.HrpPyPkgRequest) (err
 				Version: pyPkg.Version,
 				Operate: tools.Operate_INSTALL,
 			}
-			grpc.ServerToolsObj.SendMessageToSavedClients(res)
+			if grpc.ServerToolsObj != nil {
+				grpc.ServerToolsObj.SendMessageToSavedClients(res)
+				return
+			}
+			global.GVA_LOG.Warn("grpc.ServerToolsObj is nil")
 		}
 	}()
 

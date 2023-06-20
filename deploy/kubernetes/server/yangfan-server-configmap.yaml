@@ -5,38 +5,6 @@ metadata:
   namespace: yangfan
 data:
   docker.config.yaml: |
-    aliyun-oss:
-      endpoint: yourEndpoint
-      access-key-id: yourAccessKeyId
-      access-key-secret: yourAccessKeySecret
-      bucket-name: yourBucketName
-      bucket-url: yourBucketUrl
-      base-path: yourBasePath
-    autocode:
-      transfer-restart: true
-      root: C:\gva\taylor-test-platform-server\taylor-test-platform
-      server: /server
-      server-api: /api/v1/%s
-      server-plug: /plugin/%s
-      server-initialize: /initialize
-      server-model: /model/%s
-      server-request: /model/%s/request/
-      server-router: /router/%s
-      server-service: /service/%s
-      web: /web/src
-      web-api: /api
-      web-form: /view
-      web-table: /view
-    aws-s3:
-      bucket: xxxxx-10005608
-      region: ap-shanghai
-      endpoint: ""
-      s3-force-path-style: false
-      disable-ssl: false
-      secret-id: xxxxxxxx
-      secret-key: xxxxxxxx
-      base-url: https://gin.vue.admin
-      path-prefix: github.com/flipped-aurora/gin-vue-admin/server
     captcha:
       key-long: 1
       img-width: 240
@@ -47,14 +15,12 @@ data:
         - allow-origin: example1.com
           allow-methods: GET, POST
           allow-headers: content-type
-          expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers,
-            Content-Type
+          expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers,Content-Type
           allow-credentials: true
         - allow-origin: example2.com
           allow-methods: GET, POST
           allow-headers: content-type
-          expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers,
-            Content-Type
+          expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers,Content-Type
           allow-credentials: true
     db-list:
       - disable: false
@@ -70,28 +36,12 @@ data:
         max-open-conns: 100
         log-mode: ""
         log-zap: false
-    email:
-      to: xxx@qq.com
-      port: 465
-      from: xxx@163.com
-      host: smtp.163.com
-      is-ssl: true
-      secret: xxx
-      nickname: test
-    excel:
-      dir: ./resource/excel/
     fs:
       appID:
       appSecret:
       redirectUri: http://127.0.0.1:8080/api/fsLogin/login
       authorityID: 666
       projectID: 1
-    hua-wei-obs:
-      path: you-path
-      bucket: you-bucket
-      endpoint: you-endpoint
-      access-key: you-access-key
-      secret-key: you-secret-key
     jwt:
       signing-key: 6c8c168a-d00b-4929-a4cd-75ede0ad8cce
       expires-time: 604800
@@ -111,25 +61,6 @@ data:
       max-open-conns: 100
       log-mode: error
       log-zap: false
-    pgsql:
-      path: ""
-      port: ""
-      config: ""
-      db-name: ""
-      username: ""
-      password: ""
-      max-idle-conns: 10
-      max-open-conns: 100
-      log-mode: ""
-      log-zap: false
-    qiniu:
-      zone: ZoneHuaDong
-      bucket: ""
-      img-path: ""
-      use-https: false
-      access-key: ""
-      secret-key: ""
-      use-cdn-domains: false
     redis:
       db: 0
       addr: 127.0.0.1:6378
@@ -143,13 +74,6 @@ data:
       use-redis: false
       iplimit-count: 15000
       iplimit-time: 3600
-    tencent-cos:
-      bucket: xxxxx-10005608
-      region: ap-shanghai
-      secret-id: xxxxxxxx
-      secret-key: xxxxxxxx
-      base-url: https://gin.vue.admin
-      path-prefix: github.com/flipped-aurora/gin-vue-admin/server
     timer:
       start: true
       spec: '@daily'
@@ -178,7 +102,7 @@ data:
       master-boomer-prot: 9093
       master-server-prot: 7966
       prometheus-pushgateway-url: http://yangfan-pushgateway:9091/
-      grafana-host: http://192.168.0.180:31030/
+      grafana-host: http://192.168.0.184:31030/
       grafana-dashboard: ERv3OaBPYe6A
       grafana-dashboard-name: yangfan-for-distributed-load-testing
       grafana-dashboard-stats: WLVhzvOg56Mg

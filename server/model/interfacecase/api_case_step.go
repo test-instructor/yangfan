@@ -21,7 +21,7 @@ var _ = ApiStepTypeTransaction
 type ApiCaseStep struct {
 	global.GVA_MODEL
 	Operator
-	Name      string    `json:"name" form:"name" gorm:"column:name;comment:套件名称;"`
+	Name      string    `json:"name" form:"name" gorm:"column:name;comment:步骤名称;"`
 	FrontCase *bool     `json:"front_case" form:"front_case" gorm:"comment:允许设置为前置用例;"`
 	TStep     []ApiStep `json:"TStep" form:"TStep" gorm:"many2many:ApiCaseStepRelationship;"`
 	//Performance []Performance `json:"performance" form:"performance" gorm:"many2many:PerformanceRelationship;"`

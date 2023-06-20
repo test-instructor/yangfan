@@ -41,7 +41,7 @@ func main() {
 		global.GVA_LOG.Error("register db", zap.Error(global.GVA_DB.Error))
 		os.Exit(0)
 	}
-	yangfan.InitPythonPackage(true)
+	go yangfan.InitPythonPackage(true)
 	go RunPkgInstallClient()
 	server.StartRunServer()
 }

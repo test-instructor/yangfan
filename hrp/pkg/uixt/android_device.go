@@ -9,7 +9,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/code"
 	"github.com/test-instructor/yangfan/hrp/internal/json"
@@ -258,7 +259,7 @@ func (l *DeviceLogcat) Errors() (err error) {
 
 func (l *DeviceLogcat) CatchLogcat() (err error) {
 	if l.cmd != nil {
-		log.Warn().Msg("logcat already start")
+		global.GVA_LOG.Warn("logcat already start")
 		return nil
 	}
 
@@ -314,7 +315,7 @@ func ConvertPoints(data string) (eps []ExportPoint) {
 			p := ExportPoint{}
 			err := json.Unmarshal([]byte(line), &p)
 			if err != nil {
-				log.Error().Msg("failed to parse point data")
+				global.GVA_LOG.Error("failed to parse point data", zap.Error(err))
 				continue
 			}
 			eps = append(eps, p)

@@ -1,10 +1,4 @@
-aliyun-oss:
-  endpoint: yourEndpoint
-  access-key-id: yourAccessKeyId
-  access-key-secret: yourAccessKeySecret
-  bucket-name: yourBucketName
-  bucket-url: yourBucketUrl
-  base-path: yourBasePath
+# 自动生成代码的配置，只能在本地修改
 autocode:
   transfer-restart: true
   root: C:\gva\taylor-test-platform-server\taylor-test-platform
@@ -20,16 +14,7 @@ autocode:
   web-api: /api
   web-form: /view
   web-table: /view
-aws-s3:
-  bucket: xxxxx-10005608
-  region: ap-shanghai
-  endpoint: ""
-  s3-force-path-style: false
-  disable-ssl: false
-  secret-id: xxxxxxxx
-  secret-key: xxxxxxxx
-  base-url: https://gin.vue.admin
-  path-prefix: github.com/flipped-aurora/gin-vue-admin/server
+# 验证码配置
 captcha:
   key-long: 1
   img-width: 240
@@ -40,59 +25,31 @@ cors:
     - allow-origin: example1.com
       allow-methods: GET, POST
       allow-headers: content-type
-      expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers,
-        Content-Type
+      expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers,Content-Type
       allow-credentials: true
     - allow-origin: example2.com
       allow-methods: GET, POST
       allow-headers: content-type
-      expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers,
-        Content-Type
+      expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers,Content-Type
       allow-credentials: true
-db-list:
-  - disable: false
-    type: ""
-    alias-name: ""
-    path: ""
-    port: ""
-    config: ""
-    db-name: ""
-    username: ""
-    password: ""
-    max-idle-conns: 10
-    max-open-conns: 100
-    log-mode: ""
-    log-zap: false
-email:
-  to: xxx@qq.com
-  port: 465
-  from: xxx@163.com
-  host: smtp.163.com
-  is-ssl: true
-  secret: xxx
-  nickname: test
-excel:
-  dir: ./resource/excel/
+# 飞书登陆配置
 fs:
   appID:
   appSecret:
   redirectUri: http://127.0.0.1:8080/api/fsLogin/login
   authorityID: 666
   projectID: 1
-hua-wei-obs:
-  path: you-path
-  bucket: you-bucket
-  endpoint: you-endpoint
-  access-key: you-access-key
-  secret-key: you-secret-key
+# token配置
 jwt:
   signing-key: 6c8c168a-d00b-4929-a4cd-75ede0ad8cce
   expires-time: 604800
   buffer-time: 86400
   issuer: qmPlus
+# 本地上传文件配置
 local:
   path: uploads/file
   store-path: uploads/file
+# 数据看配置
 mysql:
   path: 127.0.0.1
   port: "3306"
@@ -104,26 +61,7 @@ mysql:
   max-open-conns: 100
   log-mode: debug
   log-zap: false
-
-pgsql:
-  path: ""
-  port: ""
-  config: ""
-  db-name: ""
-  username: ""
-  password: ""
-  max-idle-conns: 10
-  max-open-conns: 100
-  log-mode: ""
-  log-zap: false
-qiniu:
-  zone: ZoneHuaDong
-  bucket: ""
-  img-path: ""
-  use-https: false
-  access-key: ""
-  secret-key: ""
-  use-cdn-domains: false
+# redis 配置，如开启需要把 system.use-redis 设置为 true
 redis:
   db: 0
   addr: 127.0.0.1:6378
@@ -137,13 +75,7 @@ system:
   use-redis: false
   iplimit-count: 15000
   iplimit-time: 3600
-tencent-cos:
-  bucket: xxxxx-10005608
-  region: ap-shanghai
-  secret-id: xxxxxxxx
-  secret-key: xxxxxxxx
-  base-url: https://gin.vue.admin
-  path-prefix: github.com/flipped-aurora/gin-vue-admin/server
+# 定时任务配置，删除操作记录和jwt清除
 timer:
   start: true
   spec: '@daily'
@@ -155,6 +87,7 @@ timer:
     - tableName: jwt_blacklists
       compareField: created_at
       interval: 168h
+# 日志记录，生产不建议用debug级别
 zap:
   level: debug
   prefix: '[yangfan]'

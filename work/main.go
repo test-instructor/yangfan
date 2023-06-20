@@ -76,7 +76,7 @@ func main() {
 	boomer.NewTempConfig()
 	zerolog.SetGlobalLevel(zerolog.WarnLevel)
 	zap.ReplaceGlobals(global.GVA_LOG)
-	yangfan.InitPythonPackage(true)
+	go yangfan.InitPythonPackage(true)
 	go RunPkgInstallClient()
 	NewAgent(global.GVA_CONFIG.YangFan.Master, global.GVA_CONFIG.YangFan.MasterServerProt).Work()
 }

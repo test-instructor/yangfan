@@ -41,7 +41,7 @@ func (r *runStep) LoadCase() (err error) {
 	var envName string
 	//var apiCases interfacecase.ApiCaseStep
 	//var tcm *ApisCaseModel
-	//获取测试套件下对应的配置信息
+	//获取测试步骤下对应的配置信息
 	{
 		var testCaseStep interfacecase.ApiCaseStep
 		err := global.GVA_DB.Model(interfacecase.ApiCaseStep{}).Where("id = ? ", r.runCaseReq.CaseID).First(&testCaseStep).Error
@@ -61,7 +61,7 @@ func (r *runStep) LoadCase() (err error) {
 		return errors.New("获取环境变量失败")
 	}
 	apiConfig.Environs = r.envVars
-	//设置前置套件
+	//设置前置步骤
 	if apiConfig.SetupCaseID != nil && *apiConfig.SetupCaseID != 0 {
 		//前置用例逻辑需要修改
 		//r.tcm.SetupCase = true

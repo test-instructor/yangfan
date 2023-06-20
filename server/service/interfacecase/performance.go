@@ -191,6 +191,11 @@ func (testCaseService *PerformanceService) GetReportList(info interfacecaseReq.P
 	return err, pReport, total
 }
 
+func (testCaseService *PerformanceService) DeleteReport(report interfacecase.PerformanceReport) (err error) {
+	err = global.GVA_DB.Delete(&report).Error
+	return err
+}
+
 func (testCaseService *PerformanceService) FindReport(pReportReq interfacecaseReq.PReportDetail) (err error, report interface{}) {
 	var pReport interfacecase.PerformanceReport
 	// 创建db

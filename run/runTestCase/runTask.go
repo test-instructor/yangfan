@@ -58,7 +58,7 @@ func (r *runTask) LoadCase() (err error) {
 		}
 		apiConfig.Environs = r.envVars
 
-		//设置前置套件
+		//设置前置步骤
 		if apiConfig.SetupCaseID != nil && *apiConfig.SetupCaseID != 0 {
 			//r.tcm.SetupCase = true
 			hrpCaseStep, err := getCaseStepHrp(*apiConfig.SetupCaseID)

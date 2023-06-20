@@ -77,7 +77,7 @@ type CaseType int32
 const (
 	CaseType_CaseTypeDefault     CaseType = 0 // 默认
 	CaseType_CaseTypeApi         CaseType = 1 // api 运行
-	CaseType_CaseTypeStep        CaseType = 2 // 套件运行
+	CaseType_CaseTypeStep        CaseType = 2 // 步骤运行
 	CaseType_CaseTypeCases       CaseType = 3 // 用例运行
 	CaseType_CaseTypeTask        CaseType = 4 // 定时任务运行
 	CaseType_CaseTypeBoomerDebug CaseType = 5 // 性能任务调试

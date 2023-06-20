@@ -21,6 +21,8 @@ spec:
           volumeMounts:
             - name: yangfan-prometheus-config
               mountPath: /etc/prometheus
+            - name: yangfan-prometheus-storage
+              mountPath: /prometheus/data
           env:
             - name: TZ
               value: Asia/Shanghai
@@ -28,3 +30,6 @@ spec:
         - name: yangfan-prometheus-config
           configMap:
             name: yangfan-prometheus-config
+        - name: yangfan-prometheus-storage
+          persistentVolumeClaim:
+            claimName: yangfan-prometheus-pvc

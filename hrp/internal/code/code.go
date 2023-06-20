@@ -2,7 +2,8 @@ package code
 
 import (
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 )
 
 // general: [0, 2)
@@ -151,6 +152,6 @@ func GetErrorCode(err error) (exitCode int) {
 		exitCode = GeneralFail
 	}
 
-	log.Warn().Int("code", exitCode).Msg("hrp exit")
+	global.GVA_LOG.Warn("hrp exit", zap.Int("code", exitCode))
 	return
 }

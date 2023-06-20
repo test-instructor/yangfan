@@ -14,7 +14,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
 	"github.com/test-instructor/yangfan/hrp/internal/myexec"
@@ -37,7 +38,7 @@ func DoTraceRoute(traceRouteOptions *TraceRouteOptions, args []string) (err erro
 			traceRouteResultPath := filepath.Join(dir, traceRouteResultName)
 			err = builtin.Dump2JSON(traceRouteResult, traceRouteResultPath)
 			if err != nil {
-				log.Error().Err(err).Msg("save traceroute result failed")
+				global.GVA_LOG.Error("save traceroute result failed", zap.Error(err))
 			}
 		}
 	}()
@@ -45,24 +46,25 @@ func DoTraceRoute(traceRouteOptions *TraceRouteOptions, args []string) (err erro
 	traceRouteTarget := args[0]
 	parsedURL, err := url.Parse(traceRouteTarget)
 	if err == nil && parsedURL.Host != "" {
-		log.Info().Msgf("parse input url %v and extract host %v", traceRouteTarget, parsedURL.Host)
+		global.GVA_LOG.Info("parse input url", zap.String("url", traceRouteTarget), zap.String("host", parsedURL.Host))
 		traceRouteTarget = strings.Split(parsedURL.Host, ":")[0]
 	}
 
 	cmd := myexec.Command("tracert", "-h", strconv.Itoa(traceRouteOptions.MaxTTL), traceRouteTarget)
+	global.GVA_LOG.Info("execute traceroute", zap.String("command", cmd.String()))
 	stdout, _ := cmd.StdoutPipe()
 
 	startT := time.Now()
 	defer func() {
-		log.Info().Msgf("for target %s, traceroute costs %v", traceRouteTarget, time.Since(startT))
+		global.GVA_LOG.Info("traceroute costs", zap.String("target", traceRouteTarget), zap.Duration("cost", time.Since(startT)))
 	}()
 
-	log.Info().Msgf("start to traceroute %v", traceRouteTarget)
+	global.GVA_LOG.Info("start to traceroute", zap.String("target", traceRouteTarget))
 	err = cmd.Start()
 	if err != nil {
 		traceRouteResult.Suc = false
 		traceRouteResult.ErrMsg = "execute traceroute failed"
-		log.Error().Err(err).Msg("start command failed")
+		global.GVA_LOG.Error("start command failed", zap.Error(err))
 		return
 	}
 
@@ -97,7 +99,7 @@ func DoTraceRoute(traceRouteOptions *TraceRouteOptions, args []string) (err erro
 	if err != nil {
 		traceRouteResult.Suc = false
 		traceRouteResult.ErrMsg = "wait traceroute finish failed"
-		log.Error().Err(err).Msg("wait command failed")
+		global.GVA_LOG.Error("wait command failed", zap.Error(err))
 		return
 	}
 	return

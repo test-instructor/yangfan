@@ -4,14 +4,17 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/fullstorydev/grpcurl"
-	"github.com/pkg/errors"
-	"github.com/test-instructor/grpc-plugin/plugin"
-	"github.com/test-instructor/yangfan/hrp/internal/builtin"
 	"io"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/fullstorydev/grpcurl"
+	"github.com/pkg/errors"
+	"github.com/test-instructor/grpc-plugin/plugin"
+	"github.com/test-instructor/yangfan/hrp/internal/builtin"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 )
 
 // GrpcType Request type
@@ -78,7 +81,9 @@ func runStepGRPC(g *SessionRunner, step *TStep) (stepResult *StepResult, err err
 
 	stepVariables, err := g.ParseStepVariables(step.Variables)
 	if err != nil {
+		global.GVA_LOG.Error("parse step variables failed", zap.Error(err))
 		err = errors.Wrap(err, "parse step variables failed")
+		global.GVA_LOG.Error("parse step variables failed", zap.Error(err))
 		return
 	}
 
@@ -104,6 +109,7 @@ func runStepGRPC(g *SessionRunner, step *TStep) (stepResult *StepResult, err err
 	for _, setupHook := range step.SetupHooks {
 		req, err := parser.Parse(setupHook, stepVariables)
 		if err != nil {
+			global.GVA_LOG.Error("parse setup hook failed", zap.Error(err))
 			continue
 		}
 		reqMap, ok := req.(map[string]interface{})
@@ -115,6 +121,7 @@ func runStepGRPC(g *SessionRunner, step *TStep) (stepResult *StepResult, err err
 	for _, setupHook := range step.SetupHooks {
 		req, err := parser.Parse(setupHook, stepVariables)
 		if err != nil {
+			global.GVA_LOG.Error("parse setup hook failed", zap.Error(err))
 			continue
 		}
 		reqMap, ok := req.(map[string]interface{})
@@ -172,6 +179,7 @@ func runStepGRPC(g *SessionRunner, step *TStep) (stepResult *StepResult, err err
 		res, err := ig.InvokeFunction()
 		//result, timer, gErr := h.InvokeFunction(rb.URL, rb.body, rb.Headers)
 		if err != nil {
+			global.GVA_LOG.Error("grpc invoke function failed", zap.Error(err))
 			return setGrpcErr(g, err, start, rb, parser, step.Name)
 		}
 		gResp = &grpcResponse{
@@ -194,6 +202,7 @@ func runStepGRPC(g *SessionRunner, step *TStep) (stepResult *StepResult, err err
 	//new response object
 	respObj, err := newGrpcResponseObject(g.caseRunner.hrpRunner.t, parser, gResp)
 	if err != nil {
+		global.GVA_LOG.Error("init ResponseObject error", zap.Error(err))
 		err = errors.Wrap(err, "init ResponseObject error")
 		return
 	}
@@ -249,6 +258,7 @@ type status int
 
 var statusConnectionFailed status = 1
 var statusTypeFailed status = 2
+var _ = statusConnectionFailed
 
 // response data format
 type grpcResponse struct {
@@ -363,7 +373,7 @@ func (r *grpcBuilder) prepareBody(stepVariables map[string]interface{}) error {
 	}
 
 	r.requestMap["body"] = data
-	r.stepGrpc.Body = io.NopCloser(bytes.NewReader(dataBytes))
+	//r.stepGrpc.Body = io.NopCloser(bytes.NewReader(dataBytes))
 	r.body = io.NopCloser(bytes.NewReader(dataBytes))
 	return nil
 }
@@ -413,6 +423,7 @@ func newGrpcResponseObject(t *testing.T, parser *Parser, resp *grpcResponse) (*r
 	if resp.err != nil {
 		statusCode = ""
 		errStr = resp.err.Error()
+		global.GVA_LOG.Error("grpc request failed", zap.Error(resp.err))
 	}
 
 	respObjMeta := grpcRespObjMeta{

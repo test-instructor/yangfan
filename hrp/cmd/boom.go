@@ -4,8 +4,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 	"golang.org/x/net/context"
 
 	"github.com/test-instructor/yangfan/hrp"
@@ -40,7 +41,7 @@ var boomCmd = &cobra.Command{
 		if boomArgs.profile != "" {
 			err := builtin.LoadFile(boomArgs.profile, &boomArgs.Profile)
 			if err != nil {
-				log.Error().Err(err).Msg("failed to load profile")
+				global.GVA_LOG.Error("failed to load profile", zap.Error(err))
 				return err
 			}
 		}
@@ -146,7 +147,7 @@ func makeHRPBoomer() (*hrp.HRPBoomer, error) {
 	if boomArgs.profile != "" {
 		err := builtin.LoadFile(boomArgs.profile, &boomArgs)
 		if err != nil {
-			log.Error().Err(err).Msg("failed to load profile")
+			global.GVA_LOG.Error("failed to load profile", zap.Error(err))
 			return nil, err
 		}
 	}

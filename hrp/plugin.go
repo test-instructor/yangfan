@@ -10,7 +10,8 @@ import (
 	"github.com/httprunner/funplugin"
 	"github.com/httprunner/funplugin/fungo"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/code"
 	"github.com/test-instructor/yangfan/hrp/internal/myexec"
@@ -59,7 +60,7 @@ func initplugin(path, venv string, logOn bool) (plugin funplugin.IPlugin, err er
 	}
 	pluginPath, err := locatePlugin(path)
 	if err != nil {
-		log.Warn().Str("path", path).Msg("locate plugin failed")
+		global.GVA_LOG.Warn("locate plugin failed", zap.String("path", path), zap.Error(err))
 		return nil, nil
 	}
 
@@ -75,7 +76,7 @@ func initplugin(path, venv string, logOn bool) (plugin funplugin.IPlugin, err er
 		genPyPluginPath := filepath.Join(filepath.Dir(pluginPath), PluginPySourceGenFile)
 		err = BuildPlugin(pluginPath, genPyPluginPath)
 		if err != nil {
-			log.Error().Err(err).Str("path", pluginPath).Msg("build plugin failed")
+			global.GVA_LOG.Error("build plugin failed", zap.String("path", pluginPath), zap.Error(err))
 			return nil, err
 		}
 		pluginPath = genPyPluginPath
@@ -85,9 +86,7 @@ func initplugin(path, venv string, logOn bool) (plugin funplugin.IPlugin, err er
 		}
 		python3, err := myexec.EnsurePython3Venv(venv, packages...)
 		if err != nil {
-			log.Error().Err(err).
-				Interface("packages", packages).
-				Msg("python3 venv is not ready")
+			global.GVA_LOG.Error("python3 venv is not ready", zap.Any("packages", packages), zap.Error(err))
 			return nil, err
 		}
 		pluginOptions = append(pluginOptions, funplugin.WithPython3(python3))
@@ -96,7 +95,7 @@ func initplugin(path, venv string, logOn bool) (plugin funplugin.IPlugin, err er
 	// found plugin file
 	plugin, err = funplugin.Init(pluginPath, pluginOptions...)
 	if err != nil {
-		log.Error().Err(err).Msgf("init plugin failed: %s", pluginPath)
+		global.GVA_LOG.Error("init plugin failed", zap.String("path", pluginPath), zap.Error(err))
 		err = errors.Wrap(code.InitPluginFailed, err.Error())
 		return
 	}

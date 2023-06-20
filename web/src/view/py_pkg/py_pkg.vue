@@ -395,7 +395,7 @@ const enterDialog = async () => {
     if (res.code === 0) {
       ElMessage({
         type: "success",
-        message: "安装成功",
+        message: res.msg,
       });
       closeDialog();
       getTableData();

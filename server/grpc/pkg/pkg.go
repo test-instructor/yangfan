@@ -55,25 +55,79 @@ func (t *ToolsClient) createClientConn(target string) (*grpc.ClientConn, error) 
 	return conn, err
 }
 
+//func (t *ToolsClient) RunInstallPkg() {
+//	var err error
+//
+//	go func() {
+//		global.GVA_LOG.Debug("[RunInstallPkg]开始接收消息")
+//		var stream tools.ToolsServer_InstallPackageStreamingMessageClient
+//		stream, err = t.client.ToolsServerClient.InstallPackageStreamingMessage(context.Background(), &tools.InstallPackageReq{})
+//		if err != nil {
+//			global.GVA_LOG.Error("[RunInstallPkg]创建流失败", zap.Error(err))
+//			for {
+//				time.Sleep(3 * time.Second)
+//				t.client, err = client.Reconnect()
+//				if err != nil {
+//					global.GVA_LOG.Error("[RunInstallPkg]重新连接失败", zap.Error(err))
+//					continue
+//				}
+//				stream, err = t.client.ToolsServerClient.InstallPackageStreamingMessage(context.Background(), &tools.InstallPackageReq{})
+//				if err != nil {
+//					global.GVA_LOG.Error("[RunInstallPkg]流式接口连接失败", zap.Error(err))
+//					continue
+//				}
+//				break
+//			}
+//		}
+//
+//		for {
+//			res, err := stream.Recv()
+//			global.GVA_LOG.Debug("[RunInstallPkg]接收消息", zap.Any("res", res))
+//			if err != nil {
+//				global.GVA_LOG.Error("[RunInstallPkg]接收消息失败", zap.Error(err))
+//				// 处理连接断开的情况
+//				// 尝试重连并继续接收消息
+//				for {
+//					// 等待一段时间后尝试重连
+//					global.GVA_LOG.Debug("[RunInstallPkg]等待接收消息", zap.Any("res", res))
+//					time.Sleep(5 * time.Second)
+//					//conn, err := p.createClientConn(target)
+//					t.client, err = client.Reconnect()
+//					if err != nil {
+//						global.GVA_LOG.Error("[RunInstallPkg]重新连接失败", zap.Error(err))
+//						continue
+//					}
+//					stream, err = t.client.ToolsServerClient.InstallPackageStreamingMessage(context.Background(), &tools.InstallPackageReq{})
+//					if err != nil {
+//						global.GVA_LOG.Error("[RunInstallPkg]流式接口连接失败", zap.Error(err))
+//						continue
+//					}
+//					break
+//				}
+//				continue
+//			}
+//			global.GVA_LOG.Debug("[RunInstallPkg]接收到消息", zap.Any("res", res))
+//			t.installPythonPackage(res)
+//		}
+//	}()
+//
+//	// 等待程序退出
+//	<-make(chan struct{})
+//}
+
 func (t *ToolsClient) RunInstallPkg() {
 	var err error
 
 	go func() {
-		global.GVA_LOG.Debug("[RunInstallPkg]开始接收消息")
-		var stream tools.ToolsServer_InstallPackageStreamingMessageClient
-		stream, err = t.client.ToolsServerClient.InstallPackageStreamingMessage(context.Background(), &tools.InstallPackageReq{})
-		if err != nil {
-			global.GVA_LOG.Error("[RunInstallPkg]创建流失败", zap.Error(err))
+		// 定义重连函数
+		reconnect := func() {
 			for {
+				// 等待一段时间后尝试重连
+				global.GVA_LOG.Debug("[reconnect]开始重新连接服务端")
 				time.Sleep(3 * time.Second)
 				t.client, err = client.Reconnect()
 				if err != nil {
 					global.GVA_LOG.Error("[RunInstallPkg]重新连接失败", zap.Error(err))
-					continue
-				}
-				stream, err = t.client.ToolsServerClient.InstallPackageStreamingMessage(context.Background(), &tools.InstallPackageReq{})
-				if err != nil {
-					global.GVA_LOG.Error("[RunInstallPkg]流式接口连接失败", zap.Error(err))
 					continue
 				}
 				break
@@ -81,33 +135,29 @@ func (t *ToolsClient) RunInstallPkg() {
 		}
 
 		for {
-			res, err := stream.Recv()
-			global.GVA_LOG.Debug("[RunInstallPkg]接收消息", zap.Any("res", res))
+			global.GVA_LOG.Debug("[RunInstallPkg]开始接收消息")
+			stream, err := t.client.ToolsServerClient.InstallPackageStreamingMessage(context.Background(), &tools.InstallPackageReq{})
 			if err != nil {
-				global.GVA_LOG.Error("[RunInstallPkg]接收消息失败", zap.Error(err))
+				global.GVA_LOG.Error("[RunInstallPkg]创建流失败", zap.Error(err))
 				// 处理连接断开的情况
 				// 尝试重连并继续接收消息
-				for {
-					// 等待一段时间后尝试重连
-					global.GVA_LOG.Debug("[RunInstallPkg]等待接收消息", zap.Any("res", res))
-					time.Sleep(5 * time.Second)
-					//conn, err := p.createClientConn(target)
-					t.client, err = client.Reconnect()
-					if err != nil {
-						global.GVA_LOG.Error("[RunInstallPkg]重新连接失败", zap.Error(err))
-						continue
-					}
-					stream, err = t.client.ToolsServerClient.InstallPackageStreamingMessage(context.Background(), &tools.InstallPackageReq{})
-					if err != nil {
-						global.GVA_LOG.Error("[RunInstallPkg]流式接口连接失败", zap.Error(err))
-						continue
-					}
-					break
-				}
+				reconnect()
 				continue
 			}
-			global.GVA_LOG.Debug("[RunInstallPkg]接收到消息", zap.Any("res", res))
-			t.installPythonPackage(res)
+
+			for {
+				res, err := stream.Recv()
+				global.GVA_LOG.Debug("[RunInstallPkg]接收消息", zap.Any("res", res))
+				if err != nil {
+					global.GVA_LOG.Error("[RunInstallPkg]接收消息失败", zap.Error(err))
+					// 处理连接断开的情况
+					// 尝试重连并继续接收消息
+					reconnect()
+					break
+				}
+				global.GVA_LOG.Debug("[RunInstallPkg]接收到消息", zap.Any("res", res))
+				t.installPythonPackage(res)
+			}
 		}
 	}()
 

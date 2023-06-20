@@ -24,6 +24,7 @@
           <el-button type="primary" @click="addApiCaseFunc" round
             >添加步骤</el-button
           >
+          <el-button type="primary" @click="runCase()">调试运行 </el-button>
         </el-form-item>
 
         <!--        <el-form-item>-->
@@ -107,6 +108,14 @@
               class="table-button"
               @click="updateInterfaceTemplateFunc(scope.row)"
               >变更</el-button
+            >
+            <el-button
+              type="text"
+              icon="copy-document"
+              size="small"
+              class="table-button"
+              @click="copyStep(scope.row)"
+              >复制</el-button
             >
             <el-button
               type="text"
@@ -195,7 +204,7 @@ import {
   addTestCase,
   delTestCase,
 } from "@/api/testCase";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { reactive, ref, onMounted, watch } from "vue";
 import InterfaceTempleGrpcForm from "@/view/interface/interfaceTemplate/interfaceTemplateGrpcForm.vue";
 import interfaceTempleForm from "@/view/interface/interfaceTemplate/interfaceTemplateForm.vue";
@@ -204,6 +213,8 @@ import { findInterfaceTemplate } from "@/api/interfaceTemplate";
 import { ElMessage, ElMessageBox } from "element-plus";
 import Sortable from "sortablejs";
 import UserConfig from "@/view/interface/interfaceComponents/userConfig.vue";
+import { runTestCaseStep } from "@/api/runTestCase";
+const router = useRouter();
 
 const route = useRoute();
 const testCaseID = ref();
@@ -300,7 +311,7 @@ const addApiCaseFunc = async () => {
 const updateInterfaceTemplateFunc = async (row) => {
   const res = await findInterfaceTemplate({ ID: row.ID });
   type.value = "update";
-  dialogTitle.value = "编辑套件";
+  dialogTitle.value = "编辑步骤";
   if (res.code === 0) {
     if (res.data.reapicase.gRPC) {
       formDatasGrpc.value = res.data.reapicase;
@@ -311,6 +322,21 @@ const updateInterfaceTemplateFunc = async (row) => {
       interfaceTempleFormVisible.value = true;
     }
     // interfaceTempleFormVisible.value = true
+  }
+};
+
+const copyStep = async (row) => {
+  const res = await addTestCase({
+    apiID: row.ID,
+    caseID: Number(testCaseID.value),
+    type: "copy",
+  });
+  if (res.code === 0) {
+    ElMessage({
+      type: "success",
+      message: "复制步骤成功",
+    });
+    await getTestCaseDetailFunc(testCaseID.value);
   }
 };
 
@@ -410,6 +436,28 @@ const closeDialogGrpc = () => {
     hooks: "",
     apiMenuID: "",
   });
+};
+
+const runCase = async () => {
+  let data = { caseID: Number(testCaseID.value), run_type: 1 };
+  const res = await runTestCaseStep(data);
+  if (res.code === 0) {
+    reportDetailFunc(res.data.id);
+  }
+};
+
+const reportDetailFunc = (report_id) => {
+  console.log("=======", report_id);
+  if (report_id) {
+    router.push({
+      name: "reportDetail",
+      params: {
+        report_id: report_id,
+      },
+    });
+  } else {
+    router.push({ name: "reportDetail" });
+  }
 };
 </script>
 

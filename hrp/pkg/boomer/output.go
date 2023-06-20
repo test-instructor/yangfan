@@ -13,8 +13,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/push"
-	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/json"
 )
@@ -113,7 +114,7 @@ func (o *ConsoleOutput) OnStop() {
 func (o *ConsoleOutput) OnEvent(data map[string]interface{}) {
 	output, err := convertData(data)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to convert data")
+		global.GVA_LOG.Error("failed to convert data", zap.Any("err", err))
 		return
 	}
 
@@ -478,7 +479,7 @@ type PrometheusPusherOutput struct {
 func (o *PrometheusPusherOutput) OnStart() {
 	// reset all prometheus metrics
 	resetPrometheusMetrics()
-	log.Info().Msg("register prometheus metric collectors")
+	global.GVA_LOG.Info("register prometheus metric collectors")
 	registry := prometheus.NewRegistry()
 	registry.MustRegister(
 		// gauge vectors for requests
@@ -518,7 +519,7 @@ func (o *PrometheusPusherOutput) OnStop() {
 	// update runner state: stopped
 	gaugeState.Set(float64(StateStopped))
 	if err := o.pusher.Push(); err != nil {
-		log.Error().Err(err).Msg("push to Pushgateway failed")
+		global.GVA_LOG.Error("push to Pushgateway failed", zap.Error(err))
 	}
 }
 
@@ -526,7 +527,7 @@ func (o *PrometheusPusherOutput) OnStop() {
 func (o *PrometheusPusherOutput) OnEvent(data map[string]interface{}) {
 	output, err := convertData(data)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to convert data")
+		global.GVA_LOG.Error("failed to convert data", zap.Error(err))
 		return
 	}
 
@@ -606,13 +607,13 @@ func (o *PrometheusPusherOutput) OnEvent(data map[string]interface{}) {
 	}
 
 	if err := o.pusher.Push(); err != nil {
-		log.Error().Err(err).Msg("push to Pushgateway failed")
+		global.GVA_LOG.Error("push to Pushgateway failed", zap.Error(err))
 	}
 }
 
 // resetPrometheusMetrics will reset all metrics
 func resetPrometheusMetrics() {
-	log.Info().Msg("reset all prometheus metrics")
+	global.GVA_LOG.Info("reset prometheus metrics for stats interval")
 	gaugeNumRequests.Reset()
 	gaugeNumFailures.Reset()
 	gaugeMedianResponseTime.Reset()

@@ -5,8 +5,9 @@ import (
 
 	"github.com/denisbrodbeck/machineid"
 	"github.com/getsentry/sentry-go"
-	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/env"
 	"github.com/test-instructor/yangfan/hrp/internal/version"
@@ -37,7 +38,7 @@ func init() {
 		AttachStacktrace: true,
 	})
 	if err != nil {
-		log.Error().Err(err).Msg("init sentry sdk failed!")
+		global.GVA_LOG.Error("init sentry sdk failed!", zap.Error(err))
 		return
 	}
 	sentry.ConfigureScope(func(scope *sentry.Scope) {

@@ -93,7 +93,7 @@
             <el-table-column
               min-width="550"
               align="center"
-              label="测试套件用例详情"
+              label="测试步骤用例详情"
             >
               <template #default="scope">
                 <div
@@ -249,7 +249,7 @@ const leftDragHandler = async (dom, target) => {
         if (res.code === 0) {
           ElMessage({
             type: "success",
-            message: "添加套件成功",
+            message: "添加步骤成功",
           });
           let currRowData = res.data;
           caseData.value.splice(newIndex, 0, currRowData);

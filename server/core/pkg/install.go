@@ -14,7 +14,7 @@ import (
 )
 
 func PyPkgInstallServiceV2(pyPkg request.HrpPyPkgRequest) (err error) {
-
+	global.GVA_LOG.Debug("安装Python包", zap.Any("pyPkg", pyPkg))
 	var hrpPyPkg interfacecase.HrpPyPkg
 	// 设置安装参数
 	installArgs := []string{"install", pyPkg.Name}
@@ -23,6 +23,13 @@ func PyPkgInstallServiceV2(pyPkg request.HrpPyPkgRequest) (err error) {
 	}
 	hostname, _ := os.UserHomeDir()
 	PipEnvPath := hostname + "/.hrp/venv/bin/pip3"
+	var getPip = "get-pip.py"
+	PyEnvPath := hostname + "/.hrp/venv/bin/python3"
+	outputUpdatePip, _ := exec.Command(PyEnvPath, getPip).Output()
+	if !strings.Contains(string(outputUpdatePip), "Successfully installed") && !strings.Contains(string(outputUpdatePip), "Successfully uninstalled") {
+		global.GVA_LOG.Warn("更新pip失败", zap.String("output", string(outputUpdatePip)))
+	}
+	global.GVA_LOG.Debug("更新pip信息", zap.String("output", string(outputUpdatePip)))
 	output, _ := exec.Command(PipEnvPath, installArgs...).Output()
 	global.GVA_LOG.Debug("安装Python包", zap.String("output", string(output)))
 	if !strings.Contains(string(output), "Successfully installed") && !strings.Contains(string(output), "Successfully uninstalled") {

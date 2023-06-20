@@ -8,7 +8,6 @@ import (
 	"github.com/test-instructor/yangfan/proto/master"
 	"github.com/test-instructor/yangfan/server/global"
 	"go.uber.org/zap"
-	"os"
 	"time"
 )
 
@@ -121,8 +120,8 @@ func (b masterServer) Stop(ctx context.Context, req *master.StopReq) (resp *mast
 			resp.Resp = errResp
 		} else {
 			go func() {
-				time.Sleep(30 * time.Second)
-				os.Exit(0)
+				time.Sleep(3 * time.Second)
+				global.GVA_LOG.Panic("receive stop message from master, exit.")
 			}()
 			resp.Resp = okResp
 		}

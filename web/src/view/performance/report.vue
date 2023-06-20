@@ -90,7 +90,13 @@
               >详情</el-button
             >
             <!--            <el-button type="text" size="small" class="table-button" @click="reportDetailFunc(scope.row)">详情</el-button>-->
-            <!--            <el-button type="text" icon="delete" size="mini" @click="deleteRow(scope.row)">删除</el-button>-->
+            <el-button
+              type="text"
+              icon="delete"
+              size="mini"
+              @click="deleteRow(scope.row)"
+              >删除</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -119,7 +125,11 @@ export default {
 import { ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { deleteApiConfigByIds } from "@/api/apiConfig";
-import { getReportList } from "@/api/performance";
+import {
+  deletePerformance,
+  getReportList,
+  deleteReport,
+} from "@/api/performance";
 import {
   getDictFunc,
   formatDate,
@@ -127,6 +137,7 @@ import {
   filterDict,
 } from "@/utils/format";
 import { useRouter } from "vue-router";
+import { delApisCase } from "@/api/apiCase";
 
 // =========== 表格控制部分 ===========
 const page = ref(1);
@@ -180,18 +191,35 @@ const onDelete = async () => {
     multipleSelection.value.map((item) => {
       ids.push(item.ID);
     });
-  // const res = await deleteApiConfigByIds({ids})
+  // const res = await deleteApiConfigByIds({ ids });
   // if (res.code === 0) {
   //   ElMessage({
-  //     type: 'success',
-  //     message: '删除成功'
-  //   })
+  //     type: "success",
+  //     message: "删除成功",
+  //   });
   //   if (tableData.value.length === ids.length && page.value > 1) {
-  //     page.value--
+  //     page.value--;
   //   }
-  //   deleteVisible.value = false
-  //   await getTableData()
+  //   deleteVisible.value = false;
+  //   await getTableData();
   // }
+};
+
+const deleteRow = (row) => {
+  ElMessageBox.confirm("确定要删除吗?", "提示", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
+  }).then(async () => {
+    const res = await deleteReport({ ID: row.ID });
+    if (res.code === 0) {
+      await getTableData();
+      ElMessage({
+        type: "success",
+        message: "用例删除成功",
+      });
+    }
+  });
 };
 
 const reportDetailFunc = (row) => {

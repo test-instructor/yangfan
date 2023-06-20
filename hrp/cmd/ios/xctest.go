@@ -7,8 +7,9 @@ import (
 	"syscall"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 )
 
 var xctestCmd = &cobra.Command{
@@ -23,7 +24,7 @@ var xctestCmd = &cobra.Command{
 			return err
 		}
 
-		log.Info().Str("bundleID", bundleID).Msg("run xctest")
+		global.GVA_LOG.Info("run xctest", zap.String("bundleID", bundleID))
 		out, cancel, err := device.XCTest(bundleID)
 		if err != nil {
 			return errors.Wrap(err, "run xctest failed")

@@ -5,7 +5,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 )
 
 // StepRendezvous implements IStep interface.
@@ -30,13 +31,11 @@ func (s *StepRendezvous) Struct() *TStep {
 
 func (s *StepRendezvous) Run(r *SessionRunner) (*StepResult, error) {
 	rendezvous := s.step.Rendezvous
-	log.Info().
-		Str("name", rendezvous.Name).
-		Float32("percent", rendezvous.Percent).
-		Int64("number", rendezvous.Number).
-		Int64("timeout", rendezvous.Timeout).
-		Msg("rendezvous")
-
+	global.GVA_LOG.Info("rendezvous",
+		zap.String("name", rendezvous.Name),
+		zap.Float32("percent", rendezvous.Percent),
+		zap.Int64("number", rendezvous.Number),
+		zap.Int64("timeout", rendezvous.Timeout))
 	stepResult := &StepResult{
 		Name:     rendezvous.Name,
 		StepType: stepTypeRendezvous,
@@ -169,11 +168,7 @@ func initRendezvous(testcase *TestCase, total int64) []*Rendezvous {
 		} else if rendezvous.Number > 0 && rendezvous.Number <= total && rendezvous.Percent == 0 {
 			rendezvous.Percent = float32(rendezvous.Number) / float32(total)
 		} else {
-			log.Warn().
-				Str("name", rendezvous.Name).
-				Int64("default number", total).
-				Float32("default percent", defaultRendezvousPercent).
-				Msg("rendezvous parameter not defined or error, set to default value")
+			global.GVA_LOG.Error("rendezvous parameter not defined or error, set to default value", zap.Any("name", rendezvous.Name), zap.Any("default number", total), zap.Any("default percent", defaultRendezvousPercent))
 			rendezvous.Number = total
 			rendezvous.Percent = defaultRendezvousPercent
 		}
@@ -219,25 +214,12 @@ func waitSingleRendezvous(rendezvous *Rendezvous, rendezvousList []*Rendezvous, 
 			case <-stop:
 				rendezvous.setReleased()
 				close(rendezvous.releaseChan)
-				log.Info().
-					Str("name", rendezvous.Name).
-					Float32("percent", rendezvous.Percent).
-					Int64("number", rendezvous.Number).
-					Int64("timeout(ms)", rendezvous.Timeout).
-					Int64("cnt", rendezvous.cnt).
-					Str("reason", "rendezvous release condition satisfied").
-					Msg("rendezvous released")
+
+				global.GVA_LOG.Info("rendezvous released", zap.Any("name", rendezvous.Name), zap.Any("percent", rendezvous.Percent), zap.Any("number", rendezvous.Number), zap.Any("timeout(ms)", rendezvous.Timeout), zap.Any("cnt", rendezvous.cnt), zap.Any("reason", "rendezvous release condition satisfied"))
 			case <-timer.C:
 				rendezvous.setReleased()
 				close(rendezvous.releaseChan)
-				log.Info().
-					Str("name", rendezvous.Name).
-					Float32("percent", rendezvous.Percent).
-					Int64("number", rendezvous.Number).
-					Int64("timeout(ms)", rendezvous.Timeout).
-					Int64("cnt", rendezvous.cnt).
-					Str("reason", "time's up").
-					Msg("rendezvous released")
+				global.GVA_LOG.Info("rendezvous released", zap.Any("name", rendezvous.Name), zap.Any("percent", rendezvous.Percent), zap.Any("number", rendezvous.Number), zap.Any("timeout(ms)", rendezvous.Timeout), zap.Any("cnt", rendezvous.cnt), zap.Any("reason", "time's up"))
 			}
 		}
 		// cycle end: reset all previous rendezvous after last rendezvous released

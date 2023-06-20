@@ -11,7 +11,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
 	"github.com/test-instructor/yangfan/hrp/internal/code"
@@ -101,10 +102,8 @@ func (s *veDEMOCRService) getOCRResult(imageBuf []byte) ([]OCRResult, error) {
 		if resp != nil {
 			logID = getLogID(resp.Header)
 		}
-		log.Error().Err(err).
-			Str("logID", logID).
-			Int("imageBufSize", size).
-			Msgf("request OCR service failed, retry %d", i)
+
+		global.GVA_LOG.Error("request OCR service failed, retry %d", zap.String("logID", logID), zap.Int("imageBufSize", size))
 		time.Sleep(1 * time.Second)
 	}
 	if resp == nil {
@@ -152,7 +151,7 @@ func (s *veDEMOCRService) FindText(text string, imageBuf []byte, options ...Data
 
 	ocrResults, err := s.getOCRResult(imageBuf)
 	if err != nil {
-		log.Error().Err(err).Msg("getOCRResult failed")
+		global.GVA_LOG.Error("getOCRResult failed", zap.Error(err))
 		return
 	}
 
@@ -218,7 +217,7 @@ func (s *veDEMOCRService) FindText(text string, imageBuf []byte, options ...Data
 func (s *veDEMOCRService) FindTexts(texts []string, imageBuf []byte, options ...DataOption) (rects []image.Rectangle, err error) {
 	ocrResults, err := s.getOCRResult(imageBuf)
 	if err != nil {
-		log.Error().Err(err).Msg("getOCRResult failed")
+		global.GVA_LOG.Error("getOCRResult failed", zap.Error(err))
 		return
 	}
 
@@ -286,12 +285,11 @@ func (dExt *DriverExt) FindTextByOCR(ocrText string, options ...DataOption) (x, 
 	}
 	rect, err := service.FindText(ocrText, bufSource.Bytes(), options...)
 	if err != nil {
-		log.Warn().Msgf("FindText failed: %s", err.Error())
+		global.GVA_LOG.Error("FindText failed", zap.Error(err))
 		return
 	}
 
-	log.Info().Str("ocrText", ocrText).
-		Interface("rect", rect).Msgf("FindTextByOCR success")
+	global.GVA_LOG.Info("FindTextByOCR success", zap.String("ocrText", ocrText), zap.Any("rect", rect))
 	x, y, width, height = dExt.MappingToRectInUIKit(rect)
 	return
 }
@@ -309,12 +307,11 @@ func (dExt *DriverExt) FindTextsByOCR(ocrTexts []string, options ...DataOption) 
 	}
 	rects, err := service.FindTexts(ocrTexts, bufSource.Bytes(), options...)
 	if err != nil {
-		log.Warn().Msgf("FindTexts failed: %s", err.Error())
+		global.GVA_LOG.Error("FindTexts failed", zap.Error(err))
 		return
 	}
 
-	log.Info().Interface("ocrTexts", ocrTexts).
-		Interface("rects", rects).Msgf("FindTextsByOCR success")
+	global.GVA_LOG.Info("FindTextsByOCR success", zap.Any("ocrTexts", ocrTexts), zap.Any("rects", rects))
 	for _, rect := range rects {
 		x, y, width, height := dExt.MappingToRectInUIKit(rect)
 		points = append(points, []float64{x, y, width, height})

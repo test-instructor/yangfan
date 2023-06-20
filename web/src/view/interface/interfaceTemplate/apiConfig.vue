@@ -69,7 +69,7 @@
         />
         <el-table-column
           align="left"
-          label="前置套件"
+          label="前置步骤"
           prop="setup_case.name"
           width="240"
         />
@@ -247,7 +247,7 @@ const handleSelectionChange = (val) => {
 // 删除行
 const deleteRow = (row) => {
   ElMessageBox.confirm(
-    "删除配置会导致被应用的测试套件、测试用例、定时任务、性能测试任务无法正常运行，确定要删除吗?",
+    "删除配置会导致被应用的测试步骤、测试用例、定时任务、性能测试任务无法正常运行，确定要删除吗?",
     "提示",
     {
       confirmButtonText: "确定",
@@ -325,7 +325,7 @@ const dialogFormVisible = ref(false);
 const dialogTitle = ref(false);
 const heightDiv = ref();
 heightDiv.value =
-  window.screen.height - 480 > 600 ? 600 : window.screen.height - 480;
+  window.screen.height - 480 > 530 ? 530 : window.screen.height - 480;
 
 // 打开弹窗
 const openDialog = () => {

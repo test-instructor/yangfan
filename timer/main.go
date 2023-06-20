@@ -28,6 +28,7 @@ func RunSetTimerTaskClient() {
 	}
 	p := pkg.NewRunInstallPkg(c)
 	go p.RunSetTimerTask()
+	go p.RunInstallPkg()
 }
 
 func main() {

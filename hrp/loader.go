@@ -7,7 +7,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 )
 
 func LoadTestCases(iTestCases ...ITestCase) ([]*TestCase, error) {
@@ -17,7 +18,7 @@ func LoadTestCases(iTestCases ...ITestCase) ([]*TestCase, error) {
 		if _, ok := iTestCase.(*TestCase); ok {
 			testcase, err := iTestCase.ToTestCase()
 			if err != nil {
-				log.Error().Err(err).Msg("failed to convert ITestCase interface to TestCase struct")
+				global.GVA_LOG.Error("failed to convert ITestCase interface to TestCase struct", zap.Error(err))
 				return nil, err
 			}
 			testCases = append(testCases, testcase)
@@ -63,6 +64,6 @@ func LoadTestCases(iTestCases ...ITestCase) ([]*TestCase, error) {
 		}
 	}
 
-	log.Info().Int("count", len(testCases)).Msg("load testcases successfully")
+	global.GVA_LOG.Info("load testcases successfully", zap.Int("count", len(testCases)))
 	return testCases, nil
 }

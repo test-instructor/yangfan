@@ -352,12 +352,12 @@ const runCaseDebug = async (row, runType) => {
   }
 };
 
-const reportDetailFunc = (ID) => {
-  if (ID) {
+const reportDetailFunc = (report_id) => {
+  if (report_id) {
     router.push({
       name: "reportDetail",
       params: {
-        id: ID,
+        report_id: report_id,
       },
     });
   } else {

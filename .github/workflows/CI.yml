@@ -46,9 +46,9 @@ jobs:
         run: |
           docker build -t server -f server/Dockerfile .
           docker tag server ${{ env.REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker tag server ${{ env.REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
           docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
+          docker tag server ${{ env.REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:latest
+          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:latest
 
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
@@ -59,9 +59,9 @@ jobs:
       - name: Push to Aliyun Docker image
         run: |
           docker tag server ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker tag server ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
           docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
+          docker tag server ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:latest
+          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:latest
 
   timer:
     name: Building a timer image
@@ -89,9 +89,9 @@ jobs:
         run: |
           docker build -t timer -f timer/Dockerfile .
           docker tag timer ${{ env.REGISTRY }}${{ env.IMAGE_NAME_TIMER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker tag timer ${{ env.REGISTRY }}${{ env.IMAGE_NAME_TIMER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
           docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_TIMER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_TIMER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
+          docker tag timer ${{ env.REGISTRY }}${{ env.IMAGE_NAME_TIMER }}${{ steps.determine.outputs.image_suffix }}:latest
+          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_TIMER }}${{ steps.determine.outputs.image_suffix }}:latest
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
@@ -101,9 +101,9 @@ jobs:
       - name: Push to Aliyun Docker image
         run: |
           docker tag timer ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_TIMER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker tag timer ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_TIMER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
           docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_TIMER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_TIMER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
+          docker tag timer ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_TIMER }}${{ steps.determine.outputs.image_suffix }}:latest
+          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_TIMER }}${{ steps.determine.outputs.image_suffix }}:latest
 
   master:
     name: Building a master image
@@ -131,9 +131,9 @@ jobs:
         run: |
           docker build -t master -f master/Dockerfile .
           docker tag master ${{ env.REGISTRY }}${{ env.IMAGE_NAME_MASTER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker tag master ${{ env.REGISTRY }}${{ env.IMAGE_NAME_MASTER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
           docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_MASTER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_MASTER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
+          docker tag master ${{ env.REGISTRY }}${{ env.IMAGE_NAME_MASTER }}${{ steps.determine.outputs.image_suffix }}:latest
+          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_MASTER }}${{ steps.determine.outputs.image_suffix }}:latest
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
@@ -143,9 +143,9 @@ jobs:
       - name: Push to Aliyun Docker image
         run: |
           docker tag master ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_MASTER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker tag master ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_MASTER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
           docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_MASTER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_MASTER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
+          docker tag master ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_MASTER }}${{ steps.determine.outputs.image_suffix }}:latest
+          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_MASTER }}${{ steps.determine.outputs.image_suffix }}:latest
 
   work:
     name: Building a work image
@@ -173,9 +173,9 @@ jobs:
         run: |
           docker build -t work -f work/Dockerfile .
           docker tag work ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WORK }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker tag work ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WORK }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
           docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WORK }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WORK }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
+          docker tag work ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WORK }}${{ steps.determine.outputs.image_suffix }}:latest
+          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WORK }}${{ steps.determine.outputs.image_suffix }}:latest
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
@@ -185,9 +185,9 @@ jobs:
       - name: Push to Aliyun Docker image
         run: |
           docker tag work ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WORK }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker tag work ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WORK }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
           docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WORK }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WORK }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
+          docker tag work ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WORK }}${{ steps.determine.outputs.image_suffix }}:latest
+          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WORK }}${{ steps.determine.outputs.image_suffix }}:latest
 
   run:
     name: Building a run image
@@ -215,9 +215,9 @@ jobs:
         run: |
           docker build -t run -f run/Dockerfile .
           docker tag run ${{ env.REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker tag run ${{ env.REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
           docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
+          docker tag run ${{ env.REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:latest
+          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:latest
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
@@ -227,9 +227,9 @@ jobs:
       - name: Push to Aliyun Docker image
         run: |
           docker tag run ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker tag run ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
           docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
+          docker tag run ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:latest
+          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:latest
 
 
   web:
@@ -258,9 +258,9 @@ jobs:
         run: |
           docker build -t web -f ./web/Dockerfile .
           docker tag web ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker tag web ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
           docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
+          docker tag web ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:latest
+          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:latest
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
@@ -270,6 +270,6 @@ jobs:
       - name: Push to Aliyun Docker image
         run: |
           docker tag web ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker tag web ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
           docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
+          docker tag web ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:latest
+          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:latest

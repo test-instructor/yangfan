@@ -4,17 +4,19 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
-	"github.com/test-instructor/yangfan/hrp/internal/builtin"
-	"github.com/test-instructor/yangfan/hrp/internal/code"
-	"github.com/test-instructor/yangfan/hrp/internal/sdk"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
 	"sync"
 	"time"
+
+	"github.com/pkg/errors"
+	"github.com/test-instructor/yangfan/hrp/internal/builtin"
+	"github.com/test-instructor/yangfan/hrp/internal/code"
+	"github.com/test-instructor/yangfan/hrp/internal/sdk"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 )
 
 func (r *HRPRunner) RunJsons(testcases ...ITestCase) (data []byte, err error) {
@@ -32,7 +34,7 @@ func (r *HRPRunner) RunJsons(testcases ...ITestCase) (data []byte, err error) {
 	// load all testcases
 	testCases, err := LoadTestCases(testcases...)
 	if err != nil {
-		log.Error().Err(err).Msg("run json failed to load testcases")
+		global.GVA_LOG.Error("run json failed to load testcases", zap.Error(err))
 		return
 	}
 
@@ -57,7 +59,7 @@ func (r *HRPRunner) RunJsons(testcases ...ITestCase) (data []byte, err error) {
 			}()
 			caseRunner, err := r.NewCaseRunner(testcase)
 			if err != nil {
-				log.Error().Err(err).Msg("[Run] init case runner failed")
+				global.GVA_LOG.Error("run json failed to init case runner", zap.Error(err))
 				return
 			}
 
@@ -72,7 +74,7 @@ func (r *HRPRunner) RunJsons(testcases ...ITestCase) (data []byte, err error) {
 				sessionRunner := caseRunner.NewSession()
 				err1 := sessionRunner.Start(it.Next())
 				if err1 != nil {
-					log.Error().Err(err1).Msg("[Run] run testcase failed")
+					global.GVA_LOG.Error("run json failed to run testcase", zap.Error(err1))
 					runErr = err1
 				}
 				caseSummary, err2 := sessionRunner.GetSummary()
@@ -86,7 +88,7 @@ func (r *HRPRunner) RunJsons(testcases ...ITestCase) (data []byte, err error) {
 				caseSummary.Name = testcase.Name
 				s.appendCaseSummary(caseSummary)
 				if err2 != nil {
-					log.Error().Err(err2).Msg("[Run] get summary failed")
+					global.GVA_LOG.Error("run json failed to get summary", zap.Error(err2))
 					if err1 != nil {
 						runErr = errors.Wrap(err1, err2.Error())
 					} else {
@@ -123,19 +125,19 @@ func tmpls(relativePath, debugTalkFileName string) string {
 }
 
 func BuildHashicorpPyPlugin(debugTalkByte []byte, debugTalkFilePath string) {
-	log.Info().Msg("[init] prepare hashicorp python plugin")
+	global.GVA_LOG.Info("prepare hashicorp python plugin", zap.String("debugTalkFilePath", debugTalkFilePath))
 	err := ioutil.WriteFile(tmpls("debugtalk.py", debugTalkFilePath), debugTalkByte, 0o644)
 	if err != nil {
-		log.Error().Err(err).Msg("copy hashicorp python plugin failed")
+		global.GVA_LOG.Error("copy hashicorp python plugin failed", zap.Error(err))
 		os.Exit(code.GetErrorCode(err))
 	}
 }
 
 func RemoveHashicorpPyPlugin(debugTalkFilePath string) {
-	log.Info().Msg("[teardown] remove hashicorp python plugin")
+	global.GVA_LOG.Info("remove hashicorp python plugin", zap.String("debugTalkFilePath", debugTalkFilePath))
 	err := os.RemoveAll(debugTalkFilePath)
 	if err != nil {
-		log.Error().Err(err).Msg("删除debugTalkFilePath文件夹失败")
+		global.GVA_LOG.Error("remove hashicorp python plugin failed", zap.Error(err))
 	}
 }
 
@@ -246,7 +248,7 @@ func (testCaseJson *TestCaseJson) ToTestCase() (*TestCase, error) {
 				step: step,
 			})
 		} else {
-			log.Warn().Interface("step", step).Msg("[convertTestCase] unexpected step")
+			global.GVA_LOG.Warn("unexpected step", zap.Any("step", step))
 		}
 	}
 	return testCase, nil
@@ -363,7 +365,7 @@ func (testCaseJson *JsonToCase) ToTestCase() (ITestCase, error) {
 				step: step,
 			})
 		} else {
-			log.Warn().Interface("step", step).Msg("[convertTestCase] unexpected step")
+			global.GVA_LOG.Warn("unexpected step", zap.Any("step", step))
 		}
 	}
 	return testCase, nil

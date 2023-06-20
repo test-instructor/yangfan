@@ -14,7 +14,8 @@ import (
 	"github.com/httprunner/funplugin/shared"
 	"github.com/maja42/goval"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
 	"github.com/test-instructor/yangfan/hrp/internal/code"
@@ -31,7 +32,7 @@ type Parser struct {
 func buildURL(baseURL, stepURL string) string {
 	uStep, err := url.Parse(stepURL)
 	if err != nil {
-		log.Error().Str("stepURL", stepURL).Err(err).Msg("[buildURL] parse url failed")
+		global.GVA_LOG.Error("[buildURL] parse url failed", zap.String("stepURL", stepURL), zap.Error(err))
 		return ""
 	}
 
@@ -43,7 +44,7 @@ func buildURL(baseURL, stepURL string) string {
 	// step url is relative, based on base url
 	uConfig, err := url.Parse(baseURL)
 	if err != nil {
-		log.Error().Str("baseURL", baseURL).Err(err).Msg("[buildURL] parse url failed")
+		global.GVA_LOG.Error("[buildURL] parse url failed", zap.String("baseURL", baseURL), zap.Error(err))
 		return ""
 	}
 
@@ -199,13 +200,10 @@ func (p *Parser) ParseString(raw string, variablesMapping map[string]interface{}
 
 			result, err := p.callFunc(funcName, parsedArgs.([]interface{})...)
 			if err != nil {
-				log.Error().Str("funcName", funcName).Interface("arguments", arguments).
-					Err(err).Msg("call function failed")
+				global.GVA_LOG.Error("call function failed", zap.String("funcName", funcName), zap.Any("arguments", arguments), zap.Error(err))
 				return raw, errors.Wrap(code.CallFunctionError, err.Error())
 			}
-			log.Info().Str("funcName", funcName).Interface("arguments", arguments).
-				Interface("output", result).Msg("call function success")
-
+			global.GVA_LOG.Info("call function success", zap.String("funcName", funcName), zap.Any("arguments", arguments), zap.Any("output", result))
 			if funcMatched[0] == raw {
 				// raw_string is a function, e.g. "${add_one(3)}", return its eval value directly
 				return result, nil
@@ -215,10 +213,7 @@ func (p *Parser) ParseString(raw string, variablesMapping map[string]interface{}
 			matchStartPosition += len(funcMatched[0])
 			parsedString += convertString(result)
 			remainedString = raw[matchStartPosition:]
-			log.Debug().
-				Str("parsedString", parsedString).
-				Int("matchStartPosition", matchStartPosition).
-				Msg("[parseString] parse function")
+			global.GVA_LOG.Debug("parseString parse function", zap.String("parsedString", parsedString), zap.Int("matchStartPosition", matchStartPosition))
 			continue
 		}
 
@@ -245,10 +240,7 @@ func (p *Parser) ParseString(raw string, variablesMapping map[string]interface{}
 			matchStartPosition += len(varMatched[0])
 			parsedString += convertString(varValue)
 			remainedString = raw[matchStartPosition:]
-			log.Debug().
-				Str("parsedString", parsedString).
-				Int("matchStartPosition", matchStartPosition).
-				Msg("[parseString] parse variable")
+			global.GVA_LOG.Debug("parseString parse variable", zap.String("parsedString", parsedString), zap.Int("matchStartPosition", matchStartPosition))
 			continue
 		}
 
@@ -384,7 +376,7 @@ func literalEval(raw string) (interface{}, error) {
 	// eval string to number
 	result, err := eval.Evaluate(raw, nil, nil)
 	if err != nil {
-		log.Error().Err(err).Msgf("[literalEval] eval %s failed", raw)
+		global.GVA_LOG.Error("literalEval eval failed", zap.String("raw", raw), zap.Error(err))
 		return raw, err
 	}
 	return result, nil
@@ -435,7 +427,7 @@ func (p *Parser) ParseVariables(variables map[string]interface{}) (map[string]in
 			// variables = {"token": "abc$token"}
 			// variables = {"key": ["$key", 2]}
 			if _, ok := extractVarsSet[varName]; ok {
-				log.Error().Interface("variables", variables).Msg("[parseVariables] variable self reference error")
+				global.GVA_LOG.Error("variable self reference error", zap.Any("variables", variables))
 				return variables, errors.Wrap(code.ParseVariablesError,
 					fmt.Sprintf("variable self reference: %v", varName))
 			}
@@ -451,7 +443,7 @@ func (p *Parser) ParseVariables(variables map[string]interface{}) (map[string]in
 				}
 			}
 			if len(undefinedVars) > 0 {
-				log.Error().Interface("undefinedVars", undefinedVars).Msg("[parseVariables] variable not defined error")
+				global.GVA_LOG.Error("variable not defined error", zap.Any("variables", variables))
 				return variables, errors.Wrap(code.ParseVariablesError,
 					fmt.Sprintf("variable not defined: %v", undefinedVars))
 			}
@@ -465,7 +457,7 @@ func (p *Parser) ParseVariables(variables map[string]interface{}) (map[string]in
 		traverseRounds += 1
 		// check if circular reference exists
 		if traverseRounds > len(variables) {
-			log.Error().Msg("[parseVariables] circular reference error, break infinite loop!")
+			global.GVA_LOG.Error("circular reference error", zap.Any("variables", variables))
 			return variables, errors.Wrap(code.ParseVariablesError, "circular reference")
 		}
 	}
