@@ -14,7 +14,8 @@ import (
 
 	"github.com/miekg/dns"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
 	"github.com/test-instructor/yangfan/hrp/internal/json"
@@ -103,7 +104,7 @@ func localDns(src string, dnsRecordType int, dnsServer string) (dnsResult DnsRes
 
 	_, ipType := ParseIP(dnsServer)
 	if ipType == 4 {
-		dnsServer += ":53"
+		dnsServer = "127.0.0.1:53"
 	}
 
 	c := dns.Client{
@@ -215,7 +216,7 @@ func DoDns(dnsOptions *DnsOptions, args []string) (err error) {
 			dnsResultPath := filepath.Join(dir, dnsResultName)
 			err = builtin.Dump2JSON(dnsResult, dnsResultPath)
 			if err != nil {
-				log.Error().Err(err).Msg("save dns resolution result failed")
+				global.GVA_LOG.Error("save dns resolution result failed", zap.Error(err))
 			}
 		}
 	}()
@@ -224,10 +225,10 @@ func DoDns(dnsOptions *DnsOptions, args []string) (err error) {
 
 	parsedURL, err := url.Parse(dnsTarget)
 	if err == nil && parsedURL.Host != "" {
-		log.Info().Msgf("parse input url %v and extract host %v", dnsTarget, parsedURL.Host)
+		global.GVA_LOG.Info("parse input url and extract host", zap.String("url", dnsTarget), zap.String("host", parsedURL.Host))
 		dnsTarget = strings.Split(parsedURL.Host, ":")[0]
 	}
-	log.Info().Msgf("resolve DNS for %v", dnsTarget)
+	global.GVA_LOG.Info("resolve DNS", zap.String("target", dnsTarget))
 	dnsRecordType := dnsOptions.DnsRecordType
 	dnsServer := dnsOptions.DnsServer
 	switch dnsOptions.DnsSourceType {
@@ -241,7 +242,7 @@ func DoDns(dnsOptions *DnsOptions, args []string) (err error) {
 	if err != nil {
 		dnsResult.Suc = false
 		dnsResult.ErrMsg = err.Error()
-		log.Error().Err(err).Msgf("fail to do DNS for %s", dnsTarget)
+		global.GVA_LOG.Error("fail to do DNS", zap.String("target", dnsTarget), zap.Error(err))
 	} else {
 		dnsResult.Suc = true
 		dnsResult.ErrMsg = ""

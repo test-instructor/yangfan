@@ -17,7 +17,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 )
 
 var Functions = map[string]interface{}{
@@ -192,7 +193,7 @@ func multipartEncoder(formMap map[string]interface{}) (*TFormDataWriter, error) 
 			}
 			if (strings.ToLower(leftPart) != "type" && strings.ToLower(leftPart) != "filename") || rightPart == "" {
 				formOption := fmt.Sprintf("%s=%s", leftPart, rightPart)
-				log.Warn().Msgf("invalid form option: %v, ignore", formOption)
+				global.GVA_LOG.Info("invalid form option: %v, ignore", zap.String("formOption", formOption))
 				continue
 			}
 			if strings.ToLower(leftPart) == "type" {
@@ -204,18 +205,18 @@ func multipartEncoder(formMap map[string]interface{}) (*TFormDataWriter, error) 
 		}
 		if isFilePath {
 			if err := tFormWriter.writeCustomFile(formKey, formValue, formType, formFileName); err != nil {
-				log.Error().Err(err).Msgf("failed to write file: %v=@\"%v\", exit", formKey, formValue)
+				global.GVA_LOG.Error("failed to write file: %v=@\"%v\", exit", zap.String("formKey", formKey), zap.String("formValue", formValue))
 				return nil, err
 			}
 			continue
 		}
 		if err := tFormWriter.writeCustomText(formKey, formValue, formType, formFileName); err != nil {
-			log.Error().Err(err).Msgf("failed to write text: %v=%v, ignore", formKey, formValue)
+			global.GVA_LOG.Error("failed to write text: %v=%v, ignore", zap.String("formKey", formKey), zap.String("formValue", formValue))
 			return nil, err
 		}
 	}
 	if err := writer.Close(); err != nil {
-		log.Error().Err(err).Msg("failed to close form-data writer")
+		global.GVA_LOG.Error("failed to close form-data writer", zap.Error(err))
 	}
 	return tFormWriter, nil
 }

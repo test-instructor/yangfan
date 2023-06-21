@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: yangfan-web
+  namespace: yangfan
+spec:
+  selector:
+    app: yangfan-web
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 31080
+      protocol: TCP

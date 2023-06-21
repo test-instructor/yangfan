@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"github.com/test-instructor/yangfan/server/model/interfacecase/request"
 	"github.com/test-instructor/yangfan/server/service"
 	"go.uber.org/zap"
@@ -38,15 +39,17 @@ func (p *PyPkg) GetPyPkgList(ctx *gin.Context) {
 func (p *PyPkg) InstallPyPkg(ctx *gin.Context) {
 	var pyPkg request.HrpPyPkgRequest
 	_ = ctx.ShouldBindJSON(&pyPkg.HrpPyPkg)
-	if err := pyPkgService.PyPkgInstallServiceV2(pyPkg); err != nil {
-		response.FailWithMessage(err.Error(), ctx)
-	} else {
-		response.Ok(ctx)
-	}
+	go func() {
+		err := pyPkgService.PyPkgInstallServiceV2(pyPkg)
+		if err != nil {
+			return
+		}
+	}()
+	response.OkWithMessage("后台安装中，清稍后查看安装情况", ctx)
 }
 
 func (p *PyPkg) UninstallPyPkg(ctx *gin.Context) {
-	var pyPkg request.HrpPyPkgRequest
+	var pyPkg interfacecase.HrpPyPkg
 	_ = ctx.ShouldBindJSON(&pyPkg)
 	if err := pyPkgService.UnInstallService(pyPkg); err != nil {
 		response.FailWithMessage(err.Error(), ctx)

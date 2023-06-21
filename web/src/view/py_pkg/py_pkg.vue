@@ -66,7 +66,6 @@
               >升级
             </el-button>
             <el-button
-              v-if="scope.row.isUninstall"
               type="primary"
               link
               icon="delete"
@@ -265,7 +264,6 @@ init();
 
 const getVersionList = async () => {
   const versions = await getPyPkgVersions({ name: formData.value.name });
-  console.log("getVersionList:", versions.data);
   if (versions.code === 0) {
     versionS.value.versionList = versions.data.version;
   }
@@ -345,7 +343,6 @@ const type = ref("");
 // 更新行
 const updateHrpPyPkgFunc = async (row) => {
   const res = await updateHrpPyPkg({ name: row.name });
-  // console.log(res)
   type.value = "update";
   if (res.code === 0) {
     ElMessage({
@@ -358,7 +355,7 @@ const updateHrpPyPkgFunc = async (row) => {
 
 // 卸载python包
 const uninstallHrpPyPkgFunc = async (row) => {
-  const res = await uninstallHrpPyPkg({ name: row.name });
+  const res = await uninstallHrpPyPkg({ ID: row.ID });
   if (res.code === 0) {
     ElMessage({
       type: "success",
@@ -398,7 +395,7 @@ const enterDialog = async () => {
     if (res.code === 0) {
       ElMessage({
         type: "success",
-        message: "安装成功",
+        message: res.msg,
       });
       closeDialog();
       getTableData();

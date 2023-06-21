@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: yangfan-grafana-prometheus-config
+  namespace: yangfan
+data:
+  yangfan.grafana.prometheus.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://yangfan-prometheus:9090
+        uid: yangfan-prometheus-6a65cy2u
+

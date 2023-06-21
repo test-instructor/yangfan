@@ -26,7 +26,7 @@ func (testCaseService *PerformanceService) GetPerformanceList(info request.Perfo
 	// 创建db
 	db := global.GVA_DB.Model(&interfacecase.Performance{}).
 		Preload("RunConfig")
-	db.Preload("Project").Limit(limit).Offset(offset)
+	db.Preload("Project")
 	var testCase []interfacecase.Performance
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.Name != "" {
@@ -36,7 +36,7 @@ func (testCaseService *PerformanceService) GetPerformanceList(info request.Perfo
 	if err != nil {
 		return
 	}
-	err = db.Find(&testCase, projectDB(db, info.ProjectID)).Error
+	err = db.Limit(limit).Offset(offset).Find(&testCase, projectDB(db, info.ProjectID)).Error
 	return err, testCase, total
 }
 
@@ -191,18 +191,16 @@ func (testCaseService *PerformanceService) GetReportList(info interfacecaseReq.P
 	return err, pReport, total
 }
 
+func (testCaseService *PerformanceService) DeleteReport(report interfacecase.PerformanceReport) (err error) {
+	err = global.GVA_DB.Delete(&report).Error
+	return err
+}
+
 func (testCaseService *PerformanceService) FindReport(pReportReq interfacecaseReq.PReportDetail) (err error, report interface{}) {
 	var pReport interfacecase.PerformanceReport
 	// 创建db
 	db := global.GVA_DB.
 		Model(&interfacecase.PerformanceReport{})
-	db.Preload("PerformanceReportDetail.PerformanceReportTotalStats")
-
-	if pReportReq.DetailID == 0 {
-		db.Preload("PerformanceReportDetail")
-	} else {
-		db.Preload("PerformanceReportDetail", "id > ?", pReportReq.DetailID)
-	}
 
 	err = db.Find(&pReport, "id = ?", pReportReq.ID).Error
 

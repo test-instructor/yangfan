@@ -29,6 +29,7 @@ func (s *PerformanceRouter) InitPerformanceRouter(Router *gin.RouterGroup) {
 		performanceRouter.GET("findPerformanceCase", performanceApi.FindPerformanceCase)
 		performanceRouter.GET("findPerformanceStep", performanceApi.FindPerformanceStep)
 		performanceRouter.GET("getReportList", performanceApi.GetReportList)
+		performanceRouter.DELETE("deleteReport", performanceApi.DeleteReport)
 		//performanceRouter.POST("addTaskTestCase", taskApi.AddTaskTestCase)
 		//performanceRouter.POST("setTaskCase", taskApi.SetTaskCase)
 	}

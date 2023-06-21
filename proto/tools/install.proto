@@ -3,8 +3,9 @@ syntax = "proto3";
 package tools;
 option go_package = "./;tools";
 
-service ToolsPackage {
+service ToolsServer {
   rpc InstallPackageStreamingMessage(installPackageReq) returns (stream installPackageRes) {};
+  rpc SetTaskStreamingMessage(setTaskReq) returns (stream setTaskRes) {};
 }
 
 enum Operate {
@@ -20,3 +21,18 @@ message installPackageRes {
 }
 
 message installPackageReq {}
+
+enum TimerStatusOperate {
+  ADD = 0;
+  DELETE = 1;
+  RESET = 2;
+}
+
+
+message setTaskRes {
+  uint64 ID = 1;
+  int64 EntryID = 2;
+  TimerStatusOperate TimerStatus = 3;
+}
+
+message setTaskReq {}

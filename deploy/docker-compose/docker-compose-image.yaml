@@ -1,0 +1,104 @@
+version: "3"
+
+# 声明一个名为network的networks,subnet为network的子网地址,默认网关是177.7.0.1
+networks:
+  network:
+    ipam:
+      driver: default
+      config:
+        - subnet: '177.8.0.0/16'
+
+services:
+  server:
+    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/server:latest
+    container_name: yangfan-server
+    restart: always
+    volumes:
+      - ./config/docker.config.yaml:/yangfan/docker.config.yaml
+    ports:
+      - '8888:8888'
+      - '7967:7967'
+
+  web:
+    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/web:latest
+    container_name: yangfan-web
+    restart: always
+    volumes:
+      - ./config/my.conf:/etc/nginx/conf.d/my.conf
+    ports:
+      - '8080:8080'
+
+  prometheus:
+    image: prom/prometheus
+    container_name: yangfan-prometheus
+    hostname: yangfan-prometheus
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  pushgateway:
+    container_name: yangfan-pushgateway
+    hostname: yangfan-pushgateway
+    image: prom/pushgateway
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - '9091:9091'
+
+  grafana:
+    container_name: yangfan-grafana
+    image: "grafana/grafana:9.5.1"
+    user: root
+    ports:
+      - '3000:3000'
+    restart: always
+    volumes:
+      - ./data/grafana/data:/var/lib/grafana
+      - ./data/grafana/log:/var/log/grafana
+      - ./data/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_PATHS_CONFIG=/etc/grafana/provisioning/grafana.ini
+      - TZ=Asia/Shanghai
+
+  master:
+    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/master:latest
+    container_name: yangfan-master
+    restart: always
+    volumes:
+      - ./config/docker.config.yaml:/yangfan/docker.config.yaml
+    ports:
+      - '7966:7966'
+      - '9093:9093'
+      - '9092:9092'
+
+  work:
+    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/work:latest
+    container_name: yangfan-work
+    restart: always
+    volumes:
+      - ./config/docker.config.yaml:/yangfan/docker.config.yaml
+
+  run:
+    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/run:latest
+    container_name: yangfan-run
+    restart: always
+    volumes:
+      - ./config/docker.config.yaml:/yangfan/docker.config.yaml
+
+  timer:
+    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/timer:latest
+    container_name: yangfan-timer
+    restart: always
+    volumes:
+      - ./config/docker.config.yaml:/yangfan/docker.config.yaml
+
+
+

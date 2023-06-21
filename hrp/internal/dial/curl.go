@@ -7,7 +7,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
 	"github.com/test-instructor/yangfan/hrp/internal/myexec"
@@ -41,7 +42,7 @@ func DoCurl(args []string) (err error) {
 			curlResultPath := filepath.Join(dir, curlResultName)
 			err = builtin.Dump2JSON(curlResult, curlResultPath)
 			if err != nil {
-				log.Error().Err(err).Msg("save dns resolution result failed")
+				global.GVA_LOG.Error("save dns resolution result failed", zap.Error(err))
 			}
 		}
 	}()
@@ -53,7 +54,7 @@ func DoCurl(args []string) (err error) {
 
 	err = cmd.Run()
 	if err != nil {
-		log.Error().Err(err).Msgf("fail to run curl command")
+		global.GVA_LOG.Error("fail to run curl command", zap.Error(err))
 		curlResult.ErrorMsg = err.Error()
 		curlResult.Result = stderr.String()
 		curlResult.ResultType = errorResult

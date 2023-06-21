@@ -3,7 +3,7 @@ module github.com/test-instructor/yangfan/timer
 go 1.19
 
 require (
-	github.com/test-instructor/yangfan/server v0.0.0-20230521150540-bdfa0196efa2
+	github.com/test-instructor/yangfan/server v0.0.0-20230521151452-07d562821462
 	go.uber.org/zap v1.24.0
 )
 
@@ -130,8 +130,8 @@ require (
 	github.com/swaggo/swag v1.7.0 // indirect
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.19 // indirect
 	github.com/test-instructor/grpc-plugin v0.1.5 // indirect
-	github.com/test-instructor/yangfan/hrp v0.0.0-20230515173030-4544ed499044 // indirect
-	github.com/test-instructor/yangfan/proto v0.0.0-20230521150540-bdfa0196efa2 // indirect
+	github.com/test-instructor/yangfan/hrp v0.0.0-20230521151452-07d562821462 // indirect
+	github.com/test-instructor/yangfan/proto v0.0.0-20230521151452-07d562821462 // indirect
 	github.com/tklauser/go-sysconf v0.3.11 // indirect
 	github.com/tklauser/numcpus v0.6.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect

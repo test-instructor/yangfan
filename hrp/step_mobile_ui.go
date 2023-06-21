@@ -5,7 +5,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/code"
 	"github.com/test-instructor/yangfan/hrp/pkg/uixt"
@@ -292,7 +293,7 @@ func (s *StepMobile) Input(text string, options ...uixt.ActionOption) *StepMobil
 // Times specify running times for run last action
 func (s *StepMobile) Times(n int) *StepMobile {
 	if n <= 0 {
-		log.Warn().Int("n", n).Msg("times should be positive, set to 1")
+		global.GVA_LOG.Warn("times should be positive, set to 1", zap.Int("n", n))
 		n = 1
 	}
 
@@ -631,9 +632,9 @@ func runStepMobileUI(s *SessionRunner, step *TStep) (stepResult *StepResult, err
 	screenshotPath, err := uiDriver.ScreenShot(
 		fmt.Sprintf("%d_validate_%d", uiDriver.StartTime.Unix(), time.Now().Unix()))
 	if err != nil {
-		log.Warn().Err(err).Str("step", step.Name).Msg("take screenshot failed")
+		global.GVA_LOG.Warn("take screenshot failed", zap.String("step", step.Name), zap.Error(err))
 	} else {
-		log.Info().Str("path", screenshotPath).Msg("take screenshot before validation")
+		global.GVA_LOG.Info("take screenshot before validation", zap.String("path", screenshotPath))
 		screenshots = append(screenshots, screenshotPath)
 	}
 

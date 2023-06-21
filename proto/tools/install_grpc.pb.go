@@ -18,27 +18,28 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// ToolsPackageClient is the client API for ToolsPackage service.
+// ToolsServerClient is the client API for ToolsServer service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type ToolsPackageClient interface {
-	InstallPackageStreamingMessage(ctx context.Context, in *InstallPackageReq, opts ...grpc.CallOption) (ToolsPackage_InstallPackageStreamingMessageClient, error)
+type ToolsServerClient interface {
+	InstallPackageStreamingMessage(ctx context.Context, in *InstallPackageReq, opts ...grpc.CallOption) (ToolsServer_InstallPackageStreamingMessageClient, error)
+	SetTaskStreamingMessage(ctx context.Context, in *SetTaskReq, opts ...grpc.CallOption) (ToolsServer_SetTaskStreamingMessageClient, error)
 }
 
-type toolsPackageClient struct {
+type toolsServerClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewToolsPackageClient(cc grpc.ClientConnInterface) ToolsPackageClient {
-	return &toolsPackageClient{cc}
+func NewToolsServerClient(cc grpc.ClientConnInterface) ToolsServerClient {
+	return &toolsServerClient{cc}
 }
 
-func (c *toolsPackageClient) InstallPackageStreamingMessage(ctx context.Context, in *InstallPackageReq, opts ...grpc.CallOption) (ToolsPackage_InstallPackageStreamingMessageClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ToolsPackage_ServiceDesc.Streams[0], "/tools.ToolsPackage/InstallPackageStreamingMessage", opts...)
+func (c *toolsServerClient) InstallPackageStreamingMessage(ctx context.Context, in *InstallPackageReq, opts ...grpc.CallOption) (ToolsServer_InstallPackageStreamingMessageClient, error) {
+	stream, err := c.cc.NewStream(ctx, &ToolsServer_ServiceDesc.Streams[0], "/tools.ToolsServer/InstallPackageStreamingMessage", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &toolsPackageInstallPackageStreamingMessageClient{stream}
+	x := &toolsServerInstallPackageStreamingMessageClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -48,16 +49,16 @@ func (c *toolsPackageClient) InstallPackageStreamingMessage(ctx context.Context,
 	return x, nil
 }
 
-type ToolsPackage_InstallPackageStreamingMessageClient interface {
+type ToolsServer_InstallPackageStreamingMessageClient interface {
 	Recv() (*InstallPackageRes, error)
 	grpc.ClientStream
 }
 
-type toolsPackageInstallPackageStreamingMessageClient struct {
+type toolsServerInstallPackageStreamingMessageClient struct {
 	grpc.ClientStream
 }
 
-func (x *toolsPackageInstallPackageStreamingMessageClient) Recv() (*InstallPackageRes, error) {
+func (x *toolsServerInstallPackageStreamingMessageClient) Recv() (*InstallPackageRes, error) {
 	m := new(InstallPackageRes)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -65,66 +66,128 @@ func (x *toolsPackageInstallPackageStreamingMessageClient) Recv() (*InstallPacka
 	return m, nil
 }
 
-// ToolsPackageServer is the server API for ToolsPackage service.
-// All implementations must embed UnimplementedToolsPackageServer
+func (c *toolsServerClient) SetTaskStreamingMessage(ctx context.Context, in *SetTaskReq, opts ...grpc.CallOption) (ToolsServer_SetTaskStreamingMessageClient, error) {
+	stream, err := c.cc.NewStream(ctx, &ToolsServer_ServiceDesc.Streams[1], "/tools.ToolsServer/SetTaskStreamingMessage", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &toolsServerSetTaskStreamingMessageClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type ToolsServer_SetTaskStreamingMessageClient interface {
+	Recv() (*SetTaskRes, error)
+	grpc.ClientStream
+}
+
+type toolsServerSetTaskStreamingMessageClient struct {
+	grpc.ClientStream
+}
+
+func (x *toolsServerSetTaskStreamingMessageClient) Recv() (*SetTaskRes, error) {
+	m := new(SetTaskRes)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// ToolsServerServer is the server API for ToolsServer service.
+// All implementations must embed UnimplementedToolsServerServer
 // for forward compatibility
-type ToolsPackageServer interface {
-	InstallPackageStreamingMessage(*InstallPackageReq, ToolsPackage_InstallPackageStreamingMessageServer) error
-	mustEmbedUnimplementedToolsPackageServer()
+type ToolsServerServer interface {
+	InstallPackageStreamingMessage(*InstallPackageReq, ToolsServer_InstallPackageStreamingMessageServer) error
+	SetTaskStreamingMessage(*SetTaskReq, ToolsServer_SetTaskStreamingMessageServer) error
+	mustEmbedUnimplementedToolsServerServer()
 }
 
-// UnimplementedToolsPackageServer must be embedded to have forward compatible implementations.
-type UnimplementedToolsPackageServer struct {
+// UnimplementedToolsServerServer must be embedded to have forward compatible implementations.
+type UnimplementedToolsServerServer struct {
 }
 
-func (UnimplementedToolsPackageServer) InstallPackageStreamingMessage(*InstallPackageReq, ToolsPackage_InstallPackageStreamingMessageServer) error {
+func (UnimplementedToolsServerServer) InstallPackageStreamingMessage(*InstallPackageReq, ToolsServer_InstallPackageStreamingMessageServer) error {
 	return status.Errorf(codes.Unimplemented, "method InstallPackageStreamingMessage not implemented")
 }
-func (UnimplementedToolsPackageServer) mustEmbedUnimplementedToolsPackageServer() {}
+func (UnimplementedToolsServerServer) SetTaskStreamingMessage(*SetTaskReq, ToolsServer_SetTaskStreamingMessageServer) error {
+	return status.Errorf(codes.Unimplemented, "method SetTaskStreamingMessage not implemented")
+}
+func (UnimplementedToolsServerServer) mustEmbedUnimplementedToolsServerServer() {}
 
-// UnsafeToolsPackageServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ToolsPackageServer will
+// UnsafeToolsServerServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ToolsServerServer will
 // result in compilation errors.
-type UnsafeToolsPackageServer interface {
-	mustEmbedUnimplementedToolsPackageServer()
+type UnsafeToolsServerServer interface {
+	mustEmbedUnimplementedToolsServerServer()
 }
 
-func RegisterToolsPackageServer(s grpc.ServiceRegistrar, srv ToolsPackageServer) {
-	s.RegisterService(&ToolsPackage_ServiceDesc, srv)
+func RegisterToolsServerServer(s grpc.ServiceRegistrar, srv ToolsServerServer) {
+	s.RegisterService(&ToolsServer_ServiceDesc, srv)
 }
 
-func _ToolsPackage_InstallPackageStreamingMessage_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _ToolsServer_InstallPackageStreamingMessage_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(InstallPackageReq)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(ToolsPackageServer).InstallPackageStreamingMessage(m, &toolsPackageInstallPackageStreamingMessageServer{stream})
+	return srv.(ToolsServerServer).InstallPackageStreamingMessage(m, &toolsServerInstallPackageStreamingMessageServer{stream})
 }
 
-type ToolsPackage_InstallPackageStreamingMessageServer interface {
+type ToolsServer_InstallPackageStreamingMessageServer interface {
 	Send(*InstallPackageRes) error
 	grpc.ServerStream
 }
 
-type toolsPackageInstallPackageStreamingMessageServer struct {
+type toolsServerInstallPackageStreamingMessageServer struct {
 	grpc.ServerStream
 }
 
-func (x *toolsPackageInstallPackageStreamingMessageServer) Send(m *InstallPackageRes) error {
+func (x *toolsServerInstallPackageStreamingMessageServer) Send(m *InstallPackageRes) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-// ToolsPackage_ServiceDesc is the grpc.ServiceDesc for ToolsPackage service.
+func _ToolsServer_SetTaskStreamingMessage_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(SetTaskReq)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ToolsServerServer).SetTaskStreamingMessage(m, &toolsServerSetTaskStreamingMessageServer{stream})
+}
+
+type ToolsServer_SetTaskStreamingMessageServer interface {
+	Send(*SetTaskRes) error
+	grpc.ServerStream
+}
+
+type toolsServerSetTaskStreamingMessageServer struct {
+	grpc.ServerStream
+}
+
+func (x *toolsServerSetTaskStreamingMessageServer) Send(m *SetTaskRes) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+// ToolsServer_ServiceDesc is the grpc.ServiceDesc for ToolsServer service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var ToolsPackage_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "tools.ToolsPackage",
-	HandlerType: (*ToolsPackageServer)(nil),
+var ToolsServer_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "tools.ToolsServer",
+	HandlerType: (*ToolsServerServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "InstallPackageStreamingMessage",
-			Handler:       _ToolsPackage_InstallPackageStreamingMessage_Handler,
+			Handler:       _ToolsServer_InstallPackageStreamingMessage_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "SetTaskStreamingMessage",
+			Handler:       _ToolsServer_SetTaskStreamingMessage_Handler,
 			ServerStreams: true,
 		},
 	},

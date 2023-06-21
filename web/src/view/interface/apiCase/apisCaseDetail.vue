@@ -16,7 +16,7 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="addApiCaseFunc" round
-            >添加测试套件</el-button
+            >添加测试步骤</el-button
           >
         </el-form-item>
       </el-form>
@@ -89,7 +89,7 @@
       :visible.sync="ApisCaseVisible"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
-      title="添加测试套件"
+      title="添加测试步骤"
       width="1250px"
       top="30px"
     >

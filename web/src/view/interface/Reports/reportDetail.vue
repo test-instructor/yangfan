@@ -65,7 +65,7 @@
         <el-table-column property="name" label="用例名称" width="390">
           <template #default="scope">
             <el-tag type="danger" v-if="setupCaseShow(scope.row)">{{
-              "前置套件"
+              "前置步骤"
             }}</el-tag>
             {{ scope.row.name }}
           </template>
@@ -216,7 +216,9 @@
             </el-table-column>
             <el-table-column width="80" align="center" prop="key" label="操作">
               <template v-slot="scope">
-                <el-button type="text" @click="copy(scope.row)">复制</el-button>
+                <el-button type="text" @click="copy_text(scope.row)"
+                  >复制</el-button
+                >
               </template>
             </el-table-column>
             <el-table-column align="center" label="value">
@@ -254,7 +256,9 @@
             </el-table-column>
             <el-table-column width="80" align="center" prop="key" label="操作">
               <template v-slot="scope">
-                <el-button type="text" @click="copy(scope.row)">复制</el-button>
+                <el-button type="text" @click="copy_text(scope.row)"
+                  >复制</el-button
+                >
               </template>
             </el-table-column>
             <el-table-column align="center" label="value">
@@ -357,9 +361,11 @@ import { BarChart } from "echarts/charts";
 import { CanvasRenderer } from "echarts/renderers";
 import { useRoute } from "vue-router";
 import { getCurrentInstance } from "vue";
-import { ElMessageBox } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { formatDate } from "@/utils/format";
 import { Discount } from "@element-plus/icons-vue";
+import { defineComponent } from "vue";
+import message from "@element-plus/icons-vue/dist/es/message.mjs";
 
 const route = useRoute();
 echarts.use([
@@ -397,9 +403,17 @@ const exportFunc = () => {
   exportTable.value = !exportTable.value;
 };
 
-const copy = (row) => {
+const copy_text = (row) => {
   let last = JSON.stringify(row);
-  navigator.clipboard.writeText(last);
+  console.log(last);
+  try {
+    navigator.clipboard.writeText(last);
+    ElMessage.success("复制成功");
+    console.log("文本已复制到剪贴板");
+  } catch (error) {
+    console.error("复制文本到剪贴板失败:", error);
+    ElMessage.error("复制失败");
+  }
 };
 
 let currentInstance;
@@ -493,10 +507,6 @@ const openDrawer = (row) => {
         value: row.data.req_resps.request.headers,
         isTable: true,
       });
-      console.log(
-        "row.data.req_resps.request.body || !requestTimeShow",
-        row.data.req_resps.request.body || requestTimeShow
-      );
       if (row.data.req_resps.request.body || requestTimeShow) {
         requestData.push({
           key: "body",
@@ -686,8 +696,8 @@ const initData = async () => {
   testStepsData.value = [];
   testStepsData.value = [];
   testCaseSimple.value = [];
-  if (route.params.id > 0) {
-    reportID = route.params.id;
+  if (route.params.report_id > 0) {
+    reportID = route.params.report_id;
   }
   tableDdata.value = reportData.value.details;
   await getTestCaseDetailFunc(reportID);
@@ -695,6 +705,12 @@ const initData = async () => {
     label: "报告名称",
     name: reportData.value.name,
     key: "name",
+    str: "str",
+  });
+  testCaseSimple.value.push({
+    label: "运行节点",
+    name: reportData.value.hostname,
+    key: "hostname",
     str: "str",
   });
   testCaseSimple.value.push({
@@ -793,9 +809,9 @@ const columns = reactive([
 
 initData();
 watch(
-  () => route.params.id,
+  () => route.params.report_id,
   () => {
-    if (route.params.id) {
+    if (route.params.report_id) {
       initData();
     }
   }

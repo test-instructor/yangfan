@@ -13,7 +13,6 @@ import (
 	"github.com/test-instructor/yangfan/server/core"
 	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/initialize"
-	"github.com/test-instructor/yangfan/server/source/yangfan"
 	"go.uber.org/zap"
 	"math/rand"
 	"os"
@@ -21,14 +20,15 @@ import (
 	"time"
 )
 
-func RunPkgInstallClient() {
-	host := fmt.Sprintf("%s:%s", global.GVA_CONFIG.GrpcServer.Background, global.GVA_CONFIG.GrpcServer.BackgroundGrpcPort)
+func RunSetTimerTaskClient() {
+	host := fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Background, global.GVA_CONFIG.YangFan.BackgroundGrpcPort)
 	c, err := client.NewClient(host)
 	if err != nil {
 		global.GVA_LOG.Error("[RunClient]创建客户端失败", zap.Error(err))
 	}
 	p := pkg.NewRunInstallPkg(c)
-	p.RunClient()
+	go p.RunSetTimerTask()
+	go p.RunInstallPkg()
 }
 
 func main() {
@@ -39,9 +39,12 @@ func main() {
 	global.GVA_VP = core.Viper()
 	global.GVA_LOG = core.Zap()
 	global.GVA_DB = initialize.Gorm()
-	yangfan.InitPythonPackage(false)
+	if global.GVA_DB.Error != nil {
+		global.GVA_LOG.Error("register db", zap.Error(global.GVA_DB.Error))
+		os.Exit(0)
+	}
 	initialize.TimerTaskCase()
-	go RunPkgInstallClient()
+	go RunSetTimerTaskClient()
 	s := <-c
 	fmt.Println("exit", s)
 }

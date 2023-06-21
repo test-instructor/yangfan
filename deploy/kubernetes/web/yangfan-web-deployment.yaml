@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yangfan-web
+  namespace: yangfan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yangfan-web
+  template:
+    metadata:
+      labels:
+        app: yangfan-web
+    spec:
+      containers:
+        - name: yangfan-web
+          image: registry.cn-hangzhou.aliyuncs.com/yangfanz/web:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1000Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/my.conf
+              subPath: my.conf
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config

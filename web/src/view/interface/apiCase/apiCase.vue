@@ -220,7 +220,7 @@
             placeholder="请输入"
           />
         </el-form-item>
-        <!--        <el-form-item label="前置套件:">-->
+        <!--        <el-form-item label="前置步骤:">-->
         <!--          <el-switch v-model="formData.front_case" />-->
         <!--        </el-form-item>-->
       </el-form>
@@ -616,7 +616,6 @@ const getApiEnv = async () => {
   const res = await getEnvList();
   if (res.code === 0) {
     apiEnvData.value = res.data.list;
-    console.log("==========", apiEnvData.value);
   }
 };
 </script>

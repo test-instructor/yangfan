@@ -117,7 +117,7 @@
       :visible.sync="taskCaseVisible"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
-      title="添加测试套件"
+      title="添加测试步骤"
       width="1250px"
       top="30px"
     >
@@ -360,6 +360,14 @@ const getTaskCaseDetailFunc = async (task_id) => {
   }
 };
 init();
+watch(
+  () => route.params.id,
+  () => {
+    if (route.params.id) {
+      init();
+    }
+  }
+);
 
 const StepType = (row) => {
   let step_type = [];

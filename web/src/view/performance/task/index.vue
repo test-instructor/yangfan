@@ -352,12 +352,12 @@ const runCaseDebug = async (row, runType) => {
   }
 };
 
-const reportDetailFunc = (ID) => {
-  if (ID) {
+const reportDetailFunc = (report_id) => {
+  if (report_id) {
     router.push({
       name: "reportDetail",
       params: {
-        id: ID,
+        report_id: report_id,
       },
     });
   } else {
@@ -420,16 +420,6 @@ const closeRunner = () => {
     spawnRate: 1,
   };
   dialogRunner.value = false;
-  // formData.value = {
-  //   name: '',
-  //   runTime: '',
-  //   nextRunTime: new Date(),
-  //   status: false,
-  //   describe: '',
-  //   runNumber: 0,
-  //   config: {ID: 0},
-  // }
-  // creatCron.value = false
 };
 
 // 更新行
@@ -555,7 +545,6 @@ const getApiEnv = async () => {
   const res = await getEnvList();
   if (res.code === 0) {
     apiEnvData.value = res.data.list;
-    console.log("==========", apiEnvData.value);
   }
 };
 </script>

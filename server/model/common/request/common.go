@@ -28,8 +28,9 @@ type GetAuthorityId struct {
 type Empty struct{}
 
 type ApiCaseIdReq struct {
-	ApiID  uint `json:"apiID" form:"apiID"`
-	CaseID uint `json:"caseID" form:"caseID"`
+	ApiID  uint   `json:"apiID" form:"apiID"`
+	CaseID uint   `json:"caseID" form:"caseID"`
+	Type   string `json:"type" form:"type"`
 }
 
 type RunningType int
@@ -56,4 +57,5 @@ type RunCaseReq struct {
 	TagID     uint      `json:"tagID" form:"TagID"`
 	ProjectID uint      `json:"-"`
 	Env       uint      `json:"env" form:"env"`
+	ReportID  uint      `json:"reportID" form:"reportID"`
 }

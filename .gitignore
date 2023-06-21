@@ -31,8 +31,6 @@ yarn-error.log*
 
 deploy/docker/data/*
 deploy/docker/logs
-/go.work
-/go.work.sum
 ./server/yangfan.yaml
 ./server/config.yaml
 /config.yaml

@@ -39,11 +39,11 @@ func (apiCaseApi *InterfaceTemplateApi) CreateInterfaceTemplate(c *gin.Context) 
 	menuInt, _ := strconv.Atoi(menuStr)
 	menu := interfacecase.ApiMenu{GVA_MODEL: global.GVA_MODEL{ID: uint(menuInt)}}
 	apicase.ApiMenu = menu
-	if err := apicaseServices.CreateInterfaceTemplate(apicase); err != nil {
+	if id, err := apicaseServices.CreateInterfaceTemplate(apicase); err != nil {
 		global.GVA_LOG.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
 	} else {
-		response.OkWithMessage("创建成功", c)
+		response.OkWithData(gin.H{"id": id}, c)
 	}
 }
 

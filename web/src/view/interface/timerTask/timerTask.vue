@@ -576,12 +576,9 @@ const updateTimerTaskFunc = async (row) => {
     formData.value = res.data.retask;
     configID.value = formData.value.config.ID;
     dialogFormVisible.value = true;
-    console.log("res.data.retask", res.data.retask);
     res.data.retask.apiTimerTaskTag.forEach((item) => {
-      console.log("tag", item);
       tagIds.value.push(item.ID);
     });
-    console.log("tagIds", tagIds.value);
     formData.value.apiTimerTaskTag = [];
     formData.value.tagIds = tagIds.value;
     if (formData.value.api_env_id > 0) {
@@ -633,7 +630,6 @@ const getTagData = async () => {
       tagTableOption.value.push(option);
     });
   await getApiEnv();
-  console.log("tagTableOption", tagTableOption);
 };
 
 const openDialogTag = () => {
@@ -642,10 +638,7 @@ const openDialogTag = () => {
 
 const openDialogTagRun = async () => {
   tagDialogRun.value = true;
-
-  console.log("tagTableOption");
   await getTagData();
-  console.log("tagTableOption", tagTableOption.value);
 };
 
 const closeDialogTag = () => {
@@ -670,7 +663,9 @@ const closeDialog = () => {
     describe: "",
     runNumber: 0,
     config: { ID: 0 },
+    api_env_id: 0,
   };
+  apiEnvID.value = "";
   creatCron.value = false;
 };
 // 弹窗确定
@@ -682,7 +677,6 @@ const runDialog = async () => {
     });
     return;
   }
-  console.log("runTagId", runTagId.value);
   let data = { tagID: runTagId.value, env: runEnvId.value };
   const res = await runTimerTask(data);
   if (res.code === 0) {
@@ -741,7 +735,7 @@ const enterDialog = async () => {
       message: "创建/更改成功",
     });
     closeDialog();
-    getTableData();
+    await getTableData();
     creatCron.value = false;
   }
 };
@@ -752,7 +746,6 @@ const getApiEnv = async () => {
   const res = await getEnvList();
   if (res.code === 0) {
     apiEnvData.value = res.data.list;
-    console.log("==========", apiEnvData.value);
   }
 };
 

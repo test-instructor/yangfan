@@ -2,13 +2,10 @@ package boomer
 
 import (
 	"encoding/json"
-	"github.com/montanaflynn/stats"
-	"github.com/rs/zerolog/log"
+
 	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"go.uber.org/zap"
-	"gorm.io/datatypes"
-	"strconv"
 )
 
 type DbOutput struct {
@@ -61,56 +58,13 @@ func (o *DbOutput) updateReport(data map[string]interface{}) {
 	var reportDetail interfacecase.PerformanceReportDetail
 	output, err := convertData(data)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to convert data")
+		global.GVA_LOG.Error("failed to convert data", zap.Error(err))
 		return
 	}
 
 	outputStr, _ := json.Marshal(output)
 	err = json.Unmarshal(outputStr, &reportDetail)
-	pct := map[string]float64{}
-	pctList := []float64{75, 80, 85, 90, 95, 99}
 
-	if output.TotalStats != nil {
-		var responseTimeData []float64
-		for kr, v := range output.TotalStats.ResponseTimes {
-			for i := 0; i < int(v); i++ {
-				responseTimeData = append(responseTimeData, float64(kr))
-			}
-		}
-		for _, v := range pctList {
-			percentile, _ := stats.Percentile(responseTimeData, v)
-			pct[strconv.Itoa(int(v))] = percentile
-		}
-		reportDetail.TotalStats["pct"] = pct
-		reportDetail.TotalStats["response_times"] = nil
-	}
-
-	if reportDetail.PerformanceReportTotalStats != nil {
-		for k, _ := range reportDetail.PerformanceReportTotalStats {
-			reportDetail.PerformanceReportTotalStats[k].CurrentRps = output.Stats[k].currentRps
-			reportDetail.PerformanceReportTotalStats[k].CurrentFailPerSec = output.Stats[k].currentFailPerSec
-
-			if output.Stats[k].Method != "testcase" && output.Stats[k].Method != "transaction" {
-				var responseTimeData []float64
-				for kr, v := range output.Stats[k].ResponseTimes {
-					for i := 0; i < int(v); i++ {
-						responseTimeData = append(responseTimeData, float64(kr))
-					}
-				}
-				output.Stats[k].ResponseTimes = nil
-				for _, v := range pctList {
-					percentile, _ := stats.Percentile(responseTimeData, v)
-					pct[strconv.Itoa(int(v))] = percentile
-				}
-				reportDetail.PerformanceReportTotalStats[k].ResponseTimer = datatypes.JSONMap{}
-				reportDetail.PerformanceReportTotalStats[k].ResponseTimer["pct"] = pct
-			}
-
-		}
-	}
-	if err != nil {
-		return
-	}
 	if o.pTask.State != reportDetail.State {
 		o.pTask.State = reportDetail.State
 		global.GVA_DB.Save(&o.pTask)
@@ -119,25 +73,11 @@ func (o *DbOutput) updateReport(data map[string]interface{}) {
 		}
 	}
 
-	o.PReport.TotalRPS = output.TotalRPS
-	o.PReport.UserCount = output.UserCount
-	o.PReport.TotalAvgResponseTime = output.TotalAvgResponseTime
-	o.PReport.TotalMinResponseTime = output.TotalMinResponseTime
-	o.PReport.TotalMaxResponseTime = output.TotalMaxResponseTime
-	o.PReport.TotalFailRatio = output.TotalFailRatio
-	o.PReport.TotalFailPerSec = output.TotalFailPerSec
 	errReport := global.GVA_DB.Save(&o.PReport).Error
 	if errReport != nil {
 		global.GVA_LOG.Error("保存测试报告出错", zap.Error(errReport))
 		reportString, _ := json.Marshal(o.PReport)
 		global.GVA_LOG.Error(string(reportString))
-	}
-	reportDetail.PerformanceReportID = o.ID
-	errReportDetail := global.GVA_DB.Save(&reportDetail).Error
-	if errReportDetail != nil {
-		global.GVA_LOG.Error("创建性能测试报告详情出错", zap.Error(errReportDetail))
-		reportDetailString, _ := json.Marshal(reportDetail)
-		global.GVA_LOG.Error(string(reportDetailString))
 	}
 	if o.PReport.State == interfacecase.StateStopped {
 		o.closeChannel = true

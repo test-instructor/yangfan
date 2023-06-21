@@ -10,11 +10,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/mem"
 	"github.com/shirou/gopsutil/process"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 )
 
 func round(val float64, roundOn float64, places int) (newVal float64) {
@@ -47,14 +48,14 @@ func startMemoryProfile(file string, duration time.Duration) (err error) {
 		return err
 	}
 
-	log.Info().Dur("duration", duration).Msg("Start memory profiling")
+	global.GVA_LOG.Info("Start memory profiling", zap.Duration("duration", duration))
 	time.AfterFunc(duration, func() {
 		err := pprof.WriteHeapProfile(f)
 		if err != nil {
-			log.Error().Err(err).Msg("failed to write memory profile")
+			global.GVA_LOG.Error("failed to write memory profile", zap.Error(err))
 		}
 		f.Close()
-		log.Info().Dur("duration", duration).Msg("Stop memory profiling")
+		global.GVA_LOG.Info("Stop memory profiling", zap.Duration("duration", duration))
 	})
 	return nil
 }
@@ -66,7 +67,7 @@ func startCPUProfile(file string, duration time.Duration) (err error) {
 		return err
 	}
 
-	log.Info().Dur("duration", duration).Msg("Start CPU profiling")
+	global.GVA_LOG.Info("Start CPU profiling", zap.Duration("duration", duration))
 	err = pprof.StartCPUProfile(f)
 	if err != nil {
 		f.Close()
@@ -76,16 +77,21 @@ func startCPUProfile(file string, duration time.Duration) (err error) {
 	time.AfterFunc(duration, func() {
 		pprof.StopCPUProfile()
 		f.Close()
-		log.Info().Dur("duration", duration).Msg("Stop CPU profiling")
+		global.GVA_LOG.Info("Stop CPU profiling", zap.Duration("duration", duration))
 	})
 	return nil
 }
 
 // generate a random nodeID like locust does, using the same algorithm.
 func getNodeID() (nodeID string) {
+	nodeID = TempConfig.GetNodeID()
+	if nodeID != "" {
+		return
+	}
 	hostname, _ := os.Hostname()
 	id := strings.Replace(uuid.NewV4().String(), "-", "", -1)
 	nodeID = fmt.Sprintf("%s_%s", hostname, id)
+	TempConfig.SetNodeID(nodeID)
 	return
 }
 
@@ -94,12 +100,12 @@ func GetCurrentPidCPUUsage() float64 {
 	currentPid := os.Getpid()
 	p, err := process.NewProcess(int32(currentPid))
 	if err != nil {
-		log.Error().Err(err).Msg(fmt.Sprintf("failed to get CPU percent\n"))
+		global.GVA_LOG.Error("failed to get CPU percent", zap.Error(err))
 		return 0.0
 	}
 	percent, err := p.CPUPercent()
 	if err != nil {
-		log.Error().Err(err).Msg(fmt.Sprintf("failed to get CPU percent\n"))
+		global.GVA_LOG.Error("failed to get CPU percent", zap.Error(err))
 		return 0.0
 	}
 	return percent
@@ -110,12 +116,12 @@ func GetCurrentPidCPUPercent() float64 {
 	currentPid := os.Getpid()
 	p, err := process.NewProcess(int32(currentPid))
 	if err != nil {
-		log.Error().Err(err).Msg(fmt.Sprintf("failed to get CPU percent\n"))
+		global.GVA_LOG.Error("failed to get CPU percent", zap.Error(err))
 		return 0.0
 	}
 	percent, err := p.Percent(time.Second)
 	if err != nil {
-		log.Error().Err(err).Msg(fmt.Sprintf("failed to get CPU percent\n"))
+		global.GVA_LOG.Error("failed to get CPU percent", zap.Error(err))
 		return 0.0
 	}
 	return percent
@@ -138,12 +144,12 @@ func GetCurrentPidMemoryUsage() float64 {
 	currentPid := os.Getpid()
 	p, err := process.NewProcess(int32(currentPid))
 	if err != nil {
-		log.Error().Err(err).Msg(fmt.Sprintf("failed to get CPU percent\n"))
+		global.GVA_LOG.Error("failed to get CPU percent", zap.Error(err))
 		return 0.0
 	}
 	percent, err := p.MemoryPercent()
 	if err != nil {
-		log.Error().Err(err).Msg(fmt.Sprintf("failed to get CPU percent\n"))
+		global.GVA_LOG.Error("failed to get CPU percent", zap.Error(err))
 		return 0.0
 	}
 	return float64(percent)

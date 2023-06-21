@@ -187,6 +187,17 @@ func (apiCase *PerformanceApi) GetReportList(c *gin.Context) {
 	}
 }
 
+func (apiCase *PerformanceApi) DeleteReport(c *gin.Context) {
+	var report interfacecase.PerformanceReport
+	_ = c.ShouldBindJSON(&report)
+	if err := performanceService.DeleteReport(report); err != nil {
+		global.GVA_LOG.Error("删除测试报告失败!", zap.Error(err))
+		response.FailWithMessage("删除测试报告失败", c)
+	} else {
+		response.OkWithDetailed(response.PageResult{}, "删除测试报告成功", c)
+	}
+}
+
 func (apiCase *PerformanceApi) FindReport(c *gin.Context) {
 	var pReport interfacecaseReq.PReportDetail
 	_ = c.ShouldBindQuery(&pReport)
@@ -195,6 +206,15 @@ func (apiCase *PerformanceApi) FindReport(c *gin.Context) {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {
-		response.OkWithData(gin.H{"reapicase": reapicase}, c)
+		//grafana-host: http://localhost:3000/
+		//grafana-dashboard: ERv3OaBPYe6A
+		response.OkWithData(gin.H{
+			"reapicase":                    reapicase,
+			"grafana_host":                 global.GVA_CONFIG.YangFan.GrafanaHost,
+			"grafana_dashboard":            global.GVA_CONFIG.YangFan.GrafanaDashboard,
+			"grafana_dashboard_name":       global.GVA_CONFIG.YangFan.GrafanaDashboardName,
+			"grafana_dashboard_stats":      global.GVA_CONFIG.YangFan.GrafanaDashboardStats,
+			"grafana_dashboard_stats_name": global.GVA_CONFIG.YangFan.GrafanaDashboardStatsName,
+		}, c)
 	}
 }

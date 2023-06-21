@@ -26,7 +26,7 @@ CREATE TABLE `api_case_relationships` (
   `created_at` datetime(3) DEFAULT NULL,
   `updated_at` datetime(3) DEFAULT NULL,
   `deleted_at` datetime(3) DEFAULT NULL,
-  `api_case_step_id` bigint unsigned DEFAULT NULL COMMENT '测试套件',
+  `api_case_step_id` bigint unsigned DEFAULT NULL COMMENT '测试步骤',
   `api_case_id` bigint unsigned DEFAULT NULL COMMENT '测试用例',
   `sort` bigint unsigned DEFAULT NULL COMMENT '排序',
   PRIMARY KEY (`id`),
@@ -49,7 +49,7 @@ CREATE TABLE `api_case_step_relationships` (
   `updated_at` datetime(3) DEFAULT NULL,
   `deleted_at` datetime(3) DEFAULT NULL,
   `api_step_id` bigint unsigned DEFAULT NULL COMMENT '测试步骤',
-  `api_case_step_id` bigint unsigned DEFAULT NULL COMMENT '测试套件',
+  `api_case_step_id` bigint unsigned DEFAULT NULL COMMENT '测试步骤',
   `sort` bigint unsigned DEFAULT NULL COMMENT '排序',
   PRIMARY KEY (`id`),
   KEY `idx_api_case_step_relationships_deleted_at` (`deleted_at`)
@@ -74,7 +74,7 @@ CREATE TABLE `api_case_steps` (
   `update_by_id` bigint unsigned DEFAULT NULL COMMENT '更新者',
   `delete_by_id` bigint unsigned DEFAULT NULL COMMENT '删除者',
   `project_id` bigint unsigned DEFAULT NULL,
-  `name` varchar(191) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '套件名称',
+  `name` varchar(191) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '步骤名称',
   `front_case` tinyint(1) DEFAULT NULL COMMENT '允许设置为前置用例',
   `run_config_id` bigint unsigned DEFAULT NULL COMMENT '运行配置',
   `run_config_name` varchar(191) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '运行配置名称',
@@ -1467,7 +1467,7 @@ CREATE TABLE `performance_relationships` (
   `updated_at` datetime(3) DEFAULT NULL,
   `deleted_at` datetime(3) DEFAULT NULL,
   `performance_id` bigint unsigned DEFAULT NULL COMMENT '性能任务',
-  `api_case_step_id` bigint unsigned DEFAULT NULL COMMENT '测试套件',
+  `api_case_step_id` bigint unsigned DEFAULT NULL COMMENT '测试步骤',
   `sort` bigint unsigned DEFAULT NULL COMMENT '排序',
   PRIMARY KEY (`id`),
   KEY `idx_performance_relationships_deleted_at` (`deleted_at`)
@@ -1857,15 +1857,15 @@ INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, 
 INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (123, '2022-05-11 20:22:06.302', '2022-05-21 14:24:08.535', NULL, '/ac/:project/updateApiConfig', '更新配置管理', '测试配置', 'PUT');
 INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (124, '2022-05-11 20:22:06.302', '2022-05-21 14:24:12.518', NULL, '/ac/:project/findApiConfig', '根据ID获取配置管理', '测试配置', 'GET');
 INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (125, '2022-05-11 20:22:06.303', '2022-05-21 14:24:17.261', NULL, '/ac/:project/getApiConfigList', '获取配置管理列表', '测试配置', 'GET');
-INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (126, '2022-05-16 11:52:09.222', '2022-05-21 14:29:00.845', NULL, '/case/:project/step/createTestCase', '新增测试套件', '测试套件', 'POST');
-INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (127, '2022-05-16 11:52:09.224', '2022-05-21 14:29:05.597', NULL, '/case/:project/step/deleteTestCase', '删除测试套件', '测试套件', 'DELETE');
-INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (128, '2022-05-16 11:52:09.225', '2022-05-21 14:29:11.933', NULL, '/case/:project/step/deleteTestCaseByIds', '批量删除测试套件', '测试套件', 'DELETE');
-INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (129, '2022-05-16 11:52:09.226', '2022-05-21 14:29:18.309', NULL, '/case/:project/step/updateTestCase', '更新测试套件', '测试套件', 'PUT');
-INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (130, '2022-05-16 11:52:09.227', '2022-05-21 14:29:25.028', NULL, '/case/:project/step/findTestCase', '根据ID获取测试套件', '测试套件', 'GET');
-INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (131, '2022-05-16 11:52:09.227', '2022-05-21 14:29:32.149', NULL, '/case/:project/step/getTestCaseList', '获取测试套件列表', '测试套件', 'GET');
-INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (132, '2022-05-19 11:06:19.655', '2022-05-21 14:48:49.099', NULL, '/case/:project/step/getTestCaseList', '测试套件列表排序', '测试套件', 'POST');
-INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (133, '2022-05-25 16:47:34.031', '2022-05-28 11:39:27.033', NULL, '/case/:project/step/addTestCase', '测试套件添加api', '测试套件', 'POST');
-INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (134, '2022-05-25 19:09:32.489', '2022-05-28 11:39:18.524', NULL, '/case/:project/step/delTestCase', '删除测试套件关联的api', '测试套件', 'DELETE');
+INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (126, '2022-05-16 11:52:09.222', '2022-05-21 14:29:00.845', NULL, '/case/:project/step/createTestCase', '新增测试步骤', '测试步骤', 'POST');
+INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (127, '2022-05-16 11:52:09.224', '2022-05-21 14:29:05.597', NULL, '/case/:project/step/deleteTestCase', '删除测试步骤', '测试步骤', 'DELETE');
+INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (128, '2022-05-16 11:52:09.225', '2022-05-21 14:29:11.933', NULL, '/case/:project/step/deleteTestCaseByIds', '批量删除测试步骤', '测试步骤', 'DELETE');
+INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (129, '2022-05-16 11:52:09.226', '2022-05-21 14:29:18.309', NULL, '/case/:project/step/updateTestCase', '更新测试步骤', '测试步骤', 'PUT');
+INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (130, '2022-05-16 11:52:09.227', '2022-05-21 14:29:25.028', NULL, '/case/:project/step/findTestCase', '根据ID获取测试步骤', '测试步骤', 'GET');
+INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (131, '2022-05-16 11:52:09.227', '2022-05-21 14:29:32.149', NULL, '/case/:project/step/getTestCaseList', '获取测试步骤列表', '测试步骤', 'GET');
+INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (132, '2022-05-19 11:06:19.655', '2022-05-21 14:48:49.099', NULL, '/case/:project/step/getTestCaseList', '测试步骤列表排序', '测试步骤', 'POST');
+INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (133, '2022-05-25 16:47:34.031', '2022-05-28 11:39:27.033', NULL, '/case/:project/step/addTestCase', '测试步骤添加api', '测试步骤', 'POST');
+INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (134, '2022-05-25 19:09:32.489', '2022-05-28 11:39:18.524', NULL, '/case/:project/step/delTestCase', '删除测试步骤关联的api', '测试步骤', 'DELETE');
 INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (135, '2022-05-26 19:22:17.771', '2022-08-24 08:35:44.133', NULL, '/case/run/:project/runTestCaseStep', '运行测试用例', '运行', 'POST');
 INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (136, '2022-06-07 13:48:52.585', '2022-06-07 13:48:52.585', NULL, '/case/report/:project/getReportList', '测试报告列表', '测试报告', 'GET');
 INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (137, '2022-06-08 18:45:04.313', '2022-06-08 18:45:04.313', NULL, '/case/report/:project/findReport', '测试报告详情', '测试报告', 'GET');
@@ -1875,16 +1875,16 @@ INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, 
 INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (141, '2022-06-21 17:30:46.636', '2022-06-21 17:54:38.151', NULL, '/testcase/:project/updateApiCase', '更新测试用例', '测试用例', 'PUT');
 INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (142, '2022-06-21 17:30:46.665', '2022-08-28 21:02:33.070', '2022-08-28 21:02:34.978', '/testcase/:project/findApiTestCaseA', '根据ID获取测试用例2', '测试用例', 'GET');
 INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (143, '2022-06-21 17:30:46.696', '2022-06-21 17:54:47.086', NULL, '/testcase/:project/getApiCaseList', '获取测试用例列表', '测试用例', 'GET');
-INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (144, '2022-06-24 11:32:22.281', '2022-06-24 11:38:09.393', NULL, '/case/:project/step/sortTestCase', '测试套件排序', '测试套件', 'POST');
+INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (144, '2022-06-24 11:32:22.281', '2022-06-24 11:38:09.393', NULL, '/case/:project/step/sortTestCase', '测试步骤排序', '测试步骤', 'POST');
 INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (145, '2022-06-24 20:28:15.933', '2022-06-24 20:28:15.933', NULL, '/testcase/:project/findApiTestCase', '测试用例用例', '测试用例', 'GET');
 INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (146, '2022-06-24 21:39:07.629', '2022-06-24 21:39:07.629', NULL, '/testcase/:project/addApisCase', '添加测试用例', '测试用例', 'POST');
-INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (147, '2022-06-25 17:43:56.636', '2022-06-25 17:43:56.636', NULL, '/testcase/:project/setApisCase', '测试用例设置测试套件', '测试用例', 'POST');
+INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (147, '2022-06-25 17:43:56.636', '2022-06-25 17:43:56.636', NULL, '/testcase/:project/setApisCase', '测试用例设置测试步骤', '测试用例', 'POST');
 INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (148, '2022-06-28 10:40:46.075', '2022-06-28 10:40:46.075', NULL, '/case/run/:project/runApiCase', '运行定时任务', '运行', 'POST');
 INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (149, '2022-07-12 20:08:21.281', '2022-07-12 20:10:23.118', NULL, '/case/:project/updateDebugTalk', '更新DebugTalk文件', 'api模板', 'PUT');
 INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (150, '2022-07-12 20:08:58.940', '2022-07-12 20:13:40.945', NULL, '/case/:project/getDebugTalk', '获取DebugTalk文件', 'api模板', 'POST');
-INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (151, '2022-08-01 11:33:43.475', '2022-08-01 11:33:43.475', NULL, '/testcase/:project/sortApisCase', '测试套件排序', '测试用例', 'POST');
-INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (152, '2022-08-01 15:42:51.648', '2022-08-01 15:42:51.648', NULL, '/testcase/:project/AddApiTestCase', '任务添加测试套件', '测试用例', 'POST');
-INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (153, '2022-08-01 16:45:18.502', '2022-08-01 16:45:18.502', NULL, '/testcase/:project/delApisCase', '定时任务删除测试套件', '测试用例', 'DELETE');
+INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (151, '2022-08-01 11:33:43.475', '2022-08-01 11:33:43.475', NULL, '/testcase/:project/sortApisCase', '测试步骤排序', '测试用例', 'POST');
+INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (152, '2022-08-01 15:42:51.648', '2022-08-01 15:42:51.648', NULL, '/testcase/:project/AddApiTestCase', '任务添加测试步骤', '测试用例', 'POST');
+INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (153, '2022-08-01 16:45:18.502', '2022-08-01 16:45:18.502', NULL, '/testcase/:project/delApisCase', '定时任务删除测试步骤', '测试用例', 'DELETE');
 INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (154, '2022-08-10 12:30:44.986', '2022-08-10 12:30:44.986', NULL, '/case/run/:project/runApi', '调试接口', '运行', 'POST');
 INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (155, '2022-08-10 12:31:08.302', '2022-08-10 12:31:08.302', '2022-08-10 16:36:28.503', '/case/run/:project/runApiSave', '调试并保存接口', '运行', 'POST');
 INSERT INTO `sys_apis` (`id`, `created_at`, `updated_at`, `deleted_at`, `path`, `description`, `api_group`, `method`) VALUES (156, '2022-08-01 11:33:43.475', '2022-08-01 11:33:43.475', NULL, '/task/:project/sortTaskCase', '测试用例排序', '定时任务', 'POST');
@@ -2272,8 +2272,8 @@ INSERT INTO `sys_base_menus` (`id`, `created_at`, `updated_at`, `deleted_at`, `m
 INSERT INTO `sys_base_menus` (`id`, `created_at`, `updated_at`, `deleted_at`, `menu_level`, `parent_id`, `path`, `name`, `hidden`, `component`, `sort`, `keep_alive`, `default_menu`, `title`, `icon`, `close_tab`) VALUES (34, '2022-01-23 18:37:56.434', '2023-05-18 23:29:40.825', NULL, 0, '33', 'interfacetemplate', 'interfacetemplate', 0, 'view/interface/interfaceTemplate/interfaceTemplate.vue', 200, 0, 0, '接口管理', 'coin', 0);
 INSERT INTO `sys_base_menus` (`id`, `created_at`, `updated_at`, `deleted_at`, `menu_level`, `parent_id`, `path`, `name`, `hidden`, `component`, `sort`, `keep_alive`, `default_menu`, `title`, `icon`, `close_tab`) VALUES (35, '2022-01-28 13:29:16.282', '2023-05-18 23:29:40.841', NULL, 0, '33', 'DebugReport', 'DebugReport', 1, 'view/interface/interfaceReport/DebugReport.vue', 99999, 0, 0, 'DebugReport', 'aim', 0);
 INSERT INTO `sys_base_menus` (`id`, `created_at`, `updated_at`, `deleted_at`, `menu_level`, `parent_id`, `path`, `name`, `hidden`, `component`, `sort`, `keep_alive`, `default_menu`, `title`, `icon`, `close_tab`) VALUES (36, '2022-05-11 19:34:31.473', '2023-05-18 23:29:40.854', NULL, 0, '33', 'apiConfig', 'apiConfig', 0, 'view/interface/interfaceTemplate/apiConfig.vue', 100, 0, 0, '配置管理', 'expand', 0);
-INSERT INTO `sys_base_menus` (`id`, `created_at`, `updated_at`, `deleted_at`, `menu_level`, `parent_id`, `path`, `name`, `hidden`, `component`, `sort`, `keep_alive`, `default_menu`, `title`, `icon`, `close_tab`) VALUES (37, '2022-05-16 12:15:29.299', '2023-05-18 23:29:40.868', NULL, 0, '33', 'testCaseStep', 'testCaseStep', 0, 'view/interface/testCaseStep/testCaseStep.vue', 300, 0, 0, '测试套件', 'suitcase', 0);
-INSERT INTO `sys_base_menus` (`id`, `created_at`, `updated_at`, `deleted_at`, `menu_level`, `parent_id`, `path`, `name`, `hidden`, `component`, `sort`, `keep_alive`, `default_menu`, `title`, `icon`, `close_tab`) VALUES (38, '2022-05-17 12:54:39.571', '2023-05-18 23:29:40.884', NULL, 0, '33', 'testCaseStepDetail/:id', 'testCaseStepDetail', 1, 'view/interface/testCaseStep/testCaseStepDetail.vue', 99999, 0, 0, '套件详情-${id}', 'finished', 0);
+INSERT INTO `sys_base_menus` (`id`, `created_at`, `updated_at`, `deleted_at`, `menu_level`, `parent_id`, `path`, `name`, `hidden`, `component`, `sort`, `keep_alive`, `default_menu`, `title`, `icon`, `close_tab`) VALUES (37, '2022-05-16 12:15:29.299', '2023-05-18 23:29:40.868', NULL, 0, '33', 'testCaseStep', 'testCaseStep', 0, 'view/interface/testCaseStep/testCaseStep.vue', 300, 0, 0, '测试步骤', 'suitcase', 0);
+INSERT INTO `sys_base_menus` (`id`, `created_at`, `updated_at`, `deleted_at`, `menu_level`, `parent_id`, `path`, `name`, `hidden`, `component`, `sort`, `keep_alive`, `default_menu`, `title`, `icon`, `close_tab`) VALUES (38, '2022-05-17 12:54:39.571', '2023-05-18 23:29:40.884', NULL, 0, '33', 'testCaseStepDetail/:id', 'testCaseStepDetail', 1, 'view/interface/testCaseStep/testCaseStepDetail.vue', 99999, 0, 0, '步骤详情-${id}', 'finished', 0);
 INSERT INTO `sys_base_menus` (`id`, `created_at`, `updated_at`, `deleted_at`, `menu_level`, `parent_id`, `path`, `name`, `hidden`, `component`, `sort`, `keep_alive`, `default_menu`, `title`, `icon`, `close_tab`) VALUES (39, '2022-05-18 19:30:05.572', '2022-05-18 19:34:27.917', '2022-07-12 11:43:22.410', 0, '33', 'apiTest', 'apiTest', 0, 'view/interface/test.vue', 0, 0, 0, '测试', 'aim', 0);
 INSERT INTO `sys_base_menus` (`id`, `created_at`, `updated_at`, `deleted_at`, `menu_level`, `parent_id`, `path`, `name`, `hidden`, `component`, `sort`, `keep_alive`, `default_menu`, `title`, `icon`, `close_tab`) VALUES (40, '2022-05-21 15:15:37.413', '2022-05-21 15:16:32.325', '2022-07-12 11:43:26.991', 0, '33', 'testCaseAdd', 'testCaseAdd', 0, 'view/interface/testCase/testCaseAdd.vue', 0, 0, 0, '添加测试用例', 'aim', 0);
 INSERT INTO `sys_base_menus` (`id`, `created_at`, `updated_at`, `deleted_at`, `menu_level`, `parent_id`, `path`, `name`, `hidden`, `component`, `sort`, `keep_alive`, `default_menu`, `title`, `icon`, `close_tab`) VALUES (41, '2022-05-18 19:30:05.572', '2022-05-18 19:34:27.917', '2022-07-12 11:43:33.305', 0, '33', 'apiTest2', 'apiTest2', 0, 'view/interface/test2.vue', 0, 0, 0, '测试2', 'aim', 0);

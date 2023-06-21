@@ -548,12 +548,12 @@ const typeTransformation = (data) => {
   return dataJson;
 };
 
-const reportDetailFunc = (ID) => {
-  if (ID) {
+const reportDetailFunc = (report_id) => {
+  if (report_id) {
     router.push({
       name: "reportDetail",
       params: {
-        id: ID,
+        report_id: report_id,
       },
     });
   } else {
@@ -600,7 +600,6 @@ const runInterfaceTemplateFunc = async (id) => {
     userConfigs.value.api_env_id &&
     userConfigs.value.api_env_id > 0
   ) {
-    console.log("============", userConfigs.value.api_env_id);
     data["env"] = userConfigs.value.api_env_id;
   }
   const res = await runApi(data);
@@ -711,7 +710,6 @@ const getUserConfigs = async () => {
   let res = await getUserConfig();
   if (res.code === 0 && res.data) {
     userConfigs.value = res.data;
-    console.log("============", userConfigs.value);
   }
 };
 getUserConfigs();
@@ -721,7 +719,6 @@ getUserConfigs();
 .request {
   margin-top: 15px;
   border: 1px solid #ddd;
-  height: 520px;
 }
 .lefts {
   float: left;

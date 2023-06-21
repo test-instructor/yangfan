@@ -5,7 +5,6 @@ package gidevice
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"testing"
 )
@@ -32,11 +31,11 @@ func Test_afc_DiskInfo(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Printf("%10s: %s\n", "Model", info.Model)
-	log.Printf("%10s: %d\n", "BlockSize", info.BlockSize/8)
-	log.Printf("%10s: %s\n", "FreeSpace", byteCountDecimal(int64(info.FreeBytes)))
-	log.Printf("%10s: %s\n", "UsedSpace", byteCountDecimal(int64(info.TotalBytes-info.FreeBytes)))
-	log.Printf("%10s: %s\n", "TotalSpace", byteCountDecimal(int64(info.TotalBytes)))
+	global.GVA_LOG.Info("Model", zap.String("Model", info.Model))
+	global.GVA_LOG.Info("BlockSize", zap.Int64("BlockSize", info.BlockSize/8))
+	global.GVA_LOG.Info("FreeSpace", zap.String("FreeSpace", byteCountDecimal(int64(info.FreeBytes))))
+	global.GVA_LOG.Info("UsedSpace", zap.String("UsedSpace", byteCountDecimal(int64(info.TotalBytes-info.FreeBytes))))
+	global.GVA_LOG.Info("TotalSpace", zap.String("TotalSpace", byteCountDecimal(int64(info.TotalBytes))))
 }
 
 func byteCountDecimal(b int64) string {

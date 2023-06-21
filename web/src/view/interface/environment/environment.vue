@@ -175,7 +175,6 @@ const envTableData = ref([]);
 const init = async () => {
   const tables = await getEnvList();
   envTableData.value = tables.data.list;
-  console.log("envTableData", envTableData.value);
   const res = await getTableData();
 };
 init();
@@ -206,9 +205,7 @@ const getTableData = async () => {
   }
 };
 
-const getVar = (val) => {
-  console.log("=======val", val);
-};
+const getVar = (val) => {};
 
 const onReset = () => {
   searchInfo.value = {};
@@ -260,8 +257,6 @@ const handleSelectionChange = (val) => {
 };
 
 const addEnvVarFunc = async () => {
-  console.log("==============", varForm.value);
-
   if (varForm.value.key === "") {
     ElMessage({
       type: "warning",
@@ -303,7 +298,7 @@ const addEnvVarFunc = async () => {
 
 const deleteRow = (row) => {
   ElMessageBox.confirm(
-    "删除变量会导致被应用的测试套件、测试用例、定时任务、性能测试任务无法正常运行，确定要删除吗?",
+    "删除变量会导致被应用的测试步骤、测试用例、定时任务、性能测试任务无法正常运行，确定要删除吗?",
     "提示",
     {
       confirmButtonText: "确定",
@@ -331,7 +326,6 @@ const updateRow = async (row) => {
     envVarDialog.value = true;
     envVarType.value = "更新变量";
     varForm.value = res.data.env;
-    console.log("varForm", varForm.value);
   }
 };
 </script>

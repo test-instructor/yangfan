@@ -4,9 +4,9 @@ go 1.19
 
 require (
 	github.com/rs/zerolog v1.29.1
-	github.com/test-instructor/yangfan/hrp v0.0.0-20230515173030-4544ed499044
-	github.com/test-instructor/yangfan/proto v0.0.0-20230521150540-bdfa0196efa2
-	github.com/test-instructor/yangfan/server v0.0.0-20230521150540-bdfa0196efa2
+	github.com/test-instructor/yangfan/hrp v0.0.0-20230521151452-07d562821462
+	github.com/test-instructor/yangfan/proto v0.0.0-20230521151452-07d562821462
+	github.com/test-instructor/yangfan/server v0.0.0-20230521151452-07d562821462
 	go.uber.org/zap v1.24.0
 	google.golang.org/grpc v1.55.0
 )

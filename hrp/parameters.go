@@ -8,7 +8,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 )
 
 type TParamsConfig struct {
@@ -88,7 +89,7 @@ func newParametersIterator(parameters map[string]Parameters, config *TParamsConf
 	iterator.sequentialParameters = genCartesianProduct(parametersList)
 
 	if iterator.limit < 0 {
-		log.Warn().Msg("parameters unlimited mode is only supported for load testing")
+		global.GVA_LOG.Warn("parameters unlimited mode is only supported for load testing")
 		iterator.limit = 0
 	}
 	if iterator.limit == 0 {
@@ -102,7 +103,7 @@ func newParametersIterator(parameters map[string]Parameters, config *TParamsConf
 			iterator.limit = 1
 		}
 	} else { // limit > 0
-		log.Info().Int("limit", iterator.limit).Msg("set limit for parameters")
+		global.GVA_LOG.Info("set limit for parameters", zap.Int("limit", iterator.limit))
 	}
 
 	return iterator
@@ -120,7 +121,7 @@ type ParametersIterator struct {
 
 // SetUnlimitedMode is used for load testing
 func (iter *ParametersIterator) SetUnlimitedMode() {
-	log.Info().Msg("set parameters unlimited mode")
+	global.GVA_LOG.Info("set parameters unlimited mode")
 	iter.limit = -1
 }
 
@@ -269,25 +270,20 @@ func loadParameters(configParameters map[string]interface{}, variablesMapping ma
 			// => ["1.0.0", "1.0.1"]
 			parsedParameterContent, err := newParser().ParseString(rawValue.String(), variablesMapping)
 			if err != nil {
-				log.Error().Err(err).
-					Str("parametersRawContent", rawValue.String()).
-					Msg("parse parameters content failed")
+
+				global.GVA_LOG.Error("parse parameters content failed", zap.String("parametersRawContent", rawValue.String()), zap.Any("err", err))
 				return nil, err
 			}
 
 			parsedParameterRawValue := reflect.ValueOf(parsedParameterContent)
 			if parsedParameterRawValue.Kind() != reflect.Slice {
-				log.Error().
-					Interface("parsedParameterContent", parsedParameterRawValue).
-					Msg("parsed parameters content is not slice")
+				global.GVA_LOG.Error("parsed parameters content is not slice", zap.Any("parsedParameterContent", parsedParameterRawValue))
 				return nil, errors.New("parsed parameters content should be slice")
 			}
 			parametersRawList = parsedParameterRawValue.Interface()
 
 		default:
-			log.Error().
-				Interface("parameters", configParameters).
-				Msg("config parameters raw value should be slice or string (functions call)")
+			global.GVA_LOG.Error("config parameters raw value should be slice or string (functions call)", zap.Any("parameters", configParameters))
 			return nil, errors.New("config parameters raw value format error")
 		}
 
@@ -342,11 +338,7 @@ func convertParameters(key string, parametersRawList interface{}) (parameterSlic
 			// e.g. "username-password": ["test1", "111111"]
 			// => {"username": "test1", "password": "111111"}
 			if len(parameterNames) != elem.Len() {
-				log.Error().
-					Strs("parameterNames", parameterNames).
-					Int("lineIndex", i).
-					Interface("content", elem.Interface()).
-					Msg("parameters line length does not match to names length")
+				global.GVA_LOG.Error("parameters line length does not match to names length", zap.Any("parameterNames", parameterNames), zap.Int("lineIndex", i), zap.Any("content", elem.Interface()))
 				return nil, errors.New("parameters line length does not match to names length")
 			}
 
@@ -363,10 +355,7 @@ func convertParameters(key string, parametersRawList interface{}) (parameterSlic
 				if _, ok := lineMap[name]; ok {
 					parametersLine[name] = elem.MapIndex(reflect.ValueOf(name)).Interface()
 				} else {
-					log.Error().
-						Strs("parameterNames", parameterNames).
-						Str("name", name).
-						Msg("parameter name not found")
+					global.GVA_LOG.Error("parameter name not found", zap.Any("parameterNames", parameterNames), zap.String("name", name))
 					return nil, errors.New("parameter name not found")
 				}
 			}
@@ -376,10 +365,7 @@ func convertParameters(key string, parametersRawList interface{}) (parameterSlic
 			// e.g. "user_agent": "iOS/10.1"
 			// -> {"user_agent": "iOS/10.1"}
 			if len(parameterNames) != 1 {
-				log.Error().
-					Strs("parameterNames", parameterNames).
-					Int("lineIndex", i).
-					Msg("parameters format error")
+				global.GVA_LOG.Error("parameters format error", zap.Any("parameterNames", parameterNames), zap.Int("lineIndex", i))
 				return nil, errors.New("parameters format error")
 			}
 			parametersLine[parameterNames[0]] = elem.Interface()

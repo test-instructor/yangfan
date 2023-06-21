@@ -1,16 +1,14 @@
 package interfacecase
 
 import (
-	"strconv"
-
-	"github.com/robfig/cron/v3"
+	"github.com/test-instructor/yangfan/proto/tools"
+	"github.com/test-instructor/yangfan/server/grpc"
 	"gorm.io/gorm"
 
 	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/model/common/request"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	interfacecaseReq "github.com/test-instructor/yangfan/server/model/interfacecase/request"
-	"github.com/test-instructor/yangfan/server/service/interfacecase/runTestCase"
 )
 
 type TimerTaskService struct {
@@ -19,6 +17,15 @@ type TimerTaskService struct {
 // CreateTimerTask 创建TimerTask记录
 
 func (taskService *TimerTaskService) CreateTimerTask(task interfacecase.ApiTimerTask) (err error) {
+	defer func() {
+		if err == nil && *task.Status {
+			var res = &tools.SetTaskRes{
+				ID:          uint64(task.ID),
+				TimerStatus: tools.TimerStatusOperate_ADD,
+			}
+			grpc.ServerToolsObj.SendMessageToTimerTaskClients(res)
+		}
+	}()
 	err = global.GVA_DB.Create(&task).Error
 	return err
 }
@@ -26,6 +33,16 @@ func (taskService *TimerTaskService) CreateTimerTask(task interfacecase.ApiTimer
 // DeleteTimerTask 删除TimerTask记录
 
 func (taskService *TimerTaskService) DeleteTimerTask(task interfacecase.ApiTimerTask) (err error) {
+	defer func() {
+		if err == nil {
+			var res = &tools.SetTaskRes{
+				ID:          uint64(task.ID),
+				EntryID:     int64(task.EntryID),
+				TimerStatus: tools.TimerStatusOperate_DELETE,
+			}
+			grpc.ServerToolsObj.SendMessageToTimerTaskClients(res)
+		}
+	}()
 	err = global.GVA_DB.Delete(&task).Error
 	return err
 }
@@ -63,6 +80,15 @@ func (taskService *TimerTaskService) setTaskTag(ids []uint, taskID uint) (err er
 // UpdateTimerTask 更新TimerTask记录
 
 func (taskService *TimerTaskService) UpdateTimerTask(task interfacecase.ApiTimerTask) (err error) {
+	defer func() {
+		if err == nil {
+			var res = &tools.SetTaskRes{
+				ID:          uint64(task.ID),
+				TimerStatus: tools.TimerStatusOperate_RESET,
+			}
+			grpc.ServerToolsObj.SendMessageToTimerTaskClients(res)
+		}
+	}()
 
 	var oId interfacecase.Operator
 	err = taskService.setTaskTag(task.TagIds, task.ID)
@@ -75,18 +101,6 @@ func (taskService *TimerTaskService) UpdateTimerTask(task interfacecase.ApiTimer
 	err = global.GVA_DB.Where("id = ?", task.ID).Save(&task).Error
 	if err != nil {
 		return
-	}
-	global.GVA_Timer.Remove(strconv.Itoa(int(task.ID)), task.EntryID)
-	if *task.Status {
-		id, err := global.GVA_Timer.AddTaskByFunc(strconv.Itoa(int(task.ID)), task.RunTime, runTestCase.RunTimerTaskBack(task.ID), cron.WithSeconds())
-		if err != nil {
-			return err
-		}
-		task.EntryID = int(id)
-		err = global.GVA_DB.Save(&task).Error
-		if err != nil {
-			return err
-		}
 	}
 	return err
 }

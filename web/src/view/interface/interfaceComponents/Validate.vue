@@ -222,12 +222,7 @@ export default {
               } else if (value.indexOf("$") !== -1) {
                 tempValue = value;
               } else {
-                // this.$notify.error({
-                //   title: '类型转换错误',
-                //   message: msg,
-                //   duration: 2000
-                // });
-                // return 'exception'
+                tempValue = null;
               }
               break;
           }

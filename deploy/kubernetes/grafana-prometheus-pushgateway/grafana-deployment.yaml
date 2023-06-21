@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yangfan-grafana
+  namespace: yangfan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yangfan-grafana
+  template:
+    metadata:
+      labels:
+        app: yangfan-grafana
+    spec:
+      containers:
+        - name: yangfan-grafana
+          image: grafana/grafana:9.5.1
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: yangfan-grafana-config
+              mountPath: /etc/grafana
+            - name: yangfan-grafana-dashboard-config
+              mountPath: /etc/grafana/dashboards
+            - name: yangfan-grafana-prometheus-config
+              mountPath: /etc/grafana/provisioning/datasources
+            - name: yangfan-grafana-provisioning-dashboard-config
+              mountPath: /etc/grafana/provisioning/dashboards
+          env:
+            - name: GF_AUTH_ANONYMOUS_ENABLED
+              value: "true"
+            - name: GF_AUTH_ANONYMOUS_ORG_ROLE
+              value: "Viewer"
+            - name: GF_SECURITY_ALLOW_EMBEDDING
+              value: "true"
+            - name: GF_PATHS_CONFIG
+              value: /etc/grafana/grafana.ini
+            - name: TZ
+              value: Asia/Shanghai
+      volumes:
+        - name: yangfan-grafana-config
+          configMap:
+            name: yangfan-grafana-config
+        - name: yangfan-grafana-dashboard-config
+          configMap:
+            name: yangfan-grafana-dashboard-config
+        - name: yangfan-grafana-prometheus-config
+          configMap:
+            name: yangfan-grafana-prometheus-config
+        - name: yangfan-grafana-provisioning-dashboard-config
+          configMap:
+            name: yangfan-grafana-provisioning-dashboard-config

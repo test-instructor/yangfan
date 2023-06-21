@@ -8,7 +8,8 @@ import (
 
 	"github.com/google/shlex"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp"
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
@@ -261,10 +262,7 @@ func (c CaseCurl) checkOptions() error {
 func (c CaseCurl) toTSteps() ([]*hrp.TStep, error) {
 	var tSteps []*hrp.TStep
 	for _, rawUrl := range c[targetUrlKey] {
-		log.Info().
-			Str("url", rawUrl).
-			Msg("convert test steps")
-
+		global.GVA_LOG.Info("convert test steps", zap.String("url", rawUrl))
 		step := &stepFromCurl{
 			TStep: &hrp.TStep{
 				Request: &hrp.Request{},
@@ -378,7 +376,7 @@ func (s *stepFromCurl) makeRequestHeader(headerExpr string) error {
 		}
 		if strings.ToLower(headerKey) == "host" {
 			// headerExpr modifying internal header like "Host:"
-			log.Warn().Str("--header", headerExpr).Msg("modifying internal header not supported")
+			global.GVA_LOG.Warn("modifying internal header not supported", zap.String("--header", headerExpr))
 			return nil
 		}
 		if headerValue != "" {
@@ -391,13 +389,13 @@ func (s *stepFromCurl) makeRequestHeader(headerExpr string) error {
 		// headerExpr terminated with a semicolon like "X-Custom-Header;"
 		headerKey := strings.TrimSpace(headerExpr[:i])
 		if strings.ToLower(headerKey) == "host" {
-			log.Warn().Str("--header", headerExpr).Msg("modifying internal header not supported")
+			global.GVA_LOG.Warn("modifying internal header not supported", zap.String("--header", headerExpr))
 			return nil
 		}
 		s.Request.Headers[headerKey] = ""
 		return nil
 	}
-	log.Warn().Str("--header", headerExpr).Msg("pass meaningless curl header expression")
+	global.GVA_LOG.Warn("pass meaningless curl header expression", zap.String("--header", headerExpr))
 	return nil
 }
 
@@ -424,7 +422,7 @@ func (s *stepFromCurl) makeRequestCookie(cookieExpr string) error {
 	for _, cookie := range cookies {
 		i := strings.Index(cookie, "=")
 		if i == -1 {
-			log.Warn().Str("--cookie", cookie).Msg("pass meaningless curl cookie expression")
+			global.GVA_LOG.Warn("pass meaningless curl cookie expression", zap.String("--cookie", cookie))
 			continue
 		}
 		cookieKey := strings.TrimSpace(cookie[:i])

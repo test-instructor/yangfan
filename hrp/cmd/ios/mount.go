@@ -6,8 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
 )
@@ -26,7 +27,7 @@ var mountCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("get device ProductVersion failed: %v", err)
 		}
-		log.Info().Str("version", value.(string)).Msg("get device version")
+		global.GVA_LOG.Info("get device version", zap.String("version", value.(string)))
 
 		imageSignatures, errImage := device.Images()
 
@@ -38,11 +39,11 @@ var mountCmd = &cobra.Command{
 		}
 
 		if errImage == nil && len(imageSignatures) > 0 {
-			log.Info().Msg("ios developer image is already mounted")
+			global.GVA_LOG.Info("ios developer image is already mounted")
 			return nil
 		}
 
-		log.Info().Str("dir", developerDiskImageDir).Msg("start to mount ios developer image")
+		global.GVA_LOG.Info("start to mount ios developer image", zap.String("dir", developerDiskImageDir))
 
 		if !builtin.IsFolderPathExists(developerDiskImageDir) {
 			return fmt.Errorf("developer disk image directory not exist: %s", developerDiskImageDir)
@@ -62,7 +63,7 @@ var mountCmd = &cobra.Command{
 			dmgPath = filepath.Join(developerDiskImageDir, version, "DeveloperDiskImage.dmg")
 			signaturePath = filepath.Join(developerDiskImageDir, version, "DeveloperDiskImage.dmg.signature")
 		} else {
-			log.Error().Str("dir", developerDiskImageDir).Msg("developer disk image not found in directory")
+			global.GVA_LOG.Error("developer disk image not found in directory", zap.String("dir", developerDiskImageDir))
 			return fmt.Errorf("developer disk image not found")
 		}
 
@@ -70,7 +71,7 @@ var mountCmd = &cobra.Command{
 			return fmt.Errorf("mount developer disk image failed: %s", err)
 		}
 
-		log.Info().Msg("mount developer disk image successfully")
+		global.GVA_LOG.Info("mount developer disk image successfully")
 		return nil
 	},
 }

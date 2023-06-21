@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package run;
+option go_package = "./;run";
+
+service RunCase {
+  rpc RunApi (RunCaseReq) returns (RunCaseResponse) {}
+  rpc RunStep (RunCaseReq) returns (RunCaseResponse) {}
+  rpc RunCase (RunCaseReq) returns (RunCaseResponse) {}
+  rpc RunBoomerDebug (RunCaseReq) returns (RunCaseResponse) {}
+  rpc RunTimerTask (RunCaseReq) returns (RunCaseResponse) {}
+  rpc RunTimerTag (RunCaseReq) returns (RunCaseResponse) {}
+}
+
+message Operation{
+  RunningType running = 1;
+  int64 spawnCount = 2;
+  float spawnRate = 3;
+}
+
+enum RunningType{
+  RunningTypeDefault = 0;
+  RunningTypeRun = 1;
+  RunningTypeRebalance = 2;
+  RunningTypeStop = 3;
+}
+
+message RunCaseReq{
+  uint32 apiID  = 1;
+  uint32  configID =2;
+  uint32 caseID = 3;
+  RunType run_type = 4;
+  uint32 taskID = 5;
+  Operation operation = 6;
+  uint32 tagID = 7;
+  uint32 projectID = 8;
+  uint32 env = 9;
+  uint32 reportID = 10;
+  CaseType case_type = 11;
+}
+
+enum CaseType{
+  CaseTypeDefault = 0; // 默认
+  CaseTypeApi = 1; // api 运行
+  CaseTypeStep = 2; // 步骤运行
+  CaseTypeCases = 3; // 用例运行
+  CaseTypeTask = 4; // 定时任务运行
+  CaseTypeBoomerDebug = 5; // 性能任务调试
+  CaseTypeBoomer = 6; // 性能任务运行
+  CaseTypeTag = 7; // 性能任务运行
+}
+
+enum RunType{
+  RunTypeDefault = 0; // 默认
+  RunTypeDebug = 1; // 调试模式
+  RunTypeRuning = 2; // 立即运行
+  RunTypeRunBack = 3; // 后台运行
+  RunTypeRunTimer = 4; // 定时执行
+  RunTypeRunSave = 5; // 调试并保存
+}
+
+message RunCaseResponse{
+  uint32 reportID = 1;
+}

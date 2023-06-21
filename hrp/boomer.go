@@ -2,7 +2,6 @@ package hrp
 
 import (
 	"fmt"
-	"github.com/test-instructor/yangfan/server/global"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -11,8 +10,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
+
 	"github.com/httprunner/funplugin"
-	"github.com/rs/zerolog/log"
 	"golang.org/x/net/context"
 
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
@@ -142,7 +143,7 @@ func (b *HRPBoomer) ConvertTestCasesToBoomerTasks(testcases ...ITestCase) (taskS
 	// load all testcases
 	testCases, err := LoadTestCases(testcases...)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to load testcases")
+		global.GVA_LOG.Error("failed to load testcases", zap.Any("err", err))
 		os.Exit(code.GetErrorCode(err))
 	}
 
@@ -168,10 +169,13 @@ func (b *HRPBoomer) ParseTestCases(testCases []*TestCase) []*TCase {
 			tc.Config.Path = b.debugtalk.FilePath
 			tc.Config.ReportID = b.OutputDB.PReport.ID
 			b.Boomer.SetServerReportID(b.OutputDB.PReport.ID)
+			reportName := fmt.Sprintf("%s_id_%d", b.OutputDB.PReport.Name, b.OutputDB.PReport.ID)
+			stats := boomer.NewPrometheusPusherStats(global.GVA_CONFIG.YangFan.PrometheusPushgatewayURL, "yangfan", "stats", reportName)
+			stats.OnStart()
 		}
 		caseRunner, err := b.hrpRunner.NewCaseRunner(tc)
 		if err != nil {
-			log.Error().Err(err).Msg("failed to create runner")
+			global.GVA_LOG.Error("failed to create runner", zap.Any("err", err))
 			os.Exit(code.GetErrorCode(err))
 		}
 		caseRunner.parsedConfig.Parameters = caseRunner.parametersIterator.outParameters()
@@ -207,13 +211,13 @@ func (b *HRPBoomer) TestCasesToBytes(testcases ...ITestCase) []byte {
 	// load all testcases
 	testCases, err := LoadTestCases(testcases...)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to load testcases")
+		global.GVA_LOG.Error("failed to load testcases", zap.Any("err", err))
 		os.Exit(code.GetErrorCode(err))
 	}
 	tcs := b.ParseTestCases(testCases)
 	testCasesBytes, err := json.Marshal(tcs)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to marshal testcases")
+		global.GVA_LOG.Error("failed to marshal testcases", zap.Any("err", err))
 		return nil
 	}
 	return testCasesBytes
@@ -223,7 +227,7 @@ func (b *HRPBoomer) BytesToTCases(testCasesBytes []byte) []*TCase {
 	var testcase []*TCase
 	err := json.Unmarshal(testCasesBytes, &testcase)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to unmarshal testcases")
+		global.GVA_LOG.Error("failed to unmarshal testcases", zap.Any("err", err))
 	}
 	return testcase
 }
@@ -258,7 +262,7 @@ func (b *HRPBoomer) parseTCases(testCases []*TCase) (testcases []ITestCase) {
 		// create temp dir to save testcase
 		tempDir, err := ioutil.TempDir("", "hrp_testcases")
 		if err != nil {
-			log.Error().Err(err).Msg("failed to create hrp testcases directory")
+			global.GVA_LOG.Error("failed to create hrp testcases directory", zap.Any("err", err))
 			return
 		}
 
@@ -266,7 +270,7 @@ func (b *HRPBoomer) parseTCases(testCases []*TCase) (testcases []ITestCase) {
 			tc.Config.PluginSetting.Path = filepath.Join(tempDir, fmt.Sprintf("debugtalk.%s", tc.Config.PluginSetting.Type))
 			err = builtin.Bytes2File(tc.Config.PluginSetting.Content, tc.Config.PluginSetting.Path)
 			if err != nil {
-				log.Error().Err(err).Msg("failed to save plugin file")
+				global.GVA_LOG.Error("failed to save plugin file", zap.Any("err", err))
 				return
 			}
 			tc.Config.PluginSetting.Content = nil // remove the content in testcase
@@ -279,7 +283,7 @@ func (b *HRPBoomer) parseTCases(testCases []*TCase) (testcases []ITestCase) {
 			}
 			err = os.WriteFile(filepath.Join(tempDir, ".env"), []byte(envContent), 0o644)
 			if err != nil {
-				log.Error().Err(err).Msg("failed to dump environs")
+				global.GVA_LOG.Error("failed to dump environs", zap.Any("err", err))
 				return
 			}
 		}
@@ -287,13 +291,13 @@ func (b *HRPBoomer) parseTCases(testCases []*TCase) (testcases []ITestCase) {
 		tc.Config.Path = filepath.Join(tempDir, "test-case.json")
 		err = builtin.Dump2JSON(tc, tc.Config.Path)
 		if err != nil {
-			log.Error().Err(err).Msg("failed to dump testcases")
+			global.GVA_LOG.Error("failed to dump testcases", zap.Any("err", err))
 			return
 		}
 
 		tesecase, err := tc.toTestCase()
 		if err != nil {
-			log.Error().Err(err).Msg("failed to load testcases")
+			global.GVA_LOG.Error("failed to load testcases", zap.Any("err", err))
 			return
 		}
 
@@ -324,7 +328,7 @@ func (b *HRPBoomer) rebalanceRunner(profile *boomer.Profile) {
 	b.SetSpawnCount(profile.SpawnCount)
 	b.SetSpawnRate(profile.SpawnRate)
 	b.GetRebalanceChan() <- true
-	log.Info().Interface("profile", profile).Msg("rebalance tasks successfully")
+	global.GVA_LOG.Info("rebalance tasks successfully", zap.Any("profile", profile))
 }
 
 func (b *HRPBoomer) PollTasks(ctx context.Context) {
@@ -341,7 +345,7 @@ func (b *HRPBoomer) PollTasks(ctx context.Context) {
 				b.initWorker(task.Profile)
 				// get testcases
 				testcases := b.parseTCases(b.BytesToTCases(task.TestCasesBytes))
-				log.Info().Interface("testcases", testcases).Interface("profile", b.GetProfile()).Msg("starting to run tasks")
+				global.GVA_LOG.Info("starting to run tasks", zap.Any("testcases", testcases), zap.Any("profile", b.GetProfile()))
 				// run testcases
 				go b.Run(testcases...)
 			} else {
@@ -377,7 +381,7 @@ func (b *HRPBoomer) PollTestCases(ctx context.Context) {
 				tcs = append(tcs, &tcp)
 			}
 			b.TestCaseBytesChan() <- b.TestCasesToBytes(tcs...)
-			log.Info().Msg("put testcase successfully")
+			global.GVA_LOG.Info("put testcase successfully")
 		case <-b.Boomer.GetCloseChan():
 			return
 		case <-ctx.Done():
@@ -391,7 +395,7 @@ func (b *HRPBoomer) convertBoomerTask(testcase *TestCase, rendezvousList []*Rend
 	// this runner is shared by multiple session runners
 	caseRunner, err := b.hrpRunner.NewCaseRunner(testcase)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to create runner")
+		global.GVA_LOG.Error("failed to create runner", zap.Any("err", err))
 		os.Exit(code.GetErrorCode(err))
 	}
 	if caseRunner.parser.plugin != nil {
@@ -476,10 +480,10 @@ func (b *HRPBoomer) convertBoomerTask(testcase *TestCase, rendezvousList []*Rend
 					transactionSuccess = false
 
 					if b.hrpRunner.failfast {
-						log.Error().Err(err).Msg("abort running due to failfast setting")
+						global.GVA_LOG.Error("abort running due to failfast setting", zap.Any("err", err))
 						break
 					}
-					log.Warn().Err(err).Msg("run step failed, continue next step")
+					global.GVA_LOG.Warn("run step failed, continue next step", zap.Any("err", err))
 					continue
 				}
 
@@ -542,7 +546,7 @@ func (b *HRPBoomer) PollTestCasesPlatform(ctx context.Context) {
 			b.runBoomerMaster = NewBoomerMaster(id)
 			err := b.runBoomerMaster.LoadCase()
 			if err != nil {
-				log.Error().Err(err).Msg("获取用例失败")
+				global.GVA_LOG.Error("获取用例失败", zap.Any("err", err))
 				return
 			}
 			if err != nil {
@@ -552,7 +556,7 @@ func (b *HRPBoomer) PollTestCasesPlatform(ctx context.Context) {
 			b.Boomer.AddOutput(b.OutputDB)
 			tcs = append(tcs, b.runBoomerMaster.TCM.Case...)
 			b.TestCaseBytesChan() <- b.TestCasesToBytes(tcs...)
-			log.Info().Msg("put testcase successfully")
+			global.GVA_LOG.Info("put testcase successfully")
 		case <-b.Boomer.GetCloseChan():
 			return
 		case <-ctx.Done():

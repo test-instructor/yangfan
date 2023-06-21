@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	"github.com/jinzhu/copier"
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp/internal/builtin"
 )
@@ -107,7 +108,7 @@ func (s *StepAPIWithOptionalArgs) Run(r *SessionRunner) (stepResult *StepResult,
 	step := &TStep{}
 	// deep copy step to avoid data racing
 	if err = copier.Copy(step, s.step); err != nil {
-		log.Error().Err(err).Msg("copy step failed")
+		global.GVA_LOG.Error("copy step failed", zap.Error(err))
 		return
 	}
 	extendWithAPI(step, api)

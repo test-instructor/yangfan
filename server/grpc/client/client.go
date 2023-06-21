@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
 	"github.com/test-instructor/yangfan/proto/master"
+	"github.com/test-instructor/yangfan/proto/run"
 	"github.com/test-instructor/yangfan/proto/tools"
 	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
 	"google.golang.org/grpc/codes"
@@ -15,15 +17,15 @@ import (
 )
 
 type Client struct {
-	host               string
-	MasterClient       master.MasterClient
-	ToolsPackageClient tools.ToolsPackageClient
+	host              string
+	MasterClient      master.MasterClient
+	ToolsServerClient tools.ToolsServerClient
+	RunClient         run.RunCaseClient
 }
 
 var clientMap sync.Map
 var clientLock sync.Mutex
 var apiClient *Client
-var initOnce sync.Once
 
 func NewClientMap(host string) (*Client, error) {
 	var c *Client
@@ -44,30 +46,31 @@ func NewClientMap(host string) (*Client, error) {
 func NewClient(host string) (*Client, error) {
 	var c *Client
 	var err error
-	initOnce.Do(func() {
-		c, err = newClient(host)
-		if err != nil {
-			return
-		}
-		apiClient = c
-	})
-	return apiClient, nil
+	global.GVA_LOG.Debug("[NewClient]host", zap.Any("host", host))
+
+	c, err = newClient(host)
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
 }
 
 func Reconnect() (*Client, error) {
 	var c *Client
 	var err error
-	initOnce.Do(func() {
-		c, err = newClient(apiClient.host)
-		if err != nil {
-			return
-		}
-		apiClient = c
-	})
+	c, err = newClient(apiClient.host)
+	global.GVA_LOG.Debug("[Reconnect]重新连接", zap.Any("apiClient.host", apiClient.host))
+	if err != nil {
+		global.GVA_LOG.Error("[Reconnect]重新连接失败", zap.Error(err))
+		global.GVA_LOG.Error("[Reconnect]重新连接失败", zap.Any("apiClient.host", apiClient.host))
+		return nil, err
+	}
+	apiClient = c
 	return apiClient, nil
 }
 
 func newClient(host string) (*Client, error) {
+	global.GVA_LOG.Debug("[newClient]host", zap.Any("host", host))
 	retryMiddlewareConfig := []retry.CallOption{
 		retry.WithCodes(codes.Unavailable),
 		retry.WithBackoff(retry.BackoffExponential(100 * time.Millisecond)),
@@ -92,10 +95,11 @@ func newClient(host string) (*Client, error) {
 		global.GVA_LOG.Error(fmt.Sprintf("dial remote server fail %v", err))
 		return nil, err
 	}
-
-	return &Client{
-		host:               host,
-		MasterClient:       master.NewMasterClient(c),
-		ToolsPackageClient: tools.NewToolsPackageClient(c),
-	}, nil
+	apiClient = &Client{
+		host:              host,
+		MasterClient:      master.NewMasterClient(c),
+		ToolsServerClient: tools.NewToolsServerClient(c),
+		RunClient:         run.NewRunCaseClient(c),
+	}
+	return apiClient, nil
 }

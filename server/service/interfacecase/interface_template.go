@@ -21,10 +21,13 @@ type InterfaceTemplateService struct {
 
 // CreateInterfaceTemplate 创建InterfaceTemplate记录
 
-func (i *InterfaceTemplateService) CreateInterfaceTemplate(apicase interfacecase.ApiStep) (err error) {
+func (i *InterfaceTemplateService) CreateInterfaceTemplate(apicase interfacecase.ApiStep) (id *uint, err error) {
 	apicase.ValidateNumber = uint(len(apicase.Validate))
 	err = global.GVA_DB.Create(&apicase).Error
-	return err
+	if err != nil {
+		return nil, err
+	}
+	return &apicase.ID, nil
 }
 
 // DeleteInterfaceTemplate 删除InterfaceTemplate记录
@@ -105,6 +108,10 @@ func (i *InterfaceTemplateService) GetInterfaceTemplateInfoList(info interfaceca
 		db = db.Where("name LIKE ?", "%"+info.Name+"%")
 	}
 
+	err = db.Count(&total).Error
+	if err != nil {
+		return
+	}
 	err = db.Limit(limit).Offset(offset).Find(&apicases).Error
 	return err, apicases, total
 }
@@ -188,8 +195,9 @@ func (i *InterfaceTemplateService) CreateUserConfig(userConfig interfacecase.Api
 			return err
 		}
 	}
-	userConfig.ID = userConfigOld.ID
-	err = global.GVA_DB.Where("id = ?", userConfig.ID).Save(&userConfig).Error
+	userConfigOld.ApiConfigID = userConfig.ApiConfigID
+	userConfigOld.ApiEnvID = userConfig.ApiEnvID
+	err = global.GVA_DB.Where("id = ?", userConfig.ID).Save(&userConfigOld).Error
 	return err
 }
 

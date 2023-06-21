@@ -9,7 +9,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/rs/zerolog/log"
+	"github.com/test-instructor/yangfan/server/global"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
@@ -200,7 +201,7 @@ var (
 
 func logger(format string, a ...interface{}) {
 	// FIXME: support server-side and client-side logging to files
-	log.Info().Msg(fmt.Sprintf(format, a...))
+	global.GVA_LOG.Info(fmt.Sprintf(format, a...))
 }
 
 // valid validates the authorization.
@@ -266,7 +267,7 @@ func serverStreamInterceptor(srv interface{}, ss grpc.ServerStream, info *grpc.S
 }
 
 func newServer(masterHost string, masterPort int) (server *grpcServer) {
-	log.Info().Msg("Boomer is built with grpc support.")
+	global.GVA_LOG.Info("Boomer is built with grpc support.")
 	server = &grpcServer{
 		masterHost:       masterHost,
 		masterPort:       masterPort,
@@ -292,7 +293,7 @@ func (s *grpcServer) start() (err error) {
 	// Create tls based credential.
 	creds, err := credentials.NewServerTLSFromFile(data.Path("x509/server_cert.pem"), data.Path("x509/server_key.pem"))
 	if err != nil {
-		log.Fatal().Msg(fmt.Sprintf("failed to load key pair: %s", err))
+		global.GVA_LOG.Fatal(fmt.Sprintf("failed to load key pair: %s", err))
 	}
 	opts := []grpc.ServerOption{
 		grpc.UnaryInterceptor(serverUnaryInterceptor),
@@ -302,7 +303,7 @@ func (s *grpcServer) start() (err error) {
 	}
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to listen")
+		global.GVA_LOG.Error("failed to listen: ", zap.Error(err))
 		return
 	}
 	// create gRPC server
@@ -314,7 +315,7 @@ func (s *grpcServer) start() (err error) {
 	go func() {
 		err = s.server.Serve(lis)
 		if err != nil {
-			log.Error().Err(err).Msg("failed to serve")
+			global.GVA_LOG.Error("failed to serve: ", zap.Error(err))
 			return
 		}
 	}()
@@ -328,14 +329,14 @@ func (s *grpcServer) Register(ctx context.Context, req *messager.RegisterRequest
 	// store worker information
 	wn := newWorkerNode(req.NodeID, clientIp, req.Os, req.Arch)
 	s.clients.Store(req.NodeID, wn)
-	log.Warn().Str("worker id", req.NodeID).Msg("worker joined")
+	global.GVA_LOG.Warn("worker joined", zap.String("worker id", req.NodeID))
 	return &messager.RegisterResponse{Code: "0", Message: "register successful"}, nil
 }
 
 func (s *grpcServer) SignOut(_ context.Context, req *messager.SignOutRequest) (*messager.SignOutResponse, error) {
 	// delete worker information
 	s.clients.Delete(req.NodeID)
-	log.Warn().Str("worker id", req.NodeID).Msg("worker quited")
+	global.GVA_LOG.Error("worker quited", zap.String("worker id", req.NodeID))
 	return &messager.SignOutResponse{Code: "0", Message: "sign out successful"}, nil
 }
 
@@ -371,23 +372,19 @@ FOR:
 				switch st.Code() {
 				case codes.OK:
 					s.fromWorker <- newGenericMessage(msg.Type, msg.Data, msg.NodeID)
-					log.Info().
-						Str("nodeID", msg.NodeID).
-						Str("type", msg.Type).
-						Interface("data", msg.Data).
-						Msg("receive data from worker")
+					global.GVA_LOG.Info("receive data from worker", zap.String("nodeID", msg.NodeID), zap.String("type", msg.Type), zap.Any("data", msg.Data))
 				case codes.Unavailable, codes.Canceled, codes.DeadlineExceeded:
 					s.fromWorker <- newQuitMessage(token)
 					break FOR
 				default:
-					log.Error().Err(err).Msg("failed to get stream from client")
+					global.GVA_LOG.Error("failed to get stream from client", zap.Error(err))
 					break FOR
 				}
 			}
 		}
 	}
 
-	log.Info().Str("worker id", token).Msg("bidirectional stream closed")
+	global.GVA_LOG.Info("waiting for all workers to quit", zap.String("worker id", token))
 	return nil
 }
 
@@ -403,17 +400,12 @@ func (s *grpcServer) sendMsg(srv messager.Message_BidirectionalStreamingMessageS
 			if s, ok := status.FromError(srv.Send(res)); ok {
 				switch s.Code() {
 				case codes.OK:
-					log.Info().
-						Str("nodeID", res.NodeID).
-						Str("type", res.Type).
-						Interface("data", res.Data).
-						Interface("profile", res.Profile).
-						Msg("send data to worker")
+					global.GVA_LOG.Info("send data to worker", zap.String("nodeID", res.NodeID), zap.String("type", res.Type), zap.Any("data", res.Data))
 				case codes.Unavailable, codes.Canceled, codes.DeadlineExceeded:
-					log.Warn().Msg(fmt.Sprintf("client (%s) terminated connection", id))
+					global.GVA_LOG.Warn("client terminated connection", zap.String("nodeID", id))
 					return
 				default:
-					log.Warn().Msg(fmt.Sprintf("failed to send to client (%s): %v", id, s.Err()))
+					global.GVA_LOG.Warn("failed to send to client", zap.String("nodeID", id), zap.Error(s.Err()))
 					return
 				}
 			}

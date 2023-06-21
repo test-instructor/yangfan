@@ -81,7 +81,6 @@ const editTagRow = ref(0);
 const init = async () => {
   const tables = await getTimerTaskTagList();
   tagTableData.value = tables.data.list;
-  console.log(tagTableData.value);
 };
 
 init();
@@ -92,7 +91,6 @@ const onAddItem = () => {
     name: "",
     remarks: "",
   });
-  console.log(tagTableData);
 };
 
 const showBtn = (row) => {
@@ -138,7 +136,6 @@ const deleteTag = async (index, row) => {
   if (row.ID && row.ID > 0) {
     let res = await deleteTimerTaskTag({ ID: row.ID });
     if (res.code === 0) {
-      console.log("================1111");
       ElMessage({
         type: "success",
         message: "标签【" + row.name + "】删除成功",

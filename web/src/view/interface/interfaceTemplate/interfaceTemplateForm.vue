@@ -120,8 +120,12 @@
       </el-tabs>
     </div>
     <br />
-    <el-button type="primary" @click="saveRun">保存并调试</el-button>
-    <el-button type="primary" @click="saves">保存</el-button>
+    <el-button type="primary" @click="saveRun" :disabled="isButtonDisabled"
+      >保存并调试</el-button
+    >
+    <el-button type="primary" @click="saves" :disabled="isButtonDisabled"
+      >保存</el-button
+    >
     <el-button type="info" @click="closeDialog">取消</el-button>
   </div>
 </template>
@@ -179,6 +183,7 @@ const props = defineProps({
 const heightDiv = ref(0);
 const eventType = ref("");
 const formData = reactive({});
+const isButtonDisabled = ref(false);
 let configId;
 heightDiv.value = props.heights;
 eventType.value = props.eventType;
@@ -300,12 +305,12 @@ const typeTransformation = (data) => {
   return dataJson;
 };
 
-const reportDetailFunc = (ID) => {
-  if (ID) {
+const reportDetailFunc = (report_id) => {
+  if (report_id) {
     router.push({
       name: "reportDetail",
       params: {
-        id: ID,
+        report_id: report_id,
       },
     });
   } else {
@@ -316,6 +321,7 @@ const reportDetailFunc = (ID) => {
 const saveRun = async () => {
   let res;
   let res1;
+  isButtonDisabled.value = true;
   setReqData();
   if (formLabelAlign.name === "") {
     ElMessage({
@@ -335,6 +341,7 @@ const saveRun = async () => {
   if (res.code === 0) {
     await runInterfaceTemplateFunc(res.data.id);
   }
+  isButtonDisabled.value = false;
 };
 
 const runInterfaceTemplateFunc = async (id) => {
@@ -359,7 +366,6 @@ const runInterfaceTemplateFunc = async (id) => {
     userConfigs.value.api_env_id &&
     userConfigs.value.api_env_id > 0
   ) {
-    console.log("============", userConfigs.value.api_env_id);
     data["env"] = userConfigs.value.api_env_id;
   }
   const res = await runApi(data);
@@ -397,8 +403,10 @@ const setReqData = () => {
 };
 
 const saves = () => {
+  isButtonDisabled.value = true;
   setReqData();
   createInterface(true);
+  isButtonDisabled.value = false;
 };
 
 const createInterface = async (close) => {
@@ -483,7 +491,6 @@ const getUserConfigs = async () => {
   let res = await getUserConfig();
   if (res.code === 0 && res.data) {
     userConfigs.value = res.data;
-    console.log("============", userConfigs.value);
   }
 };
 getUserConfigs();
@@ -493,6 +500,5 @@ getUserConfigs();
 .request {
   margin-top: 15px;
   border: 1px solid #ddd;
-  height: 600px;
 }
 </style>
