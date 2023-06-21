@@ -159,8 +159,10 @@ func (r *requestBuilder) prepareHeaders(stepVariables map[string]interface{}) er
 	return nil
 }
 
+// prepareUrlParams 获取请求参数,将函数、变量转换为常量
 func (r *requestBuilder) prepareUrlParams(stepVariables map[string]interface{}) error {
 	// parse step request url
+	// 将变量解析为常量
 	requestUrl, err := r.parser.ParseString(r.stepRequest.URL, stepVariables)
 	if err != nil {
 		log.Error().Err(err).Msg("parse request url failed")
@@ -170,15 +172,22 @@ func (r *requestBuilder) prepareUrlParams(stepVariables map[string]interface{}) 
 	if stepVariables["base_url"] != nil {
 		baseURL = stepVariables["base_url"].(string)
 	}
+	// 合并base_url和request_url
+	// 如果request_url中有域名则直接使用request_url
 	rawUrl := buildURL(baseURL, convertString(requestUrl))
 
 	// prepare request params
+	// 获取请求参数
 	var queryParams url.Values
+	// 代码检查 r.stepRequest.Params 的长度是否大于 0，如果是，则执行参数解析操作
 	if len(r.stepRequest.Params) > 0 {
+		// r.parser.Parse 函数用于解析参数，返回解析后的结果 params 和一个可能的错误
 		params, err := r.parser.Parse(r.stepRequest.Params, stepVariables)
 		if err != nil {
+			// 如果解析过程中出现错误，代码返回一个包装了错误信息的错误对象。
 			return errors.Wrap(err, "parse request params failed")
 		}
+		// 将解析后的参数设置为url.Values
 		parsedParams := params.(map[string]interface{})
 		r.requestMap["params"] = parsedParams
 		if len(parsedParams) > 0 {

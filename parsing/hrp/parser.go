@@ -29,6 +29,7 @@ type Parser struct {
 }
 
 func buildURL(baseURL, stepURL string) string {
+	// 解析url格式
 	uStep, err := url.Parse(stepURL)
 	if err != nil {
 		log.Error().Str("stepURL", stepURL).Err(err).Msg("[buildURL] parse url failed")
@@ -36,11 +37,13 @@ func buildURL(baseURL, stepURL string) string {
 	}
 
 	// step url is absolute url
+	// 如果url存在域名直接返回url
 	if uStep.Host != "" {
 		return stepURL
 	}
 
 	// step url is relative, based on base url
+	// 解析base url格式
 	uConfig, err := url.Parse(baseURL)
 	if err != nil {
 		log.Error().Str("baseURL", baseURL).Err(err).Msg("[buildURL] parse url failed")
@@ -48,11 +51,13 @@ func buildURL(baseURL, stepURL string) string {
 	}
 
 	// merge url
+	// 合并url
 	uStep.Scheme = uConfig.Scheme
 	uStep.Host = uConfig.Host
 	uStep.Path = path.Join(uConfig.Path, uStep.Path)
 
 	// base url missed
+	// 返回合并后的url
 	return uStep.String()
 }
 
@@ -153,11 +158,14 @@ var (
 )
 
 // ParseString parse string with variables
+// 将变量解析为常量
+// raw:需要解析函数、变量的字符串
+// variablesMapping:变量映射，key为变量名，value为变量值
 func (p *Parser) ParseString(raw string, variablesMapping map[string]interface{}) (interface{}, error) {
 	matchStartPosition := 0
 	parsedString := ""
 	remainedString := raw
-
+	// 在字符串中提取变量格式的字符串
 	for matchStartPosition < len(raw) {
 		// locate $ char position
 		startPosition := strings.Index(remainedString, "$")
@@ -184,21 +192,27 @@ func (p *Parser) ParseString(raw string, variablesMapping map[string]interface{}
 		}
 
 		// search function like ${func($a, $b)}
+		// 提取字符串中的的函数
+		// 返回内容为[]string，第一个元素为函数名，第二个元素为函数参数
 		funcMatched := regexCompileFunction.FindStringSubmatch(remainedString)
 		if len(funcMatched) == 3 {
 			funcName := funcMatched[1]
 			argsStr := funcMatched[2]
+			// 获取变量，返回内容为[]interface{}为函数参数的值
+			// 变量值类型不确定，故采用interface{}类型
 			arguments, err := parseFunctionArguments(argsStr)
 			if err != nil {
 				return raw, errors.Wrap(code.ParseFunctionError, err.Error())
 			}
+			// 解析变量
 			parsedArgs, err := p.Parse(arguments, variablesMapping)
 			if err != nil {
 				return raw, err
 			}
-
+			// 调用函数
 			result, err := p.callFunc(funcName, parsedArgs.([]interface{})...)
 			if err != nil {
+				// 解析错误时直接返回
 				log.Error().Str("funcName", funcName).Interface("arguments", arguments).
 					Err(err).Msg("call function failed")
 				return raw, errors.Wrap(code.CallFunctionError, err.Error())
@@ -208,6 +222,7 @@ func (p *Parser) ParseString(raw string, variablesMapping map[string]interface{}
 
 			if funcMatched[0] == raw {
 				// raw_string is a function, e.g. "${add_one(3)}", return its eval value directly
+				// 如果返回值和原始字符串相同，则直接返回
 				return result, nil
 			}
 
@@ -390,22 +405,29 @@ func literalEval(raw string) (interface{}, error) {
 	return result, nil
 }
 
+// parseFunctionArguments 把字符串分割成变量、字符串和数字
 func parseFunctionArguments(argsStr string) ([]interface{}, error) {
+	// 调整args格式，用于去除字符串的首尾空白字符（空格、制表符、换行符等），并返回新的字符串
 	argsStr = strings.TrimSpace(argsStr)
 	if argsStr == "" {
 		return []interface{}{}, nil
 	}
 
 	// split arguments by comma
+	// 将字符串按照逗号分割成字符串数组
 	args := strings.Split(argsStr, ",")
+	// 创建一个长度为len(args)的interface{}类型的切片
 	arguments := make([]interface{}, len(args))
+	// 获取变量对应的值
 	for index, arg := range args {
+		// 调整arg格式，用于去除字符串的首尾空白字符（空格、制表符、换行符等），并返回新的字符串
 		arg = strings.TrimSpace(arg)
 		if arg == "" {
 			continue
 		}
 
 		// parse argument to number if possible
+		// 将字符串转换为数字
 		arg, err := literalEval(arg)
 		if err != nil {
 			return nil, err
