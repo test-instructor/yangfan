@@ -198,6 +198,7 @@
       <div v-if="requestTimeShow" id="requestTimeEl"></div>
 
       <div style="margin: 20px; overflow: auto; padding-right: 10px">
+        <el-input v-model="copy_text_id" id="copy_text_id"></el-input>
         <div class="tableDetail">
           <div>
             <el-button type="info" @click="requestFunc">
@@ -402,18 +403,21 @@ const requestFunc = () => {
 const exportFunc = () => {
   exportTable.value = !exportTable.value;
 };
-
+const copy_text_id = ref("");
+const copy_text_reset = ref(0);
 const copy_text = (row) => {
+  copy_text_reset.value = new Date().getTime();
   let last = JSON.stringify(row);
-  console.log(last);
-  try {
-    navigator.clipboard.writeText(last);
-    ElMessage.success("复制成功");
-    console.log("文本已复制到剪贴板");
-  } catch (error) {
-    console.error("复制文本到剪贴板失败:", error);
-    ElMessage.error("复制失败");
-  }
+  navigator.clipboard
+    .writeText(last)
+    .then(() => {
+      console.log("复制成功");
+      ElMessage.success("复制成功");
+    })
+    .catch((error) => {
+      console.error("复制失败", error);
+      ElMessage.error("复制失败");
+    });
 };
 
 let currentInstance;

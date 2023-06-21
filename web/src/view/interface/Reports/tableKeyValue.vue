@@ -25,6 +25,7 @@ export default {
 
 <script setup>
 import { ref } from "vue";
+import { ElMessage } from "element-plus";
 
 const tableDatas = ref();
 const isTable = ref(false);
@@ -52,14 +53,16 @@ const initData = () => {
 const copy = (row) => {
   let last = JSON.stringify(row);
   console.log(last);
-  try {
-    navigator.clipboard.writeText(last);
-    message.success("复制成功");
-    console.log("文本已复制到剪贴板");
-  } catch (error) {
-    console.error("复制文本到剪贴板失败:", error);
-    message.error("复制失败");
-  }
+  navigator.clipboard
+    .writeText(last)
+    .then(() => {
+      console.log("复制成功");
+      ElMessage.success("复制成功");
+    })
+    .catch((error) => {
+      console.error("复制失败", error);
+      ElMessage.error("复制失败");
+    });
 };
 
 const createElement = (text) => {
