@@ -52,16 +52,13 @@ const initData = () => {
 const copy = (row) => {
   let last = JSON.stringify(row);
   console.log(last);
-
   try {
     navigator.clipboard.writeText(last);
+    message.success("复制成功");
+    console.log("文本已复制到剪贴板");
   } catch (error) {
-    let element = createElement(last);
-    element.select();
-    element.setSelectionRange(0, element.value.length);
-    document.execCommand("copy");
-    element.remove();
-    alert("已复制到剪切板");
+    console.error("复制文本到剪贴板失败:", error);
+    message.error("复制失败");
   }
 };
 

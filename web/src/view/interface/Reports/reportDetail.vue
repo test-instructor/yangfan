@@ -365,8 +365,8 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import { formatDate } from "@/utils/format";
 import { Discount } from "@element-plus/icons-vue";
 import { defineComponent } from "vue";
-import useClipboard from "vue-clipboard3";
-const to = useClipboard().toClipboard;
+import message from "@element-plus/icons-vue/dist/es/message.mjs";
+
 const route = useRoute();
 echarts.use([
   TooltipComponent,
@@ -406,13 +406,14 @@ const exportFunc = () => {
 const copy_text = (row) => {
   let last = JSON.stringify(row);
   console.log(last);
-  const aux = document.createElement("input");
-  aux.value = last;
-  // aux.setAttribute("value", last);
-  document.body.appendChild(aux);
-  aux.select();
-  document.execCommand("copy");
-  document.body.removeChild(aux);
+  try {
+    navigator.clipboard.writeText(last);
+    ElMessage.success("复制成功");
+    console.log("文本已复制到剪贴板");
+  } catch (error) {
+    console.error("复制文本到剪贴板失败:", error);
+    ElMessage.error("复制失败");
+  }
 };
 
 let currentInstance;
