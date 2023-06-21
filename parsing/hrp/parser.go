@@ -85,19 +85,25 @@ func convertString(raw interface{}) string {
 	return fmt.Sprintf("%v", raw)
 }
 
+// ParseString 将interface内容转换为string
 func (p *Parser) Parse(raw interface{}, variablesMapping map[string]interface{}) (interface{}, error) {
 	rawValue := reflect.ValueOf(raw)
 	switch rawValue.Kind() {
 	case reflect.String:
+		// raw 为string
 		// json.Number
+		// 如果为数字则转换为数字
 		if rawValue, ok := raw.(builtinJSON.Number); ok {
 			return parseJSONNumber(rawValue)
 		}
 		// other string
+		// 如果为字符串则转换为字符串
 		value := rawValue.String()
 		value = strings.TrimSpace(value)
 		return p.ParseString(value, variablesMapping)
 	case reflect.Slice:
+		// raw 为切片
+		// 获取每个元素内容并获取元素中的函数\变量
 		parsedSlice := make([]interface{}, rawValue.Len())
 		for i := 0; i < rawValue.Len(); i++ {
 			parsedValue, err := p.Parse(rawValue.Index(i).Interface(), variablesMapping)
@@ -108,13 +114,18 @@ func (p *Parser) Parse(raw interface{}, variablesMapping map[string]interface{})
 		}
 		return parsedSlice, nil
 	case reflect.Map: // convert any map to map[string]interface{}
+		// raw 为map
+		// 获取每个元素内容并获取元素中的函数\变量
+		// map类型一般为header\body\params等格式
 		parsedMap := make(map[string]interface{})
 		for _, k := range rawValue.MapKeys() {
+			// 获取key,并对key进行解析
 			parsedKey, err := p.ParseString(k.String(), variablesMapping)
 			if err != nil {
 				return raw, err
 			}
 			v := rawValue.MapIndex(k)
+			// 获取value,并对value进行解析
 			parsedValue, err := p.Parse(v.Interface(), variablesMapping)
 			if err != nil {
 				return raw, err

@@ -197,9 +197,12 @@ func (r *requestBuilder) prepareUrlParams(stepVariables map[string]interface{}) 
 			}
 		}
 	}
+	// 如果queryParams有参数，则添加到url中
 	if queryParams != nil {
 		// append params to url
+		// 将queryParams转换为字符串
 		paramStr := queryParams.Encode()
+		// 根据url是否已有参数添加对应的拼接符号
 		if strings.IndexByte(rawUrl, '?') == -1 {
 			rawUrl = rawUrl + "?" + paramStr
 		} else {
@@ -208,6 +211,7 @@ func (r *requestBuilder) prepareUrlParams(stepVariables map[string]interface{}) 
 	}
 
 	// prepare url
+	// 将url转换为http.Request对象
 	u, err := url.Parse(rawUrl)
 	if err != nil {
 		return errors.Wrap(err, "parse url failed")
@@ -216,13 +220,16 @@ func (r *requestBuilder) prepareUrlParams(stepVariables map[string]interface{}) 
 	r.req.Host = u.Host
 
 	// update url
+	// 将url设置到requestMap中，requestMap主要用于测试报告中的展示
 	r.requestMap["url"] = u.String()
 
 	return nil
 }
 
+// prepareBody 获取请求体内容，将函数、变量转换为常量
 func (r *requestBuilder) prepareBody(stepVariables map[string]interface{}) error {
 	// prepare request body
+	// 如果请求体为空，则直接返回
 	if r.stepRequest.Body == nil {
 		return nil
 	}
@@ -232,6 +239,7 @@ func (r *requestBuilder) prepareBody(stepVariables map[string]interface{}) error
 		return err
 	}
 	// check request body format if Content-Type specified as application/json
+	// 如果Content-Type为application/json，则检查请求体格式
 	if strings.HasPrefix(r.req.Header.Get("Content-Type"), "application/json") {
 		switch data.(type) {
 		case bool, float64, string, map[string]interface{}, []interface{}, nil:
@@ -241,13 +249,19 @@ func (r *requestBuilder) prepareBody(stepVariables map[string]interface{}) error
 				r.req.Header.Get("Content-Type"))
 		}
 	}
+	// 将请求体设置到requestMap中，requestMap主要用于测试报告中的展示
 	r.requestMap["body"] = data
+	// 将data转换为字节数组
 	var dataBytes []byte
 	switch vv := data.(type) {
 	case map[string]interface{}:
+		// 获取Content-Type
 		contentType := r.req.Header.Get("Content-Type")
+		// 根据Content-Type的不同，将请求体转换为不同的格式
+		// 如果Content-Type为application/x-www-form-urlencoded，则转换为表单格式,否则转换为json格式
 		if strings.HasPrefix(contentType, "application/x-www-form-urlencoded") {
 			// post form data
+			// 转换为表单格式
 			formData := make(url.Values)
 			for k, v := range vv {
 				formData.Add(k, convertString(v))
@@ -255,21 +269,25 @@ func (r *requestBuilder) prepareBody(stepVariables map[string]interface{}) error
 			dataBytes = []byte(formData.Encode())
 		} else {
 			// post json
+			// 转换为json格式
 			dataBytes, err = json.Marshal(vv)
 			if err != nil {
 				return err
 			}
+			// 设置Content-Type
 			if contentType == "" {
 				r.req.Header.Set("Content-Type", "application/json; charset=utf-8")
 			}
 		}
 	case []interface{}:
+		// 如果为[]interface{}类型，则转换为json格式
 		contentType := r.req.Header.Get("Content-Type")
 		// post json
 		dataBytes, err = json.Marshal(vv)
 		if err != nil {
 			return err
 		}
+		// 设置Content-Type
 		if contentType == "" {
 			r.req.Header.Set("Content-Type", "application/json; charset=utf-8")
 		}
@@ -284,8 +302,9 @@ func (r *requestBuilder) prepareBody(stepVariables map[string]interface{}) error
 	default: // unexpected body type
 		return errors.New("unexpected request body type")
 	}
-
+	// 将字节数组转换成io.ReadCloser对象
 	r.req.Body = io.NopCloser(bytes.NewReader(dataBytes))
+	// 设置Content-Length
 	r.req.ContentLength = int64(len(dataBytes))
 
 	return nil
