@@ -216,7 +216,9 @@
             </el-table-column>
             <el-table-column width="80" align="center" prop="key" label="操作">
               <template v-slot="scope">
-                <el-button type="text" @click="copy(scope.row)">复制</el-button>
+                <el-button type="text" @click="copy_text(scope.row)"
+                  >复制</el-button
+                >
               </template>
             </el-table-column>
             <el-table-column align="center" label="value">
@@ -254,7 +256,9 @@
             </el-table-column>
             <el-table-column width="80" align="center" prop="key" label="操作">
               <template v-slot="scope">
-                <el-button type="text" @click="copy(scope.row)">复制</el-button>
+                <el-button type="text" @click="copy_text(scope.row)"
+                  >复制</el-button
+                >
               </template>
             </el-table-column>
             <el-table-column align="center" label="value">
@@ -360,7 +364,9 @@ import { getCurrentInstance } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { formatDate } from "@/utils/format";
 import { Discount } from "@element-plus/icons-vue";
-
+import { defineComponent } from "vue";
+import useClipboard from "vue-clipboard3";
+const to = useClipboard().toClipboard;
 const route = useRoute();
 echarts.use([
   TooltipComponent,
@@ -397,59 +403,16 @@ const exportFunc = () => {
   exportTable.value = !exportTable.value;
 };
 
-const copy = (row) => {
+const copy_text = (row) => {
   let last = JSON.stringify(row);
   console.log(last);
-
-  try {
-    navigator.clipboard.writeText(last);
-  } catch (error) {
-    let element = createElement(last);
-    element.select();
-    element.setSelectionRange(0, element.value.length);
-    document.execCommand("copy");
-    element.remove();
-    alert("已复制到剪切板");
-  }
-};
-
-const createElement = (text) => {
-  let isRTL = document.documentElement.getAttribute("dir") === "rtl";
-  let element = document.createElement("textarea");
-  // 防止在ios中产生缩放效果
-  element.style.fontSize = "12pt";
-  // 重置盒模型
-  element.style.border = "0";
-  element.style.padding = "0";
-  element.style.margin = "0";
-  // 将元素移到屏幕外
-  element.style.position = "absolute";
-  element.style[isRTL ? "right" : "left"] = "-9999px";
-  // 移动元素到页面底部
-  let yPosition = window.pageYOffset || document.documentElement.scrollTop;
-  element.style.top = `${yPosition}px`;
-  //设置元素只读
-  element.setAttribute("readonly", "");
-  element.value = text;
-  document.body.appendChild(element);
-  return element;
-};
-
-const copyToClipboard = (text) => {
-  navigator.clipboard
-    .writeText(text)
-    .then(() => {
-      ElMessage({
-        type: "success",
-        message: "复制成功",
-      });
-    })
-    .catch((error) => {
-      ElMessage({
-        type: "error",
-        message: "复制失败",
-      });
-    });
+  const aux = document.createElement("input");
+  aux.value = last;
+  // aux.setAttribute("value", last);
+  document.body.appendChild(aux);
+  aux.select();
+  document.execCommand("copy");
+  document.body.removeChild(aux);
 };
 
 let currentInstance;
