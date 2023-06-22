@@ -1,13 +1,13 @@
 <template>
   <div style="padding: 2px">
     <el-table border v-show="isTable" :data="tableDatas">
-      <el-table-column width="180" align="center" prop="key" label="key">
+      <el-table-column width="280" align="center" prop="key" label="key">
       </el-table-column>
-      <el-table-column width="80" align="center" prop="key" label="操作">
-        <template v-slot="scope">
-          <el-button type="text" @click="copy(scope.row)">复制</el-button>
-        </template>
-      </el-table-column>
+      <!--      <el-table-column width="80" align="center" prop="key" label="操作">-->
+      <!--        <template v-slot="scope">-->
+      <!--          <el-button type="text" @click="copy(scope.row)">复制</el-button>-->
+      <!--        </template>-->
+      <!--      </el-table-column>-->
       <el-table-column align="center" label="value">
         <template #default="scope">
           <span>{{ scope.row.value }}</span>

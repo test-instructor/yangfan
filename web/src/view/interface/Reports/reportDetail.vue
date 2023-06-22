@@ -203,6 +203,10 @@
             <el-button type="info" @click="requestFunc">
               {{ requestTable ? "收起" : "展开" }} Request 详情
             </el-button>
+
+            <el-button type="info" @click="reportDetailFunc('request')">
+              request json 数据
+            </el-button>
           </div>
           <br />
           <el-table
@@ -214,13 +218,13 @@
           >
             <el-table-column width="120" align="center" prop="key" label="key">
             </el-table-column>
-            <el-table-column width="80" align="center" prop="key" label="操作">
-              <template v-slot="scope">
-                <el-button type="text" @click="copy_text(scope.row)"
-                  >复制</el-button
-                >
-              </template>
-            </el-table-column>
+            <!--            <el-table-column width="80" align="center" prop="key" label="操作">-->
+            <!--              <template v-slot="scope">-->
+            <!--                <el-button type="text" @click="copy_text(scope.row)"-->
+            <!--                  >复制</el-button-->
+            <!--                >-->
+            <!--              </template>-->
+            <!--            </el-table-column>-->
             <el-table-column align="center" label="value">
               <template #default="scope">
                 <span
@@ -244,6 +248,9 @@
             <el-button type="info" @click="responseFunc">
               {{ responseTable ? "收起" : "展开" }} Response 详情
             </el-button>
+            <el-button type="info" @click="reportDetailFunc('response')">
+              response json 数据
+            </el-button>
           </div>
           <br />
           <el-table
@@ -254,13 +261,13 @@
           >
             <el-table-column width="120" align="center" prop="key" label="key">
             </el-table-column>
-            <el-table-column width="80" align="center" prop="key" label="操作">
-              <template v-slot="scope">
-                <el-button type="text" @click="copy_text(scope.row)"
-                  >复制</el-button
-                >
-              </template>
-            </el-table-column>
+            <!--            <el-table-column width="80" align="center" prop="key" label="操作">-->
+            <!--              <template v-slot="scope">-->
+            <!--                <el-button type="text" @click="copy_text(scope.row)"-->
+            <!--                  >复制</el-button-->
+            <!--                >-->
+            <!--              </template>-->
+            <!--            </el-table-column>-->
             <el-table-column align="center" label="value">
               <template #default="scope">
                 <span v-if="!scope.row.isTable">{{ scope.row.value }}</span>
@@ -336,6 +343,20 @@
         </div>
       </div>
     </el-drawer>
+
+    <el-dialog
+      :title="dialogTitle"
+      :before-close="dialogClose"
+      @close="dialogClose"
+      v-model="dialogFormDetail"
+    >
+      <jsons
+        v-if="dialogFormDetail"
+        :heights="600"
+        :jsons="dialogData ? dialogData : ''"
+      >
+      </jsons>
+    </el-dialog>
   </div>
 </template>
 
@@ -363,9 +384,12 @@ import { useRoute } from "vue-router";
 import { getCurrentInstance } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { formatDate } from "@/utils/format";
+import jsons from "@/view/interface/interfaceComponents/Jsons.vue";
+
 import { Discount } from "@element-plus/icons-vue";
 import { defineComponent } from "vue";
 import message from "@element-plus/icons-vue/dist/es/message.mjs";
+import Jsons from "@/view/interface/interfaceComponents/Jsons.vue";
 
 const route = useRoute();
 echarts.use([
@@ -389,6 +413,12 @@ const validatorsTable = ref(true);
 const responseTable = ref(true);
 const requestTable = ref(true);
 const exportTable = ref(true);
+const dialogFormVisible = ref(false);
+const dialogFormDetail = ref(false);
+const dialogTitle = ref("");
+const dialogData = ref({});
+const dialogDataRequest = ref({});
+const dialogDataResponse = ref({});
 
 const validatorsFunc = () => {
   validatorsTable.value = !validatorsTable.value;
@@ -399,8 +429,20 @@ const responseFunc = () => {
 const requestFunc = () => {
   requestTable.value = !requestTable.value;
 };
+
+const reportDetailFunc = (dataType) => {
+  if (dataType === "request") {
+    dialogTitle.value = "request json 数据";
+    dialogData.value = dialogDataRequest.value;
+  }
+  if (dataType === "response") {
+    dialogTitle.value = "response json 数据";
+    dialogData.value = dialogDataResponse.value;
+  }
+  dialogFormDetail.value = true;
+};
 const exportFunc = () => {
-  exportTable.value = !exportTable.value;
+  dialogFormVisible.value = true;
 };
 let copy_report_data = "";
 const copy_text = (row) => {
@@ -496,6 +538,8 @@ const openDrawer = (row) => {
     let requestData = [];
     let responseData = [];
     {
+      dialogDataRequest.value = row.data.req_resps.request;
+      dialogDataResponse.value = row.data.req_resps.response;
       requestData.push({ key: "url", value: row.data.req_resps.request.url });
       if (row.data.req_resps.request.method) {
         requestData.push({
@@ -905,6 +949,11 @@ const toggleExpand = (row) => {
   } else {
     currentIndex.value = row.ID;
   }
+};
+
+const dialogClose = () => {
+  dialogFormDetail.value = false;
+  dialogData.value = {};
 };
 </script>
 
