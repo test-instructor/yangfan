@@ -34,8 +34,8 @@ cors:
       allow-credentials: true
 # 飞书登陆配置
 fs:
-  appID:
-  appSecret:
+  appID: cli_a241057640bd900c
+  appSecret: UopjRmMwsOSSHtaYoHtv4mjaomwWlajn
   redirectUri: http://127.0.0.1:8080/api/fsLogin/login
   authorityID: 666
   projectID: 1
