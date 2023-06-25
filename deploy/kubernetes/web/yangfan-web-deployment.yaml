@@ -38,6 +38,11 @@ spec:
             - name: nginx-config
               mountPath: /etc/nginx/conf.d/my.conf
               subPath: my.conf
+          env:
+            - name: ENV_VITE_FS_APP_ID
+              value: "cli_a241057640bd900c"
+            - name: ENV_VITE_FS_LOGIN
+              value: "http://localhost:8080/api/fsLogin/login"
       volumes:
         - name: nginx-config
           configMap:
