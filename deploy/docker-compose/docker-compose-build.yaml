@@ -30,6 +30,10 @@ services:
       dockerfile: ./web/Dockerfile
     container_name: yangfan-web
     restart: always
+    # 飞书登陆环境变量
+    environment:
+      - ENV_VITE_FS_APP_ID=cli_a241057640bd900c
+      - ENV_VITE_FS_LOGIN=http://localhost:8080/api/fsLogin/login
     ports:
       - '8080:8080'
     command: [ 'nginx-debug', '-g', 'daemon off;' ]
