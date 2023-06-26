@@ -14,6 +14,27 @@
 # 部署方式
 > 飞书登录的前端信息暂时不支持动态配置，飞书登录需要修改后重新构建镜像
 
+## 本地调试
+### 后端
+1. 下载golang安装 版本号需>=1.18
+   * 国际: https://golang.org/dl/
+   * 国内: https://golang.google.cn/dl/
+2. goland 打开项目根目录
+3. 修改`config.yaml`中的数据库`mysql`、飞书登录`fs`相关配置
+4. 使用软件包进行运行，目前已有的软件包为
+   ```shell
+   github.com/test-instructor/yangfan/server  # 后端服务
+   github.com/test-instructor/yangfan/run     # 用例运行服务
+   github.com/test-instructor/yangfan/master  # 性能测试master服务
+   github.com/test-instructor/yangfan/work    # 性能测试worker服务
+   github.com/test-instructor/yangfan/timer   # 定时任务服务
+   ```
+### 前端
+1. 前往https://nodejs.org/zh-cn/下载当前版本node 
+2. 命令行运行 node -v 若控制台输出版本号则前端环境搭建成功 
+3. node 版本需大于 16.4 
+4. 开发工具推荐vscode https://code.visualstudio.com/
+
 ## 
 
 
@@ -25,7 +46,7 @@
 
 ## docker 部署
 
-* 前端：如果需要飞书登录则需要修改env:`web/.env.production`中的`VITE_FS_LOGIN`、`VITE_FS_APP_ID`
+* 前端：修改对应`docker-compose`文件中的`ENV_VITE_FS_APP_ID`、`ENV_VITE_FS_LOGIN`
 * 后端：修改`deploy/docker-compose/config/docker.config.yaml`中的数据库`mysql`、飞书登录`fs`相关配置
 
 1. 本地构建模式文件：`deploy/docker-compose/docker-compose-build.yaml`
@@ -39,9 +60,27 @@
    docker-compose up -f docker-compose-image.yaml
       
    ```
-
-
-
-
+   
 ## k8s 部署
+文件目录`./deploy/kubernetes`
+```shell
+kubernetes
+    ├── grafana-prometheus-pushgateway    # 性能测试报告监控
+    ├── httpbin                           # http、grpc demo
+    ├── k8s_yangfan.yaml                  # 部署文件
+    ├── server                            # 后端部署文件
+    ├── web                               # 前端部署文件
+    └── yangfan-namespace.yaml            # 命名空间
+```
+
+1. 修改`ConfigMap/docker-config-yaml`中的数据库`mysql`、飞书登录`fs`相关配置
+2. 修改`Deployment/yangfan-web`中的`ENV_VITE_FS_APP_ID`、`ENV_VITE_FS_LOGIN`
+3. 执行命令：
+   ```shell
+   cd deploy/kubernetes
+   kubectl apply -f k8s_yangfan.yaml
+   ```
+
+
+
 
