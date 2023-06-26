@@ -12,7 +12,11 @@
 密码： 123456
 
 # 部署方式
-> 飞书登录的前端信息暂时不支持动态配置，飞书登录需要修改后重新构建镜像
+> 部署前请先安装好数据看，以下所有部分方式都需要手动配置数据库
+> 一键部署方式正在开发中，尽请期待
+1. 新建数据库，并导入`docs/sql/yangfan.sql`文件
+2. 管理员账号`yangfan`,密码`123456`
+
 
 ## 本地调试
 ### 后端
@@ -35,14 +39,6 @@
 3. node 版本需大于 16.4 
 4. 开发工具推荐vscode https://code.visualstudio.com/
 
-## 
-
-
-1. 新建数据库，并导入`docs/sql/yangfan.sql`文件
-2. 修改`web/.env.development`、 `web/.env.production`中的`VITE_FS_LOGIN`、`VITE_FS_APP_ID`
-3. 管理员账号`yangfan`,密码`123456`
-
-## 本地调试
 
 ## docker 部署
 
