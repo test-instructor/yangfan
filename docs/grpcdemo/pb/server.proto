@@ -7,6 +7,7 @@ option go_package = "./;pb";
 service ServerDemo{
   rpc get (getReq) returns (GetResp) {}
   rpc processData (processDataReq) returns (processDataResp) {}
+  rpc demoData (demoReq) returns (demoReq) {}
 }
 
 message getReq{}
@@ -24,4 +25,42 @@ message processDataResp{
   string hostname = 1;
   string ip = 2;
 }
+enum week{
+  Sunday = 0;
+  Monday = 1;
+  Tuesday = 2;
+  Wednesday = 3;
+  Thursday = 4;
+  Friday = 5;
+  Saturday = 6;
+}
 
+message family{
+  string father = 1;
+  string mother = 2;
+  repeated string children = 3;
+}
+
+enum gender{
+  male = 0;
+  female = 1;
+}
+
+message company{
+  string name = 1;
+  string address = 2;
+}
+
+
+message user_info{
+  gender sex = 1;
+  string name = 2;
+  uint32 age = 3;
+  family family = 4;
+  company company = 5;
+}
+
+message demoReq{
+  week week = 1;
+  user_info user_info = 2;
+}

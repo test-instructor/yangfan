@@ -15,6 +15,10 @@ type GrpcDemoServer struct {
 	*pb.UnimplementedServerDemoServer
 }
 
+func (s *GrpcDemoServer) DemoData(ctx context.Context, req *pb.DemoReq) (*pb.DemoReq, error) {
+	return req, nil
+}
+
 func (s *GrpcDemoServer) ProcessData(_ context.Context, req *pb.ProcessDataReq) (*pb.ProcessDataResp, error) {
 	response := &pb.ProcessDataResp{
 		Hostname: req.Hostname,
