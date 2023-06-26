@@ -44,6 +44,7 @@
 
 * 前端：修改对应`docker-compose`文件中的`ENV_VITE_FS_APP_ID`、`ENV_VITE_FS_LOGIN`
 * 后端：修改`deploy/docker-compose/config/docker.config.yaml`中的数据库`mysql`、飞书登录`fs`相关配置
+* docker镜像源：目前使用阿里云镜像源(registry.cn-hangzhou.aliyuncs.com)，如需使用docker官方镜像源，请将阿里云镜像源(registry.cn-hangzhou.aliyuncs.com/)删除即可
 
 1. 本地构建模式文件：`deploy/docker-compose/docker-compose-build.yaml`
 2. 远程镜像模式文件: `deploy/docker-compose/docker-compose-image.yaml`
