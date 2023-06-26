@@ -203,6 +203,10 @@
             <el-button type="info" @click="requestFunc">
               {{ requestTable ? "收起" : "展开" }} Request 详情
             </el-button>
+
+            <el-button type="info" @click="reportDetailFunc('request')">
+              request json 数据
+            </el-button>
           </div>
           <br />
           <el-table
@@ -214,11 +218,13 @@
           >
             <el-table-column width="120" align="center" prop="key" label="key">
             </el-table-column>
-            <el-table-column width="80" align="center" prop="key" label="操作">
-              <template v-slot="scope">
-                <el-button type="text" @click="copy(scope.row)">复制</el-button>
-              </template>
-            </el-table-column>
+            <!--            <el-table-column width="80" align="center" prop="key" label="操作">-->
+            <!--              <template v-slot="scope">-->
+            <!--                <el-button type="text" @click="copy_text(scope.row)"-->
+            <!--                  >复制</el-button-->
+            <!--                >-->
+            <!--              </template>-->
+            <!--            </el-table-column>-->
             <el-table-column align="center" label="value">
               <template #default="scope">
                 <span
@@ -242,6 +248,9 @@
             <el-button type="info" @click="responseFunc">
               {{ responseTable ? "收起" : "展开" }} Response 详情
             </el-button>
+            <el-button type="info" @click="reportDetailFunc('response')">
+              response json 数据
+            </el-button>
           </div>
           <br />
           <el-table
@@ -252,11 +261,13 @@
           >
             <el-table-column width="120" align="center" prop="key" label="key">
             </el-table-column>
-            <el-table-column width="80" align="center" prop="key" label="操作">
-              <template v-slot="scope">
-                <el-button type="text" @click="copy(scope.row)">复制</el-button>
-              </template>
-            </el-table-column>
+            <!--            <el-table-column width="80" align="center" prop="key" label="操作">-->
+            <!--              <template v-slot="scope">-->
+            <!--                <el-button type="text" @click="copy_text(scope.row)"-->
+            <!--                  >复制</el-button-->
+            <!--                >-->
+            <!--              </template>-->
+            <!--            </el-table-column>-->
             <el-table-column align="center" label="value">
               <template #default="scope">
                 <span v-if="!scope.row.isTable">{{ scope.row.value }}</span>
@@ -332,6 +343,20 @@
         </div>
       </div>
     </el-drawer>
+
+    <el-dialog
+      :title="dialogTitle"
+      :before-close="dialogClose"
+      @close="dialogClose"
+      v-model="dialogFormDetail"
+    >
+      <jsons
+        v-if="dialogFormDetail"
+        :heights="600"
+        :jsons="dialogData ? dialogData : ''"
+      >
+      </jsons>
+    </el-dialog>
   </div>
 </template>
 
@@ -359,7 +384,12 @@ import { useRoute } from "vue-router";
 import { getCurrentInstance } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { formatDate } from "@/utils/format";
+import jsons from "@/view/interface/interfaceComponents/Jsons.vue";
+
 import { Discount } from "@element-plus/icons-vue";
+import { defineComponent } from "vue";
+import message from "@element-plus/icons-vue/dist/es/message.mjs";
+import Jsons from "@/view/interface/interfaceComponents/Jsons.vue";
 
 const route = useRoute();
 echarts.use([
@@ -383,6 +413,12 @@ const validatorsTable = ref(true);
 const responseTable = ref(true);
 const requestTable = ref(true);
 const exportTable = ref(true);
+const dialogFormVisible = ref(false);
+const dialogFormDetail = ref(false);
+const dialogTitle = ref("");
+const dialogData = ref({});
+const dialogDataRequest = ref({});
+const dialogDataResponse = ref({});
 
 const validatorsFunc = () => {
   validatorsTable.value = !validatorsTable.value;
@@ -393,62 +429,33 @@ const responseFunc = () => {
 const requestFunc = () => {
   requestTable.value = !requestTable.value;
 };
-const exportFunc = () => {
-  exportTable.value = !exportTable.value;
-};
 
-const copy = (row) => {
-  let last = JSON.stringify(row);
-  console.log(last);
-
-  try {
-    navigator.clipboard.writeText(last);
-  } catch (error) {
-    let element = createElement(last);
-    element.select();
-    element.setSelectionRange(0, element.value.length);
-    document.execCommand("copy");
-    element.remove();
-    alert("已复制到剪切板");
+const reportDetailFunc = (dataType) => {
+  if (dataType === "request") {
+    dialogTitle.value = "request json 数据";
+    dialogData.value = dialogDataRequest.value;
   }
+  if (dataType === "response") {
+    dialogTitle.value = "response json 数据";
+    dialogData.value = dialogDataResponse.value;
+  }
+  dialogFormDetail.value = true;
 };
-
-const createElement = (text) => {
-  let isRTL = document.documentElement.getAttribute("dir") === "rtl";
-  let element = document.createElement("textarea");
-  // 防止在ios中产生缩放效果
-  element.style.fontSize = "12pt";
-  // 重置盒模型
-  element.style.border = "0";
-  element.style.padding = "0";
-  element.style.margin = "0";
-  // 将元素移到屏幕外
-  element.style.position = "absolute";
-  element.style[isRTL ? "right" : "left"] = "-9999px";
-  // 移动元素到页面底部
-  let yPosition = window.pageYOffset || document.documentElement.scrollTop;
-  element.style.top = `${yPosition}px`;
-  //设置元素只读
-  element.setAttribute("readonly", "");
-  element.value = text;
-  document.body.appendChild(element);
-  return element;
+const exportFunc = () => {
+  dialogFormVisible.value = true;
 };
-
-const copyToClipboard = (text) => {
+let copy_report_data = "";
+const copy_text = (row) => {
+  copy_report_data = JSON.stringify(row);
   navigator.clipboard
-    .writeText(text)
+    .writeText(copy_report_data)
     .then(() => {
-      ElMessage({
-        type: "success",
-        message: "复制成功",
-      });
+      console.log("复制成功");
+      ElMessage.success("复制成功");
     })
     .catch((error) => {
-      ElMessage({
-        type: "error",
-        message: "复制失败",
-      });
+      console.error("复制失败", error);
+      ElMessage.error("复制失败");
     });
 };
 
@@ -531,6 +538,8 @@ const openDrawer = (row) => {
     let requestData = [];
     let responseData = [];
     {
+      dialogDataRequest.value = row.data.req_resps.request;
+      dialogDataResponse.value = row.data.req_resps.response;
       requestData.push({ key: "url", value: row.data.req_resps.request.url });
       if (row.data.req_resps.request.method) {
         requestData.push({
@@ -940,6 +949,11 @@ const toggleExpand = (row) => {
   } else {
     currentIndex.value = row.ID;
   }
+};
+
+const dialogClose = () => {
+  dialogFormDetail.value = false;
+  dialogData.value = {};
 };
 </script>
 

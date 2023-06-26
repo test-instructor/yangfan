@@ -21,18 +21,18 @@ func CreateFsLoginPlug(engine *gin.Engine) *FsLoginPlugin {
 	global.GlobalConfig = global2.GVA_CONFIG.FS
 
 	global2.GVA_DB.AutoMigrate(model.FsUserInfo{})
-	_, err := os.Stat("./resource/fsView")
+	_, err := os.Stat("./server/resource/fsView")
 	if err != nil {
 		if os.IsNotExist(err) {
-			cp.Copy("./plugin/fslogin/resource", "./resource")
-			fmt.Println("飞书登录oAuth2.0插件资源文件夹初始化完成，资源目录为：./resource/fsView")
+			cp.Copy("./plugin/fslogin/resource", "./server/resource")
+			fmt.Println("飞书登录oAuth2.0插件资源文件夹初始化完成，资源目录为：./server/resource/fsView")
 		}
 	} else {
 		fmt.Println("resource/fsView已存在，如已安装过飞书登录插件，请忽略此提示")
 	}
 
 	var files []string
-	filepath.Walk("./resource", func(path string, info os.FileInfo, err error) error {
+	filepath.Walk("./server/resource", func(path string, info os.FileInfo, err error) error {
 		if strings.HasSuffix(path, ".html") {
 			files = append(files, path)
 		}

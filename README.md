@@ -36,77 +36,9 @@
 用户名：admin
 密码： 123456
 
-# 部署方式
+# 项目部署
 
-
-> - [环境准备](https://www.gin-vue-admin.com/guide/start-quickly/env.html)
-> - 1、新建数据库，并导入docs/sql/yangfan.sql文件
-> - 2、修改`server/config.yaml`文件中的数据库`mysql`、飞书登录`fs`相关配置
-> - 3、修改`web/.env.development`、 `web/.env.production`中的`VITE_FS_LOGIN`、`VITE_FS_APP_ID`
-> - 4、管理员账号`yangfan`,密码`123456`
-### [本地调试](https://www.gin-vue-admin.com/guide/start-quickly/initialization.html)
-
-## docker 部署
-
-1. 环境准备
-   * 前端Dockerfile：`web/Dockerfile`,env:`web/.env.production`中的`VITE_FS_LOGIN`、`VITE_FS_APP_ID`
-   * 后端Dockerfile：`server/Dockerfile`，config：`server/docker.config.yaml`
-   * nginx配置文件: web/.docker-compose/nginx/conf.d/my.conf
-2. 容器编排：`deploy/docker-compose/docker-compose.yaml`
-3. 部署，cd 到 `deploy/docker-compose/` 目录下执行 `docker-compose up --build --force-recreate -d`
-
-
-
-
-## 服务器直接部署
-
-### 前端
-> 在web目录下执行 npm run build 得到 dist文件夹 将dist文件夹上传到服务器 建议使用nginx进行代理 并且设置 proxy 把请求代理到后端
-
-### 后端
-首次安装运行，由于httprunner在Linux上环境缺少pip，所以需要执行2-4步骤，非首次安装只需要执行步骤1即可
-
-> 1. 执行脚本`start_server.sh`，config为根目录下的`config.production.yaml`
-> 2. 进入接口管理并在任意功能模块（接口管理、测试步骤、测试用例、定时任务）运行1次
-> 3. cd `./docs`，执行`/root/.hrp/venv/bin/python3 get-pip.py`
-> 4. 重启服务
-
-### nginx 配置
-```nginx
-server {
-    listen  8080;
-    server_name localhost;
-
-    #charset koi8-r;
-    #access_log  logs/host.access.log  main;
-
-    location / {
-        root /usr/share/nginx/html/dist;
-        add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
-        try_files $uri $uri/ /index.html;
-    }[README.md](README.md)
-
-    location /api {
-        proxy_set_header Host $http_host;
-        proxy_set_header  X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        rewrite ^/api/(.*)$ /$1 break;  #重写
-        proxy_pass http://127.0.0.1:8888; # 设置代理服务器的协议和地址
-     }
-    location  /form-generator {
-        proxy_set_header Host $http_host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_pass http://127.0.0.1:8888;
-    }
-    location /api/swagger/index.html {
-        proxy_pass http://127.0.0.1:8888/swagger/index.html;
-     }
- }
-
-```
+[本地调试、docker部署、k8s部署](./deploy/README.md)
 
 # 项目概况
 
