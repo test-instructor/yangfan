@@ -122,14 +122,18 @@ type ToTestCase struct {
 // GetTestCase 根据id获取TestCase记录
 
 func (t *TestCaseService) FindTestCaseStep(id uint) (err error, apicase interfacecase.ApiCaseStep) {
-	err = global.GVA_DB.
+	err = global.GVA_DB.Model(interfacecase.ApiCaseStep{}).
 		Preload("Project").
 		Preload("TStep", func(db2 *gorm.DB) *gorm.DB {
-			return db2.Order("Sort")
+			return db2.Preload("Request", func(db *gorm.DB) *gorm.DB {
+				return db.Select("requests.url,requests.id,requests.method")
+			}).Joins("Request").
+				Preload("Grpc", func(db *gorm.DB) *gorm.DB {
+					return db.Select("grpc.id,grpc.url,grpc.type")
+				}).Joins("Grpc").
+				Select("api_steps.id,api_steps.name,api_steps.sort").Order("Sort")
 		}).
-		Preload("TStep.Request").
-		Preload("TStep.Grpc").
-		Where("id = ?", id).First(&apicase).Error
+		Where("id = ?", id).Select("ID,name").First(&apicase).Error
 	return
 }
 
@@ -157,6 +161,8 @@ func (t *TestCaseService) GetTestCaseStepInfoList(info interfacecaseReq.TestCase
 	if err != nil {
 		return
 	}
-	err = db.Preload("Project").Limit(limit).Offset(offset).Find(&apicases).Error
+	err = db.Preload("Project").
+		Select("run_config_name,api_env_name,front_case,api_case_steps.created_at,api_case_steps.name,api_case_steps.ID").
+		Limit(limit).Offset(offset).Find(&apicases).Error
 	return err, apicases, total
 }

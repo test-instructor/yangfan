@@ -16,7 +16,7 @@ var (
 
 type ApiGrpc struct {
 	global.GVA_MODEL
-	URL         string            `json:"url" yaml:"url" gorm:"column:url;comment:请求地址"`
+	URL         string            `json:"url,omitempty" yaml:"url" gorm:"column:url;comment:请求地址"`
 	Headers     datatypes.JSONMap `json:"headers,omitempty" form:"headers" gorm:"column:headers;comment:请求头;type:text"`
 	HeadersJson datatypes.JSON    `json:"headers_json,omitempty" form:"headers_json" gorm:"column:headers_json;comment:请求头json数据格式;"`
 	Body        datatypes.JSONMap `json:"body,omitempty" gorm:"column:body;comment:请求体"`

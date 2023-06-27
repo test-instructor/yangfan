@@ -39,11 +39,11 @@ type ApiStep struct {
 	Rendezvous  *ApiStepRendezvous  `json:"rendezvous,omitempty" yaml:"rendezvous,omitempty;comment:集合点"`
 	ThinkTime   *ApiStepThinkTime   `json:"think_time,omitempty" yaml:"think_time,omitempty;comment:思考时间"`
 
-	ThinkTimeID   uint `gorm:"comment:思考时间"`
-	TransactionID uint `gorm:"comment:事务"`
-	RendezvousID  uint `gorm:"comment:集合点"`
-	RequestID     uint `gorm:"comment:http请求"`
-	GrpcID        uint `gorm:"comment:grpc请求"`
+	ThinkTimeID   uint `json:"think_time_id,omitempty" gorm:"comment:思考时间"`
+	TransactionID uint `json:"transaction_id,omitempty" gorm:"comment:事务"`
+	RendezvousID  uint `json:"rendezvous_id,omitempty" gorm:"comment:集合点"`
+	RequestID     uint `json:"request_id,omitempty" gorm:"comment:http请求"`
+	GrpcID        uint `json:"grpc_id,omitempty" gorm:"comment:grpc请求"`
 
 	Variables       datatypes.JSONMap      `json:"variables,omitempty" form:"variables" gorm:"column:variables;comment:变量;type:text"`
 	Extract         datatypes.JSONMap      `json:"extract,omitempty" form:"extract" gorm:"column:extract;comment:导出参数;type:text"`
@@ -53,12 +53,12 @@ type ApiStep struct {
 	ExtractJson     datatypes.JSON         `json:"extract_json,omitempty" form:"extract_json;comment:导出参数json格式"`
 	VariablesJson   datatypes.JSON         `json:"variables_json,omitempty" form:"variables_json;comment:断言json类型"`
 	Hooks           string                 `json:"hooks,omitempty" form:"hooks" gorm:"column:hooks;"`
-	SetupHooks      customType.TypeArgs    `json:"setup_hooks,omitempty,omitempty" form:"setup_hooks,omitempty" gorm:"column:setup_hooks;type:text"`
-	TeardownHooks   customType.TypeArgs    `json:"teardown_hooks,omitempty,omitempty" form:"teardown_hooks,omitempty" gorm:"column:teardown_hooks;type:text"`
+	SetupHooks      customType.TypeArgs    `json:"setup_hooks,omitempty" form:"setup_hooks,omitempty" gorm:"column:setup_hooks;type:text"`
+	TeardownHooks   customType.TypeArgs    `json:"teardown_hooks,omitempty" form:"teardown_hooks,omitempty" gorm:"column:teardown_hooks;type:text"`
 	TTestCase       []ApiCaseStep          `json:"testCase,omitempty" form:"testCase" gorm:"many2many:ApiCaseStepRelationship;"`
 	Sort            uint                   `json:"sort,omitempty" form:"sort" gorm:"column:sort;"`
-	ExportHeader    datatypes.JSON         `json:"export_header" gorm:"column:export_header;comment:导出请求头到全局config;type:text"`
-	ExportParameter datatypes.JSON         `json:"export_parameter" gorm:"column:export_parameter;comment:导出参数到全局config;type:text"`
+	ExportHeader    datatypes.JSON         `json:"export_header,omitempty" gorm:"column:export_header;comment:导出请求头到全局config;type:text"`
+	ExportParameter datatypes.JSON         `json:"export_parameter,omitempty" gorm:"column:export_parameter;comment:导出参数到全局config;type:text"`
 
 	Parent    uint    `json:"-"`
 	ApiMenuID uint    `json:"-"`
@@ -67,13 +67,13 @@ type ApiStep struct {
 
 type ApiStepTransaction struct {
 	global.GVA_MODEL
-	Name string          `json:"name" yaml:"name"`
-	Type TransactionType `json:"type" yaml:"type"`
+	Name string          `json:"name,omitempty" yaml:"name"`
+	Type TransactionType `json:"type,omitempty" yaml:"type"`
 }
 
 type ApiStepRendezvous struct {
 	global.GVA_MODEL
-	Name    string  `json:"name" yaml:"name"`                           // required
+	Name    string  `json:"name,omitempty" yaml:"name"`                 // required
 	Percent float32 `json:"percent,omitempty" yaml:"percent,omitempty"` // default to 1(100%)
 	Number  int64   `json:"number,omitempty" yaml:"number,omitempty"`
 	Timeout int64   `json:"timeout,omitempty" yaml:"timeout,omitempty"` // milliseconds
@@ -81,5 +81,5 @@ type ApiStepRendezvous struct {
 
 type ApiStepThinkTime struct {
 	global.GVA_MODEL
-	Time float64 `json:"time" yaml:"time"`
+	Time float64 `json:"time,omitempty" yaml:"time"`
 }
