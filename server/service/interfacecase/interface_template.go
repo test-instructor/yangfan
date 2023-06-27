@@ -93,11 +93,9 @@ func (i *InterfaceTemplateService) GetInterfaceTemplateInfoList(info interfaceca
 	// 创建db
 	db := global.GVA_DB.
 		Model(&interfacecase.ApiStep{}).
-		Preload("Request", func(db *gorm.DB) *gorm.DB {
-			return db.Select("url,id,method")
-		}).Preload("ApiMenu").Preload("Grpc", func(db *gorm.DB) *gorm.DB {
-		return db.Select("id,url,type")
-	}).Preload("Project").Joins("Project").Where("Project.ID = ?", info.ProjectID)
+		Preload("Project").Joins("Project").
+		Preload("ApiMenu").Joins("ApiMenu").
+		Where("Project.ID = ?", info.ProjectID)
 	if info.ApiMenuID > 0 {
 		db.Preload("ApiMenu").Joins("ApiMenu").Where("ApiMenu.ID = ?", info.ApiMenuID)
 	}
@@ -115,7 +113,11 @@ func (i *InterfaceTemplateService) GetInterfaceTemplateInfoList(info interfaceca
 	if err != nil {
 		return
 	}
-	err = db.Limit(limit).Offset(offset).Find(&apicases).Error
+	err = db.Preload("Request", func(db *gorm.DB) *gorm.DB {
+		return db.Select("ID,Name,Method")
+	}).Joins("Request").Select("api_steps.id,api_steps.name").
+		Preload("Grpc", "id,url,type").Joins("Grpc").
+		Limit(limit).Offset(offset).Find(&apicases).Error
 	return err, apicases, total
 }
 
