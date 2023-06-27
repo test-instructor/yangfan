@@ -8,5 +8,5 @@ import (
 type ApiCaseSearch struct {
 	interfacecase.ApiCase
 	request.PageInfo
-	FrontCase bool `json:"front_case" form:"front_case"`
+	FrontCase bool `json:"front_case,omitempty" form:"front_case"`
 }

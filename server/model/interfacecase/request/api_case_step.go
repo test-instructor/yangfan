@@ -8,6 +8,6 @@ import (
 type TestCaseSearch struct {
 	interfacecase.ApiCaseStep
 	request.PageInfo
-	FrontCase bool                  `json:"front_case" form:"front_case"`
-	ApiType   interfacecase.ApiType `json:"type" form:"type"`
+	FrontCase bool                  `json:"front_case,omitempty" form:"front_case"`
+	ApiType   interfacecase.ApiType `json:"type,omitempty" form:"type"`
 }

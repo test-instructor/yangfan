@@ -11,7 +11,7 @@ type EnvSearch struct {
 }
 
 type EnvVariableSearch struct {
-	ShowKey bool `json:"show_key" form:"show_key"`
+	ShowKey bool `json:"show_key,omitempty" form:"show_key"`
 	interfacecase.ApiEnvDetail
 	request.PageInfo
 }

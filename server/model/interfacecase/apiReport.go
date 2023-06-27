@@ -44,7 +44,7 @@ type ApiReport struct {
 	RunType    RunType            `json:"type"`    //1、调试，2、立即运行，3、后台运行
 	Status     int                `json:"status"`
 	SetupCase  bool               `json:"setup_case"`
-	Describe   string             `json:"describe" form:"describe" gorm:"column:describe;comment:;"`
+	Describe   string             `json:"describe,omitempty" form:"describe" gorm:"column:describe;comment:;"`
 	ApiEnvName string             `json:"api_env_name" gorm:"comment:所属环境名称;"`
 	ApiEnvID   uint               `json:"api_env_id" gorm:"comment:所属环境;"`
 	Hostname   string             `json:"hostname" gorm:"comment:主机名;"`
@@ -99,7 +99,7 @@ type ApiReportDetailsRecords struct {
 	StepType           string                        `json:"step_type"`
 	Success            bool                          `json:"success"`
 	ElapsedMs          int                           `json:"elapsed_ms"`
-	ValidateNumber     uint                          `json:"validate_number" form:"validate_number"`
+	ValidateNumber     uint                          `json:"validate_number,omitempty" form:"validate_number"`
 	Data               []ApiReportDetailsRecordsData `json:"data"`
 	ExportVars         datatypes.JSON                `json:"export_vars"`
 	ContentSize        int                           `json:"content_size"`

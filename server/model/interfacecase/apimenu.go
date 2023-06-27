@@ -12,7 +12,7 @@ type MenuType int
 type ApiMenu struct {
 	global.GVA_MODEL
 	Operator
-	Name     string `json:"name" form:"name" gorm:"column:name;comment:菜单名称;"`
-	Parent   uint   `json:"parent" form:"parent" gorm:"column:parent;comment:父节点id;"`
-	MenuType string `json:"menuType" form:"menuType" gorm:"column:menu_type;comment:菜单类型;"`
+	Name     string `json:"name,omitempty" form:"name" gorm:"column:name;comment:菜单名称;"`
+	Parent   uint   `json:"parent,omitempty" form:"parent" gorm:"column:parent;comment:父节点id;"`
+	MenuType string `json:"menuType,omitempty" form:"menuType" gorm:"column:menu_type;comment:菜单类型;"`
 }

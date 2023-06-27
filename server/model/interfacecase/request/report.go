@@ -8,13 +8,13 @@ import (
 type ReportSearch struct {
 	interfacecase.ApiReport
 	request.PageInfo
-	ApiType int `json:"type" form:"type"`
+	ApiType int `json:"type,omitempty" form:"type"`
 }
 
 type PReportSearch struct {
 	interfacecase.PerformanceReport
 	request.PageInfo
-	ApiType int `json:"type" form:"type"`
+	ApiType int `json:"type,omitempty" form:"type"`
 }
 
 type PReportDetail struct {

@@ -8,7 +8,7 @@ import (
 type InterfaceTemplateSearch struct {
 	interfacecase.ApiStep
 	request.PageInfo
-	ApiType int `json:"type" form:"type"`
+	ApiType int `json:"type,omitempty" form:"type"`
 }
 
 type InterfaceTemplateApi struct {

@@ -142,7 +142,7 @@ func (taskApi *TimerTaskApi) DelTaskCase(c *gin.Context) {
 	}
 }
 
-type taskTcaseResp struct {
+type taskCaseResp struct {
 	Name     string     `json:"name"`
 	TestCase []testCase `json:"test_case"`
 }
@@ -157,7 +157,7 @@ func (taskApi *TimerTaskApi) FindTaskTestCase(c *gin.Context) {
 	_ = c.ShouldBindQuery(&task)
 	global.GVA_DB.First(&task)
 	task.ProjectID = utils.GetUserProject(c)
-	var reapicase taskTcaseResp
+	var reapicase taskCaseResp
 	err, resp := taskService.FindTaskTestCase(task.ID)
 	if err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Error(err))

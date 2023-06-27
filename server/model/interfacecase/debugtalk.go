@@ -19,5 +19,5 @@ type ApiDebugTalk struct {
 	global.GVA_MODEL
 	Operator
 	FileType FileType `json:"file_type" gorm:"comment:文件类型"`
-	Content  string   `json:"content" form:"content" gorm:"column:content;type:text;comment:文件内容"`
+	Content  string   `json:"content,omitempty" form:"content" gorm:"column:content;type:text;comment:文件内容"`
 }
