@@ -227,16 +227,18 @@ func (taskService *TimerTaskService) GetTimerTaskInfoList(info interfacecaseReq.
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := global.GVA_DB.Model(&interfacecase.ApiTimerTask{}).
-		Preload("RunConfig").
-		Preload("TestCase")
+	db := global.GVA_DB.Model(&interfacecase.ApiTimerTask{}).Preload("RunConfig").Preload("TestCase")
+	db2 := global.GVA_DB.Model(&interfacecase.ApiTimerTask{}).Preload("RunConfig").Preload("TestCase").Preload("Project")
 	db.Preload("Project").Limit(limit).Offset(offset)
+
 	var tasks []interfacecase.ApiTimerTask
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.Name != "" {
 		db = db.Where("name LIKE ?", "%"+info.Name+"%")
+		db2 = db2.Where("name LIKE ?", "%"+info.Name+"%")
 	}
-	err = db.Count(&total).Error
+	db2.Find(nil, projectDB(db2, info.ProjectID))
+	err = db2.Count(&total).Error
 	if err != nil {
 		return
 	}

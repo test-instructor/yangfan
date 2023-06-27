@@ -57,19 +57,20 @@ func (acService *ApiConfigService) GetApiConfigInfoList(info interfacecaseReq.Ap
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
 	db := global.GVA_DB.Model(&interfacecase.ApiConfig{})
+	db2 := global.GVA_DB.Model(&interfacecase.ApiConfig{})
 	var acs []interfacecase.ApiConfig
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.Name != "" {
 		db = db.Where("name LIKE ?", "%"+info.Name+"%")
+		db2 = db2.Where("name LIKE ?", "%"+info.Name+"%")
 	}
-	err = db.Count(&total).Error
+	err = db.Model(&interfacecase.ApiConfig{}).Preload("Project").Preload("SetupCase").Find(nil, projectDB(db, info.ProjectID)).Count(&total).Error
 	if err != nil {
 		return
 	}
-	//configStruct2 := configStruct{}
-	err = db.Model(&interfacecase.ApiConfig{}).
+	err = db2.Model(&interfacecase.ApiConfig{}).
 		Preload("Project").Preload("SetupCase").
-		Limit(limit).Offset(offset).Find(&acs, projectDB(db, info.ProjectID)).
+		Limit(limit).Offset(offset).Find(&acs, projectDB(db2, info.ProjectID)).
 		Error
 	return err, acs, total
 }
