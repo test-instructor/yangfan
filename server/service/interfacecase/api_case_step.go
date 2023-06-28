@@ -39,7 +39,7 @@ func (t *TestCaseService) UpdateTestCaseStep(apicase interfacecase.ApiCaseStep) 
 	var oId interfacecase.Operator
 	global.GVA_DB.Model(interfacecase.ApiCaseStep{}).Where("id = ?", apicase.ID).First(&oId)
 	apicase.CreatedBy = oId.CreatedBy
-	apicase.TStep = []interfacecase.ApiStep{}
+	apicase.TStep = []*interfacecase.ApiStep{}
 	err = global.GVA_DB.Save(&apicase).Error
 	return err
 }
@@ -125,15 +125,10 @@ func (t *TestCaseService) FindTestCaseStep(id uint) (err error, apicase interfac
 	err = global.GVA_DB.Model(interfacecase.ApiCaseStep{}).
 		Preload("Project").
 		Preload("TStep", func(db2 *gorm.DB) *gorm.DB {
-			return db2.Preload("Request", func(db *gorm.DB) *gorm.DB {
-				return db.Select("requests.url,requests.id,requests.method")
-			}).Joins("Request").
-				Preload("Grpc", func(db *gorm.DB) *gorm.DB {
-					return db.Select("grpc.id,grpc.url,grpc.type")
-				}).Joins("Grpc").
-				Select("api_steps.id,api_steps.name,api_steps.sort").Order("Sort")
+			return db2.Joins("Request").Joins("Grpc").Order("Sort")
 		}).
 		Where("id = ?", id).Select("ID,name").First(&apicase).Error
+	resetApiCaseStep(apicase.TStep...)
 	return
 }
 

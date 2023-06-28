@@ -8,7 +8,7 @@ type Operator struct {
 	DeleteBy  *uint `json:"DeleteBy,omitempty" gorm:"column:delete_by_id;comment:删除者"`
 
 	Project   system.Project `json:"-"`
-	ProjectID uint           `json:"project_id",omitempty`
+	ProjectID uint           `json:"project_id,omitempty"`
 	//CreatedBy   *system.SysUser
 	//UpdateBy    *system.SysUser
 	//DeleteBy    *system.SysUser

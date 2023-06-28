@@ -71,7 +71,7 @@ func (r *runAPI) LoadCase() (err error) {
 	hrpTestCase.Name = apiStep.Name
 	hrpTestCase.ID = apiStep.ID
 	hrpTestCase.Confing = *apiConfig
-	hrpTestCase.TestSteps = append(hrpTestCase.TestSteps, apiStep)
+	hrpTestCase.TestSteps = append(hrpTestCase.TestSteps, &apiStep)
 	hrpCase := &interfacecase.HrpCaseStep{
 		ID:       hrpTestCase.ID,
 		Name:     hrpTestCase.Name,

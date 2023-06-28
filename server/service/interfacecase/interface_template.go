@@ -99,7 +99,7 @@ func (i *InterfaceTemplateService) GetInterfaceTemplateInfoList(info interfaceca
 	if info.ApiMenuID > 0 {
 		db.Preload("ApiMenu").Joins("ApiMenu").Where("ApiMenu.ID = ?", info.ApiMenuID)
 	}
-	var apicases []interfacecase.ApiStep
+	var apicases []*interfacecase.ApiStep
 
 	//查询对应的类型
 	db.Where("api_type = ?", info.ApiType)
@@ -113,11 +113,9 @@ func (i *InterfaceTemplateService) GetInterfaceTemplateInfoList(info interfaceca
 	if err != nil {
 		return
 	}
-	err = db.Preload("Request", func(db *gorm.DB) *gorm.DB {
-		return db.Select("ID,Name,Method")
-	}).Joins("Request").Select("api_steps.id,api_steps.name").
-		Preload("Grpc", "id,url,type").Joins("Grpc").
+	err = db.Joins("Request").Joins("Grpc").
 		Limit(limit).Offset(offset).Find(&apicases).Error
+	resetApiCaseStep(apicases...)
 	return err, apicases, total
 }
 

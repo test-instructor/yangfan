@@ -23,7 +23,7 @@ type ApiCaseStep struct {
 	Operator
 	Name          string      `json:"name,omitempty" form:"name" gorm:"column:name;comment:步骤名称;"`
 	FrontCase     *bool       `json:"front_case,omitempty" form:"front_case" gorm:"comment:允许设置为前置用例;"`
-	TStep         []ApiStep   `json:"TStep,omitempty" form:"TStep" gorm:"many2many:ApiCaseStepRelationship;"`
+	TStep         []*ApiStep  `json:"TStep,omitempty" form:"TStep" gorm:"many2many:ApiCaseStepRelationship;"`
 	ApiCase       []ApiCase   `json:"case,omitempty" form:"case" gorm:"many2many:ApiCaseRelationship;"`
 	RunConfigID   uint        `json:"RunConfigID,omitempty" form:"RunConfigID" gorm:"comment:运行配置;"`
 	RunConfigName *string     `json:"RunConfigName,omitempty" form:"RunConfigName" gorm:"comment:运行配置名称;"`
@@ -48,8 +48,8 @@ type HrpCaseStep struct {
 type HrpTestCase struct {
 	ID        uint
 	Name      string
-	Confing   ApiConfig `json:"config,omitempty" form:"config"`
-	TestSteps []ApiStep `json:"teststeps,omitempty" yaml:"teststeps,omitempty"`
+	Confing   ApiConfig  `json:"config,omitempty" form:"config"`
+	TestSteps []*ApiStep `json:"teststeps,omitempty" yaml:"teststeps,omitempty"`
 }
 
 type HrpCase struct {
