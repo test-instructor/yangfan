@@ -72,7 +72,7 @@ func (r *runAPI) LoadCase() (err error) {
 	hrpTestCase.Name = apiStep.Name
 	hrpTestCase.ID = apiStep.ID
 	hrpTestCase.Confing = *apiConfig
-	hrpTestCase.TestSteps = append(hrpTestCase.TestSteps, apiStep)
+	hrpTestCase.TestSteps = append(hrpTestCase.TestSteps, &apiStep)
 	hrpCase := &interfacecase.HrpCaseStep{
 		ID:       hrpTestCase.ID,
 		Name:     hrpTestCase.Name,
@@ -116,7 +116,10 @@ func (r *runAPI) RunCase() (err error) {
 		SetFailfast(false).
 		RunJsons(r.tcm.Case...)
 	var report interfacecase.ApiReport
-	json.Unmarshal(reportHRP, &report)
+	err = json.Unmarshal(reportHRP, &report)
+	if err != nil {
+		return err
+	}
 	r.reportOperation.UpdateReport(&report)
 	global.GVA_LOG.Debug("debugtalk 目录")
 	global.GVA_LOG.Debug(r.d.FilePath)
