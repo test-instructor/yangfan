@@ -34,6 +34,18 @@ func (acApi *ReportApi) GetReportList(c *gin.Context) {
 	}
 }
 
+func (acApi *ReportApi) GetReportDetail(c *gin.Context) {
+	var pageInfo interfacecaseReq.ReportSearch
+	_ = c.ShouldBindQuery(&pageInfo)
+	pageInfo.ProjectID = utils.GetUserProject(c)
+	if err, data := reportService.GetReportDetail(pageInfo.ID); err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithData(gin.H{"data": data}, c)
+	}
+}
+
 func (acApi *ReportApi) FindReport(c *gin.Context) {
 	var apiReport interfacecase.ApiReport
 	_ = c.ShouldBindQuery(&apiReport)

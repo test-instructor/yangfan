@@ -17,6 +17,7 @@ func (s *ReportRouter) InitReportRouter(Router *gin.RouterGroup) {
 	var reportApi = v1.ApiGroupApp.InterfaceCaseApiGroup.ReportApi
 	{
 		reportRouter.GET("getReportList", reportApi.GetReportList)
+		reportRouter.GET("getReportDetail", reportApi.GetReportDetail)
 		reportRouter.GET("findReport", reportApi.FindReport)
 		reportRouter.DELETE("delReport", reportApi.DelReport)
 	}

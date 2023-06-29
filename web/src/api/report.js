@@ -1,16 +1,15 @@
-import service from '@/utils/request'
+import service from "@/utils/request";
 
-const project = JSON.parse(window.localStorage.getItem('project')).ID
-const baseURL = '/case/report/' + project
-
+const project = JSON.parse(window.localStorage.getItem("project")).ID;
+const baseURL = "/case/report/" + project;
 
 export const deleteReport = (data) => {
-    return service({
-        url: baseURL + '/deleteReport',
-        method: 'delete',
-        data
-    })
-}
+  return service({
+    url: baseURL + "/deleteReport",
+    method: "delete",
+    data,
+  });
+};
 
 // @Tags TestCase
 // @Summary 删除TestCase
@@ -21,13 +20,12 @@ export const deleteReport = (data) => {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
 // @Router /apicase/deleteTestCase [delete]
 export const deleteReportIds = (data) => {
-    return service({
-        url: baseURL + '/deleteReportIds',
-        method: 'delete',
-        data
-    })
-}
-
+  return service({
+    url: baseURL + "/deleteReportIds",
+    method: "delete",
+    data,
+  });
+};
 
 // @Tags TestCase
 // @Summary 用id查询TestCase
@@ -38,22 +36,28 @@ export const deleteReportIds = (data) => {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
 // @Router /apicase/findTestCase [get]
 export const findReport = (params) => {
-    return service({
-        url: baseURL + '/findReport',
-        method: 'get',
-        params
-    })
-}
+  return service({
+    url: baseURL + "/findReport",
+    method: "get",
+    params,
+  });
+};
 
+export const getReportDetail = (params) => {
+  return service({
+    url: baseURL + "/getReportDetail",
+    method: "get",
+    params,
+  });
+};
 
 export const delReport = (data) => {
-    return service({
-        url: baseURL + '/delReport',
-        method: 'delete',
-        data
-    })
-}
-
+  return service({
+    url: baseURL + "/delReport",
+    method: "delete",
+    data,
+  });
+};
 
 // @Tags TestCase
 // @Summary 分页获取TestCase列表
@@ -64,9 +68,9 @@ export const delReport = (data) => {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /apicase/getTestCaseList [get]
 export const getReportList = (params) => {
-    return service({
-        url: baseURL + '/getReportList',
-        method: 'get',
-        params
-    })
-}
+  return service({
+    url: baseURL + "/getReportList",
+    method: "get",
+    params,
+  });
+};

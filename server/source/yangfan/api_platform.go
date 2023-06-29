@@ -205,6 +205,7 @@ func RegisterApis() {
 		{ApiGroup: "测试步骤", Method: "PUT", Path: "/case/:project/step/updateTestCase", Description: "更新测试步骤"},
 
 		{ApiGroup: "测试报告", Method: "GET", Path: "/case/report/:project/getReportList", Description: "测试报告列表"},
+		{ApiGroup: "测试报告", Method: "GET", Path: "/case/report/:project/getReportDetail", Description: "测试报告详情"},
 		{ApiGroup: "测试报告", Method: "DELETE", Path: "/case/report/:project/delReport", Description: "删除测试报告"},
 		{ApiGroup: "测试报告", Method: "GET", Path: "/case/report/:project/findReport", Description: "测试报告详情"},
 

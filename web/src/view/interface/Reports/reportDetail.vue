@@ -694,6 +694,7 @@ const openDrawer = (row) => {
 
 const getTestCaseDetailFunc = async (testCaseID) => {
   const res = await findReport({ ID: testCaseID });
+  let reset = true;
   if (res.code === 0) {
     let reapicase = JSON.parse(JSON.stringify(res.data.reapicase));
     res.data.reapicase.details.forEach((item, index, arr) => {
@@ -711,12 +712,40 @@ const getTestCaseDetailFunc = async (testCaseID) => {
           }
         );
       });
-
       reportData.value = reapicase;
-      return true;
+      return false;
     });
   }
-  reportData.value = res.data.reapicase;
+  if (reset) {
+    reportData.value = res.data.reapicase;
+  }
+  await getTestCaseDetailData();
+};
+
+const getTestCaseDetailData = async () => {
+  for (var i = 0; i < reportData.value.details.length; i++) {
+    // 遍历records
+    for (var j = 0; j < reportData.value.details[i].records.length; j++) {
+      // 将data设置为空
+      console.log(
+        "reapicase-data",
+        reportData.value.details[i].records[j].data
+      );
+      // TODO 这里从接口获取data并更新
+      for (
+        var k = 0;
+        k < reportData.value.details[i].records[j].data.length;
+        k++
+      ) {
+        let data = reportData.value.details[i].records[j].data[k];
+        let res = await findReport({ ID: data.id });
+        if (res.code === 0) {
+          reportData.value.details[i].records[j].data[k] = res.data.reapicase;
+        }
+      }
+      // reportData.value.details[i].records[j].data = {};
+    }
+  }
 };
 
 const runTime = (row, column) => {
