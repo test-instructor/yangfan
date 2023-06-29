@@ -284,7 +284,7 @@ const init = () => {
   }
 };
 const getTestCaseDetailFunc = async (testCaseID) => {
-  const res = await findTestCase({ ID: testCaseID });
+  const res = await findTestCase({ ID: testCaseID, detail: true });
   if (res.code === 0) {
     tableData.value = res.data.reapicase.TStep;
     caseName.value = res.data.reapicase.name;

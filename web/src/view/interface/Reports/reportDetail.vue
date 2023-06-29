@@ -363,7 +363,7 @@
 <script setup>
 import tableKeyValue from "@/view/interface/Reports/tableKeyValue.vue";
 
-import { findReport } from "@/api/report";
+import { findReport, getReportDetail } from "@/api/report";
 
 name = "ReportDetail";
 import { onBeforeMount, onMounted, onUpdated, reactive, ref, watch } from "vue";
@@ -405,6 +405,7 @@ echarts.use([
 
 let pieOption;
 const reportData = ref({});
+const reportDataDetail = new Map();
 const testCasesData = ref([]);
 const testStepsData = ref([]);
 const testCaseSimple = ref([]);
@@ -450,11 +451,9 @@ const copy_text = (row) => {
   navigator.clipboard
     .writeText(copy_report_data)
     .then(() => {
-      console.log("复制成功");
       ElMessage.success("复制成功");
     })
     .catch((error) => {
-      console.error("复制失败", error);
       ElMessage.error("复制失败");
     });
 };
@@ -529,6 +528,7 @@ const shouStep = (data) => {
 };
 
 const openDrawer = (row) => {
+  row = reportDataDetail.get(row.ID);
   if (row.data) {
     requestTimeShow.value = row.data.req_resps.response.proto !== "gRPC";
     drawer.value = true;
@@ -719,31 +719,23 @@ const getTestCaseDetailFunc = async (testCaseID) => {
   if (reset) {
     reportData.value = res.data.reapicase;
   }
-  await getTestCaseDetailData();
+  getTestCaseDetailData();
 };
 
 const getTestCaseDetailData = async () => {
   for (var i = 0; i < reportData.value.details.length; i++) {
-    // 遍历records
     for (var j = 0; j < reportData.value.details[i].records.length; j++) {
-      // 将data设置为空
-      console.log(
-        "reapicase-data",
-        reportData.value.details[i].records[j].data
-      );
-      // TODO 这里从接口获取data并更新
       for (
         var k = 0;
         k < reportData.value.details[i].records[j].data.length;
         k++
       ) {
         let data = reportData.value.details[i].records[j].data[k];
-        let res = await findReport({ ID: data.id });
+        let res = await getReportDetail({ ID: data.ID });
         if (res.code === 0) {
-          reportData.value.details[i].records[j].data[k] = res.data.reapicase;
+          reportDataDetail.set(data.ID, res.data.data);
         }
       }
-      // reportData.value.details[i].records[j].data = {};
     }
   }
 };

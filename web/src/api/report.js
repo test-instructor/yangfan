@@ -48,6 +48,7 @@ export const getReportDetail = (params) => {
     url: baseURL + "/getReportDetail",
     method: "get",
     params,
+    donNotShowLoading: true,
   });
 };
 

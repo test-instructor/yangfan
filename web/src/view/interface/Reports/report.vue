@@ -231,6 +231,7 @@ const successType = (row) => {
   if (row.status === 2) {
     return ["danger", "错误"];
   }
+  return ["info", "未知状态"];
 };
 
 // 分页

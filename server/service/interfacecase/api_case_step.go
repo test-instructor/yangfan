@@ -121,14 +121,17 @@ type ToTestCase struct {
 
 // GetTestCase 根据id获取TestCase记录
 
-func (t *TestCaseService) FindTestCaseStep(id uint) (err error, apicase interfacecase.ApiCaseStep) {
-	err = global.GVA_DB.Model(interfacecase.ApiCaseStep{}).
-		Preload("Project").
-		Preload("TStep", func(db2 *gorm.DB) *gorm.DB {
-			return db2.Joins("Request").Joins("Grpc").Order("Sort")
-		}).
-		Where("id = ?", id).Select("ID,name").First(&apicase).Error
-	resetApiCaseStep(apicase.TStep...)
+func (t *TestCaseService) FindTestCaseStep(id uint, detail bool) (err error, apicase interfacecase.ApiCaseStep) {
+	db := global.GVA_DB.Model(&interfacecase.ApiCaseStep{})
+	if detail {
+		db.Preload("TStep", func(db *gorm.DB) *gorm.DB {
+			return db.Order("Sort")
+		}).Preload("TStep.Request").Preload("TStep.Grpc")
+	}
+	err = db.Where("id = ?", id).First(&apicase).Error
+	if detail {
+		resetApiCaseStep(apicase.TStep...)
+	}
 	return
 }
 

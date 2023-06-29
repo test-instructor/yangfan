@@ -28,9 +28,11 @@ type GetAuthorityId struct {
 type Empty struct{}
 
 type ApiCaseIdReq struct {
+	ID     uint   `json:"ID" form:"ID"`
 	ApiID  uint   `json:"apiID" form:"apiID"`
 	CaseID uint   `json:"caseID" form:"caseID"`
 	Type   string `json:"type" form:"type"`
+	Detail bool   `json:"detail" form:"detail"`
 }
 
 type RunningType int

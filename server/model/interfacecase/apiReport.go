@@ -66,16 +66,16 @@ type ApiReportStat struct {
 
 type ApiReportStatTestcases struct {
 	global.GVA_MODEL
-	Total   int `json:"total,omitempty"`
-	Success int `json:"success,omitempty"`
-	Fail    int `json:"fail,omitempty"`
+	Total   int `json:"total"`
+	Success int `json:"success"`
+	Fail    int `json:"fail"`
 }
 
 type ApiReportStatTeststeps struct {
 	global.GVA_MODEL
-	Total     int `json:"total,omitempty"`
-	Successes int `json:"successes,omitempty"`
-	Failures  int `json:"failures,omitempty"`
+	Total     int `json:"total"`
+	Successes int `json:"successes"`
+	Failures  int `json:"failures"`
 }
 
 type ApiReportDetails struct {

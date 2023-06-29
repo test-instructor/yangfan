@@ -528,6 +528,7 @@ const enterDialog = async () => {
       res = await createTestCase(formData.value, params);
       break;
     case "update":
+      console.log("update", formData.value);
       res = await updateTestCase(formData.value, params);
       break;
     default:

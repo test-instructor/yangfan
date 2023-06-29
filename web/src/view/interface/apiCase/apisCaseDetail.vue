@@ -115,18 +115,6 @@
 
 <script setup>
 import {
-  createTestCase,
-  deleteTestCase,
-  deleteTestCaseByIds,
-  updateTestCase,
-  findTestCase,
-  getTestCaseList,
-  sortTestCase,
-  addTestCase,
-  delTestCase,
-} from "@/api/testCase";
-
-import {
   sortApisCase,
   findApiTestCase,
   addApisCase,

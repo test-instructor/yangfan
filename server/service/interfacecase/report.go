@@ -34,18 +34,16 @@ func (reportService *ReportService) GetReportList(info interfacecaseReq.ReportSe
 	return err, apiReport, total
 }
 
-func (reportService *ReportService) GetReportDetail(id uint) (err error, detail interfacecase.ApiReportDetails) {
+func (reportService *ReportService) GetReportDetail(id uint) (err error, detail interfacecase.ApiReportDetailsRecordsData) {
 
 	// 创建db
 	db := global.GVA_DB.
-		Model(&interfacecase.ApiReportDetails{}).
-		Preload("Details.Records").
-		Preload("Details.Records.Data").
-		Preload("Details.Records.Data.HttpStat")
+		Model(&interfacecase.ApiReportDetailsRecordsData{}).
+		Preload("HttpStat")
 
-	var apiReport interfacecase.ApiReportDetails
+	var apiReport interfacecase.ApiReportDetailsRecordsData
 
-	err = db.Find(&apiReport).Error
+	err = db.Find(&apiReport, "id = ?", id).Error
 
 	return err, apiReport
 }

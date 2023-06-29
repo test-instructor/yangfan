@@ -188,10 +188,9 @@ func (apiCase *ApiCase) DelTestCaseStep(c *gin.Context) {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
 // @Router /apicase/findTestCase [get]
 func (apiCase *ApiCase) FindTestCaseStep(c *gin.Context) {
-	var apicase interfacecase.ApiCaseStep
+	var apicase request.ApiCaseIdReq
 	_ = c.ShouldBindQuery(&apicase)
-	apicase.ProjectID = utils.GetUserProject(c)
-	if err, reapicase := testCaseService.FindTestCaseStep(apicase.ID); err != nil {
+	if err, reapicase := testCaseService.FindTestCaseStep(apicase.ID, apicase.Detail); err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
