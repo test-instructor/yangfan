@@ -72,5 +72,12 @@ func (acService *ApiConfigService) GetApiConfigInfoList(info interfacecaseReq.Ap
 		Preload("Project").Preload("SetupCase").
 		Limit(limit).Offset(offset).Find(&acs, projectDB(db2, info.ProjectID)).
 		Error
+	for i := 0; i < len(acs); i++ {
+		acs[i].Variables = nil
+		acs[i].Headers = nil
+		acs[i].Parameters = nil
+		acs[i].VariablesJson = nil
+		acs[i].HeadersJson = nil
+	}
 	return err, acs, total
 }
