@@ -13,7 +13,7 @@
             @click="updateDetail"
             type="primary"
             :disabled="boomerButton"
-            >手动刷新</el-button
+            >刷新</el-button
           >
           <el-button
             @click="resetBoomer"
@@ -24,24 +24,6 @@
           <el-button @click="stopBoomer" type="danger" :disabled="boomerButton"
             >停止运行</el-button
           >
-        </el-form-item>
-
-        <el-form-item>
-          <el-select
-            :disabled="boomerButton"
-            v-model="timerValue"
-            @change="updateTimerData(timerValue)"
-            class="m-2"
-            placeholder="Select"
-            size="small"
-          >
-            <el-option
-              v-for="item in timerOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
         </el-form-item>
       </el-form>
     </div>
@@ -135,7 +117,6 @@ const grafana_dashboard_stats = ref("");
 const grafana_dashboard_stats_name = ref("");
 const CreatedAt = ref("");
 const UpdatedAt = ref("");
-let detailId = 0;
 const tableData = ref([]);
 
 let runnerConfig = {
@@ -280,7 +261,7 @@ const isTimeExpired = (timeInterval, CreatedAt) => {
 };
 
 const updateDetail = async () => {
-  const res = await findReport({ ID: reportID, DetailID: detailId });
+  const res = await findReport({ ID: reportID });
   if (res.code === 0) {
     respData.value = res.data.reapicase;
     state.value = res.data.reapicase.state;
@@ -369,6 +350,7 @@ const initData = async () => {
     reportID = route.params.id;
   }
   await getTestCaseDetailFunc(reportID);
+  updateTimerData(30);
 };
 initData();
 watch(
@@ -383,29 +365,6 @@ watch(
 
 // 定时刷新
 let timerData = setInterval(function () {}, 10000000000);
-const timerOptions = [
-  {
-    value: 5,
-    label: "5s",
-  },
-  {
-    value: 15,
-    label: "15s",
-  },
-  {
-    value: 30,
-    label: "30s",
-  },
-  {
-    value: 30,
-    label: "60s",
-  },
-  {
-    value: 0,
-    label: "关闭自动刷新",
-  },
-];
-const timerValue = ref("手动刷新");
 const updateTimerData = (timer) => {
   clearInterval(timerData);
   if (timer === 0 || state.value === 5) {

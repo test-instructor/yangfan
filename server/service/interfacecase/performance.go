@@ -25,7 +25,7 @@ func (testCaseService *PerformanceService) GetPerformanceList(info request.Perfo
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
 	db := global.GVA_DB.Model(&interfacecase.Performance{}).Preload("RunConfig").Preload("Project")
-	db2 := global.GVA_DB.Model(&interfacecase.Performance{}).Preload("RunConfig").Preload("Project")
+	db2 := global.GVA_DB.Model(&interfacecase.Performance{}).Preload("Project")
 	var testCase []interfacecase.Performance
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.Name != "" {
@@ -37,6 +37,9 @@ func (testCaseService *PerformanceService) GetPerformanceList(info request.Perfo
 		return
 	}
 	err = db.Limit(limit).Offset(offset).Find(&testCase, projectDB(db, info.ProjectID)).Error
+	for i := 0; i < len(testCase); i++ {
+		resetRunConfig(testCase[i].RunConfig)
+	}
 	return err, testCase, total
 }
 
