@@ -75,9 +75,9 @@
           :formatter="runTime"
           width="165"
         ></el-table-column>
-        <el-table-column label="运行时长/秒" width="115">
+        <el-table-column label="运行时长" width="115">
           <template #default="scope">
-            {{ Number(scope.row.time.duration).toFixed(3) }}
+            {{ formatTime(scope.row.time.duration) }}
           </template>
         </el-table-column>
         <el-table-column
@@ -517,6 +517,30 @@ const dataMethod = (row) => {
   }
 };
 
+const formatTime = (duration) => {
+  let hours = Math.floor(duration / 3600);
+  let minutes = Math.floor((duration % 3600) / 60);
+  let seconds = Math.floor(duration % 60);
+
+  let formattedTime = "";
+
+  if (hours > 0) {
+    formattedTime += hours + "小时";
+  }
+
+  if (minutes > 0 || (hours > 0 && seconds > 0)) {
+    formattedTime += minutes + "分钟";
+  }
+
+  if (seconds <= 0 && formattedTime === "") {
+    formattedTime = "1秒";
+  } else if (seconds > 0) {
+    formattedTime += seconds + "秒";
+  }
+
+  return formattedTime;
+};
+
 const setupCaseShow = (row) => {
   return !!(
     reportData.value.setup_case && row.ID === reportData.value.details[0].ID
@@ -792,7 +816,7 @@ const initData = async () => {
   });
   testCaseSimple.value.push({
     label: "运行时长",
-    name: reportData.value.time.duration.toFixed(2).toString() + "(秒)",
+    name: formatTime(reportData.value.time.duration),
     key: "duration",
     str: "str",
   });

@@ -290,7 +290,27 @@ const runType = (t) => {
 const durations = (row) => {
   const t = ref(0);
   if (row.time && row.time.duration) {
-    t.value = Number(Number(row.time.duration).toFixed(2));
+    let hours = Math.floor(row.time.duration / 3600);
+    let minutes = Math.floor((row.time.duration % 3600) / 60);
+    let seconds = Math.floor(row.time.duration % 60);
+
+    let formattedTime = "";
+
+    if (hours > 0) {
+      formattedTime += hours + "小时";
+    }
+
+    if (minutes > 0 || (hours > 0 && seconds > 0)) {
+      formattedTime += minutes + "分钟";
+    }
+
+    if (seconds <= 0 && formattedTime === "") {
+      formattedTime = "1秒";
+    } else if (seconds > 0) {
+      formattedTime += seconds + "秒";
+    }
+
+    return formattedTime;
   }
   return t;
 };
