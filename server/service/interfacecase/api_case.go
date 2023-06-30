@@ -177,8 +177,7 @@ func (testCaseService *ApiCaseService) GetApiCaseInfoList(info interfacecaseReq.
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
 	db := global.GVA_DB.Model(&interfacecase.ApiCase{}).
-		Preload("RunConfig").
-		Preload("ApiCaseStep")
+		Preload("RunConfig")
 	//Preload("Project").Joins("Project").Where("Project.ID = ?", info.ProjectID)
 	if info.ApiMenuID > 0 {
 		db.Preload("ApiMenu").Joins("ApiMenu").Where("ApiMenu.ID = ?", info.ApiMenuID)
@@ -196,5 +195,21 @@ func (testCaseService *ApiCaseService) GetApiCaseInfoList(info interfacecaseReq.
 		return
 	}
 	err = db.Preload("Project").Limit(limit).Offset(offset).Find(&testCases, projectDB(db, info.ProjectID)).Error
+	for i := 0; i < len(testCases); i++ {
+		testCases[i].RunConfig.BaseUrl = ""
+		testCases[i].RunConfig.Variables = nil
+		testCases[i].RunConfig.Headers = nil
+		testCases[i].RunConfig.Parameters = nil
+		testCases[i].RunConfig.VariablesJson = nil
+		testCases[i].RunConfig.HeadersJson = nil
+		testCases[i].RunConfig.SetupCase = nil
+		testCases[i].RunConfig.Weight = 0
+		testCases[i].RunConfig.Default = false
+		testCases[i].RunConfig.Timeout = 0
+		testCases[i].RunConfig.AllowRedirects = false
+		testCases[i].RunConfig.Verify = false
+		testCases[i].RunConfig.SetupCaseID = nil
+		testCases[i].RunConfig.Environs = nil
+	}
 	return err, testCases, total
 }

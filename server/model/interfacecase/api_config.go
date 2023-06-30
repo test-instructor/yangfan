@@ -26,9 +26,9 @@ type ApiConfig struct {
 	AllowRedirects bool                `json:"allow_redirects,omitempty,omitempty" form:"allow_redirects" gorm:"column:allow_redirects;comment:;"`
 	Verify         bool                `json:"verify,omitempty" form:"verify" gorm:"column:verify;comment:;"`
 	Export         customType.TypeArgs `json:"export,omitempty" gorm:"column:export;comment:导出参数;"`
-	SetupCase      *ApiCaseStep        `json:"setup_case" `
+	SetupCase      *ApiCaseStep        `json:"setup_case,omitempty" `
 	SetupCaseID    *uint               `json:"setup_case_id,omitempty" form:"setup_case_id" gorm:"comment:前置用例"`
 	Environs       map[string]string   `json:"environs,omitempty" yaml:"environs,omitempty" gorm:"-"` // environment variables
-	CaseID         uint                `json:"case_id" gorm:"-"`
-	ReportID       uint                `json:"report_id" gorm:"-"`
+	CaseID         uint                `json:"case_id,omitempty" gorm:"-"`
+	ReportID       uint                `json:"report_id,omitempty" gorm:"-"`
 }

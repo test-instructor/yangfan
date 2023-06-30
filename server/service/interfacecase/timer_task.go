@@ -227,8 +227,8 @@ func (taskService *TimerTaskService) GetTimerTaskInfoList(info interfacecaseReq.
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := global.GVA_DB.Model(&interfacecase.ApiTimerTask{}).Preload("RunConfig").Preload("TestCase")
-	db2 := global.GVA_DB.Model(&interfacecase.ApiTimerTask{}).Preload("RunConfig").Preload("TestCase").Preload("Project")
+	db := global.GVA_DB.Model(&interfacecase.ApiTimerTask{}).Preload("RunConfig")
+	db2 := global.GVA_DB.Model(&interfacecase.ApiTimerTask{}).Preload("RunConfig").Preload("Project")
 	db.Preload("Project").Limit(limit).Offset(offset)
 
 	var tasks []interfacecase.ApiTimerTask
@@ -243,6 +243,23 @@ func (taskService *TimerTaskService) GetTimerTaskInfoList(info interfacecaseReq.
 		return
 	}
 	err = db.Find(&tasks, projectDB(db, info.ProjectID)).Error
+	for i := 0; i < len(tasks); i++ {
+		tasks[i].RunConfig.BaseUrl = ""
+		tasks[i].RunConfig.Variables = nil
+		tasks[i].RunConfig.Headers = nil
+		tasks[i].RunConfig.Parameters = nil
+		tasks[i].RunConfig.VariablesJson = nil
+		tasks[i].RunConfig.HeadersJson = nil
+		tasks[i].RunConfig.SetupCase = nil
+		tasks[i].RunConfig.Weight = 0
+		tasks[i].RunConfig.Default = false
+		tasks[i].RunConfig.Timeout = 0
+		tasks[i].RunConfig.AllowRedirects = false
+		tasks[i].RunConfig.Verify = false
+		tasks[i].RunConfig.SetupCaseID = nil
+		tasks[i].RunConfig.Environs = nil
+
+	}
 	return err, tasks, total
 }
 
