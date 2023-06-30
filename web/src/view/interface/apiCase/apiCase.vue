@@ -281,9 +281,7 @@ const formData = ref({
   describe: "",
   runNumber: 0,
   case: [],
-  runConfig: {
-    ID: 0,
-  },
+  RunConfigID: 0,
   front_case: false,
   api_env_id: 0,
 });
@@ -301,7 +299,7 @@ const closeRunTimeCron = (isClose) => {
 const configID = ref();
 const apiEnvID = ref();
 const configChange = (key) => {
-  formData.value.runConfig.ID = key;
+  formData.value.RunConfigID = key;
 };
 
 const envChange = (key) => {
@@ -500,7 +498,7 @@ const updateApiCaseFunc = async (row) => {
   type.value = "update";
   if (res.code === 0) {
     formData.value = res.data.retestCase;
-    configID.value = formData.value.runConfig.ID;
+    configID.value = formData.value.RunConfigID;
     dialogFormVisible.value = true;
     if (formData.value.api_env_id > 0) {
       apiEnvID.value = formData.value.api_env_id;
@@ -560,7 +558,7 @@ const enterDialog = async () => {
     });
     return;
   }
-  if (formData.value.runConfig.ID === 0) {
+  if (formData.value.RunConfigID === 0) {
     ElMessage({
       type: "error",
       message: "请选择运行配置",

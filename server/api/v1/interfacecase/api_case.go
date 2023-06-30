@@ -175,6 +175,15 @@ func (apiCase *ApiCaseApi) FindApiTestCase(c *gin.Context) {
 		for _, v := range resp {
 			var testcase apiTestCase
 			testcase.ID = v.ID
+			v.ApiCaseStep.CreatedBy = nil
+			v.ApiCaseStep.UpdateBy = nil
+			v.ApiCaseStep.DeleteBy = nil
+			v.ApiCaseStep.FrontCase = nil
+			v.ApiCaseStep.ProjectID = 0
+			v.ApiCaseStep.RunConfigID = 0
+			v.ApiCaseStep.ApiEnvID = 0
+			v.ApiCaseStep.RunConfigName = nil
+			v.ApiCaseStep.ApiEnvName = nil
 			testcase.Case = v.ApiCaseStep
 			reapicase.TestCase = append(reapicase.TestCase, testcase)
 		}
@@ -215,10 +224,9 @@ func (apiCase *ApiCaseApi) SetApisCase(c *gin.Context) {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
 // @Router /testCase/findApiCase [get]
 func (apiCase *ApiCaseApi) FindApiCase(c *gin.Context) {
-	var testCase interfacecase.ApiCase
+	var testCase request.ApiCaseIdReq
 	_ = c.ShouldBindQuery(&testCase)
-	testCase.ProjectID = utils.GetUserProject(c)
-	if err, retestCase := apiCaseService.GetApiCase(testCase.ID); err != nil {
+	if err, retestCase := apiCaseService.GetApiCase(testCase.ID, testCase.Detail); err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {

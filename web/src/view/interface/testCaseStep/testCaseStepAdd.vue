@@ -196,7 +196,7 @@ caseIds.menuIds = 47;
 const apiTypes = 1;
 
 const getTestCaseDetailFunc = async (testCaseID) => {
-  const res = await findTestCase({ ID: testCaseID });
+  const res = await findTestCase({ ID: testCaseID, detail: true });
   if (res.code === 0) {
     caseData.value = res.data.reapicase.TStep;
     // dialogFormVisible.value = true

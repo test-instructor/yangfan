@@ -23,8 +23,8 @@ type ApiCaseStep struct {
 	Operator
 	Name          string      `json:"name,omitempty" form:"name" gorm:"column:name;comment:步骤名称;"`
 	FrontCase     *bool       `json:"front_case,omitempty" form:"front_case" gorm:"comment:允许设置为前置用例;"`
-	TStep         []*ApiStep  `json:"TStep" form:"TStep" gorm:"many2many:ApiCaseStepRelationship;"`
-	ApiCase       []ApiCase   `json:"case" form:"case" gorm:"many2many:ApiCaseRelationship;"`
+	TStep         []*ApiStep  `json:"TStep,omitempty" form:"TStep" gorm:"many2many:ApiCaseStepRelationship;"`
+	ApiCase       []ApiCase   `json:"case,omitempty" form:"case" gorm:"many2many:ApiCaseRelationship;"`
 	RunConfigID   uint        `json:"RunConfigID,omitempty" form:"RunConfigID" gorm:"comment:运行配置;"`
 	RunConfigName *string     `json:"RunConfigName,omitempty" form:"RunConfigName" gorm:"comment:运行配置名称;"`
 	ApiMenu       ApiMenu     `json:"-"`

@@ -165,12 +165,8 @@ func (testCaseService *ApiCaseService) SetApisCase(id uint, caseIds []uint) (err
 
 // GetApiCase 根据id获取ApiCase记录
 
-func (testCaseService *ApiCaseService) GetApiCase(id uint) (err error, testCase interfacecase.ApiCase) {
-	err = global.GVA_DB.Preload("Project").
-		Preload("RunConfig").
-		Preload("ApiCaseStep").
-		Where("id = ?", id).
-		First(&testCase).Error
+func (testCaseService *ApiCaseService) GetApiCase(id uint, detail bool) (err error, testCase interfacecase.ApiCase) {
+	err = global.GVA_DB.Preload("Project").Where("id = ?", id).First(&testCase).Error
 	return
 }
 
