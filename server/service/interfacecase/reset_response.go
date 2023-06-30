@@ -120,3 +120,20 @@ func resetReportDetailData(data datatypes.JSON) (dataNew datatypes.JSON, err err
 
 	return
 }
+
+func resetRunConfig(config *interfacecase.ApiConfig) {
+	config.BaseUrl = ""
+	config.Variables = nil
+	config.Headers = nil
+	config.Parameters = nil
+	config.VariablesJson = nil
+	config.HeadersJson = nil
+	config.SetupCase = nil
+	config.Weight = 0
+	config.Default = false
+	config.Timeout = 0
+	config.AllowRedirects = false
+	config.Verify = false
+	config.SetupCaseID = nil
+	config.Environs = nil
+}

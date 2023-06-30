@@ -226,7 +226,7 @@ func (apiCase *ApiCaseApi) SetApisCase(c *gin.Context) {
 func (apiCase *ApiCaseApi) FindApiCase(c *gin.Context) {
 	var testCase request.ApiCaseIdReq
 	_ = c.ShouldBindQuery(&testCase)
-	if err, retestCase := apiCaseService.GetApiCase(testCase.ID, testCase.Detail); err != nil {
+	if err, retestCase := apiCaseService.GetApiCase(testCase.ID); err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {

@@ -244,21 +244,7 @@ func (taskService *TimerTaskService) GetTimerTaskInfoList(info interfacecaseReq.
 	}
 	err = db.Find(&tasks, projectDB(db, info.ProjectID)).Error
 	for i := 0; i < len(tasks); i++ {
-		tasks[i].RunConfig.BaseUrl = ""
-		tasks[i].RunConfig.Variables = nil
-		tasks[i].RunConfig.Headers = nil
-		tasks[i].RunConfig.Parameters = nil
-		tasks[i].RunConfig.VariablesJson = nil
-		tasks[i].RunConfig.HeadersJson = nil
-		tasks[i].RunConfig.SetupCase = nil
-		tasks[i].RunConfig.Weight = 0
-		tasks[i].RunConfig.Default = false
-		tasks[i].RunConfig.Timeout = 0
-		tasks[i].RunConfig.AllowRedirects = false
-		tasks[i].RunConfig.Verify = false
-		tasks[i].RunConfig.SetupCaseID = nil
-		tasks[i].RunConfig.Environs = nil
-
+		resetRunConfig(&tasks[i].RunConfig)
 	}
 	return err, tasks, total
 }

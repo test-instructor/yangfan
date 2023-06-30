@@ -165,7 +165,7 @@ func (testCaseService *ApiCaseService) SetApisCase(id uint, caseIds []uint) (err
 
 // GetApiCase 根据id获取ApiCase记录
 
-func (testCaseService *ApiCaseService) GetApiCase(id uint, detail bool) (err error, testCase interfacecase.ApiCase) {
+func (testCaseService *ApiCaseService) GetApiCase(id uint) (err error, testCase interfacecase.ApiCase) {
 	err = global.GVA_DB.Preload("Project").Where("id = ?", id).First(&testCase).Error
 	return
 }
@@ -196,20 +196,7 @@ func (testCaseService *ApiCaseService) GetApiCaseInfoList(info interfacecaseReq.
 	}
 	err = db.Preload("Project").Limit(limit).Offset(offset).Find(&testCases, projectDB(db, info.ProjectID)).Error
 	for i := 0; i < len(testCases); i++ {
-		testCases[i].RunConfig.BaseUrl = ""
-		testCases[i].RunConfig.Variables = nil
-		testCases[i].RunConfig.Headers = nil
-		testCases[i].RunConfig.Parameters = nil
-		testCases[i].RunConfig.VariablesJson = nil
-		testCases[i].RunConfig.HeadersJson = nil
-		testCases[i].RunConfig.SetupCase = nil
-		testCases[i].RunConfig.Weight = 0
-		testCases[i].RunConfig.Default = false
-		testCases[i].RunConfig.Timeout = 0
-		testCases[i].RunConfig.AllowRedirects = false
-		testCases[i].RunConfig.Verify = false
-		testCases[i].RunConfig.SetupCaseID = nil
-		testCases[i].RunConfig.Environs = nil
+		resetRunConfig(testCases[i].RunConfig)
 	}
 	return err, testCases, total
 }
