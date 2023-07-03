@@ -106,7 +106,7 @@ func (i *InterfaceTemplateService) GetInterfaceTemplateInfoList(info interfaceca
 
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.Name != "" {
-		db = db.Where("name LIKE ?", "%"+info.Name+"%")
+		db = db.Where("api_steps.name LIKE ?", "%"+info.Name+"%")
 	}
 
 	err = db.Count(&total).Error

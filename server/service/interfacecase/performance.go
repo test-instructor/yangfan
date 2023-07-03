@@ -32,11 +32,11 @@ func (testCaseService *PerformanceService) GetPerformanceList(info request.Perfo
 		db.Where("performances.name LIKE ?", "%"+info.Name+"%")
 		db2.Where("performances.name LIKE ?", "%"+info.Name+"%")
 	}
-	err = db2.Find(nil, projectDB(db2, info.ProjectID)).Count(&total).Error
+	err = db2.Find(nil, projectDB(info.ProjectID)).Count(&total).Error
 	if err != nil {
 		return
 	}
-	err = db.Limit(limit).Offset(offset).Find(&testCase, projectDB(db, info.ProjectID)).Error
+	err = db.Limit(limit).Offset(offset).Find(&testCase, projectDB(info.ProjectID)).Error
 	for i := 0; i < len(testCase); i++ {
 		resetRunConfig(testCase[i].RunConfig)
 	}

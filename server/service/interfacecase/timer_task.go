@@ -237,12 +237,12 @@ func (taskService *TimerTaskService) GetTimerTaskInfoList(info interfacecaseReq.
 		db = db.Where("name LIKE ?", "%"+info.Name+"%")
 		db2 = db2.Where("name LIKE ?", "%"+info.Name+"%")
 	}
-	db2.Find(nil, projectDB(db2, info.ProjectID))
+	db2.Find(nil, projectDB(info.ProjectID))
 	err = db2.Count(&total).Error
 	if err != nil {
 		return
 	}
-	err = db.Find(&tasks, projectDB(db, info.ProjectID)).Error
+	err = db.Find(&tasks, projectDB(info.ProjectID)).Error
 	for i := 0; i < len(tasks); i++ {
 		resetRunConfig(&tasks[i].RunConfig)
 	}
@@ -255,7 +255,7 @@ func (taskService *TimerTaskService) CreateTaskTag(taskTag interfacecase.ApiTime
 		return nil, err
 	}
 	db := global.GVA_DB.Model(&interfacecase.ApiTimerTaskTag{})
-	err = db.Find(&taskTags, projectDB(db, taskTag.ProjectID)).Error
+	err = db.Find(&taskTags, projectDB(taskTag.ProjectID)).Error
 	return
 }
 
@@ -272,7 +272,7 @@ func (taskService *TimerTaskService) GetTimerTaskTagInfoList(info interfacecaseR
 	if err != nil {
 		return
 	}
-	err = db.Find(&tasks, projectDB(db, info.ProjectID)).Error
+	err = db.Find(&tasks, projectDB(info.ProjectID)).Error
 	return err, tasks, total
 }
 

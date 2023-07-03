@@ -194,7 +194,7 @@ func (testCaseService *ApiCaseService) GetApiCaseInfoList(info interfacecaseReq.
 	if err != nil {
 		return
 	}
-	err = db.Preload("Project").Limit(limit).Offset(offset).Find(&testCases, projectDB(db, info.ProjectID)).Error
+	err = db.Preload("Project").Limit(limit).Offset(offset).Find(&testCases, projectDB(info.ProjectID)).Error
 	for i := 0; i < len(testCases); i++ {
 		resetRunConfig(testCases[i].RunConfig)
 	}

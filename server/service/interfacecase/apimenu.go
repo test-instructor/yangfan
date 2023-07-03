@@ -28,8 +28,8 @@ func (a *ApiMenuService) GetMenu(pid uint, menuType string, project uint) ([]*Tr
 	var menu []interfacecase.ApiMenu
 
 	db := global.GVA_DB.Model(&interfacecase.ApiMenu{})
-
-	db.Where("Parent = ?", pid).Where("menu_type = ?", menuType).Find(&menu, projectDB(db, project))
+	db.Scopes(projectDB(project))
+	db.Where("Parent = ?", pid).Where("menu_type = ?", menuType).Find(&menu)
 	var treeList []*TreeList
 	for _, v := range menu {
 		child, _ := a.GetMenu(v.ID, v.MenuType, project)
@@ -102,7 +102,7 @@ func (a *ApiMenuService) GetApiMenuInfoList(info interfacecaseReq.ApiMenuSearch)
 	if err != nil {
 		return
 	}
-	err = db.Preload("Project").Limit(limit).Offset(offset).Find(&apicases, projectDB(db, info.ProjectID)).Error
+	err = db.Preload("Project").Limit(limit).Offset(offset).Find(&apicases, projectDB(info.ProjectID)).Error
 	return err, apicases, total
 }
 

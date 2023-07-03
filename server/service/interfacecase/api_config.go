@@ -56,22 +56,22 @@ func (acService *ApiConfigService) GetApiConfigInfoList(info interfacecaseReq.Ap
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := global.GVA_DB.Model(&interfacecase.ApiConfig{})
-	db2 := global.GVA_DB.Model(&interfacecase.ApiConfig{})
+	db := global.GVA_DB.Model(&interfacecase.ApiConfig{}).Preload("SetupCase").Scopes(projectDB(info.ProjectID))
 	var acs []interfacecase.ApiConfig
-	// 如果有条件搜索 下方会自动创建搜索语句
+
+	// 构建查询条件
 	if info.Name != "" {
 		db = db.Where("api_configs.name LIKE ?", "%"+info.Name+"%")
-		db2 = db2.Where("api_configs.name LIKE ?", "%"+info.Name+"%")
 	}
-	err = db.Model(&interfacecase.ApiConfig{}).Preload("Project").Preload("SetupCase").Find(nil, projectDB(db, info.ProjectID)).Count(&total).Error
+
+	// 查询总数
+	err = db.Count(&total).Error
 	if err != nil {
 		return
 	}
-	err = db2.Model(&interfacecase.ApiConfig{}).
-		Preload("Project").Preload("SetupCase").
-		Limit(limit).Offset(offset).Find(&acs, projectDB(db2, info.ProjectID)).
-		Error
+
+	// 查询分页数据
+	err = db.Limit(limit).Offset(offset).Find(&acs).Error
 	for i := 0; i < len(acs); i++ {
 		acs[i].Variables = nil
 		acs[i].Headers = nil
