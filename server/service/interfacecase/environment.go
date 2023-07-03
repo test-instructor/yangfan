@@ -17,7 +17,8 @@ func (env *EnvironmentService) CreateEnv(environment interfacecase.ApiEnv) (envs
 		return nil, err
 	}
 	db := global.GVA_DB.Model(&interfacecase.ApiEnv{})
-	err = db.Find(&envs, projectDB(environment.ProjectID)).Error
+	db.Scopes(projectDB(environment.ProjectID))
+	err = db.Find(&envs).Error
 	return
 }
 func (env *EnvironmentService) DeleteEnv(environment interfacecase.ApiEnv) (err error) {
@@ -45,8 +46,9 @@ func (env *EnvironmentService) GetEnvList(info interfacecaseReq.EnvSearch) (err 
 	// 创建db
 	db := global.GVA_DB.Model(&interfacecase.ApiEnv{})
 	var envs []interfacecase.ApiEnv
+	db.Scopes(projectDB(info.ProjectID))
 	err = db.Model(&interfacecase.ApiEnv{}).
-		Find(&envs, projectDB(info.ProjectID)).
+		Find(&envs).
 		Error
 	return err, envs
 }

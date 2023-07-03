@@ -290,11 +290,13 @@ export default {
     },
     setNodeStatus() {
       this.$nextTick(() => {
-        let data = this.trees[0];
-        data = this.getDefaultTreeNode(data);
-        this.$refs.tree.setCurrentKey(data.id);
-        this.current_node_key = data.id;
-        this.handleClick(data);
+        if (this.trees && this.trees.length > 0) {
+          let data = this.trees[0];
+          data = this.getDefaultTreeNode(data);
+          this.$refs.tree.setCurrentKey(data.id);
+          this.current_node_key = data.id;
+          this.handleClick(data);
+        }
       });
     },
     remove(node, data) {

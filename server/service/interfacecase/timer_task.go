@@ -228,21 +228,18 @@ func (taskService *TimerTaskService) GetTimerTaskInfoList(info interfacecaseReq.
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
 	db := global.GVA_DB.Model(&interfacecase.ApiTimerTask{}).Preload("RunConfig")
-	db2 := global.GVA_DB.Model(&interfacecase.ApiTimerTask{}).Preload("RunConfig").Preload("Project")
-	db.Preload("Project").Limit(limit).Offset(offset)
 
 	var tasks []interfacecase.ApiTimerTask
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.Name != "" {
 		db = db.Where("name LIKE ?", "%"+info.Name+"%")
-		db2 = db2.Where("name LIKE ?", "%"+info.Name+"%")
 	}
-	db2.Find(nil, projectDB(info.ProjectID))
-	err = db2.Count(&total).Error
+	db.Scopes(projectDB(info.ProjectID))
+	err = db.Count(&total).Error
 	if err != nil {
 		return
 	}
-	err = db.Find(&tasks, projectDB(info.ProjectID)).Error
+	err = db.Limit(limit).Offset(offset).Find(&tasks).Error
 	for i := 0; i < len(tasks); i++ {
 		resetRunConfig(&tasks[i].RunConfig)
 	}
@@ -254,14 +251,14 @@ func (taskService *TimerTaskService) CreateTaskTag(taskTag interfacecase.ApiTime
 	if err != nil {
 		return nil, err
 	}
-	db := global.GVA_DB.Model(&interfacecase.ApiTimerTaskTag{})
-	err = db.Find(&taskTags, projectDB(taskTag.ProjectID)).Error
+	db := global.GVA_DB.Model(&interfacecase.ApiTimerTaskTag{}).Scopes(projectDB(taskTag.ProjectID))
+	err = db.Find(&taskTags).Error
 	return
 }
 
 func (taskService *TimerTaskService) GetTimerTaskTagInfoList(info interfacecaseReq.TimerTaskTagSearch) (err error, list interface{}, total int64) {
 	// 创建db
-	db := global.GVA_DB.Model(&interfacecase.ApiTimerTaskTag{})
+	db := global.GVA_DB.Model(&interfacecase.ApiTimerTaskTag{}).Scopes(projectDB(info.ProjectID))
 	db.Preload("Project")
 	var tasks []interfacecase.ApiTimerTaskTag
 	// 如果有条件搜索 下方会自动创建搜索语句
@@ -272,7 +269,7 @@ func (taskService *TimerTaskService) GetTimerTaskTagInfoList(info interfacecaseR
 	if err != nil {
 		return
 	}
-	err = db.Find(&tasks, projectDB(info.ProjectID)).Error
+	err = db.Find(&tasks).Error
 	return err, tasks, total
 }
 

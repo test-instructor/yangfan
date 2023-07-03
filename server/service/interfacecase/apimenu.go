@@ -96,13 +96,14 @@ func (a *ApiMenuService) GetApiMenuInfoList(info interfacecaseReq.ApiMenuSearch)
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
 	db := global.GVA_DB.Model(&interfacecase.ApiMenu{})
+	db.Scopes(projectDB(info.ProjectID))
 	var apicases []interfacecase.ApiMenu
 	// 如果有条件搜索 下方会自动创建搜索语句
 	err = db.Count(&total).Error
 	if err != nil {
 		return
 	}
-	err = db.Preload("Project").Limit(limit).Offset(offset).Find(&apicases, projectDB(info.ProjectID)).Error
+	err = db.Preload("Project").Limit(limit).Offset(offset).Find(&apicases).Error
 	return err, apicases, total
 }
 
