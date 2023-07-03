@@ -199,13 +199,16 @@ func (i *InterfaceTemplateService) CreateUserConfig(userConfig interfacecase.Api
 		}
 	}
 	userConfigOld.ApiConfigID = userConfig.ApiConfigID
+	userConfigOld.UserID = userConfig.UserID
 	userConfigOld.ApiEnvID = userConfig.ApiEnvID
+	userConfigOld.ProjectID = userConfig.ProjectID
 	err = global.GVA_DB.Where("id = ?", userConfig.ID).Save(&userConfigOld).Error
 	return err
 }
 
 func (i *InterfaceTemplateService) GetUserConfig(projectID uint, userID uint) (userConfig *interfacecase.ApiUserConfig, err error) {
 	err = global.GVA_DB.Model(interfacecase.ApiUserConfig{}).Preload("ApiConfig").Preload("ApiEnv").
-		Where("project_id = ? and user_id = ?", projectID, userID).First(&userConfig).Error
+		Scopes(projectDB(projectID)).
+		Where("user_id = ?", userID).First(&userConfig).Error
 	return
 }
