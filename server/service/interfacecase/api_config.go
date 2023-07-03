@@ -61,8 +61,8 @@ func (acService *ApiConfigService) GetApiConfigInfoList(info interfacecaseReq.Ap
 	var acs []interfacecase.ApiConfig
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.Name != "" {
-		db = db.Where("name LIKE ?", "%"+info.Name+"%")
-		db2 = db2.Where("name LIKE ?", "%"+info.Name+"%")
+		db = db.Where("api_configs.name LIKE ?", "%"+info.Name+"%")
+		db2 = db2.Where("api_configs.name LIKE ?", "%"+info.Name+"%")
 	}
 	err = db.Model(&interfacecase.ApiConfig{}).Preload("Project").Preload("SetupCase").Find(nil, projectDB(db, info.ProjectID)).Count(&total).Error
 	if err != nil {
