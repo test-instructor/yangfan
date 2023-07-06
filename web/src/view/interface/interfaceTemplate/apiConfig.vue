@@ -342,6 +342,7 @@ const closeDialog = () => {
     base_url: "",
     default: false,
   };
+  getTableData();
 };
 // 弹窗确定
 const enterDialog = async () => {

@@ -411,6 +411,7 @@ const getConfigData = async () => {
 // 弹窗关闭
 const closeDialog = () => {
   configID.value = "";
+  apiEnvID.value = "";
   dialogFormVisible.value = false;
 };
 

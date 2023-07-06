@@ -566,8 +566,6 @@ const runEnvId = ref("");
 const updateTimerTaskFunc = async (row) => {
   tagIds.value = [];
   const res = await findTimerTask({ ID: row.ID });
-  await getConfigData();
-  await getApiEnv();
   await getTagData();
   creatCron.value = true;
   // configID.value = configData.value.config.ID
@@ -576,9 +574,14 @@ const updateTimerTaskFunc = async (row) => {
     formData.value = res.data.retask;
     configID.value = formData.value.config.ID;
     dialogFormVisible.value = true;
-    res.data.retask.apiTimerTaskTag.forEach((item) => {
-      tagIds.value.push(item.ID);
-    });
+    if (
+      res.data.retask.apiTimerTaskTag &&
+      res.data.retask.apiTimerTaskTag.length > 0
+    ) {
+      res.data.retask.apiTimerTaskTag.forEach((item) => {
+        tagIds.value.push(item.ID);
+      });
+    }
     formData.value.apiTimerTaskTag = [];
     formData.value.tagIds = tagIds.value;
     if (formData.value.api_env_id > 0) {
@@ -608,7 +611,6 @@ const dialogFormVisible = ref(false);
 // 打开弹窗
 const openDialog = () => {
   getConfigData();
-  getApiEnv();
   getTagData();
   type.value = "create";
   creatCron.value = true;
@@ -654,6 +656,7 @@ const closeDialogTagRung = () => {
 // 关闭弹窗
 const closeDialog = () => {
   configID.value = "";
+  apiEnvID.value = "";
   dialogFormVisible.value = false;
   formData.value = {
     name: "",
@@ -667,6 +670,7 @@ const closeDialog = () => {
   };
   apiEnvID.value = "";
   creatCron.value = false;
+  tagIds.value = [];
 };
 // 弹窗确定
 const runDialog = async () => {

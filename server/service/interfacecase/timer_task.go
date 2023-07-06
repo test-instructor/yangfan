@@ -27,6 +27,10 @@ func (taskService *TimerTaskService) CreateTimerTask(task interfacecase.ApiTimer
 		}
 	}()
 	err = global.GVA_DB.Create(&task).Error
+	if err != nil {
+		return err
+	}
+	err = taskService.setTaskTag(task.TagIds, task.ID)
 	return err
 }
 

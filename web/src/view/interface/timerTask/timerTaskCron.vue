@@ -125,8 +125,8 @@ export default {
   },
   created() {
     this.initData();
-    let str = this.runTimeStr.split(" ");
-    if (str.length > 1) {
+    if (this.runTimeStr && this.runTimeStr.length > 1) {
+      let str = this.runTimeStr.split(" ");
       if (str[0] !== "*") {
         this.time = str[2] + ":" + str[1] + ":" + str[0];
       }

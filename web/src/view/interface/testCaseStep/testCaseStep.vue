@@ -477,6 +477,7 @@ const openDialog = () => {
 // 关闭弹窗
 const closeDialog = () => {
   configID.value = "";
+  apiEnvID.value = "";
   dialogFormVisible.value = false;
   formData.value = {
     name: "",
