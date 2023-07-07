@@ -580,6 +580,7 @@ func printf(format string, a ...interface{}) (n int, err error) {
 	return fmt.Fprintf(color.Output, format, a...)
 }
 
+// printResponse 打印响应数据
 func printResponse(resp *http.Response) error {
 	fmt.Println("==================== response ====================")
 	connectedVia := "plaintext"
@@ -607,6 +608,7 @@ func printResponse(resp *http.Response) error {
 	return nil
 }
 
+// decodeResponseBody 解析响应体
 func decodeResponseBody(resp *http.Response) (err error) {
 	switch resp.Header.Get("Content-Encoding") {
 	case "br":
@@ -646,6 +648,7 @@ func shouldPrintBody(contentType string) bool {
 }
 
 // NewStep returns a new constructed teststep with specified step name.
+// 创建一个新的测试步骤
 func NewStep(name string) *StepRequest {
 	return &StepRequest{
 		step: &TStep{
@@ -655,23 +658,27 @@ func NewStep(name string) *StepRequest {
 	}
 }
 
+// StepRequest 设置测试步骤类型
 type StepRequest struct {
 	step *TStep
 }
 
 // WithVariables sets variables for current teststep.
+// 设置当前测试步骤的变量
 func (s *StepRequest) WithVariables(variables map[string]interface{}) *StepRequest {
 	s.step.Variables = variables
 	return s
 }
 
 // SetupHook adds a setup hook for current teststep.
+// 设置当前测试步骤的setup hook
 func (s *StepRequest) SetupHook(hook string) *StepRequest {
 	s.step.SetupHooks = append(s.step.SetupHooks, hook)
 	return s
 }
 
 // HTTP2 enables HTTP/2 protocol
+// 设置当前测试步骤的HTTP2协议
 func (s *StepRequest) HTTP2() *StepRequest {
 	s.step.Request = &Request{
 		HTTP2: true,
@@ -680,12 +687,14 @@ func (s *StepRequest) HTTP2() *StepRequest {
 }
 
 // Loop specify running times for the current step
+// 设置当前测试步骤的循环时间
 func (s *StepRequest) Loop(times int) *StepRequest {
 	s.step.Loops = times
 	return s
 }
 
 // GET makes a HTTP GET request.
+// 设置当前测试步骤的请求方法为GET、设置url
 func (s *StepRequest) GET(url string) *StepRequestWithOptionalArgs {
 	if s.step.Request != nil {
 		s.step.Request.Method = httpGET
@@ -702,6 +711,7 @@ func (s *StepRequest) GET(url string) *StepRequestWithOptionalArgs {
 }
 
 // HEAD makes a HTTP HEAD request.
+// 设置当前测试步骤的请求方法为HEAD、设置url
 func (s *StepRequest) HEAD(url string) *StepRequestWithOptionalArgs {
 	if s.step.Request != nil {
 		s.step.Request.Method = httpHEAD
@@ -718,6 +728,7 @@ func (s *StepRequest) HEAD(url string) *StepRequestWithOptionalArgs {
 }
 
 // POST makes a HTTP POST request.
+// 设置当前测试步骤的请求方法为POST、设置url
 func (s *StepRequest) POST(url string) *StepRequestWithOptionalArgs {
 	if s.step.Request != nil {
 		s.step.Request.Method = httpPOST
@@ -734,6 +745,7 @@ func (s *StepRequest) POST(url string) *StepRequestWithOptionalArgs {
 }
 
 // PUT makes a HTTP PUT request.
+// 设置当前测试步骤的请求方法为PUT、设置url
 func (s *StepRequest) PUT(url string) *StepRequestWithOptionalArgs {
 	if s.step.Request != nil {
 		s.step.Request.Method = httpPUT
@@ -750,6 +762,7 @@ func (s *StepRequest) PUT(url string) *StepRequestWithOptionalArgs {
 }
 
 // DELETE makes a HTTP DELETE request.
+// 设置当前测试步骤的请求方法为DELETE、设置url
 func (s *StepRequest) DELETE(url string) *StepRequestWithOptionalArgs {
 	if s.step.Request != nil {
 		s.step.Request.Method = httpDELETE
@@ -766,6 +779,7 @@ func (s *StepRequest) DELETE(url string) *StepRequestWithOptionalArgs {
 }
 
 // OPTIONS makes a HTTP OPTIONS request.
+// 设置当前测试步骤的请求方法为OPTIONS、设置url
 func (s *StepRequest) OPTIONS(url string) *StepRequestWithOptionalArgs {
 	if s.step.Request != nil {
 		s.step.Request.Method = httpOPTIONS
@@ -782,6 +796,7 @@ func (s *StepRequest) OPTIONS(url string) *StepRequestWithOptionalArgs {
 }
 
 // PATCH makes a HTTP PATCH request.
+// 设置当前测试步骤的请求方法为PATCH、设置url
 func (s *StepRequest) PATCH(url string) *StepRequestWithOptionalArgs {
 	if s.step.Request != nil {
 		s.step.Request.Method = httpPATCH
