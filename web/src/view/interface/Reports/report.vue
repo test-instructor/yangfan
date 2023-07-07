@@ -5,6 +5,34 @@
         <el-form-item label="报告名称">
           <el-input v-model="searchInfo.name" placeholder="搜索条件" />
         </el-form-item>
+        <el-form-item label="用例类型">
+          <el-select
+            v-model="searchInfo.type"
+            placeholder="请选择用例类型"
+            clearable
+          >
+            <el-option
+              v-for="item in case_type"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="执行类型">
+          <el-select
+            v-model="searchInfo.runType"
+            placeholder="请选择执行类型"
+            clearable
+          >
+            <el-option
+              v-for="item in run_type"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button size="mini" type="primary" icon="search" @click="onSubmit"
             >查询</el-button
@@ -267,6 +295,23 @@ const caseType = (t) => {
   }
   return ["定时任务"];
 };
+
+const case_type = ref([
+  { value: 1, label: "api" },
+  { value: 2, label: "套件" },
+  { value: 3, label: "用例" },
+  { value: 4, label: "定时任务" },
+  { value: 5, label: "性能测试" },
+  { value: 7, label: "任务标签" },
+]);
+
+const run_type = ref([
+  { value: 1, label: "调试运行" },
+  { value: 2, label: "立即运行" },
+  { value: 3, label: "后台运行" },
+  { value: 4, label: "定时执行" },
+  { value: 5, label: "保存调试" },
+]);
 
 const runType = (t) => {
   if (t === 5) {
