@@ -4,6 +4,7 @@ use (
 	./docs/grpcdemo
 	./hrp
 	./master
+	./parsing
 	./proto
 	./run
 	./server

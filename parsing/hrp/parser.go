@@ -85,7 +85,7 @@ func convertString(raw interface{}) string {
 	return fmt.Sprintf("%v", raw)
 }
 
-// ParseString 将interface内容转换为string
+// ParseString 将interface(变量、函数)内容转换为string
 func (p *Parser) Parse(raw interface{}, variablesMapping map[string]interface{}) (interface{}, error) {
 	rawValue := reflect.ValueOf(raw)
 	switch rawValue.Kind() {

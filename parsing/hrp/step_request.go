@@ -310,6 +310,7 @@ func (r *requestBuilder) prepareBody(stepVariables map[string]interface{}) error
 	return nil
 }
 
+// prepareHeaders 设置content tpe
 func initUpload(step *TStep) {
 	if step.Request.Headers == nil {
 		step.Request.Headers = make(map[string]string)
@@ -318,6 +319,7 @@ func initUpload(step *TStep) {
 	step.Request.Body = "$m_encoder"
 }
 
+// prepareUpload 设置上传文件内容
 func prepareUpload(parser *Parser, step *TStep, stepVariables map[string]interface{}) (err error) {
 	if len(step.Request.Upload) == 0 {
 		return
@@ -335,6 +337,7 @@ func prepareUpload(parser *Parser, step *TStep, stepVariables map[string]interfa
 	return
 }
 
+// runStepRequest 执行请求
 func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err error) {
 	stepResult = &StepResult{
 		Name:        step.Name,
@@ -344,6 +347,7 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 	}
 
 	// merge step variables with session variables
+	// 合并step、运行和config变量
 	stepVariables, err := r.ParseStepVariables(step.Variables)
 	if err != nil {
 		err = errors.Wrap(err, "parse step variables failed")
@@ -352,23 +356,27 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 
 	defer func() {
 		// update testcase summary
+		// 更新测试报告的错误状态
 		if err != nil {
 			stepResult.Attachments = err.Error()
 		}
 	}()
-
+	// 如果请求体中包含上传文件，则设置上传文件内容
 	err = prepareUpload(r.caseRunner.parser, step, stepVariables)
 	if err != nil {
 		return
 	}
 
+	// 创建测试报告内容
 	sessionData := newSessionData()
 	parser := r.caseRunner.parser
 	config := r.caseRunner.parsedConfig
 
+	// 创建请求构建器
 	rb := newRequestBuilder(parser, config, step.Request)
 	rb.req.Method = strings.ToUpper(string(step.Request.Method))
 
+	// 将params、headers、body的函数、变量等解析为具体的值
 	err = rb.prepareUrlParams(stepVariables)
 	if err != nil {
 		return
@@ -385,23 +393,29 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 	}
 
 	// add request object to step variables, could be used in setup hooks
+	// 将请求对象添加到step变量中，hook中可以直接使用hrp_step_name、hrp_step_request、request 变量
 	stepVariables["hrp_step_name"] = step.Name
 	stepVariables["hrp_step_request"] = rb.requestMap
 	stepVariables["request"] = rb.requestMap
 
 	// deal with setup hooks
+	// 遍历setp hook并执行
 	for _, setupHook := range step.SetupHooks {
+		// 调用hook
 		req, err := parser.Parse(setupHook, stepVariables)
 		if err != nil {
 			return stepResult, errors.Wrap(err, "run setup hooks failed")
 		}
+		// 处理hook返回的结果
 		reqMap, ok := req.(map[string]interface{})
 		if ok && reqMap != nil {
 			rb.requestMap = reqMap
 			stepVariables["request"] = reqMap
 		}
 	}
+	// 将hook处理后的结果回写到请求对象中
 	if len(step.SetupHooks) > 0 {
+		// 更新body的内容
 		requestBody, ok := rb.requestMap["body"].(map[string]interface{})
 		if ok {
 			body, err := json.Marshal(requestBody)
@@ -410,6 +424,7 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 				rb.req.ContentLength = int64(len(body))
 			}
 		}
+		// 更新header的内容
 		headers, ok := rb.requestMap["headers"].(map[string]string)
 		rb.req.Header = map[string][]string{}
 		for key, value := range headers {
@@ -418,6 +433,7 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 	}
 
 	// log & print request
+	// 打印req内容
 	if r.caseRunner.hrpRunner.requestsLogOn {
 		if err := printRequest(rb.req); err != nil {
 			return stepResult, err
@@ -425,6 +441,7 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 	}
 
 	// stat HTTP request
+	// 统计http请求
 	var httpStat httpstat.Stat
 	if r.caseRunner.hrpRunner.httpStatOn {
 		ctx := httpstat.WithHTTPStat(rb.req, &httpStat)
@@ -432,6 +449,7 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 	}
 
 	// select HTTP client
+	// 设置http client版本
 	var client *http.Client
 	if step.Request.HTTP2 {
 		client = r.caseRunner.hrpRunner.http2Client
@@ -440,28 +458,34 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 	}
 
 	// set step timeout
+	// 设置超时时间
 	if step.Request.Timeout != 0 {
 		client.Timeout = time.Duration(step.Request.Timeout*1000) * time.Millisecond
 	}
 
 	// do request action
+	// 发起http请求
 	start := time.Now()
 	resp, err := client.Do(rb.req)
 	if err != nil {
 		return stepResult, errors.Wrap(err, "do request failed")
 	}
 	if resp != nil {
+		// 释放资源
 		defer resp.Body.Close()
 	}
 
 	// decode response body in br/gzip/deflate formats
+	// 解析响应体
 	err = decodeResponseBody(resp)
 	if err != nil {
 		return stepResult, errors.Wrap(err, "decode response body failed")
 	}
+	// 释放资源
 	defer resp.Body.Close()
 
 	// log & print response
+	// 打印响应体
 	if r.caseRunner.hrpRunner.requestsLogOn {
 		if err := printResponse(resp); err != nil {
 			return stepResult, err
@@ -469,51 +493,62 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 	}
 
 	// new response object
+	// 创建测试报告中的返回对象
 	respObj, err := newHttpResponseObject(r.caseRunner.hrpRunner.t, parser, resp)
 	if err != nil {
 		err = errors.Wrap(err, "init ResponseObject error")
 		return
 	}
-
+	// 统计请求消耗的时间
 	stepResult.Elapsed = time.Since(start).Milliseconds()
 	if r.caseRunner.hrpRunner.httpStatOn {
 		// resp.Body has been ReadAll
+		// 获取http请求的时间
 		httpStat.Finish()
 		stepResult.HttpStat = httpStat.Durations()
 		httpStat.Print()
 	}
 
 	// add response object to step variables, could be used in teardown hooks
+	// 将响应对象添加到step变量中，hrp_step_response、response 变量
 	stepVariables["hrp_step_response"] = respObj.respObjMeta
 	stepVariables["response"] = respObj.respObjMeta
 
 	// deal with teardown hooks
+	// 遍历teardown hook并执行
 	for _, teardownHook := range step.TeardownHooks {
+		// 调用hook
 		res, err := parser.Parse(teardownHook, stepVariables)
 		if err != nil {
 			return stepResult, errors.Wrap(err, "run teardown hooks failed")
 		}
+		// 处理hook返回的结果
 		resMpa, ok := res.(map[string]interface{})
 		if ok {
 			stepVariables["response"] = resMpa
 			respObj.respObjMeta = resMpa
 		}
 	}
-
+	// 将hook处理后的结果回写到响应对象中
 	sessionData.ReqResps.Request = rb.requestMap
 	sessionData.ReqResps.Response = builtin.FormatResponse(respObj.respObjMeta)
 
 	// extract variables from response
+	// 从响应体中提取变量
 	extractors := step.Extract
 	extractMapping := respObj.Extract(extractors, stepVariables)
 	stepResult.ExportVars = extractMapping
 
 	// override step variables with extracted variables
+	// 将提取的变量覆盖到step变量中
 	stepVariables = mergeVariables(stepVariables, extractMapping)
 
 	// validate response
+	// 断言
 	err = respObj.Validate(step.Validators, stepVariables)
+	// 设置测试报告中的断言结果
 	sessionData.Validators = respObj.validationResults
+	// 设置测试报告中的断言结果
 	if err == nil {
 		sessionData.Success = true
 		stepResult.Success = true
@@ -524,6 +559,7 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 	return stepResult, err
 }
 
+// printRequest 打印请求数据
 func printRequest(req *http.Request) error {
 	reqContentType := req.Header.Get("Content-Type")
 	printBody := shouldPrintBody(reqContentType)
