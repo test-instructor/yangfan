@@ -23,7 +23,13 @@ func (reportService *ReportService) GetReportList(info interfacecaseReq.ReportSe
 
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.Name != "" {
-		db = db.Where("name LIKE ?", "%"+info.Name+"%")
+		db.Where("name LIKE ?", "%"+info.Name+"%")
+	}
+	if info.ApiType > 0 {
+		db.Where("case_type = ?", info.ApiType)
+	}
+	if info.RunType > 0 {
+		db.Where("run_type = ?", info.RunType)
 	}
 	err = db.Count(&total).Error
 	if err != nil {

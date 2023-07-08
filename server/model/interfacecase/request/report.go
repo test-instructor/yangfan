@@ -9,6 +9,7 @@ type ReportSearch struct {
 	interfacecase.ApiReport
 	request.PageInfo
 	ApiType int `json:"type,omitempty" form:"type"`
+	RunType int `json:"runType,omitempty" form:"runType"`
 }
 
 type PReportSearch struct {
