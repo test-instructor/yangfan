@@ -17,6 +17,11 @@
 1. 新建数据库，并导入`docs/sql/yangfan.sql`文件
 2. 管理员账号`yangfan`,密码`123456`
 
+## shell 脚本一键安装
+```shell
+mkdir -p /home/yangfan && cd /home/yangfan
+bash -c "$(curl -fsSLk http://qiniu.yangfan.gd.cn/install/install.sh)"
+```
 
 ## 本地调试
 ### 后端

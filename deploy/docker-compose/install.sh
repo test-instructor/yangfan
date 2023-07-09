@@ -111,8 +111,10 @@ else
         info "发现 docker-compose 组件: '`command -v docker-compose`'"
     fi
 fi
-
+current_dir=$(pwd)
+env_file="${current_dir}/.env"
 while true; do
+
     if [ -e ".env" ]; then
         echo ".env 文件存在"
 
@@ -122,7 +124,8 @@ while true; do
         # 判断 YANGFAN_DIR 变量是否存在并非空
         if [ -n "$YANGFAN_DIR" ]; then
             info "YANGFAN_DIR 存在并已设置为: $YANGFAN_DIR"
-            yangfan_path="$YANGFAN_DIR"
+            yangfan_path=$YANGFAN_DIR
+            info "安装目录确认完成: '$yangfan_path'"
         else
             echo -e -n "\033[34m[扬帆测试平台] 安装目录 (留空则为 '$yangfan_path'): \033[0m"
             read input_path
@@ -132,6 +135,7 @@ while true; do
                 warning "'$input_path' 不是合法的绝对路径"
                 continue
             fi
+            yangfan_path=$input_path
         fi
     else
         echo -e -n "\033[34m[扬帆测试平台] 安装目录 (留空则为 '$yangfan_path'): \033[0m"
@@ -142,16 +146,15 @@ while true; do
             warning "'$input_path' 不是合法的绝对路径"
             continue
         fi
+        yangfan_path=$input_path
     fi
-
-
-    yangfan_path=$input_path
 
     if confirm "目录 '$yangfan_path' 当前剩余存储空间为 `space_left \"$yangfan_path\"` , 至少需要 5G, 是否确定"; then
         break
     fi
 done
 
+info "再次确认安装目录确认完成: '$yangfan_path'"
 mkdir -p "$yangfan_path"
 if [ $? -ne "0" ]; then
     abort "创建安装目录 '$yangfan_path' 失败"
@@ -261,13 +264,13 @@ else
     info "下载 yangfan-for-node-status.json 文件成功"
 fi
 
-touch ".env"
+touch "$env_file"
 if [ $? -ne "0" ]; then
     abort "创建 .env 脚本失败"
 fi
 info "创建 .env 脚本成功"
 
-echo "YANGFAN_DIR=$yangfan_path" >> .env
+echo "YANGFAN_DIR=$yangfan_path" > "$env_file"
 
 
 info "即将开始下载 Docker 镜像"
