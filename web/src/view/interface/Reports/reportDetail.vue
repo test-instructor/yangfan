@@ -551,8 +551,16 @@ const shouStep = (data) => {
   return data.length > 0;
 };
 
-const openDrawer = (row) => {
-  row = reportDataDetail.get(row.ID);
+const openDrawer = async (row) => {
+  let row_id = row.ID;
+  row = reportDataDetail.get(row_id);
+  if (!row) {
+    let res = await getReportDetail({ ID: row_id });
+    if (res.code === 0) {
+      row = res.data.data;
+    }
+  }
+  console.log("row:::", row);
   if (row.data) {
     requestTimeShow.value = row.data.req_resps.response.proto !== "gRPC";
     drawer.value = true;

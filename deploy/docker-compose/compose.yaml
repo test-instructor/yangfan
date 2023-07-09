@@ -27,7 +27,7 @@ services:
 
 
   yangfan-server:
-    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/server:latest
+    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/server:${ENV_TAG}
     depends_on:
       - yangfan-mysql
     container_name: yangfan-server
@@ -42,7 +42,7 @@ services:
       - '7967:7967'
 
   yangfan-web:
-    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/web:latest
+    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/web:${ENV_TAG}
     depends_on:
       - yangfan-server
     container_name: yangfan-web
@@ -109,7 +109,7 @@ services:
         ipv4_address: 177.8.0.7
 
   yangfan-master:
-    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/master:latest
+    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/master:${ENV_TAG}
     depends_on:
       - yangfan-mysql
     container_name: yangfan-master
@@ -125,7 +125,7 @@ services:
         ipv4_address: 177.8.0.8
 
   yangfan-work:
-    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/work:latest
+    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/work:${ENV_TAG}
     depends_on:
       - yangfan-mysql
     container_name: yangfan-work
@@ -137,7 +137,7 @@ services:
         ipv4_address: 177.8.0.9
 
   yangfan-run:
-    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/run:latest
+    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/run:${ENV_TAG}
     depends_on:
       - yangfan-mysql
     container_name: yangfan-run
@@ -149,7 +149,7 @@ services:
         ipv4_address: 177.8.0.10
 
   yangfan-timer:
-    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/timer:latest
+    image: registry.cn-hangzhou.aliyuncs.com/yangfanz/timer:${ENV_TAG}
     depends_on:
       - yangfan-mysql
     container_name: yangfan-timer
