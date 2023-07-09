@@ -50,7 +50,7 @@ onexit() {
 
 
 yangfan_path='/data/yangfan'
-ENV_TAG='v1.3.0'
+ENV_TAG='v1.3.1'
 export ENV_TAG
 
 if [ -z "$BASH" ]; then
