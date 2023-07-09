@@ -28,6 +28,7 @@ bash -c "$(curl -fsSLk http://qiniu.yangfan.gd.cn/install/install.sh)"
 > 2. 如需修改配置请到安装目录下修改`./config/docker.config.yaml`文件
 > 3. `./config/docker.config.yaml`中的`grafana-host`需要手动修改为`http://IP:3000`，否则无法访问grafana
 > 4. `./config/docker.config.yaml`中的`fs`需要手动修改为飞书登录相关配置，否则无法登录
+> 5. 修改配置后重新执行安装脚本即可
 
 ## 本地调试
 ### 后端
