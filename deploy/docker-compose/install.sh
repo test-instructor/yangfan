@@ -50,6 +50,8 @@ onexit() {
 
 
 yangfan_path='/data/yangfan'
+ENV_TAG='v1.3.0'
+export ENV_TAG
 
 if [ -z "$BASH" ]; then
     abort "请用 bash 执行本脚本"
@@ -171,7 +173,7 @@ mkdir -p ./data/grafana/provisioning/yangfan-json
 
 
 # 下载 compose.yaml 脚本
-wget "http://qiniu.yangfan.gd.cn/install/compose.yaml" --no-check-certificate -O compose.yaml
+wget "http://docs.yangfan.gd.cn/install/compose.yaml" --no-check-certificate -O compose.yaml
 if [ $? -ne "0" ]; then
     abort "下载 compose.yaml 脚本失败"
 else
@@ -181,7 +183,7 @@ fi
 # 下载 docker.config.yaml 文件
 config_file="./config/docker.config.yaml"
 if [ ! -f "$config_file" ]; then
-    wget "http://qiniu.yangfan.gd.cn/install/docker.config.yaml" --no-check-certificate -O "$config_file"
+    wget "http://docs.yangfan.gd.cn/install/docker.config.yaml" --no-check-certificate -O "$config_file"
 
     if [ $? -ne 0 ]; then
         abort "下载 docker.config.yaml 文件失败"
@@ -197,7 +199,7 @@ fi
 config_file="./config/my.conf"
 
 if [ ! -f "$config_file" ]; then
-    wget "http://qiniu.yangfan.gd.cn/install/my.conf" --no-check-certificate -O "$config_file"
+    wget "http://docs.yangfan.gd.cn/install/my.conf" --no-check-certificate -O "$config_file"
     if [ $? -ne 0 ]; then
         abort "下载 my.conf 文件失败"
     else
@@ -209,7 +211,7 @@ fi
 
 
 # 下载 prometheus.yml 文件
-wget "http://qiniu.yangfan.gd.cn/install/prometheus.yml" --no-check-certificate -O ./config/prometheus.yml
+wget "http://docs.yangfan.gd.cn/install/prometheus.yml" --no-check-certificate -O ./config/prometheus.yml
 if [ $? -ne "0" ]; then
     abort "下载 prometheus.yml 文件失败"
 else
@@ -217,7 +219,7 @@ else
 fi
 
 # 下载 yangfan.sql 文件
-wget "http://qiniu.yangfan.gd.cn/install/yangfan.sql" --no-check-certificate -O ./mysql/yangfan.sql
+wget "http://docs.yangfan.gd.cn/install/yangfan.sql" --no-check-certificate -O ./mysql/yangfan.sql
 if [ $? -ne "0" ]; then
     abort "下载 yangfan.sql 文件失败"
 else
@@ -225,7 +227,7 @@ else
 fi
 
 # 下载 grafana.ini 文件
-wget "http://qiniu.yangfan.gd.cn/install/grafana.ini" --no-check-certificate -O ./data/grafana/provisioning/grafana.ini
+wget "http://docs.yangfan.gd.cn/install/grafana.ini" --no-check-certificate -O ./data/grafana/provisioning/grafana.ini
 if [ $? -ne "0" ]; then
     abort "下载 grafana.ini 文件失败"
 else
@@ -233,7 +235,7 @@ else
 fi
 
 # 下载 yangfan.grafana.dashboard.yaml 文件
-wget "http://qiniu.yangfan.gd.cn/install/yangfan.grafana.dashboard.yaml" --no-check-certificate -O ./data/grafana/provisioning/dashboards/yangfan.grafana.dashboard.yaml
+wget "http://docs.yangfan.gd.cn/install/yangfan.grafana.dashboard.yaml" --no-check-certificate -O ./data/grafana/provisioning/dashboards/yangfan.grafana.dashboard.yaml
 if [ $? -ne "0" ]; then
     abort "下载 yangfan.grafana.dashboard.yaml 文件失败"
 else
@@ -241,7 +243,7 @@ else
 fi
 
 # 下载 yangfan.grafana.prometheus.yaml 文件
-wget "http://qiniu.yangfan.gd.cn/install/yangfan.grafana.prometheus.yaml" --no-check-certificate -O ./data/grafana/provisioning/datasources/yangfan.grafana.prometheus.yaml
+wget "http://docs.yangfan.gd.cn/install/yangfan.grafana.prometheus.yaml" --no-check-certificate -O ./data/grafana/provisioning/datasources/yangfan.grafana.prometheus.yaml
 if [ $? -ne "0" ]; then
     abort "下载 yangfan.grafana.prometheus.yaml 文件失败"
 else
@@ -249,7 +251,7 @@ else
 fi
 
 # 下载 yangfan-for-distributed-load-testing.json 文件
-wget "http://qiniu.yangfan.gd.cn/install/yangfan-for-distributed-load-testing.json" --no-check-certificate -O ./data/grafana/provisioning/yangfan-json/yangfan-for-distributed-load-testing.json
+wget "http://docs.yangfan.gd.cn/install/yangfan-for-distributed-load-testing.json" --no-check-certificate -O ./data/grafana/provisioning/yangfan-json/yangfan-for-distributed-load-testing.json
 if [ $? -ne "0" ]; then
     abort "下载 yangfan-for-distributed-load-testing.json 文件失败"
 else
@@ -257,7 +259,7 @@ else
 fi
 
 # 下载 yangfan-for-node-status.json 文件
-wget "http://qiniu.yangfan.gd.cn/install/yangfan-for-node-status.json" --no-check-certificate -O ./data/grafana/provisioning/yangfan-json/yangfan-for-node-status.json
+wget "http://docs.yangfan.gd.cn/install/yangfan-for-node-status.json" --no-check-certificate -O ./data/grafana/provisioning/yangfan-json/yangfan-for-node-status.json
 if [ $? -ne "0" ]; then
     abort "下载 yangfan-for-node-status.json 文件失败"
 else
@@ -271,6 +273,7 @@ fi
 info "创建 .env 脚本成功"
 
 echo "YANGFAN_DIR=$yangfan_path" > "$env_file"
+echo "YANGFAN_TAG=$ENV_TAG" > "$env_file"
 
 
 info "即将开始下载 Docker 镜像"
@@ -286,5 +289,6 @@ if [ $? -ne "0" ]; then
     abort "启动 Docker 容器失败"
 fi
 
+info "当前安装版本：$ENV_TAG"
 
 

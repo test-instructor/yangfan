@@ -22,7 +22,7 @@
 # 进入目录
 mkdir -p /home/yangfan && cd /home/yangfan
 # 执行安装
-bash -c "$(curl -fsSLk http://qiniu.yangfan.gd.cn/install/install.sh)"
+bash -c "$(curl -fsSLk http://docs.yangfan.gd.cn/install/install.sh)"
 ```
 > 1. 脚本默认安装在/data/yangfan目录下
 > 2. 如需修改配置请到安装目录下修改`./config/docker.config.yaml`文件
