@@ -273,7 +273,7 @@ fi
 info "创建 .env 脚本成功"
 
 echo "YANGFAN_DIR=$yangfan_path" > "$env_file"
-echo "YANGFAN_TAG=$ENV_TAG" > "$env_file"
+echo "YANGFAN_TAG=$ENV_TAG" >> "$env_file"
 
 
 info "即将开始下载 Docker 镜像"
