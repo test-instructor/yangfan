@@ -16,11 +16,11 @@
           </template>
           <div style="display: flex">
             <img
-              src="http://qiniu.yangfan.gd.cn/about/author.jpeg"
+              :src="`http://qiniu.yangfan.gd.cn/about/author.jpeg?time=${timestamp}`"
               alt="Author Image"
             />
             <img
-              src="http://qiniu.yangfan.gd.cn/about/group.jpeg"
+              :src="`http://qiniu.yangfan.gd.cn/about/group.jpeg?time=${timestamp}`"
               alt="Group Image"
             />
           </div>
@@ -71,6 +71,8 @@ const loadMore = () => {
   page.value++;
   loadCommits();
 };
+
+const timestamp = Date.now();
 
 const dataTimeline = ref([]);
 const loadCommits = () => {
