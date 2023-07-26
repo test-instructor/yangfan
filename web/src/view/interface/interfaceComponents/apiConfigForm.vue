@@ -32,7 +32,7 @@
       <div
         style="width: 150px; margin-top: 5px; display: table; margin-left: 20px"
       >
-        <el-button @click="openEnvCopy">查看环境变量</el-button>
+        <env-copy></env-copy>
       </div>
     </div>
     <div style="width: 1000px; margin-top: 10px; display: flex">
@@ -93,16 +93,6 @@
     <el-button type="primary" @click="saves">保存</el-button>
     <el-button type="info" @click="closeDialog">取消</el-button>
   </div>
-  <el-dialog
-    title="查看环境变量"
-    :visible.sync="dialogVisible"
-    v-model="dialogVisible"
-    v-if="dialogVisible"
-    width="30%"
-    :before-close="closeEnvCopy"
-  >
-    <env-copy></env-copy>
-  </el-dialog>
 </template>
 
 <script>
@@ -130,7 +120,6 @@ import { ElMessage } from "element-plus";
 import { ref, reactive } from "vue";
 import { getApiCaseList } from "@/api/apiCase";
 import EnvCopy from "@/view/interface/interfaceComponents/envCopy.vue";
-const dialogVisible = ref(false);
 const emit = defineEmits(["close"]);
 const route = useRoute();
 const router = useRouter();
@@ -159,14 +148,6 @@ const props = defineProps({
     default: false,
   }),
 });
-
-const openEnvCopy = () => {
-  dialogVisible.value = true;
-};
-
-const closeEnvCopy = () => {
-  dialogVisible.value = false;
-};
 
 const heightDiv = ref(false);
 const eventType = ref("");
