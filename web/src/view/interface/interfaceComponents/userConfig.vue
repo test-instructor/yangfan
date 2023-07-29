@@ -13,6 +13,9 @@
         {{ userConfig.api_env.name }}
       </el-tag>
     </el-form-item>
+    <el-form-item>
+      <env-copy></env-copy>
+    </el-form-item>
   </el-form>
 </template>
 
@@ -25,6 +28,7 @@ export default {
 <script setup>
 import { ref } from "vue";
 import { getUserConfig } from "@/api/interfaceTemplate";
+import EnvCopy from "@/view/interface/interfaceComponents/envCopy.vue";
 
 const props = defineProps({
   api_config_name: "",
