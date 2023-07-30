@@ -158,7 +158,7 @@ func (userService *UserService) SetUserAuthorities(id uint, authorityIds []uint)
 	})
 }
 
-func (userService *UserService) SetUserProjects(id uint, projectIds []string) (err error) {
+func (userService *UserService) SetUserProjects(id uint, projectIds []uint) (err error) {
 	return global.GVA_DB.Transaction(func(tx *gorm.DB) error {
 		TxErr := tx.Delete(&[]system.SysUseProject{}, "sys_user_id = ?", id).Error
 		if TxErr != nil {
@@ -167,7 +167,7 @@ func (userService *UserService) SetUserProjects(id uint, projectIds []string) (e
 		useProject := []system.SysUseProject{}
 		for _, v := range projectIds {
 			useProject = append(useProject, system.SysUseProject{
-				id, v,
+				SysUserId: id, ProjectId: v,
 			})
 		}
 		TxErr = tx.Create(&useProject).Error

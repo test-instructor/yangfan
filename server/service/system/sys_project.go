@@ -127,10 +127,9 @@ func (projectService *ProjectService) SetUserProjectAuth(sup system.SysUseProjec
 		First(&sysUseProject).Error; err != nil {
 		return err
 	}
-	sysUseProject.Read = sup.Read
+	sysUseProject.Select = sup.Select
 	sysUseProject.Delete = sup.Delete
-	sysUseProject.Update = sup.Update
-	sysUseProject.Create = sup.Create
+	sysUseProject.Save = sup.Save
 	err = global.GVA_DB.Model(&system.SysUseProject{}).Save(&sysUseProject).Error
 	return err
 }
