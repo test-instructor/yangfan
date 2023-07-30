@@ -52,7 +52,7 @@ func RegisterTables(db *gorm.DB) {
 		example.ExaFileUploadAndDownload{},
 
 		// 接口测试模块
-		system.SysUseProject{},
+		system.SysUserProject{},
 		system.Project{},
 		interfacecase.ApiMenu{},
 		interfacecase.ApiStepThinkTime{},

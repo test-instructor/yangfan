@@ -97,7 +97,7 @@ func (projectApi *ProjectApi) UpdateProject(c *gin.Context) {
 }
 
 func (projectApi *ProjectApi) SetUserProjectAuth(c *gin.Context) {
-	var sua system.SysUseProject
+	var sua system.SysUserProject
 	_ = c.ShouldBindJSON(&sua)
 	if err := projectService.SetUserProjectAuth(sua); err != nil {
 		global.GVA_LOG.Error("修改失败!", zap.Error(err))

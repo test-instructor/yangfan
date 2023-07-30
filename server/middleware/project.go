@@ -14,11 +14,11 @@ import (
 func ProjectHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userID := utils.GetUserID(c)
-		var userProject system.SysUseProject
+		var userProject system.SysUserProject
 		project := utils.GetUserProject(c)
 		db := global.GVA_DB
 		db.Where("sys_user_id =?", userID).Where("project_id =?", project).Find(&userProject)
-		if userProject.SysUserId == 0 {
+		if userProject.SysUserID == 0 {
 			response.FailWithDetailed(gin.H{}, "项目权限不足", c)
 			c.Abort()
 			return

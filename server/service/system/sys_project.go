@@ -120,17 +120,17 @@ func (projectService *ProjectService) UpdateProject(project system.Project) (err
 	return err
 }
 
-func (projectService *ProjectService) SetUserProjectAuth(sup system.SysUseProject) (err error) {
-	var sysUseProject system.SysUseProject
-	if err := global.GVA_DB.Model(&system.SysUseProject{}).
-		Where("sys_user_id = ? AND project_id = ?", sup.SysUserId, sup.ProjectId).
+func (projectService *ProjectService) SetUserProjectAuth(sup system.SysUserProject) (err error) {
+	var sysUseProject system.SysUserProject
+	if err := global.GVA_DB.Model(&system.SysUserProject{}).
+		Where("sys_user_id = ? AND project_id = ?", sup.SysUserID, sup.ProjectID).
 		First(&sysUseProject).Error; err != nil {
 		return err
 	}
 	sysUseProject.Select = sup.Select
 	sysUseProject.Delete = sup.Delete
 	sysUseProject.Save = sup.Save
-	err = global.GVA_DB.Model(&system.SysUseProject{}).Save(&sysUseProject).Error
+	err = global.GVA_DB.Model(&system.SysUserProject{}).Save(&sysUseProject).Error
 	return err
 }
 
@@ -158,15 +158,26 @@ func (projectService *ProjectService) GetProjectInfoList(info interfacecaseReq.P
 	return err, projects, total
 }
 
-func (projectService *ProjectService) GetProjectUserList(info interfacecaseReq.SysProjectUsers) (list []system.SysUseProject, total int64, err error) {
+func (projectService *ProjectService) GetProjectUserList(info interfacecaseReq.SysProjectUsers) (list []system.SysUserProject, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
-	db := global.GVA_DB.Model(&system.SysUseProject{}).Where("project_id = ?", info.ProjectId).Preload("SysUser")
-	var users []system.SysUseProject
+	db := global.GVA_DB.Model(&system.SysUserProject{}).Preload("SysUser").
+		Joins("RIGHT JOIN sys_users ON sys_user_project.sys_user_id = sys_users.id").
+		Where("project_id = ? AND sys_user_id != 0", info.ProjectId)
+
+	var users []system.SysUserProject
 	err = db.Count(&total).Error
 	if err != nil {
 		return nil, total, err
 	}
 	err = db.Limit(limit).Offset(offset).Find(&users).Error
+	projectService.ResetProjectUserAuthList(users)
 	return users, total, err
+}
+
+func (projectService *ProjectService) ResetProjectUserAuthList(list []system.SysUserProject) {
+	for i := 0; i < len(list); i++ {
+		list[i].Username = list[i].SysUser.Username
+		list[i].SysUser = nil
+	}
 }
