@@ -20,9 +20,11 @@ func (s *ProjectRouter) InitProjectRouter(Router *gin.RouterGroup) {
 		projectRouter.DELETE("deleteProject", projectApi.DeleteProject)           // 删除Project
 		projectRouter.DELETE("deleteProjectByIds", projectApi.DeleteProjectByIds) // 批量删除Project
 		projectRouter.PUT("updateProject", projectApi.UpdateProject)              // 更新Project
+		projectRouter.POST("setUserProjectAuth", projectApi.SetUserProjectAuth)   // 设置用户项目权限
 	}
 	{
-		projectRouterWithoutRecord.GET("findProject", projectApi.FindProject)       // 根据ID获取Project
-		projectRouterWithoutRecord.GET("getProjectList", projectApi.GetProjectList) // 获取Project列表
+		projectRouterWithoutRecord.GET("findProject", projectApi.FindProject)               // 根据ID获取Project
+		projectRouterWithoutRecord.GET("getProjectList", projectApi.GetProjectList)         // 获取Project列表
+		projectRouterWithoutRecord.GET("getProjectUserList", projectApi.GetProjectUserList) // 获取项目用户列表
 	}
 }
