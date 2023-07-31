@@ -25,13 +25,34 @@
       </el-form>
     </div>
     <div class="gva-table-box">
-      <el-table> </el-table>
+      <el-table
+        ref="multipleTable"
+        :data="tableData"
+        row-key="SysUserID"
+        style="width: 100%"
+        tooltip-effect="dark"
+      >
+        <el-table-column label="项目成员" width="300">
+          <template #default="scope">
+            <span>{{ scope.row.username }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="权限" width="300">
+          <template #default="scope">
+            <el-checkbox-group>
+              <el-checkbox label="select">查询</el-checkbox>
+              <el-checkbox label="save">新增/修改</el-checkbox>
+              <el-checkbox label="delete">删除</el-checkbox>
+            </el-checkbox-group>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { getProjectUserList, setUserProjectAuth } from "@/api/project";
 
 // =========== 表格控制部分 ===========
@@ -40,6 +61,15 @@ const total = ref(0);
 const pageSize = ref(10);
 const tableData = ref([]);
 const searchInfo = ref({});
+const checkboxGroup = ref([]);
+
+const checkboxGroupFunc = (row) => {
+  return checkboxGroup.value;
+};
+
+const checkboxValue = (row, key) => {
+  return row[key];
+};
 
 // 重置
 const onReset = () => {
@@ -67,6 +97,8 @@ const getTableData = async () => {
     page.value = table.data.page;
     pageSize.value = table.data.pageSize;
   }
+  console.log("tableData.value", tableData.value);
+  console.log("table.data.list", table.data.list);
 };
 getTableData();
 </script>
