@@ -68,6 +68,17 @@ func (userService *UserService) Login(u *system.SysUser) (userInter *system.SysU
 			user.Authority.DefaultRouter = "404"
 		}
 	}
+	var sup []system.SysUserProject
+	var projects []system.Project
+	err = global.GVA_DB.Model(&system.SysUserProject{}).Preload("Project").Where("sys_user_id = ?", user.ID).Find(&sup).Error
+	if err != nil {
+		return nil, err
+	}
+
+	for _, s := range sup {
+		projects = append(projects, *s.Project)
+	}
+	user.Projects = projects
 
 	return &user, err
 }
@@ -217,6 +228,15 @@ func (userService *UserService) GetUserInfo(uuid uuid.UUID) (user system.SysUser
 	if err != nil {
 		return reqUser, err
 	}
+
+	var sup []system.SysUserProject
+	var projects []system.Project
+	global.GVA_DB.Model(&system.SysUserProject{}).Preload("Project").Where("sys_user_id = ?", reqUser.ID).Find(&sup)
+
+	for _, s := range sup {
+		projects = append(projects, *s.Project)
+	}
+	reqUser.Projects = projects
 
 	var SysAuthorityMenus []system.SysAuthorityMenu
 	err = global.GVA_DB.Where("sys_authority_authority_id = ?", reqUser.AuthorityId).Find(&SysAuthorityMenus).Error
