@@ -12,8 +12,9 @@ import (
 
 func LoadTestCases(iTestCases ...ITestCase) ([]*TestCase, error) {
 	testCases := make([]*TestCase, 0)
-
+	// 遍历传入的ITestCase接口切片，处理每个测试用例。
 	for _, iTestCase := range iTestCases {
+		// 如果当前ITestCase是*TestCase类型，则直接转换为TestCase并添加到testCases切片中
 		if _, ok := iTestCase.(*TestCase); ok {
 			testcase, err := iTestCase.ToTestCase()
 			if err != nil {
@@ -24,32 +25,33 @@ func LoadTestCases(iTestCases ...ITestCase) ([]*TestCase, error) {
 			continue
 		}
 
-		// iTestCase should be a TestCasePath, file path or folder path
+		// 否则，iTestCase应该是一个TestCasePath，表示文件路径或文件夹路径
 		tcPath, ok := iTestCase.(*TestCasePath)
 		if !ok {
 			return nil, errors.New("invalid iTestCase type")
 		}
-
+		// 获取测试用例路径
 		casePath := tcPath.GetPath()
+		// 使用fs.WalkDir函数遍历目录结构，处理每个测试用例文件
 		err := fs.WalkDir(os.DirFS(casePath), ".", func(path string, dir fs.DirEntry, e error) error {
 			if dir == nil {
-				// casePath is a file other than a dir
+				// casePath是文件而不是目录
 				path = casePath
 			} else if dir.IsDir() && path != "." && strings.HasPrefix(path, ".") {
-				// skip hidden folders
+				// 跳过隐藏文件夹
 				return fs.SkipDir
 			} else {
-				// casePath is a dir
+				// casePath是目录
 				path = filepath.Join(casePath, path)
 			}
 
-			// ignore non-testcase files
+			// 忽略非测试用例文件
 			ext := filepath.Ext(path)
 			if ext != ".yml" && ext != ".yaml" && ext != ".json" {
 				return nil
 			}
 
-			// filtered testcases
+			// 获取TestCasePath并转换为TestCase结构，然后添加到testCases切片中
 			testCasePath := TestCasePath(path)
 			tc, err := testCasePath.ToTestCase()
 			if err != nil {

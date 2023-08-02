@@ -94,7 +94,7 @@ func (path *TestCasePath) ToTestCase() (*TestCase, error) {
 	tc := &TCase{}
 	// 获取 TestCasePath 的路径
 	casePath := path.GetPath()
-	// 使用内置的 LoadFile 函数从文件中加载内容到 tc
+	// 使用内置的 LoadFile 函数从文件中加载内容到测试用例类型`TCase`
 	err := builtin.LoadFile(casePath, tc)
 	// 如果加载过程中出现错误，则返回错误
 	if err != nil {
@@ -112,6 +112,7 @@ type TCase struct {
 }
 
 // MakeCompat converts TCase compatible with Golang engine style
+// 目的是使TCase结构与Golang引擎风格兼容。它通过对TCase对象及其相关的TestSteps执行某些兼容性转换来实现
 func (tc *TCase) MakeCompat() (err error) {
 	defer func() {
 		if p := recover(); p != nil {
@@ -120,15 +121,18 @@ func (tc *TCase) MakeCompat() (err error) {
 	}()
 	for _, step := range tc.TestSteps {
 		// 1. deal with request body compatibility
+		// 将请求体转换为与Golang引擎风格兼容
 		convertCompatRequestBody(step.Request)
 
 		// 2. deal with validators compatibility
+		// 将断言转换为与Golang引擎风格兼容
 		err = convertCompatValidator(step.Validators)
 		if err != nil {
 			return err
 		}
 
 		// 3. deal with extract expr including hyphen
+		// 将提取表达式转换为与Golang引擎风格兼容
 		convertExtract(step.Extract)
 	}
 	return nil
@@ -154,7 +158,7 @@ func (tc *TCase) toTestCase() (*TestCase, error) {
 	testCase := &TestCase{
 		Config: tc.Config,
 	}
-
+	// 使TCase结构与Golang引擎风格兼容
 	err := tc.MakeCompat()
 	if err != nil {
 		return nil, err

@@ -243,15 +243,19 @@ func InterfaceType(raw interface{}) string {
 // LoadFile loads file content with file extension and assigns to structObj
 func LoadFile(path string, structObj interface{}) (err error) {
 	log.Info().Str("path", path).Msg("load file")
+	// 使用ReadFile函数读取文件内容
 	file, err := ReadFile(path)
 	if err != nil {
 		return errors.Wrap(err, "read file failed")
 	}
-	// remove BOM at the beginning of file
+	// 移除文件开头的BOM（字节顺序标记）
 	file = bytes.TrimLeft(file, "\xef\xbb\xbf")
+	// 获取文件扩展名
 	ext := filepath.Ext(path)
 	switch ext {
 	case ".json", ".har":
+		// 如果文件扩展名是.json或.har，使用json.NewDecoder和Decode函数解码JSON格式文件内容
+		// 并将解码后的结果赋值给structObj对象
 		decoder := json.NewDecoder(bytes.NewReader(file))
 		decoder.UseNumber()
 		err = decoder.Decode(structObj)
@@ -259,11 +263,15 @@ func LoadFile(path string, structObj interface{}) (err error) {
 			err = errors.Wrap(code.LoadJSONError, err.Error())
 		}
 	case ".yaml", ".yml":
+		// 如果文件扩展名是.yaml或.yml，使用yaml.Unmarshal函数解析YAML格式文件内容
+		// 并将解析后的结果赋值给structObj对象
 		err = yaml.Unmarshal(file, structObj)
 		if err != nil {
 			err = errors.Wrap(code.LoadYAMLError, err.Error())
 		}
 	case ".env":
+		// 如果文件扩展名是.env，使用parseEnvContent函数解析环境变量文件内容
+		// 并将解析后的结果赋值给structObj对象
 		err = parseEnvContent(file, structObj)
 		if err != nil {
 			err = errors.Wrap(code.LoadEnvError, err.Error())
