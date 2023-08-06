@@ -121,16 +121,9 @@ func (projectService *ProjectService) UpdateProject(project system.Project) (err
 }
 
 func (projectService *ProjectService) SetUserProjectAuth(sup system.SysUserProject) (err error) {
-	var sysUseProject system.SysUserProject
-	if err := global.GVA_DB.Model(&system.SysUserProject{}).
+	err = global.GVA_DB.Model(&system.SysUserProject{}).
 		Where("sys_user_id = ? AND project_id = ?", sup.SysUserID, sup.ProjectID).
-		First(&sysUseProject).Error; err != nil {
-		return err
-	}
-	sysUseProject.Select = sup.Select
-	sysUseProject.Delete = sup.Delete
-	sysUseProject.Save = sup.Save
-	err = global.GVA_DB.Model(&system.SysUserProject{}).Save(&sysUseProject).Error
+		Save(&sup).Error
 	return err
 }
 

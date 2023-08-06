@@ -39,8 +39,11 @@
         </el-table-column>
         <el-table-column label="权限" width="300">
           <template #default="scope">
-            <el-checkbox-group>
-              <el-checkbox label="select">查询</el-checkbox>
+            <el-checkbox-group
+              v-model="scope.row.status"
+              @change="handleChecked(scope.row)"
+            >
+              <el-checkbox label="select" disabled>查询</el-checkbox>
               <el-checkbox label="save">新增/修改</el-checkbox>
               <el-checkbox label="delete">删除</el-checkbox>
             </el-checkbox-group>
@@ -54,6 +57,7 @@
 <script setup>
 import { computed, ref } from "vue";
 import { getProjectUserList, setUserProjectAuth } from "@/api/project";
+import { ElMessage } from "element-plus";
 
 // =========== 表格控制部分 ===========
 const page = ref(1);
@@ -96,11 +100,40 @@ const getTableData = async () => {
     total.value = table.data.total;
     page.value = table.data.page;
     pageSize.value = table.data.pageSize;
+    tableData.value.forEach((item) => {
+      item.status = [];
+      item.status.push("select");
+      if (item.save) {
+        item.status.push("save");
+      }
+      if (item.delete) {
+        item.status.push("delete");
+      }
+    });
   }
   console.log("tableData.value", tableData.value);
   console.log("table.data.list", table.data.list);
 };
 getTableData();
+
+const handleChecked = async (row) => {
+  let params = {
+    SysUserID: row.SysUserID,
+    ProjectID: row.ProjectID,
+    select: true,
+    delete: false,
+    save: false,
+  };
+  row.status.forEach((item) => {
+    params[item] = true;
+  });
+  console.log("params", params);
+  const res = await setUserProjectAuth(params);
+  if (res.code === 0) {
+    ElMessage.success("设置成功");
+    getTableData();
+  }
+};
 </script>
 
 <style scoped></style>
