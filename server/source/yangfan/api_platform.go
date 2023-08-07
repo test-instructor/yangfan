@@ -245,6 +245,7 @@ func RegisterApis() {
 		{ApiGroup: "项目管理", Method: "GET", Path: "/project/getProjectList", Description: "获取项目管理列表"},
 		{ApiGroup: "项目管理", Method: "POST", Path: "/project/createProject", Description: "新增项目管理"},
 		{ApiGroup: "项目管理", Method: "POST", Path: "/project/setUserProjectAuth", Description: "设置用户项目权限"},
+		{ApiGroup: "项目管理", Method: "DELETE", Path: "/project/deleteUserProjectAuth", Description: "删除项目成员"},
 		{ApiGroup: "项目管理", Method: "GET", Path: "/project/getProjectUserList", Description: "获取项目用户列表"},
 
 		{ApiGroup: "环境变量", Method: "POST", Path: "/env/:project/createEnv", Description: "新增环境"},

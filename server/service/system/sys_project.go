@@ -127,6 +127,13 @@ func (projectService *ProjectService) SetUserProjectAuth(sup system.SysUserProje
 	return err
 }
 
+func (projectService *ProjectService) DeleteProjectAuth(sup system.SysUserProject) (err error) {
+	err = global.GVA_DB.Model(&system.SysUserProject{}).
+		Where("sys_user_id = ? AND project_id = ?", sup.SysUserID, sup.ProjectID).
+		Delete(&sup).Error
+	return err
+}
+
 // GetProject 根据id获取Project记录
 
 func (projectService *ProjectService) GetProject(id uint) (err error, project system.Project) {
@@ -170,7 +177,9 @@ func (projectService *ProjectService) GetProjectUserList(info interfacecaseReq.S
 
 func (projectService *ProjectService) ResetProjectUserAuthList(list []system.SysUserProject) {
 	for i := 0; i < len(list); i++ {
-		list[i].Username = list[i].SysUser.Username
-		list[i].SysUser = nil
+		if list[i].SysUser != nil {
+			list[i].Username = list[i].SysUser.Username
+			list[i].SysUser = nil
+		}
 	}
 }

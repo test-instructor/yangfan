@@ -120,6 +120,20 @@ func (userService *UserService) GetUserInfoList(info request.PageInfo) (list int
 	}
 	//err = db.Limit(limit).Offset(offset).Preload("Authorities").Preload("Authority").Find(&userList).Error
 	err = db.Limit(limit).Offset(offset).Preload("Projects").Preload("Authorities").Preload("Authority").Find(&userList).Error
+	for i := 0; i < len(userList); i++ {
+		var sup []system.SysUserProject
+		var projects []system.Project
+		err = global.GVA_DB.Model(&system.SysUserProject{}).Preload("Project").Where("sys_user_id = ?", userList[i].ID).Find(&sup).Error
+		if err != nil {
+			continue
+		}
+		for _, s := range sup {
+			if s.Project != nil {
+				projects = append(projects, *s.Project)
+			}
+		}
+		userList[i].Projects = projects
+	}
 	return userList, total, err
 }
 
@@ -170,12 +184,12 @@ func (userService *UserService) SetUserAuthorities(id uint, authorityIds []uint)
 }
 
 func (userService *UserService) SetUserProjects(id uint, projectIds []uint) (err error) {
-	return global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
 		TxErr := tx.Delete(&[]system.SysUserProject{}, "sys_user_id = ?", id).Error
 		if TxErr != nil {
 			return TxErr
 		}
-		useProject := []system.SysUserProject{}
+		var useProject []system.SysUserProject
 		for _, v := range projectIds {
 			useProject = append(useProject, system.SysUserProject{
 				SysUserID: id, ProjectID: v,
@@ -187,6 +201,7 @@ func (userService *UserService) SetUserProjects(id uint, projectIds []uint) (err
 		}
 		return nil
 	})
+	return err
 }
 
 //@author: [piexlmax](https://github.com/piexlmax)

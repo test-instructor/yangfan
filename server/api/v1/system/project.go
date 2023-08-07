@@ -107,6 +107,17 @@ func (projectApi *ProjectApi) SetUserProjectAuth(c *gin.Context) {
 	}
 }
 
+func (projectApi *ProjectApi) DeleteProjectAuth(c *gin.Context) {
+	var sua system.SysUserProject
+	_ = c.ShouldBindJSON(&sua)
+	if err := projectService.DeleteProjectAuth(sua); err != nil {
+		global.GVA_LOG.Error("修改失败!", zap.Error(err))
+		response.FailWithMessage("修改失败", c)
+	} else {
+		response.OkWithMessage("修改成功", c)
+	}
+}
+
 // FindProject 用id查询Project
 // @Tags Project
 // @Summary 用id查询Project

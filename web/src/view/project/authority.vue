@@ -49,6 +49,18 @@
             </el-checkbox-group>
           </template>
         </el-table-column>
+        <el-table-column align="left" label="操作" width="460">
+          <template #default="scope">
+            <el-button
+              icon="delete"
+              size="small"
+              type="primary"
+              link
+              @click="deleteUser(scope.row)"
+              >删除</el-button
+            >
+          </template>
+        </el-table-column>
       </el-table>
     </div>
   </div>
@@ -56,8 +68,12 @@
 
 <script setup>
 import { computed, ref } from "vue";
-import { getProjectUserList, setUserProjectAuth } from "@/api/project";
-import { ElMessage } from "element-plus";
+import {
+  deleteUserProjectAuth,
+  getProjectUserList,
+  setUserProjectAuth,
+} from "@/api/project";
+import { ElMessage, ElMessageBox } from "element-plus";
 
 // =========== 表格控制部分 ===========
 const page = ref(1);
@@ -133,6 +149,39 @@ const handleChecked = async (row) => {
     ElMessage.success("设置成功");
     getTableData();
   }
+};
+
+const deleteUser = (row) => {
+  ElMessageBox.confirm("此操作将永久删除该该项目成员, 是否继续?", "提示", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
+  })
+    .then(async () => {
+      let deleteData = {
+        sys_user_id: row.SysUserID,
+        project_id: row.ProjectID,
+      };
+      console.log("row", row);
+      console.log("deleteData", deleteData);
+      const res = await deleteUserProjectAuth(deleteData);
+      if (res.code === 0) {
+        ElMessage({
+          type: "success",
+          message: "删除成功!",
+        });
+        if (tableData.value.length === 1 && page.value > 1) {
+          page.value--;
+        }
+        await getTableData();
+      }
+    })
+    .catch(() => {
+      ElMessage({
+        type: "info",
+        message: "已取消删除",
+      });
+    });
 };
 </script>
 

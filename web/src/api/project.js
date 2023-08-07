@@ -111,3 +111,11 @@ export const setUserProjectAuth = (data) => {
     data,
   });
 };
+
+export const deleteUserProjectAuth = (data) => {
+  return service({
+    url: "/project/deleteUserProjectAuth",
+    method: "delete",
+    data,
+  });
+};
