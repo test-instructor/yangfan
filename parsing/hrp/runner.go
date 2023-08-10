@@ -32,7 +32,7 @@ func Run(testcases ...ITestCase) error {
 	return NewRunner(t).SetRequestsLogOn().Run(testcases...)
 }
 
-// NewRunner constructs a new runner instance.
+// NewRunner 构造一个新的运行器实例。
 func NewRunner(t *testing.T) *HRPRunner {
 	if t == nil {
 		t = &testing.T{}
@@ -40,23 +40,23 @@ func NewRunner(t *testing.T) *HRPRunner {
 	jar, _ := cookiejar.New(nil)
 	return &HRPRunner{
 		t:             t,
-		failfast:      true, // default to failfast
+		failfast:      true, // 默认为 failfast 模式
 		genHTMLReport: false,
 		httpClient: &http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			},
-			Jar:     jar, // insert response cookies into request
+			Jar:     jar, // 将响应的 cookies 插入请求中
 			Timeout: 120 * time.Second,
 		},
 		http2Client: &http.Client{
 			Transport: &http2.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			},
-			Jar:     jar, // insert response cookies into request
+			Jar:     jar, // 将响应的 cookies 插入请求中
 			Timeout: 120 * time.Second,
 		},
-		// use default handshake timeout (no timeout limit) here, enable timeout at step level
+		// 在此处使用默认的握手超时时间（没有超时限制），在步骤级别启用超时
 		wsDialer: &websocket.Dialer{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		},
@@ -64,21 +64,21 @@ func NewRunner(t *testing.T) *HRPRunner {
 }
 
 type HRPRunner struct {
-	t             *testing.T
-	failfast      bool
-	httpStatOn    bool
-	requestsLogOn bool
-	pluginLogOn   bool
-	venv          string
-	saveTests     bool
-	genHTMLReport bool
-	httpClient    *http.Client
-	http2Client   *http.Client
-	wsDialer      *websocket.Dialer
-	uiClients     map[string]*uixt.DriverExt // UI automation clients for iOS and Android, key is udid/serial
+	t             *testing.T                 // testing.T 的引用，用于报告测试失败和管理测试状态
+	failfast      bool                       // 在第一个测试步骤失败后是否立即停止的标志。如果为 true，则在第一个失败步骤后停止测试，否则继续执行所有步骤。
+	httpStatOn    bool                       // 是否启用 HTTP 统计跟踪的标志。如果为 true，则在测试执行期间收集和显示与 HTTP 请求相关的统计信息。
+	requestsLogOn bool                       // 是否启用 HTTP 请求日志的标志。如果为 true，则在测试执行期间记录每个 HTTP 请求的详细信息。
+	pluginLogOn   bool                       // 是否启用插件日志的标志。如果为 true，则在测试执行期间记录与插件相关的信息。
+	venv          string                     // 虚拟环境路径的字符串。用于指定测试将在其中执行的虚拟环境的路径。
+	saveTests     bool                       // 是否保存测试结果的标志。如果为 true，则会保存测试结果。
+	genHTMLReport bool                       // 是否生成测试执行的 HTML 报告的标志。如果为 true，则会生成包含测试结果总结的 HTML 报告。
+	httpClient    *http.Client               // 指向 HTTP 客户端实例的指针。用于在测试执行期间进行 HTTP 请求。
+	http2Client   *http.Client               // 指向 HTTP/2 客户端实例的指针。用于在测试执行期间进行 HTTP/2 请求。
+	wsDialer      *websocket.Dialer          // 指向 WebSocket 拨号器实例的指针。用于在测试执行期间建立 WebSocket 连接。
+	uiClients     map[string]*uixt.DriverExt // UI 客户端的映射。用于管理具有唯一键作为标识符的 UI 测试驱动程序。
 }
 
-// SetClientTransport configures transport of http client for high concurrency load testing
+// SetClientTransport 配置 HTTP 客户端的传输以进行高并发负载测试。
 func (r *HRPRunner) SetClientTransport(maxConns int, disableKeepAlive bool, disableCompression bool) *HRPRunner {
 	log.Info().
 		Int("maxConns", maxConns).
@@ -101,42 +101,42 @@ func (r *HRPRunner) SetClientTransport(maxConns int, disableKeepAlive bool, disa
 	return r
 }
 
-// SetFailfast configures whether to stop running when one step fails.
+// SetFailfast 配置是否在步骤失败时停止运行。
 func (r *HRPRunner) SetFailfast(failfast bool) *HRPRunner {
 	log.Info().Bool("failfast", failfast).Msg("[init] SetFailfast")
 	r.failfast = failfast
 	return r
 }
 
-// SetRequestsLogOn turns on request & response details logging.
+// SetRequestsLogOn 打开请求和响应详细信息记录。
 func (r *HRPRunner) SetRequestsLogOn() *HRPRunner {
 	log.Info().Msg("[init] SetRequestsLogOn")
 	r.requestsLogOn = true
 	return r
 }
 
-// SetHTTPStatOn turns on HTTP latency stat.
+// SetHTTPStatOn 打开 HTTP 延迟统计。
 func (r *HRPRunner) SetHTTPStatOn() *HRPRunner {
 	log.Info().Msg("[init] SetHTTPStatOn")
 	r.httpStatOn = true
 	return r
 }
 
-// SetPluginLogOn turns on plugin logging.
+// SetPluginLogOn 打开插件日志记录。
 func (r *HRPRunner) SetPluginLogOn() *HRPRunner {
 	log.Info().Msg("[init] SetPluginLogOn")
 	r.pluginLogOn = true
 	return r
 }
 
-// SetPython3Venv specifies python3 venv.
+// SetPython3Venv 指定 Python3 虚拟环境。
 func (r *HRPRunner) SetPython3Venv(venv string) *HRPRunner {
 	log.Info().Str("venv", venv).Msg("[init] SetPython3Venv")
 	r.venv = venv
 	return r
 }
 
-// SetProxyUrl configures the proxy URL, which is usually used to capture HTTP packets for debugging.
+// SetProxyUrl 配置代理 URL，通常用于捕获 HTTP 数据包进行调试。
 func (r *HRPRunner) SetProxyUrl(proxyUrl string) *HRPRunner {
 	log.Info().Str("proxyUrl", proxyUrl).Msg("[init] SetProxyUrl")
 	p, err := url.Parse(proxyUrl)
@@ -152,49 +152,49 @@ func (r *HRPRunner) SetProxyUrl(proxyUrl string) *HRPRunner {
 	return r
 }
 
-// SetTimeout configures global timeout in seconds.
+// SetTimeout 配置全局超时时间（秒）。
 func (r *HRPRunner) SetTimeout(timeout time.Duration) *HRPRunner {
 	log.Info().Float64("timeout(seconds)", timeout.Seconds()).Msg("[init] SetTimeout")
 	r.httpClient.Timeout = timeout
 	return r
 }
 
-// SetSaveTests configures whether to save summary of tests.
+// SetSaveTests 配置是否保存测试摘要。
 func (r *HRPRunner) SetSaveTests(saveTests bool) *HRPRunner {
 	log.Info().Bool("saveTests", saveTests).Msg("[init] SetSaveTests")
 	r.saveTests = saveTests
 	return r
 }
 
-// GenHTMLReport configures whether to gen html report of api tests.
+// GenHTMLReport 配置是否生成 API 测试的 HTML 报告。
 func (r *HRPRunner) GenHTMLReport() *HRPRunner {
 	log.Info().Bool("genHTMLReport", true).Msg("[init] SetgenHTMLReport")
 	r.genHTMLReport = true
 	return r
 }
 
-// Run starts to execute one or multiple testcases.
+// Run 开始执行一个或多个测试用例。
 func (r *HRPRunner) Run(testcases ...ITestCase) error {
+	// 输出HRP版本号
 	log.Info().Str("hrp_version", version.VERSION).Msg("start running")
+	// 初始化事件跟踪对象，用于统计执行过程中的事件
 	event := sdk.EventTracking{
 		Category: "RunAPITests",
 		Action:   "hrp run",
 	}
-	// report start event
 	go sdk.SendEvent(event)
-	// report execution timing event
 	defer sdk.SendEvent(event.StartTiming("execution"))
-	// record execution data to summary
+	// 记录执行数据到总结对象中
 	s := newOutSummary()
 
-	// load all testcases
+	// 加载所有测试用例
 	testCases, err := LoadTestCases(testcases...)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to load testcases")
 		return err
 	}
 
-	// quit all plugins
+	// 退出所有函数插件
 	defer func() {
 		pluginMap.Range(func(key, value interface{}) bool {
 			if plugin, ok := value.(funplugin.IPlugin); ok {
@@ -205,31 +205,32 @@ func (r *HRPRunner) Run(testcases ...ITestCase) error {
 	}()
 
 	var runErr error
-	// run testcase one by one
+	// 遍历所有用例
 	for _, testcase := range testCases {
-		// each testcase has its own case runner
+		// 每个测试用例都有自己的用例运行器，把用例转换成可迭代的用例
 		caseRunner, err := r.NewCaseRunner(testcase)
 		if err != nil {
 			log.Error().Err(err).Msg("[Run] init case runner failed")
 			return err
 		}
 
-		// release UI driver session
+		// 释放UI驱动程序的会话
 		defer func() {
 			for _, client := range r.uiClients {
 				client.Driver.DeleteSession()
 			}
 		}()
 
+		// 使用参数迭代器执行用例多次，每次执行有不同的参数
 		for it := caseRunner.parametersIterator; it.HasNext(); {
-			// case runner can run multiple times with different parameters
-			// each run has its own session runner
+			// 每次运行都有自己的会话运行器
 			sessionRunner := caseRunner.NewSession()
 			err1 := sessionRunner.Start(it.Next())
 			if err1 != nil {
 				log.Error().Err(err1).Msg("[Run] run testcase failed")
 				runErr = err1
 			}
+			// 获取用例的执行结果
 			caseSummary, err2 := sessionRunner.GetSummary()
 			s.appendCaseSummary(caseSummary)
 			if err2 != nil {
@@ -241,14 +242,18 @@ func (r *HRPRunner) Run(testcases ...ITestCase) error {
 				}
 			}
 
+			// 如果发生错误且设置了failfast标志，则终止运行
+			// 实际操作一般都会执行所有用例后，最后获取用例执行情况
 			if runErr != nil && r.failfast {
 				break
 			}
 		}
 	}
+
+	// 计算执行时间
 	s.Time.Duration = time.Since(s.Time.StartAt).Seconds()
 
-	// save summary
+	// 保存测试报告
 	if r.saveTests {
 		err := s.genSummary()
 		if err != nil {
@@ -256,7 +261,7 @@ func (r *HRPRunner) Run(testcases ...ITestCase) error {
 		}
 	}
 
-	// generate HTML report
+	// 生成HTML报告
 	if r.genHTMLReport {
 		err := s.genHTMLReport()
 		if err != nil {
@@ -267,37 +272,38 @@ func (r *HRPRunner) Run(testcases ...ITestCase) error {
 	return runErr
 }
 
-// NewCaseRunner creates a new case runner for testcase.
-// each testcase has its own case runner
+// NewCaseRunner 创建一个新的用例运行器（CaseRunner）用于指定的测试用例（testcase）。
+// 每个测试用例都有自己的用例运行器。
 func (r *HRPRunner) NewCaseRunner(testcase *TestCase) (*CaseRunner, error) {
+	// 创建一个新的用例运行器（CaseRunner）对象
 	caseRunner := &CaseRunner{
-		testCase:  testcase,
-		hrpRunner: r,
-		parser:    newParser(),
+		testCase:  testcase,    // 设置用例运行器的测试用例字段
+		hrpRunner: r,           // 设置用例运行器的HRPRunner字段
+		parser:    newParser(), // 创建并初始化一个新的解析器（parser）对象
 	}
 
-	// init parser plugin
+	// 初始化函数插件
 	plugin, err := initPlugin(testcase.Config.Path, r.venv, r.pluginLogOn)
 	if err != nil {
 		return nil, errors.Wrap(err, "init plugin failed")
 	}
 	if plugin != nil {
-		caseRunner.parser.plugin = plugin
-		caseRunner.rootDir = filepath.Dir(plugin.Path())
+		caseRunner.parser.plugin = plugin                // 将解析器插件设置到用例运行器的解析器对象中
+		caseRunner.rootDir = filepath.Dir(plugin.Path()) // 设置用例运行器的根目录（rootDir），即插件所在的目录
 	}
 
-	// parse testcase config
+	// 解析测试用例的配置
 	if err := caseRunner.parseConfig(); err != nil {
 		return nil, errors.Wrap(err, "parse testcase config failed")
 	}
 
-	// set testcase timeout in seconds
+	// 设置测试用例的超时时间（timeout）（单位：秒）
 	if testcase.Config.Timeout != 0 {
 		timeout := time.Duration(testcase.Config.Timeout*1000) * time.Millisecond
 		r.SetTimeout(timeout)
 	}
 
-	// load plugin info to testcase config
+	// 将插件信息加载到测试用例的配置中
 	if plugin != nil {
 		pluginPath, _ := locatePlugin(testcase.Config.Path)
 		if caseRunner.parsedConfig.PluginSetting == nil {
@@ -314,9 +320,10 @@ func (r *HRPRunner) NewCaseRunner(testcase *TestCase) (*CaseRunner, error) {
 		}
 	}
 
-	return caseRunner, nil
+	return caseRunner, nil // 返回用例运行器对象和可能出现的错误
 }
 
+// CaseRunner 结构体用于执行单个测试用例的运行器
 type CaseRunner struct {
 	testCase  *TestCase
 	hrpRunner *HRPRunner
@@ -324,21 +331,21 @@ type CaseRunner struct {
 
 	parsedConfig       *TConfig
 	parametersIterator *ParametersIterator
-	rootDir            string // project root dir
+	rootDir            string // 项目根目录
 }
 
-// parseConfig parses testcase config, stores to parsedConfig.
+// parseConfig 方法解析测试用例的配置，将解析结果存储到 parsedConfig 中
 func (r *CaseRunner) parseConfig() error {
 	cfg := r.testCase.Config
 
-	r.parsedConfig = &TConfig{}
-	// deep copy config to avoid data racing
+	r.parsedConfig = &TConfig{} // 创建一个新的 TConfig 对象
+	// 深拷贝配置以避免数据竞争
 	if err := copier.Copy(r.parsedConfig, cfg); err != nil {
 		log.Error().Err(err).Msg("copy testcase config failed")
 		return err
 	}
 
-	// parse config variables
+	// 解析配置变量
 	parsedVariables, err := r.parser.ParseVariables(cfg.Variables)
 	if err != nil {
 		log.Error().Interface("variables", cfg.Variables).Err(err).Msg("parse config variables failed")
@@ -346,22 +353,22 @@ func (r *CaseRunner) parseConfig() error {
 	}
 	r.parsedConfig.Variables = parsedVariables
 
-	// parse config name
+	// 解析配置名称
 	parsedName, err := r.parser.ParseString(cfg.Name, parsedVariables)
 	if err != nil {
 		return errors.Wrap(err, "parse config name failed")
 	}
 	r.parsedConfig.Name = convertString(parsedName)
 
-	// parse config base url
+	// 解析配置基础URL
 	parsedBaseURL, err := r.parser.ParseString(cfg.BaseURL, parsedVariables)
 	if err != nil {
 		return errors.Wrap(err, "parse config base url failed")
 	}
 	r.parsedConfig.BaseURL = convertString(parsedBaseURL)
 
-	// merge config environment variables with base_url
-	// priority: env base_url > base_url
+	// 合并配置环境变量和基础URL
+	// 优先级：env base_url > base_url
 	if cfg.Environs != nil {
 		r.parsedConfig.Environs = cfg.Environs
 	} else {
@@ -373,19 +380,19 @@ func (r *CaseRunner) parseConfig() error {
 		}
 	}
 
-	// merge config variables with environment variables
-	// priority: env > config variables
+	// 合并配置变量和环境变量
+	// 优先级：env > config variables
 	for k, v := range r.parsedConfig.Environs {
 		r.parsedConfig.Variables[k] = v
 	}
 
-	// ensure correction of think time config
+	// 确保思考时间配置的正确性
 	r.parsedConfig.ThinkTimeSetting.checkThinkTime()
 
-	// ensure correction of websocket config
+	// 确保WebSocket配置的正确性
 	r.parsedConfig.WebSocketSetting.checkWebSocket()
 
-	// parse testcase config parameters
+	// 解析测试用例配置参数
 	parametersIterator, err := r.parser.initParametersIterator(r.parsedConfig)
 	if err != nil {
 		log.Error().Err(err).
@@ -396,11 +403,12 @@ func (r *CaseRunner) parseConfig() error {
 	}
 	r.parametersIterator = parametersIterator
 
-	// init iOS/Android clients
+	// 初始化iOS/Android客户端
 	if r.hrpRunner.uiClients == nil {
 		r.hrpRunner.uiClients = make(map[string]*uixt.DriverExt)
 	}
 	for _, iosDeviceConfig := range r.parsedConfig.IOS {
+		// 解析iOS设备的UDID
 		if iosDeviceConfig.UDID != "" {
 			udid, err := r.parser.ParseString(iosDeviceConfig.UDID, parsedVariables)
 			if err != nil {
@@ -408,10 +416,12 @@ func (r *CaseRunner) parseConfig() error {
 			}
 			iosDeviceConfig.UDID = udid.(string)
 		}
+		// 创建iOS设备驱动
 		device, err := uixt.NewIOSDevice(uixt.GetIOSDeviceOptions(iosDeviceConfig)...)
 		if err != nil {
 			return errors.Wrap(err, "init iOS device failed")
 		}
+		// 创建iOS设备UI驱动客户端
 		client, err := device.NewDriver(nil)
 		if err != nil {
 			return errors.Wrap(err, "init iOS WDA client failed")
@@ -419,6 +429,7 @@ func (r *CaseRunner) parseConfig() error {
 		r.hrpRunner.uiClients[device.UDID] = client
 	}
 	for _, androidDeviceConfig := range r.parsedConfig.Android {
+		// 解析Android设备的序列号
 		if androidDeviceConfig.SerialNumber != "" {
 			sn, err := r.parser.ParseString(androidDeviceConfig.SerialNumber, parsedVariables)
 			if err != nil {
@@ -426,10 +437,12 @@ func (r *CaseRunner) parseConfig() error {
 			}
 			androidDeviceConfig.SerialNumber = sn.(string)
 		}
+		// 创建Android设备驱动
 		device, err := uixt.NewAndroidDevice(uixt.GetAndroidDeviceOptions(androidDeviceConfig)...)
 		if err != nil {
 			return errors.Wrap(err, "init Android device failed")
 		}
+		// 创建Android设备UIAutomator客户端
 		client, err := device.NewDriver(nil)
 		if err != nil {
 			return errors.Wrap(err, "init Android UIAutomator client failed")
@@ -440,34 +453,32 @@ func (r *CaseRunner) parseConfig() error {
 	return nil
 }
 
-// each boomer task initiates a new session
-// in order to avoid data racing
+// NewSession 方法用于创建一个新的会话运行器（SessionRunner）
 func (r *CaseRunner) NewSession() *SessionRunner {
 	sessionRunner := &SessionRunner{
 		caseRunner: r,
 	}
-	sessionRunner.resetSession()
+	sessionRunner.resetSession() // 重置会话状态
 	return sessionRunner
 }
 
-// SessionRunner is used to run testcase and its steps.
-// each testcase has its own SessionRunner instance and share session variables.
+// SessionRunner 用于运行测试用例及其步骤。
+// 每个测试用例都有自己的 SessionRunner 实例，并共享会话变量。
 type SessionRunner struct {
-	caseRunner       *CaseRunner
-	sessionVariables map[string]interface{}
-	// transactions stores transaction timing info.
-	// key is transaction name, value is map of transaction type and time, e.g. start time and end time.
+	caseRunner        *CaseRunner
+	sessionVariables  map[string]interface{}
 	transactions      map[string]map[transactionType]time.Time
-	startTime         time.Time                  // record start time of the testcase
-	summary           *TestCaseSummary           // record test case summary
-	wsConnMap         map[string]*websocket.Conn // save all websocket connections
-	inheritWsConnMap  map[string]*websocket.Conn // inherit all websocket connections
-	pongResponseChan  chan string                // channel used to receive pong response message
-	closeResponseChan chan *wsCloseRespObject    // channel used to receive close response message
+	startTime         time.Time                  // 记录测试用例的开始时间
+	summary           *TestCaseSummary           // 记录测试用例的摘要信息
+	wsConnMap         map[string]*websocket.Conn // 保存所有 WebSocket 连接
+	inheritWsConnMap  map[string]*websocket.Conn // 继承的 WebSocket 连接
+	pongResponseChan  chan string                // 通道用于接收 Pong 响应消息
+	closeResponseChan chan *wsCloseRespObject    // 通道用于接收关闭响应消息
 }
 
+// resetSession 重置会话状态，用于初始化一个新的会话
 func (r *SessionRunner) resetSession() {
-	log.Info().Msg("reset session runner")
+	log.Info().Msg("重置会话运行器")
 	r.sessionVariables = make(map[string]interface{})
 	r.transactions = make(map[string]map[transactionType]time.Time)
 	r.startTime = time.Now()
@@ -478,8 +489,9 @@ func (r *SessionRunner) resetSession() {
 	r.closeResponseChan = make(chan *wsCloseRespObject, 1)
 }
 
+// inheritConnection 从另一个 SessionRunner 实例继承 WebSocket 连接
 func (r *SessionRunner) inheritConnection(src *SessionRunner) {
-	log.Info().Msg("inherit session runner")
+	log.Info().Msg("继承会话运行器")
 	r.inheritWsConnMap = make(map[string]*websocket.Conn, len(src.wsConnMap)+len(src.inheritWsConnMap))
 	for k, v := range src.wsConnMap {
 		r.inheritWsConnMap[k] = v
@@ -489,60 +501,61 @@ func (r *SessionRunner) inheritConnection(src *SessionRunner) {
 	}
 }
 
-// Start runs the test steps in sequential order.
-// givenVars is used for data driven
+// Start 按顺序运行测试步骤。
+// givenVars 用于数据驱动
 func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
+	// 获取测试用例配置信息
 	config := r.caseRunner.testCase.Config
-	log.Info().Str("testcase", config.Name).Msg("run testcase start")
+	log.Info().Str("testcase", config.Name).Msg("运行测试用例开始")
 
-	// update config variables with given variables
+	// 使用给定的变量更新配置变量
 	r.InitWithParameters(givenVars)
 
 	defer func() {
-		// close session resource after all steps done or fast fail
+		// 在所有步骤完成或出现快速失败时释放会话资源
 		r.releaseResources()
 	}()
 
-	// run step in sequential order
+	// 按顺序运行每个步骤
 	for _, step := range r.caseRunner.testCase.TestSteps {
-		// TODO: parse step struct
-		// parse step name
+		// TODO: 解析步骤结构
+		// 解析步骤名称
 		parsedName, err := r.caseRunner.parser.ParseString(step.Name(), r.sessionVariables)
 		if err != nil {
 			parsedName = step.Name()
 		}
 		stepName := convertString(parsedName)
 		log.Info().Str("step", stepName).
-			Str("type", string(step.Type())).Msg("run step start")
+			Str("type", string(step.Type())).Msg("运行步骤开始")
 
-		// run times of step
+		// 获取步骤运行次数
 		loopTimes := step.Struct().Loops
 		if loopTimes < 0 {
-			log.Warn().Int("loops", loopTimes).Msg("loop times should be positive, set to 1")
+			log.Warn().Int("loops", loopTimes).Msg("循环次数应为正数，设置为 1")
 			loopTimes = 1
 		} else if loopTimes == 0 {
 			loopTimes = 1
 		} else if loopTimes > 1 {
-			log.Info().Int("loops", loopTimes).Msg("run step with specified loop times")
+			log.Info().Int("loops", loopTimes).Msg("按指定的循环次数运行步骤")
 		}
 
-		// run step with specified loop times
+		// 按指定的循环次数运行步骤
 		var stepResult *StepResult
 		for i := 1; i <= loopTimes; i++ {
 			var loopIndex string
 			if loopTimes > 1 {
-				log.Info().Int("index", i).Msg("start running step in loop")
+				log.Info().Int("index", i).Msg("在循环中开始运行步骤")
 				loopIndex = fmt.Sprintf("_loop_%d", i)
 			}
 
-			// run step
+			// 运行步骤
 			stepResult, err = step.Run(r)
 			stepResult.Name = stepName + loopIndex
 
 			r.updateSummary(stepResult)
 		}
 
-		// update extracted variables
+		// 更新提取的变量
 		for k, v := range stepResult.ExportVars {
 			r.sessionVariables[k] = v
 		}
@@ -552,57 +565,58 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 				Str("type", string(stepResult.StepType)).
 				Bool("success", true).
 				Interface("exportVars", stepResult.ExportVars).
-				Msg("run step end")
+				Msg("运行步骤结束")
 			continue
 		}
 
-		// failed
+		// 运行失败
 		log.Error().Err(err).Str("step", stepResult.Name).
 			Str("type", string(stepResult.StepType)).
 			Bool("success", false).
-			Msg("run step end")
+			Msg("运行步骤结束")
 
-		// check if failfast
+		// 检查是否设置了 failfast
 		if r.caseRunner.hrpRunner.failfast {
-			return errors.Wrap(err, "abort running due to failfast setting")
+			return errors.Wrap(err, "由于设置了 failfast，中止运行")
 		}
 	}
 
-	log.Info().Str("testcase", config.Name).Msg("run testcase end")
+	log.Info().Str("testcase", config.Name).Msg("运行测试用例结束")
 	return nil
 }
 
-// ParseStepVariables merges step variables with config variables and session variables
+// ParseStepVariables 将步骤变量与配置变量和会话变量合并
 func (r *SessionRunner) ParseStepVariables(stepVariables map[string]interface{}) (map[string]interface{}, error) {
-	// override variables
-	// step variables > session variables (extracted variables from previous steps)
+	// 覆盖变量
+	// 步骤变量 > 会话变量（从之前的步骤中提取的变量）
 	overrideVars := mergeVariables(stepVariables, r.sessionVariables)
-	// step variables > testcase config variables
+	// 步骤变量 > 测试用例配置变量
 	overrideVars = mergeVariables(overrideVars, r.caseRunner.parsedConfig.Variables)
 
-	// parse step variables
+	// 解析步骤变量
 	parsedVariables, err := r.caseRunner.parser.ParseVariables(overrideVars)
 	if err != nil {
 		log.Error().Interface("variables", r.caseRunner.parsedConfig.Variables).
-			Err(err).Msg("parse step variables failed")
-		return nil, errors.Wrap(err, "parse step variables failed")
+			Err(err).Msg("解析步骤变量失败")
+		return nil, errors.Wrap(err, "解析步骤变量失败")
 	}
 	return parsedVariables, nil
 }
 
-// InitWithParameters updates session variables with given parameters.
-// this is used for data driven
+// InitWithParameters 使用给定参数更新会话变量。
+// 这用于数据驱动
 func (r *SessionRunner) InitWithParameters(parameters map[string]interface{}) {
 	if len(parameters) == 0 {
 		return
 	}
 
-	log.Info().Interface("parameters", parameters).Msg("update session variables")
+	log.Info().Interface("parameters", parameters).Msg("更新会话变量")
 	for k, v := range parameters {
 		r.sessionVariables[k] = v
 	}
 }
 
+// GetSummary 获取测试用例的摘要信息
 func (r *SessionRunner) GetSummary() (*TestCaseSummary, error) {
 	caseSummary := r.summary
 	caseSummary.Name = r.caseRunner.parsedConfig.Name
@@ -616,7 +630,7 @@ func (r *SessionRunner) GetSummary() (*TestCaseSummary, error) {
 	caseSummary.InOut.ConfigVars = r.caseRunner.parsedConfig.Variables
 
 	for uuid, client := range r.caseRunner.hrpRunner.uiClients {
-		// add WDA/UIA logs to summary
+		// 将 WDA/UIA 日志添加到摘要信息中
 		logs := map[string]interface{}{
 			"uuid": uuid,
 		}
@@ -629,7 +643,7 @@ func (r *SessionRunner) GetSummary() (*TestCaseSummary, error) {
 			logs["content"] = log
 		}
 
-		// stop performance monitor
+		// 停止性能监控
 		logs["performance"] = client.Device.StopPerf()
 		logs["pcap"] = client.Device.StopPcap()
 
@@ -639,11 +653,11 @@ func (r *SessionRunner) GetSummary() (*TestCaseSummary, error) {
 	return caseSummary, nil
 }
 
-// updateSummary updates summary of StepResult.
+// updateSummary 更新 StepResult 的摘要信息。
 func (r *SessionRunner) updateSummary(stepResult *StepResult) {
 	switch stepResult.StepType {
 	case stepTypeTestCase:
-		// record requests of testcase step
+		// 记录测试用例步骤的请求
 		if records, ok := stepResult.Data.([]*StepResult); ok {
 			for _, result := range records {
 				r.addSingleStepResult(result)
@@ -656,33 +670,35 @@ func (r *SessionRunner) updateSummary(stepResult *StepResult) {
 	}
 }
 
+// addSingleStepResult 更新单个步骤的摘要信息
 func (r *SessionRunner) addSingleStepResult(stepResult *StepResult) {
-	// update summary
+	// 更新摘要信息
 	r.summary.Records = append(r.summary.Records, stepResult)
 	r.summary.Stat.Total += 1
 	if stepResult.Success {
 		r.summary.Stat.Successes += 1
 	} else {
 		r.summary.Stat.Failures += 1
-		// update summary result to failed
+		// 将摘要信息结果更新为失败
 		r.summary.Success = false
 	}
 }
 
-// releaseResources releases resources used by session runner
+// releaseResources 释放会话运行器使用的资源
 func (r *SessionRunner) releaseResources() {
-	// close websocket connections
+	// 关闭 WebSocket 连接
 	for _, wsConn := range r.wsConnMap {
 		if wsConn != nil {
-			log.Info().Str("testcase", r.caseRunner.testCase.Config.Name).Msg("websocket disconnected")
+			log.Info().Str("testcase", r.caseRunner.testCase.Config.Name).Msg("WebSocket 连接已断开")
 			err := wsConn.Close()
 			if err != nil {
-				log.Error().Err(err).Msg("websocket disconnection failed")
+				log.Error().Err(err).Msg("WebSocket 连接关闭失败")
 			}
 		}
 	}
 }
 
+// getWsClient 获取指定 URL 的 WebSocket 客户端连接
 func (r *SessionRunner) getWsClient(url string) *websocket.Conn {
 	if client, ok := r.wsConnMap[url]; ok {
 		return client

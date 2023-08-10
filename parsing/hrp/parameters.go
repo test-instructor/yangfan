@@ -27,8 +27,10 @@ const (
 
 /*
 [
+
 	{"username": "test1", "password": "111111"},
 	{"username": "test2", "password": "222222"},
+
 ]
 */
 type Parameters []map[string]interface{}
@@ -106,19 +108,20 @@ func newParametersIterator(parameters map[string]Parameters, config *TParamsConf
 	return iterator
 }
 
+// ParametersIterator 用于迭代测试参数。
 type ParametersIterator struct {
 	sync.Mutex
-	data                 map[string]Parameters
-	hasNext              bool       // cache query result
-	sequentialParameters Parameters // cartesian product for sequential parameters
-	randomParameterNames []string   // value is parameter names
-	limit                int        // limit count for iteration
-	index                int        // current iteration index
+	data                 map[string]Parameters // 参数数据集合
+	hasNext              bool                  // 缓存查询结果
+	sequentialParameters Parameters            // 顺序参数的笛卡尔积
+	randomParameterNames []string              // 随机参数的参数名
+	limit                int                   // 迭代次数限制
+	index                int                   // 当前迭代索引
 }
 
-// SetUnlimitedMode is used for load testing
+// SetUnlimitedMode 用于设置无限制模式，适用于负载测试。
 func (iter *ParametersIterator) SetUnlimitedMode() {
-	log.Info().Msg("set parameters unlimited mode")
+	log.Info().Msg("设置参数无限制模式")
 	iter.limit = -1
 }
 
@@ -127,14 +130,14 @@ func (iter *ParametersIterator) HasNext() bool {
 		return false
 	}
 
-	// unlimited mode
+	// 无限制模式
 	if iter.limit == -1 {
 		return true
 	}
 
-	// reached limit
+	// 达到限制次数
 	if iter.index >= iter.limit {
-		// cache query result
+		// 缓存查询结果
 		iter.hasNext = false
 		return false
 	}
@@ -156,12 +159,12 @@ func (iter *ParametersIterator) Next() map[string]interface{} {
 	} else if iter.index < len(iter.sequentialParameters) {
 		selectedParameters = iter.sequentialParameters[iter.index]
 	} else {
-		// loop back to the first sequential parameter
+		// 循环回到第一个顺序参数
 		index := iter.index % len(iter.sequentialParameters)
 		selectedParameters = iter.sequentialParameters[index]
 	}
 
-	// merge with random parameters
+	// 与随机参数合并
 	for _, paramName := range iter.randomParameterNames {
 		randSource := rand.New(rand.NewSource(time.Now().UnixNano()))
 		randIndex := randSource.Intn(len(iter.data[paramName]))
@@ -205,36 +208,38 @@ func genCartesianProduct(multiParameters []Parameters) Parameters {
 	return cartesianProduct
 }
 
-/* loadParameters loads parameters from multiple sources.
+/*
+	loadParameters loads parameters from multiple sources.
 
 parameter value may be in three types:
+
 	(1) data list, e.g. ["iOS/10.1", "iOS/10.2", "iOS/10.3"]
 	(2) call built-in parameterize function, "${parameterize(account.csv)}"
 	(3) call custom function in debugtalk.py, "${gen_app_version()}"
 
-configParameters = {
-	"user_agent": ["iOS/10.1", "iOS/10.2", "iOS/10.3"],		// case 1
-	"username-password": "${parameterize(account.csv)}", 	// case 2
-	"app_version": "${gen_app_version()}", 					// case 3
-}
+	configParameters = {
+		"user_agent": ["iOS/10.1", "iOS/10.2", "iOS/10.3"],		// case 1
+		"username-password": "${parameterize(account.csv)}", 	// case 2
+		"app_version": "${gen_app_version()}", 					// case 3
+	}
 
 =>
 
-{
-	"user_agent": [
-		{"user_agent": "iOS/10.1"},
-		{"user_agent": "iOS/10.2"},
-		{"user_agent": "iOS/10.3"},
-	],
-	"username-password": [
-		{"username": "test1", "password": "111111"},
-		{"username": "test2", "password": "222222"},
-	],
-	"app_version": [
-		{"app_version": "1.0.0"},
-		{"app_version": "1.0.1"},
-	]
-}
+	{
+		"user_agent": [
+			{"user_agent": "iOS/10.1"},
+			{"user_agent": "iOS/10.2"},
+			{"user_agent": "iOS/10.3"},
+		],
+		"username-password": [
+			{"username": "test1", "password": "111111"},
+			{"username": "test2", "password": "222222"},
+		],
+		"app_version": [
+			{"app_version": "1.0.0"},
+			{"app_version": "1.0.1"},
+		]
+	}
 */
 func (p *Parser) loadParameters(configParameters map[string]interface{}, variablesMapping map[string]interface{}) (
 	map[string]Parameters, error) {
@@ -296,19 +301,23 @@ func (p *Parser) loadParameters(configParameters map[string]interface{}, variabl
 	return parsedParameters, nil
 }
 
-/* convert parameters to standard format
+/*
+	convert parameters to standard format
 
 key and parametersRawList may be in three types:
 
 case 1:
+
 	key = "user_agent"
 	parametersRawList = ["iOS/10.1", "iOS/10.2"]
 
 case 2:
+
 	key = "username-password"
 	parametersRawList = [{"username": "test1", "password": "111111"}, {"username": "test2", "password": "222222"}]
 
 case 3:
+
 	key = "username-password"
 	parametersRawList = [["test1", "111111"], ["test2", "222222"]]
 */
