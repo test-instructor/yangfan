@@ -1,7 +1,7 @@
 # 扬帆测试平台
 
 <img src="docs/img/logoLogin.jpg" alt="logoLogin" width="538" >
-<img src="http://qiniu.yangfan.gd.cn/about/mp.png" alt="公众号" width="500" >
+<img src="docs/img/mp.png" alt="公众号" width="500" >
 
 
 - 前后端采用[gin-vue-admin v2.5.3](https://www.gin-vue-admin.com/), Gin + Vue全栈开发基础平台
