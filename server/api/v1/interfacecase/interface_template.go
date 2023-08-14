@@ -180,7 +180,7 @@ func (apiCaseApi *InterfaceTemplateApi) UpdateDebugTalk(c *gin.Context) {
 
 func (apiCaseApi *InterfaceTemplateApi) GetDebugTalk(c *gin.Context) {
 	var debugTalk interfacecase.ApiDebugTalk
-	_ = c.ShouldBindJSON(&debugTalk)
+	_ = c.ShouldBindQuery(&debugTalk)
 	debugTalk.Project.ID = utils.GetUserProject(c)
 	if err, reapicase := apicaseServices.GetDebugTalk(debugTalk); err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Error(err))
@@ -192,7 +192,7 @@ func (apiCaseApi *InterfaceTemplateApi) GetDebugTalk(c *gin.Context) {
 
 func (apiCaseApi *InterfaceTemplateApi) GetGrpc(c *gin.Context) {
 	var gRPC interfacecaseReq.GrpcFunc
-	_ = c.ShouldBindJSON(&gRPC)
+	_ = c.ShouldBindQuery(&gRPC)
 	if err, data := apicaseServices.GetGrpc(gRPC); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)

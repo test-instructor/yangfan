@@ -141,11 +141,11 @@ func RegisterApis() {
 		{ApiGroup: "api模板", Method: "GET", Path: "/case/:project/findInterfaceTemplate", Description: "根据ID获取api 模版"},
 		{ApiGroup: "api模板", Method: "GET", Path: "/case/:project/getInterfaceTemplateList", Description: "获取api 模版列表"},
 		{ApiGroup: "api模板", Method: "PUT", Path: "/case/:project/updateDebugTalk", Description: "更新DebugTalk文件"},
-		{ApiGroup: "api模板", Method: "POST", Path: "/case/:project/getDebugTalk", Description: "获取DebugTalk文件"},
+		{ApiGroup: "api模板", Method: "GET", Path: "/case/:project/getDebugTalk", Description: "获取DebugTalk文件"},
 		{ApiGroup: "api模板", Method: "POST", Path: "/case/:project/createDebugTalk", Description: "创建DebugTalk文件"},
 		{ApiGroup: "api模板", Method: "POST", Path: "/case/:project/deleteDebugTalk", Description: "删除DebugTalk文件"},
 		{ApiGroup: "api模板", Method: "POST", Path: "/case/:project/getDebugTalkList", Description: "获取DebugTalk列表"},
-		{ApiGroup: "api模板", Method: "POST", Path: "/case/:project/getGrpc", Description: "获取grpc信息"},
+		{ApiGroup: "api模板", Method: "GET", Path: "/case/:project/getGrpc", Description: "获取grpc信息"},
 		{ApiGroup: "api模板", Method: "POST", Path: "/case/:project/createUserConfig", Description: "创建/更新用户配置"},
 		{ApiGroup: "api模板", Method: "GET", Path: "/case/:project/getUserConfig", Description: "获取用户配置"},
 
