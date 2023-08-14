@@ -17,9 +17,9 @@ func (p *PyPkgRouter) InitPyPkgRouter(Router *gin.RouterGroup) {
 		pyPkgRouter.POST("uninstallPyPkg", pkg.UninstallPyPkg)
 		pyPkgRouter.POST("updatePyPkg", pkg.UpdatePyPkg)
 		pyPkgRouter.POST("searchPyPkg", pkg.SearchPyPkg)
-		pyPkgRouter.POST("getPkgVersionList", pkg.GetPkgVersion)
 	}
 	{
 		pyPkgRouterWithoutRecord.GET("pyPkgList", pkg.GetPyPkgList) // 获取Python包列表
+		pyPkgRouter.GET("getPkgVersionList", pkg.GetPkgVersion)
 	}
 }
