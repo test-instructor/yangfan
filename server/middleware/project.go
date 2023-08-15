@@ -53,14 +53,14 @@ func ProjectAuth() gin.HandlerFunc {
 		case http.MethodPost, http.MethodPut:
 			// For POST and PUT requests, check the 'save' permission
 			if !userProject.Save {
-				response.FailWithDetailed(gin.H{}, "权限不足", c)
+				response.FailWithDetailed(gin.H{}, "权限不足，请联系管理员增加权限", c)
 				c.Abort()
 				return
 			}
 		case http.MethodDelete:
 			// For DELETE requests, check the 'delete' permission
 			if !userProject.Delete {
-				response.FailWithDetailed(gin.H{}, "权限不足", c)
+				response.FailWithDetailed(gin.H{}, "权限不足，请联系管理员增加权限", c)
 				c.Abort()
 				return
 			}
