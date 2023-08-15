@@ -663,22 +663,19 @@ type StepRequest struct {
 	step *TStep
 }
 
-// WithVariables sets variables for current teststep.
-// 设置当前测试步骤的变量
+// WithVariables 设置当前测试步骤的变量
 func (s *StepRequest) WithVariables(variables map[string]interface{}) *StepRequest {
 	s.step.Variables = variables
 	return s
 }
 
-// SetupHook adds a setup hook for current teststep.
-// 设置当前测试步骤的setup hook
+// SetupHook 设置当前测试步骤的setup hook
 func (s *StepRequest) SetupHook(hook string) *StepRequest {
 	s.step.SetupHooks = append(s.step.SetupHooks, hook)
 	return s
 }
 
-// HTTP2 enables HTTP/2 protocol
-// 设置当前测试步骤的HTTP2协议
+// HTTP2 设置当前测试步骤的HTTP2协议
 func (s *StepRequest) HTTP2() *StepRequest {
 	s.step.Request = &Request{
 		HTTP2: true,
@@ -686,15 +683,13 @@ func (s *StepRequest) HTTP2() *StepRequest {
 	return s
 }
 
-// Loop specify running times for the current step
-// 设置当前测试步骤的循环时间
+// Loop 设置当前测试步骤的循环次数
 func (s *StepRequest) Loop(times int) *StepRequest {
 	s.step.Loops = times
 	return s
 }
 
-// GET makes a HTTP GET request.
-// 设置当前测试步骤的请求方法为GET、设置url
+// GET 设置当前测试步骤的请求方法为GET、设置url
 func (s *StepRequest) GET(url string) *StepRequestWithOptionalArgs {
 	if s.step.Request != nil {
 		s.step.Request.Method = httpGET
@@ -710,8 +705,7 @@ func (s *StepRequest) GET(url string) *StepRequestWithOptionalArgs {
 	}
 }
 
-// HEAD makes a HTTP HEAD request.
-// 设置当前测试步骤的请求方法为HEAD、设置url
+// HEAD 设置当前测试步骤的请求方法为HEAD、设置url
 func (s *StepRequest) HEAD(url string) *StepRequestWithOptionalArgs {
 	if s.step.Request != nil {
 		s.step.Request.Method = httpHEAD
@@ -727,8 +721,7 @@ func (s *StepRequest) HEAD(url string) *StepRequestWithOptionalArgs {
 	}
 }
 
-// POST makes a HTTP POST request.
-// 设置当前测试步骤的请求方法为POST、设置url
+// POST 设置当前测试步骤的请求方法为POST、设置url
 func (s *StepRequest) POST(url string) *StepRequestWithOptionalArgs {
 	if s.step.Request != nil {
 		s.step.Request.Method = httpPOST
@@ -744,8 +737,7 @@ func (s *StepRequest) POST(url string) *StepRequestWithOptionalArgs {
 	}
 }
 
-// PUT makes a HTTP PUT request.
-// 设置当前测试步骤的请求方法为PUT、设置url
+// PUT 设置当前测试步骤的请求方法为PUT、设置url
 func (s *StepRequest) PUT(url string) *StepRequestWithOptionalArgs {
 	if s.step.Request != nil {
 		s.step.Request.Method = httpPUT
@@ -761,8 +753,7 @@ func (s *StepRequest) PUT(url string) *StepRequestWithOptionalArgs {
 	}
 }
 
-// DELETE makes a HTTP DELETE request.
-// 设置当前测试步骤的请求方法为DELETE、设置url
+// DELETE 设置当前测试步骤的请求方法为DELETE、设置url
 func (s *StepRequest) DELETE(url string) *StepRequestWithOptionalArgs {
 	if s.step.Request != nil {
 		s.step.Request.Method = httpDELETE
@@ -778,8 +769,7 @@ func (s *StepRequest) DELETE(url string) *StepRequestWithOptionalArgs {
 	}
 }
 
-// OPTIONS makes a HTTP OPTIONS request.
-// 设置当前测试步骤的请求方法为OPTIONS、设置url
+// OPTIONS 设置当前测试步骤的请求方法为OPTIONS、设置url
 func (s *StepRequest) OPTIONS(url string) *StepRequestWithOptionalArgs {
 	if s.step.Request != nil {
 		s.step.Request.Method = httpOPTIONS
@@ -795,8 +785,7 @@ func (s *StepRequest) OPTIONS(url string) *StepRequestWithOptionalArgs {
 	}
 }
 
-// PATCH makes a HTTP PATCH request.
-// 设置当前测试步骤的请求方法为PATCH、设置url
+// PATCH 设置当前测试步骤的请求方法为PATCH、设置url
 func (s *StepRequest) PATCH(url string) *StepRequestWithOptionalArgs {
 	if s.step.Request != nil {
 		s.step.Request.Method = httpPATCH
@@ -812,7 +801,7 @@ func (s *StepRequest) PATCH(url string) *StepRequestWithOptionalArgs {
 	}
 }
 
-// CallRefCase calls a referenced testcase.
+// CallRefCase 调用一个引用的测试用例。
 func (s *StepRequest) CallRefCase(tc ITestCase) *StepTestCaseWithOptionalArgs {
 	var err error
 	s.step.TestCase, err = tc.ToTestCase()
@@ -825,7 +814,7 @@ func (s *StepRequest) CallRefCase(tc ITestCase) *StepTestCaseWithOptionalArgs {
 	}
 }
 
-// CallRefAPI calls a referenced api.
+// CallRefAPI 调用一个引用的 API。
 func (s *StepRequest) CallRefAPI(api IAPI) *StepAPIWithOptionalArgs {
 	var err error
 	s.step.API, err = api.ToAPI()
@@ -838,7 +827,7 @@ func (s *StepRequest) CallRefAPI(api IAPI) *StepAPIWithOptionalArgs {
 	}
 }
 
-// StartTransaction starts a transaction.
+// StartTransaction 开始一个事务。
 func (s *StepRequest) StartTransaction(name string) *StepTransaction {
 	s.step.Transaction = &Transaction{
 		Name: name,
@@ -849,7 +838,7 @@ func (s *StepRequest) StartTransaction(name string) *StepTransaction {
 	}
 }
 
-// EndTransaction ends a transaction.
+// EndTransaction 结束一个事务。
 func (s *StepRequest) EndTransaction(name string) *StepTransaction {
 	s.step.Transaction = &Transaction{
 		Name: name,
@@ -860,7 +849,7 @@ func (s *StepRequest) EndTransaction(name string) *StepTransaction {
 	}
 }
 
-// SetThinkTime sets think time.
+// SetThinkTime 设置思考时间。
 func (s *StepRequest) SetThinkTime(time float64) *StepThinkTime {
 	s.step.ThinkTime = &ThinkTime{
 		Time: time,
@@ -870,7 +859,7 @@ func (s *StepRequest) SetThinkTime(time float64) *StepThinkTime {
 	}
 }
 
-// SetRendezvous creates a new rendezvous
+// SetRendezvous 创建一个新的会合点。
 func (s *StepRequest) SetRendezvous(name string) *StepRendezvous {
 	s.step.Rendezvous = &Rendezvous{
 		Name: name,
@@ -880,7 +869,7 @@ func (s *StepRequest) SetRendezvous(name string) *StepRendezvous {
 	}
 }
 
-// WebSocket creates a new websocket action
+// WebSocket 创建一个新的 WebSocket 动作。
 func (s *StepRequest) WebSocket() *StepWebSocket {
 	s.step.WebSocket = &WebSocketAction{}
 	return &StepWebSocket{
@@ -888,7 +877,7 @@ func (s *StepRequest) WebSocket() *StepWebSocket {
 	}
 }
 
-// Android creates a new android action
+// Android 创建一个新的 Android 动作。
 func (s *StepRequest) Android() *StepMobile {
 	s.step.Android = &MobileStep{}
 	return &StepMobile{
@@ -896,7 +885,7 @@ func (s *StepRequest) Android() *StepMobile {
 	}
 }
 
-// IOS creates a new ios action
+// IOS 创建一个新的 iOS 动作。
 func (s *StepRequest) IOS() *StepMobile {
 	s.step.IOS = &MobileStep{}
 	return &StepMobile{

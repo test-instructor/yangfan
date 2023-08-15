@@ -57,8 +57,8 @@ type TStep struct {
 // StepTransaction, StepRendezvous, StepWebSocket.
 // 测试步骤接口(类型)
 type IStep interface {
-	Name() string
-	Type() StepType
-	Struct() *TStep
-	Run(*SessionRunner) (*StepResult, error)
+	Name() string                            // 步骤名称
+	Type() StepType                          // 步骤类型
+	Struct() *TStep                          // 步骤实例
+	Run(*SessionRunner) (*StepResult, error) // 运行步骤
 }

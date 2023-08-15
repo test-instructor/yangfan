@@ -167,10 +167,11 @@ func TestRunCaseWithTimeout(t *testing.T) {
 			SetTimeout(10 * time.Second). // set global timeout to 10s
 			SetBaseURL("https://httpbin.org"),
 		TestSteps: []IStep{
-			NewStep("step1").
-				GET("/delay/1").
-				Validate().
-				AssertEqual("status_code", 200, "check status code"),
+			NewStep("step1"). // 创建Step对象StepRequest
+						GET("/delay/1"). // 设请求方法，并返回IStep(StepRequestWithOptionalArgs)对象
+						Extract().       // 设请求方法，并返回IStep(StepRequestExtraction)对象
+						Validate().      // 设置断言，并返回IStep(StepRequestValidation)对象
+						AssertEqual("status_code", 200, "check status code"),
 		},
 	}
 	err := r.Run(testcase1)
