@@ -78,7 +78,7 @@ func Routers() *gin.Engine {
 	//获取路由组实例
 	interfacecaseRouter := router.RouterGroupApp.Interfacecase
 	InterfaceGroup := Router.Group("case/:project")
-	InterfaceGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler())
+	InterfaceGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler()).Use(middleware.ProjectAuth())
 	{
 		interfacecaseRouter.InitApiMenuRouter(InterfaceGroup)
 		interfacecaseRouter.InitInterfaceTemplateRouter(InterfaceGroup)
@@ -88,49 +88,49 @@ func Routers() *gin.Engine {
 
 	runCaseRouter := router.RouterGroupApp.RunCase
 	runCaseGroup := Router.Group("case/run/:project")
-	runCaseGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler())
+	runCaseGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler()).Use(middleware.ProjectAuth())
 	{
 		runCaseRouter.InitRunCaseRouter(runCaseGroup)
 	}
 
 	reportRouter := router.RouterGroupApp.Report
 	reportGroup := Router.Group("case/report/:project")
-	reportGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler())
+	reportGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler()).Use(middleware.ProjectAuth())
 	{
 		reportRouter.InitReportRouter(reportGroup)
 	}
 
 	apiConfigRouter := router.RouterGroupApp.ApiConfig
 	apiConfigGroup := Router.Group("ac/:project")
-	apiConfigGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler())
+	apiConfigGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler()).Use(middleware.ProjectAuth())
 	{
 		apiConfigRouter.InitApiConfigRouter(apiConfigGroup)
 	}
 
 	apiCaseRouter := router.RouterGroupApp.ApiCase
 	apiCaseGroup := Router.Group("testcase/:project")
-	apiCaseGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler())
+	apiCaseGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler()).Use(middleware.ProjectAuth())
 	{
 		apiCaseRouter.InitApiCaseRouter(apiCaseGroup)
 	}
 
 	timerTaskRouter := router.RouterGroupApp.TimerTask
 	timerTaskGroup := Router.Group("task/:project")
-	timerTaskGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler())
+	timerTaskGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler()).Use(middleware.ProjectAuth())
 	{
 		timerTaskRouter.InitTimerTaskRouter(timerTaskGroup)
 	}
 
 	performanceRouter := router.RouterGroupApp.Performance
 	performanceGroup := Router.Group("performance/:project")
-	performanceGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler())
+	performanceGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler()).Use(middleware.ProjectAuth())
 	{
 		performanceRouter.InitPerformanceRouter(performanceGroup)
 	}
 
 	environmentRouter := router.RouterGroupApp.Environment
 	environmentGroup := Router.Group("env/:project")
-	environmentGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler())
+	environmentGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler()).Use(middleware.ProjectAuth())
 	{
 		environmentRouter.InitEnvironmentRouter(environmentGroup)
 	}
