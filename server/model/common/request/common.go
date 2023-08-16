@@ -60,4 +60,11 @@ type RunCaseReq struct {
 	ProjectID uint      `json:"-"`
 	Env       uint      `json:"env" form:"env"`
 	ReportID  uint      `json:"reportID" form:"reportID"`
+	Interval  *Interval `json:"interval"`
+}
+
+type Interval struct {
+	IntervalTime   uint `json:"intervalTime"`
+	IntervalCount  uint `json:"intervalCount"`
+	IntervalNumber uint `json:"intervalNumber"`
 }
