@@ -52,7 +52,7 @@ bash -c "$(curl -fsSLk http://docs.yangfan.gd.cn/install/install.sh)"
 4. 开发工具推荐vscode https://code.visualstudio.com/
 
 
-## docker 部署
+## 二、docker 部署
 
 * 前端：修改对应`docker-compose`文件中的`ENV_VITE_FS_APP_ID`、`ENV_VITE_FS_LOGIN`
 * 后端：修改`deploy/docker-compose/config/docker.config.yaml`中的数据库`mysql`、飞书登录`fs`相关配置
@@ -70,7 +70,7 @@ bash -c "$(curl -fsSLk http://docs.yangfan.gd.cn/install/install.sh)"
       
    ```
    
-## k8s 部署
+## 三、k8s 部署
 文件目录`./deploy/kubernetes`
 ```shell
 kubernetes
