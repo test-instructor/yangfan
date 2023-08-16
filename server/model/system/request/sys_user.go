@@ -54,5 +54,5 @@ type ChangeUserInfo struct {
 
 type SetUserProjects struct {
 	ID         uint
-	ProjectIds []string `json:"projectIds"` // 角色ID
+	ProjectIds []uint `json:"projectIds"` // 角色ID
 }

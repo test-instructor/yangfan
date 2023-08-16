@@ -96,6 +96,28 @@ func (projectApi *ProjectApi) UpdateProject(c *gin.Context) {
 	}
 }
 
+func (projectApi *ProjectApi) SetUserProjectAuth(c *gin.Context) {
+	var sua system.SysUserProject
+	_ = c.ShouldBindJSON(&sua)
+	if err := projectService.SetUserProjectAuth(sua); err != nil {
+		global.GVA_LOG.Error("修改失败!", zap.Error(err))
+		response.FailWithMessage("修改失败", c)
+	} else {
+		response.OkWithMessage("修改成功", c)
+	}
+}
+
+func (projectApi *ProjectApi) DeleteProjectAuth(c *gin.Context) {
+	var sua system.SysUserProject
+	_ = c.ShouldBindJSON(&sua)
+	if err := projectService.DeleteProjectAuth(sua); err != nil {
+		global.GVA_LOG.Error("修改失败!", zap.Error(err))
+		response.FailWithMessage("修改失败", c)
+	} else {
+		response.OkWithMessage("修改成功", c)
+	}
+}
+
 // FindProject 用id查询Project
 // @Tags Project
 // @Summary 用id查询Project
@@ -139,4 +161,20 @@ func (projectApi *ProjectApi) GetProjectList(c *gin.Context) {
 			PageSize: pageInfo.PageSize,
 		}, "获取成功", c)
 	}
+}
+
+func (projectApi *ProjectApi) GetProjectUserList(c *gin.Context) {
+	var search interfacecaseReq.SysProjectUsers
+	_ = c.ShouldBindQuery(&search)
+	list, total, err := projectService.GetProjectUserList(search)
+	if err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+	}
+	response.OkWithDetailed(response.PageResult{
+		List:     list,
+		Total:    total,
+		Page:     search.Page,
+		PageSize: search.PageSize,
+	}, "获取成功", c)
 }

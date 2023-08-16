@@ -9,3 +9,8 @@ type ProjectSearch struct {
 	system.Project
 	request.PageInfo
 }
+
+type SysProjectUsers struct {
+	ProjectId uint `json:"projectId" form:"projectId"`
+	request.PageInfo
+}

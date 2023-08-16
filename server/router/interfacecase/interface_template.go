@@ -21,14 +21,14 @@ func (s *InterfaceTemplateRouter) InitInterfaceTemplateRouter(Router *gin.Router
 		apicaseRouter.DELETE("deleteInterfaceTemplateByIds", apiCaseApi.DeleteInterfaceTemplateByIds) // 批量删除InterfaceTemplate
 		apicaseRouter.PUT("updateInterfaceTemplate", apiCaseApi.UpdateInterfaceTemplate)              // 更新InterfaceTemplate
 		apicaseRouter.PUT("updateDebugTalk", apiCaseApi.UpdateDebugTalk)
-		apicaseRouter.POST("getDebugTalk", apiCaseApi.GetDebugTalk)
+		//apicaseRouter.GET("getDebugTalk", apiCaseApi.GetDebugTalk)
 		apicaseRouter.POST("createUserConfig", apiCaseApi.CreateUserConfig)
 	}
 	{
 		apicaseRouterWithoutRecord.GET("findInterfaceTemplate", apiCaseApi.FindInterfaceTemplate)       // 根据ID获取InterfaceTemplate
 		apicaseRouterWithoutRecord.GET("getInterfaceTemplateList", apiCaseApi.GetInterfaceTemplateList) // 获取InterfaceTemplate列表
 		apicaseRouterWithoutRecord.GET("getDebugTalk", apiCaseApi.GetDebugTalk)
-		apicaseRouterWithoutRecord.POST("getGrpc", apiCaseApi.GetGrpc)
+		apicaseRouterWithoutRecord.GET("getGrpc", apiCaseApi.GetGrpc)
 		apicaseRouterWithoutRecord.GET("getUserConfig", apiCaseApi.GetUserConfig)
 	}
 }

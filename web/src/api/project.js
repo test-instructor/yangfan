@@ -1,4 +1,4 @@
-import service from '@/utils/request'
+import service from "@/utils/request";
 
 // @Tags Project
 // @Summary 创建Project
@@ -9,12 +9,12 @@ import service from '@/utils/request'
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /project/createProject [post]
 export const createProject = (data) => {
-    return service({
-        url: '/project/createProject',
-        method: 'post',
-        data
-    })
-}
+  return service({
+    url: "/project/createProject",
+    method: "post",
+    data,
+  });
+};
 
 // @Tags Project
 // @Summary 删除Project
@@ -25,12 +25,12 @@ export const createProject = (data) => {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
 // @Router /project/deleteProject [delete]
 export const deleteProject = (data) => {
-    return service({
-        url: '/project/deleteProject',
-        method: 'delete',
-        data
-    })
-}
+  return service({
+    url: "/project/deleteProject",
+    method: "delete",
+    data,
+  });
+};
 
 // @Tags Project
 // @Summary 删除Project
@@ -41,12 +41,12 @@ export const deleteProject = (data) => {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
 // @Router /project/deleteProject [delete]
 export const deleteProjectByIds = (data) => {
-    return service({
-        url: '/project/deleteProjectByIds',
-        method: 'delete',
-        data
-    })
-}
+  return service({
+    url: "/project/deleteProjectByIds",
+    method: "delete",
+    data,
+  });
+};
 
 // @Tags Project
 // @Summary 更新Project
@@ -57,12 +57,12 @@ export const deleteProjectByIds = (data) => {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
 // @Router /project/updateProject [put]
 export const updateProject = (data) => {
-    return service({
-        url: '/project/updateProject',
-        method: 'put',
-        data
-    })
-}
+  return service({
+    url: "/project/updateProject",
+    method: "put",
+    data,
+  });
+};
 
 // @Tags Project
 // @Summary 用id查询Project
@@ -73,12 +73,12 @@ export const updateProject = (data) => {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
 // @Router /project/findProject [get]
 export const findProject = (params) => {
-    return service({
-        url: '/project/findProject',
-        method: 'get',
-        params
-    })
-}
+  return service({
+    url: "/project/findProject",
+    method: "get",
+    params,
+  });
+};
 
 // @Tags Project
 // @Summary 分页获取Project列表
@@ -89,9 +89,33 @@ export const findProject = (params) => {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /project/getProjectList [get]
 export const getProjectList = (params) => {
-    return service({
-        url: '/project/getProjectList',
-        method: 'get',
-        params
-    })
-}
+  return service({
+    url: "/project/getProjectList",
+    method: "get",
+    params,
+  });
+};
+
+export const getProjectUserList = (params) => {
+  return service({
+    url: "/project/getProjectUserList",
+    method: "get",
+    params,
+  });
+};
+
+export const setUserProjectAuth = (data) => {
+  return service({
+    url: "/project/setUserProjectAuth",
+    method: "post",
+    data,
+  });
+};
+
+export const deleteUserProjectAuth = (data) => {
+  return service({
+    url: "/project/deleteUserProjectAuth",
+    method: "delete",
+    data,
+  });
+};

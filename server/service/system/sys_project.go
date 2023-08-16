@@ -120,6 +120,20 @@ func (projectService *ProjectService) UpdateProject(project system.Project) (err
 	return err
 }
 
+func (projectService *ProjectService) SetUserProjectAuth(sup system.SysUserProject) (err error) {
+	err = global.GVA_DB.Model(&system.SysUserProject{}).
+		Where("sys_user_id = ? AND project_id = ?", sup.SysUserID, sup.ProjectID).
+		Save(&sup).Error
+	return err
+}
+
+func (projectService *ProjectService) DeleteProjectAuth(sup system.SysUserProject) (err error) {
+	err = global.GVA_DB.Model(&system.SysUserProject{}).
+		Where("sys_user_id = ? AND project_id = ?", sup.SysUserID, sup.ProjectID).
+		Delete(&sup).Error
+	return err
+}
+
 // GetProject 根据id获取Project记录
 
 func (projectService *ProjectService) GetProject(id uint) (err error, project system.Project) {
@@ -142,4 +156,30 @@ func (projectService *ProjectService) GetProjectInfoList(info interfacecaseReq.P
 	}
 	err = db.Limit(limit).Offset(offset).Find(&projects).Error
 	return err, projects, total
+}
+
+func (projectService *ProjectService) GetProjectUserList(info interfacecaseReq.SysProjectUsers) (list []system.SysUserProject, total int64, err error) {
+	limit := info.PageSize
+	offset := info.PageSize * (info.Page - 1)
+	db := global.GVA_DB.Model(&system.SysUserProject{}).Preload("SysUser").
+		Joins("RIGHT JOIN sys_users ON sys_user_project.sys_user_id = sys_users.id").
+		Where("project_id = ? AND sys_user_id != 0", info.ProjectId)
+
+	var users []system.SysUserProject
+	err = db.Count(&total).Error
+	if err != nil {
+		return nil, total, err
+	}
+	err = db.Limit(limit).Offset(offset).Find(&users).Error
+	projectService.ResetProjectUserAuthList(users)
+	return users, total, err
+}
+
+func (projectService *ProjectService) ResetProjectUserAuthList(list []system.SysUserProject) {
+	for i := 0; i < len(list); i++ {
+		if list[i].SysUser != nil {
+			list[i].Username = list[i].SysUser.Username
+			list[i].SysUser = nil
+		}
+	}
 }

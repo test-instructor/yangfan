@@ -68,6 +68,17 @@ func (userService *UserService) Login(u *system.SysUser) (userInter *system.SysU
 			user.Authority.DefaultRouter = "404"
 		}
 	}
+	var sup []system.SysUserProject
+	var projects []system.Project
+	err = global.GVA_DB.Model(&system.SysUserProject{}).Preload("Project").Where("sys_user_id = ?", user.ID).Find(&sup).Error
+	if err != nil {
+		return nil, err
+	}
+
+	for _, s := range sup {
+		projects = append(projects, *s.Project)
+	}
+	user.Projects = projects
 
 	return &user, err
 }
@@ -109,6 +120,20 @@ func (userService *UserService) GetUserInfoList(info request.PageInfo) (list int
 	}
 	//err = db.Limit(limit).Offset(offset).Preload("Authorities").Preload("Authority").Find(&userList).Error
 	err = db.Limit(limit).Offset(offset).Preload("Projects").Preload("Authorities").Preload("Authority").Find(&userList).Error
+	for i := 0; i < len(userList); i++ {
+		var sup []system.SysUserProject
+		var projects []system.Project
+		err = global.GVA_DB.Model(&system.SysUserProject{}).Preload("Project").Where("sys_user_id = ?", userList[i].ID).Find(&sup).Error
+		if err != nil {
+			continue
+		}
+		for _, s := range sup {
+			if s.Project != nil {
+				projects = append(projects, *s.Project)
+			}
+		}
+		userList[i].Projects = projects
+	}
 	return userList, total, err
 }
 
@@ -158,16 +183,16 @@ func (userService *UserService) SetUserAuthorities(id uint, authorityIds []uint)
 	})
 }
 
-func (userService *UserService) SetUserProjects(id uint, projectIds []string) (err error) {
-	return global.GVA_DB.Transaction(func(tx *gorm.DB) error {
-		TxErr := tx.Delete(&[]system.SysUseProject{}, "sys_user_id = ?", id).Error
+func (userService *UserService) SetUserProjects(id uint, projectIds []uint) (err error) {
+	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+		TxErr := tx.Delete(&[]system.SysUserProject{}, "sys_user_id = ?", id).Error
 		if TxErr != nil {
 			return TxErr
 		}
-		useProject := []system.SysUseProject{}
+		var useProject []system.SysUserProject
 		for _, v := range projectIds {
-			useProject = append(useProject, system.SysUseProject{
-				id, v,
+			useProject = append(useProject, system.SysUserProject{
+				SysUserID: id, ProjectID: v,
 			})
 		}
 		TxErr = tx.Create(&useProject).Error
@@ -176,6 +201,7 @@ func (userService *UserService) SetUserProjects(id uint, projectIds []string) (e
 		}
 		return nil
 	})
+	return err
 }
 
 //@author: [piexlmax](https://github.com/piexlmax)
@@ -217,6 +243,15 @@ func (userService *UserService) GetUserInfo(uuid uuid.UUID) (user system.SysUser
 	if err != nil {
 		return reqUser, err
 	}
+
+	var sup []system.SysUserProject
+	var projects []system.Project
+	global.GVA_DB.Model(&system.SysUserProject{}).Preload("Project").Where("sys_user_id = ?", reqUser.ID).Find(&sup)
+
+	for _, s := range sup {
+		projects = append(projects, *s.Project)
+	}
+	reqUser.Projects = projects
 
 	var SysAuthorityMenus []system.SysAuthorityMenu
 	err = global.GVA_DB.Where("sys_authority_authority_id = ?", reqUser.AuthorityId).Find(&SysAuthorityMenus).Error

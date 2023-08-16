@@ -90,7 +90,7 @@ func (p *PyPkg) SearchPyPkg(ctx *gin.Context) {
 
 func (p *PyPkg) GetPkgVersion(ctx *gin.Context) {
 	var pyPkg request.HrpPyPkgRequest
-	_ = ctx.ShouldBindJSON(&pyPkg)
+	_ = ctx.ShouldBindQuery(&pyPkg)
 	err, versionList := pyPkgService.PyPkgVersionService(pyPkg)
 	if err != nil {
 		response.FailWithMessage(err.Error(), ctx)

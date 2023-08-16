@@ -23,6 +23,10 @@
               :src="`http://qiniu.yangfan.gd.cn/about/group.jpeg?time=${timestamp}`"
               alt="Group Image"
             />
+            <img
+              :src="`http://qiniu.yangfan.gd.cn/about/mp.jpg?time=${timestamp}`"
+              alt="mp Image"
+            />
           </div>
         </el-card>
       </el-col>
@@ -138,7 +142,7 @@ loadMembers();
 }
 
 img {
-  width: 390px;
+  width: 270px;
   height: auto;
 }
 </style>
