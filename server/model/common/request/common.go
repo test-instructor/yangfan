@@ -47,6 +47,7 @@ type Operation struct {
 	Running    RunningType `json:"running"`
 	SpawnCount int64       `json:"spawnCount"`
 	SpawnRate  float64     `json:"spawnRate"`
+	Interval   *Interval   `json:"interval"`
 }
 
 type RunCaseReq struct {
@@ -60,7 +61,6 @@ type RunCaseReq struct {
 	ProjectID uint      `json:"-"`
 	Env       uint      `json:"env" form:"env"`
 	ReportID  uint      `json:"reportID" form:"reportID"`
-	Interval  *Interval `json:"interval"`
 }
 
 type Interval struct {
