@@ -64,7 +64,7 @@ type RunCaseReq struct {
 }
 
 type Interval struct {
-	IntervalTime   uint `json:"intervalTime"`
-	IntervalCount  uint `json:"intervalCount"`
-	IntervalNumber uint `json:"intervalNumber"`
+	IntervalTime   int64 `json:"intervalTime"`
+	IntervalCount  int64 `json:"intervalCount"`
+	IntervalNumber int64 `json:"intervalNumber"`
 }
