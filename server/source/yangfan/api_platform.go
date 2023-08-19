@@ -307,6 +307,7 @@ func RegisterMenus() {
 		{GVA_MODEL: global.GVA_MODEL{ID: 61, CreatedAt: time.Time{}, UpdatedAt: time.Time{}, DeletedAt: gorm.DeletedAt{}}, MenuLevel: 0, Hidden: false, ParentId: "33", Path: "env", Name: "env", Component: "view/interface/environment/environment.vue", Sort: 0, Meta: system.Meta{KeepAlive: true, Title: "环境变量", Icon: "grid"}},
 		{GVA_MODEL: global.GVA_MODEL{ID: 62, CreatedAt: time.Time{}, UpdatedAt: time.Time{}, DeletedAt: gorm.DeletedAt{}}, MenuLevel: 0, Hidden: false, ParentId: "33", Path: "py_pkg", Name: "py_pkg", Component: "view/py_pkg/py_pkg.vue", Sort: 680, Meta: system.Meta{KeepAlive: true, Title: "py库管理", Icon: "office-building"}},
 		{GVA_MODEL: global.GVA_MODEL{ID: 80, CreatedAt: time.Time{}, UpdatedAt: time.Time{}, DeletedAt: gorm.DeletedAt{}}, MenuLevel: 0, Hidden: false, ParentId: "0", Path: "about", Name: "关于我们", Component: "view/about/index.vue", Sort: 0, Meta: system.Meta{KeepAlive: true, Title: "关于我们", Icon: "info-filled"}},
+		{GVA_MODEL: global.GVA_MODEL{ID: 81, CreatedAt: time.Time{}, UpdatedAt: time.Time{}, DeletedAt: gorm.DeletedAt{}}, MenuLevel: 0, Hidden: false, ParentId: "3", Path: "project-auth", Name: "项目权限", Component: "view/project/authority.vue", Sort: 0, Meta: system.Meta{KeepAlive: true, Title: "项目权限", Icon: "avatar"}},
 	}
 	baseMenuService := system2.BaseMenuService{}
 	for i := 0; i < len(entities); i++ {
