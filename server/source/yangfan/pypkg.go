@@ -22,7 +22,7 @@ type Config struct {
 
 type PkgInstalledType int
 
-var (
+const (
 	PkgInstalledTypeFalse PkgInstalledType = 0
 	PkgInstalledTypeTrue  PkgInstalledType = 1
 )

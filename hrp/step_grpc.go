@@ -20,7 +20,7 @@ import (
 // GrpcType Request type
 type GrpcType string
 
-var (
+const (
 	GrpcTypeSimple              GrpcType = "Simple"
 	GrpcTypeServerSideStream    GrpcType = "ServerSideStream"
 	GrpcTypeClientSideStream    GrpcType = "ClientSideStream"
