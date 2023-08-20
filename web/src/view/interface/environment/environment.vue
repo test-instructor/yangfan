@@ -123,7 +123,7 @@
       <el-form :model="varForm" label-width="120px">
         <el-form-item label="变量key">
           <el-input v-model="varForm.key" :disabled="envVarType === '更新变量'">
-            <template v-if="envVarType != '更新变量'" #prepend>env_</template>
+            <template v-if="envVarType !== '更新变量'" #prepend>env_</template>
           </el-input>
         </el-form-item>
         <el-form-item label="变量名称">

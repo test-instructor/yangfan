@@ -14,7 +14,7 @@ func (msgs *MessageServer) CreateMessage(msg interfacecase.ApiMessage) (err erro
 }
 
 func (msgs *MessageServer) DeleteMessage(msg interfacecase.ApiMessage) (err error) {
-	err = global.GVA_DB.Delete(&msg).Error
+	err = global.GVA_DB.Model(&interfacecase.ApiMessage{}).Delete(&msg).Error
 	return err
 }
 

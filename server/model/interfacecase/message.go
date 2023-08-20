@@ -7,14 +7,16 @@ type MessageType string
 const MessageTypeFeishu MessageType = "feishu"
 const MessageTypeDingtalk MessageType = "dingtalk"
 
+var _ = []MessageType{MessageTypeFeishu, MessageTypeDingtalk}
+
 type ApiMessage struct {
 	global.GVA_MODEL
 	Operator
-	Name      string      `json:"name,omitempty" form:"name" gorm:"column:name;comment:消息名称;"`
-	Type      MessageType `json:"type,omitempty" form:"type" gorm:"column:type;comment:消息类型;"`
-	WebHook   string      `json:"webhook,omitempty" form:"webhook" gorm:"column:webhook;comment:webhook地址;"`
-	Signature string      `json:"signature,omitempty" form:"signature" gorm:"column:signature;comment:签名;"`
-	Fail      bool        `json:"fail,omitempty" form:"fail" gorm:"column:fail;comment:仅失败时发送;"`
+	Name      string      `json:"name" form:"name" gorm:"column:name;comment:消息名称;"`
+	Type      MessageType `json:"type" form:"type" gorm:"column:type;comment:消息类型;"`
+	WebHook   string      `json:"webhook" form:"webhook" gorm:"column:webhook;comment:webhook地址;"`
+	Signature string      `json:"signature" form:"signature" gorm:"column:signature;comment:签名;"`
+	Fail      bool        `json:"fail" form:"fail" gorm:"column:fail;comment:仅失败时发送;"`
 }
 
 type ApiMessageLog struct {
