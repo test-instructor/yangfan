@@ -126,10 +126,22 @@
           >
         </el-table-column>
       </el-table>
+      <div class="gva-pagination">
+        <el-pagination
+          layout="total, sizes, prev, pager, next, jumper"
+          :current-page="page"
+          :page-size="pageSize"
+          :page-sizes="[10, 30, 50, 100]"
+          :total="total"
+          @current-change="handleCurrentChange"
+          @size-change="handleSizeChange"
+        />
+      </div>
     </div>
     <el-dialog
       :title="dialogTitle"
       v-model="dialogFormVisible"
+      :before-close="closeDialogMsg"
       width="50%"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
@@ -202,7 +214,7 @@ const typeList = ref([
 ]);
 
 // 行为控制标记（弹窗内部需要增还是改）
-const type = ref("");
+const msgType = ref("");
 
 // 弹窗控制标记
 const dialogFormVisible = ref(false);
@@ -245,7 +257,7 @@ const init = () => {
 };
 init();
 const openDialog = () => {
-  type.value = "create";
+  msgType.value = "create";
   dialogTitle.value = "新增消息";
   dialogFormVisible.value = true;
 };
@@ -268,14 +280,35 @@ const submitForm = async () => {
     ElMessage.warning("Webhook不能为空");
     return;
   }
-  let res = await createMessage(dialogForm.value);
-  if (res.code === 0) {
-    ElMessage.success("新增成功");
-    dialogFormVisible.value = false;
-    getTableData();
+  if (msgType.value === "create") {
+    let res = await createMessage(dialogForm.value);
+    if (res.code === 0) {
+      ElMessage.success("新增成功");
+      dialogFormVisible.value = false;
+      await getTableData();
+      dialogForm.value = {};
+    }
+  }
+  if (msgType.value === "update") {
+    let res = await updateMessage(dialogForm.value);
+    if (res.code === 0) {
+      ElMessage.success("变更成功");
+      dialogFormVisible.value = false;
+      await getTableData();
+      dialogForm.value = {};
+    }
   }
 };
-const updateRow = (row) => {};
+const updateRow = (row) => {
+  msgType.value = "update";
+  dialogTitle.value = "变更消息";
+  dialogFormVisible.value = true;
+  findMessage({ ID: row.ID }).then((res) => {
+    if (res.code === 0) {
+      dialogForm.value = res.data;
+    }
+  });
+};
 
 const deleteRow = (row) => {
   ElMessageBox.confirm(
@@ -305,6 +338,21 @@ const deleteMsgRow = async (row) => {
 const getMessageType = (type) => {
   let res = typeList.value.find((item) => item.value === type);
   return res ? res.label : "";
+};
+
+const handleCurrentChange = (val) => {
+  page.value = val;
+  getTableData();
+};
+
+const handleSizeChange = (val) => {
+  pageSize.value = val;
+  getTableData();
+};
+
+const closeDialogMsg = () => {
+  dialogFormVisible.value = false;
+  dialogForm.value = {};
 };
 </script>
 
