@@ -32,6 +32,10 @@ func (msgs *MessageServer) GetMessageList(info interfacecaseReq.ApiMessaceSearch
 	if info.Name != "" {
 		db = db.Where("name LIKE ?", "%"+info.Name+"%")
 	}
+	if info.Type != "" {
+		db.Where("type = ?", info.Type)
+	}
+
 	err = db.Count(&total).Error
 	if err != nil {
 		return

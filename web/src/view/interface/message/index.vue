@@ -11,7 +11,7 @@
           <el-input v-model="searchInfo.name" placeholder="名称" size="mini" />
         </el-form-item>
         <el-form-item label="类型" prop="type">
-          <el-select v-model="searchInfo.type">
+          <el-select v-model="searchInfo.type" clearable>
             <el-option
               v-for="item in typeList"
               :key="item.value"
@@ -21,11 +21,14 @@
           </el-select>
         </el-form-item>
         <el-form-item label="仅失败通知" prop="fail">
-          <el-switch
-            v-model="searchInfo.fail"
-            :active-value="true"
-            :inactive-value="false"
-          />
+          <el-select v-model="searchInfo.fail" clearable>
+            <el-option
+              v-for="item in failList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item>
           <el-button size="mini" type="primary" icon="search" @click="onSubmit"
@@ -211,6 +214,11 @@ const dialogForm = ref({
 const typeList = ref([
   { label: "钉钉", value: "dingtalk" },
   { label: "飞书", value: "feishu" },
+]);
+
+const failList = ref([
+  { label: "是", value: true },
+  { label: "否", value: false },
 ]);
 
 // 行为控制标记（弹窗内部需要增还是改）
