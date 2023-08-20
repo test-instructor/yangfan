@@ -258,6 +258,12 @@ func RegisterApis() {
 		{ApiGroup: "环境变量", Method: "DELETE", Path: "/env/:project/deleteEnvVariable", Description: "删除变量"},
 		{ApiGroup: "环境变量", Method: "GET", Path: "/env/:project/findEnvVariable", Description: "通过id查找变量"},
 		{ApiGroup: "环境变量", Method: "GET", Path: "/env/:project/getEnvVariableList", Description: "查询变量列表"},
+
+		{ApiGroup: "消息通知", Method: "POST", Path: "/message/:project/createMessage", Description: "新建Message"},
+		{ApiGroup: "消息通知", Method: "DELETE", Path: "/message/:project/deleteMessage", Description: "删除Message"},
+		{ApiGroup: "消息通知", Method: "PUT", Path: "/message/:project/updateMessage", Description: "更新Message"},
+		{ApiGroup: "消息通知", Method: "GET", Path: "/message/:project/findMessage", Description: "根据ID获取Message"},
+		{ApiGroup: "消息通知", Method: "GET", Path: "/message/:project/getMessageList", Description: "获取Message列表"},
 	}
 
 	var count int64

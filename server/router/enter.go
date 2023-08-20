@@ -17,6 +17,7 @@ type RouterGroup struct {
 	TimerTask     interfacecase.TimerTaskGroup
 	Performance   interfacecase.PerformanceRouterGroup
 	Environment   interfacecase.EnvironmentRouterGroup
+	Message       interfacecase.MessageRouterGroup
 }
 
 var RouterGroupApp = new(RouterGroup)

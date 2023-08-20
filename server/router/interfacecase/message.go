@@ -11,12 +11,15 @@ type MessageRouter struct {
 
 func (msg *MessageRouter) InitMessageRouter(Router *gin.RouterGroup) {
 	msgRouter := Router.Group("").Use(middleware.OperationRecord())
-	//msgRouterWithoutRecord := Router.Group("")
-	var magApi = v1.ApiGroupApp.InterfaceCaseApiGroup.MessageApi
+	msgRouterWithoutRecord := Router.Group("")
+	var msgApi = v1.ApiGroupApp.InterfaceCaseApiGroup.MessageApi
 	{
-		msgRouter.POST("createMessage", magApi.CreateMessageType) // 新建Message
+		msgRouter.POST("createMessage", msgApi.CreateMessage)   // 新建Message
+		msgRouter.DELETE("deleteMessage", msgApi.DeleteMessage) // 删除Message
+		msgRouter.PUT("updateMessage", msgApi.UpdateMessage)    // 更新Message
 	}
 	{
-		//msgRouterWithoutRecord.GET("getMessageList", GetMessageList)
+		msgRouterWithoutRecord.GET("getMessageList", msgApi.GetMessageList) // 获取Message列表
+		msgRouterWithoutRecord.GET("findMessage", msgApi.FindMessage)       // 根据ID获取Message
 	}
 }

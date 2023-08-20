@@ -134,6 +134,12 @@ func Routers() *gin.Engine {
 	{
 		environmentRouter.InitEnvironmentRouter(environmentGroup)
 	}
+	messageRouter := router.RouterGroupApp.Message
+	messageGroup := Router.Group("message/:project")
+	messageGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler()).Use(middleware.ProjectAuth())
+	{
+		messageRouter.InitMessageRouter(messageGroup)
+	}
 	InstallPlugin(
 		Router,
 		InterfaceGroup,
