@@ -26,6 +26,7 @@ type ApiTimerTask struct {
 	TagIds          []uint            `json:"tagIds" gorm:"-"`
 	ApiEnvName      *string           `json:"api_env_name" gorm:"comment:所属环境名称;"`
 	ApiEnvID        uint              `json:"api_env_id" gorm:"comment:所属环境;"`
+	ApiMessageID    uint              `json:"api_message_id" gorm:"comment:消息发送;"`
 }
 
 type ApiTimerTaskTag struct {

@@ -14,6 +14,7 @@ type ApiMessage struct {
 	Operator
 	Name      string      `json:"name" form:"name" gorm:"column:name;comment:消息名称;"`
 	Type      MessageType `json:"type" form:"type" gorm:"column:type;comment:消息类型;"`
+	TypeName  string      `json:"type_name" form:"type_name" gorm:"column:type_name;comment:消息类型名称;"`
 	WebHook   string      `json:"webhook" form:"webhook" gorm:"column:webhook;comment:webhook地址;"`
 	Signature string      `json:"signature" form:"signature" gorm:"column:signature;comment:签名;"`
 	Fail      bool        `json:"fail" form:"fail" gorm:"column:fail;comment:仅失败时发送;"`

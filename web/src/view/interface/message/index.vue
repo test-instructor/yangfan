@@ -209,6 +209,7 @@ const dialogForm = ref({
   webhook: "",
   signature: "",
   fail: false,
+  type_name: "",
 });
 
 const typeList = ref([
@@ -288,6 +289,7 @@ const submitForm = async () => {
     ElMessage.warning("Webhook不能为空");
     return;
   }
+  dialogForm.value.type_name = getMessageType(dialogForm.value.type);
   if (msgType.value === "create") {
     let res = await createMessage(dialogForm.value);
     if (res.code === 0) {

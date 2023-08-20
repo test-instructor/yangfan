@@ -50,14 +50,15 @@ type Operation struct {
 }
 
 type RunCaseReq struct {
-	ApiID     uint      `json:"apiID" form:"apiID"`
-	ConfigID  uint      `json:"configID" form:"configID"`
-	CaseID    uint      `json:"caseID" form:"caseID"`
-	RunType   uint      `json:"run_type" form:"run_type"`
-	TaskID    uint      `json:"taskID" form:"taskID"`
-	Operation Operation `json:"operation"`
-	TagID     uint      `json:"tagID" form:"TagID"`
-	ProjectID uint      `json:"-"`
-	Env       uint      `json:"env" form:"env"`
-	ReportID  uint      `json:"reportID" form:"reportID"`
+	ApiID        uint      `json:"apiID" form:"apiID"`
+	ConfigID     uint      `json:"configID" form:"configID"`
+	CaseID       uint      `json:"caseID" form:"caseID"`
+	RunType      uint      `json:"run_type" form:"run_type"`
+	TaskID       uint      `json:"taskID" form:"taskID"`
+	Operation    Operation `json:"operation"`
+	TagID        uint      `json:"tagID" form:"TagID"`
+	ProjectID    uint      `json:"-"`
+	Env          uint      `json:"env" form:"env"`
+	ReportID     uint      `json:"reportID" form:"reportID"`
+	ApiMessageID uint      `json:"api_message_id" gorm:"comment:消息发送;"`
 }

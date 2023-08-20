@@ -230,6 +230,22 @@
             style="width: 100%"
           />
         </el-form-item>
+        <el-form-item label="消息通知:">
+          <el-select
+            v-model="api_message_id"
+            placeholder="请选择"
+            @change="msgChange"
+            style="width: 600px"
+            clearable
+          >
+            <el-option
+              v-for="item in apiMsgList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="备注:">
           <el-input
             v-model="formData.describe"
@@ -257,7 +273,7 @@
       <timer-task-tag v-if="tagDialog"></timer-task-tag>
     </el-dialog>
     <el-dialog
-      width="350px"
+      width="500px"
       v-model="tagDialogRun"
       :before-close="closeDialogTagRung"
       :close-on-click-modal="false"
@@ -293,6 +309,22 @@
                 :key="item.ID"
                 :label="item.name"
                 :value="item.ID"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="消息通知:">
+            <el-select
+              v-model="api_message_id"
+              placeholder="请选择"
+              @change="msgChange"
+              style="width: 600px"
+              clearable
+            >
+              <el-option
+                v-for="item in apiMsgList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
               />
             </el-select>
           </el-form-item>
@@ -340,6 +372,7 @@ import {
   formatBoolean,
   filterDict,
 } from "@/utils/format";
+import { getMessageList } from "@/api/message";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { ref, watch, nextTick } from "vue";
 
@@ -351,7 +384,6 @@ import TimerTaskTag from "@/view/interface/timerTask/timerTaskTag.vue";
 import { getEnvList } from "@/api/env";
 
 const router = useRouter();
-
 // 自动化生成的字典（可能为空）以及字段
 const formData = ref({
   name: "",
@@ -365,6 +397,7 @@ const formData = ref({
     ID: 0,
   },
   api_env_id: 0,
+  api_message_id: 0,
 });
 const cronVisible = ref(false);
 const cronFun = () => {
@@ -402,6 +435,26 @@ const onSubmit = () => {
     searchInfo.value.status = null;
   }
   getTableData();
+};
+
+const apiMsgList = ref([]);
+
+const getApiMsgList = async () => {
+  apiMsgList.value = [];
+  let res = await getMessageList({ page: 1, pageSize: 99999 });
+  if (res.code === 0) {
+    res.data.list.forEach((item) => {
+      let name = item.name + "(" + item.type_name;
+      if (item.fail) {
+        name += "-仅失败时通知";
+      }
+      name += ")";
+      let msg = { label: name, value: item.ID };
+      console.log("msg", msg);
+      apiMsgList.value.push(msg);
+    });
+  }
+  console.log("apiMsgList", apiMsgList.value);
 };
 
 // 分页
@@ -564,6 +617,7 @@ const runTagId = ref("");
 const runEnvId = ref("");
 // 更新行
 const updateTimerTaskFunc = async (row) => {
+  getApiMsgList();
   tagIds.value = [];
   const res = await findTimerTask({ ID: row.ID });
   await getTagData();
@@ -586,6 +640,9 @@ const updateTimerTaskFunc = async (row) => {
     formData.value.tagIds = tagIds.value;
     if (formData.value.api_env_id > 0) {
       apiEnvID.value = formData.value.api_env_id;
+    }
+    if (formData.value.api_message_id > 0) {
+      api_message_id.value = formData.value.api_message_id;
     }
   }
 };
@@ -615,6 +672,7 @@ const openDialog = () => {
   type.value = "create";
   creatCron.value = true;
   dialogFormVisible.value = true;
+  getApiMsgList();
 };
 
 const tagTableOption = ref([]);
@@ -640,6 +698,7 @@ const openDialogTag = () => {
 
 const openDialogTagRun = async () => {
   tagDialogRun.value = true;
+  await getApiMsgList();
   await getTagData();
 };
 
@@ -651,6 +710,7 @@ const closeDialogTagRung = () => {
   tagDialogRun.value = false;
   runTagId.value = "";
   runEnvId.value = "";
+  api_message_id.value = null;
 };
 
 // 关闭弹窗
@@ -667,8 +727,9 @@ const closeDialog = () => {
     runNumber: 0,
     config: { ID: 0 },
     api_env_id: 0,
+    api_message_id: 0,
   };
-  apiEnvID.value = "";
+  api_message_id.value = 0;
   creatCron.value = false;
   tagIds.value = [];
 };
@@ -681,7 +742,11 @@ const runDialog = async () => {
     });
     return;
   }
-  let data = { tagID: runTagId.value, env: runEnvId.value };
+  let data = {
+    tagID: runTagId.value,
+    env: runEnvId.value,
+    api_message_id: api_message_id.value,
+  };
   const res = await runTimerTask(data);
   if (res.code === 0) {
     ElMessage({
@@ -746,6 +811,7 @@ const enterDialog = async () => {
 
 const apiEnvData = ref([]);
 const apiEnvID = ref();
+const api_message_id = ref();
 const getApiEnv = async () => {
   const res = await getEnvList();
   if (res.code === 0) {
@@ -757,6 +823,13 @@ const envChange = (key) => {
   formData.value.api_env_id = null;
   if (key && key > 0) {
     formData.value.api_env_id = key;
+  }
+};
+
+const msgChange = (key) => {
+  formData.value.api_message_id = null;
+  if (key && key > 0) {
+    formData.value.api_message_id = key;
   }
 };
 </script>
