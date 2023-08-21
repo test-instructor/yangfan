@@ -42,9 +42,79 @@ type DingTalkNotifier struct {
 }
 
 func (dn DingTalkNotifier) Send() error {
-	// 实现钉钉消息发送逻辑
-	fmt.Println("Sending DingTalk message:")
+	if dn.reports.Success != nil && *dn.reports.Success && dn.msg.GetFail() {
+		return nil
+	}
+	global.GVA_LOG.Debug("Sending DingTalk message:")
+	body := make(map[string]interface{})
+	body["msgtype"] = "actionCard"
+	var actionCard = make(map[string]interface{})
+	var success = "失败"
+	if *dn.reports.Success {
+		success = "成功"
+	}
+	title := fmt.Sprintf("【%s】%s | %s", dn.reports.Name, success, dn.reports.ApiEnvName)
+	actionCard["title"] = title
+	text := fmt.Sprintf("# <font color=#FF0000>%s</font>\n\n", title)
+	if *dn.reports.Success {
+		text = fmt.Sprintf("# <font color=#0000FF>%s</font>\n\n", title)
+	}
+	data := getCard(dn.reports)
+	tableContent := dn.generateTableContent(data.Data.TemplateVariable.Content)
+	text += fmt.Sprintf("<table><tr><th style=\"min-width: 80px; max-width: 240px;\">用例名称</th>"+
+		"<th style=\"min-width: 80px; max-width: 240px;\">成功数</th>"+
+		"<th style=\"min-width: 80px; max-width: 240px;\">失败数</th>"+
+		"<th style=\"min-width: 80px; max-width: 240px;\">耗时</th></tr>%s</table>", tableContent)
+	actionCard["text"] = text
+
+	btn := make(map[string]interface{})
+	btn["title"] = "查看详情"
+	btn["actionURL"] = ""
+	actionCard["btns"] = []interface{}{btn}
+	actionCard["btnOrientation"] = "0"
+	actionCard["hideAvatar"] = "0"
+	actionCard["btnBackgroundColor"] = "#FF9900"
+	body["actionCard"] = actionCard
+
+	contentType := "application/json"
+	reqJSON, err := json.Marshal(body)
+	if err != nil {
+		global.GVA_LOG.Error("Error marshaling JSON:", zap.Error(err))
+		return err
+	}
+	// 发起 POST 请求
+	global.GVA_LOG.Debug("请求数据", zap.Any("reqJSON", string(reqJSON)))
+	bodyByte := bytes.NewBuffer(reqJSON)
+	req, err := http.NewRequest(http.MethodPost, dn.msg.GetWebhook(), bodyByte)
+	if err != nil {
+		global.GVA_LOG.Error("Error creating request:", zap.Error(err))
+	}
+	req.Header.Set("Content-Type", contentType)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		global.GVA_LOG.Error("Error sending POST request:", zap.Error(err))
+	}
+	defer resp.Body.Close()
+
+	global.GVA_LOG.Debug("请求数据", zap.Any("header", resp.Request.Header))
+	global.GVA_LOG.Debug("响应数据", zap.Any("Status", resp.Status))
 	return nil
+}
+
+func (dn DingTalkNotifier) generateTableContent(data []Content) (tableContent string) {
+
+	for _, row := range data {
+		tableContent += "<tr>"
+		tableContent += fmt.Sprintf("<td>%s</td>", row.Name)
+		tableContent += fmt.Sprintf("<td>%d</td>", row.Total)
+		tableContent += fmt.Sprintf("<td>%d</td>", row.Fail)
+		tableContent += fmt.Sprintf("<td>%d秒</td>", row.Time)
+		tableContent += "</tr>"
+	}
+
+	return tableContent
 }
 
 type FSCard struct {
@@ -57,11 +127,11 @@ type FSData struct {
 	TemplateVariable TemplateVariable `json:"template_variable"`
 }
 type Content struct {
-	Name    string      `json:"name"`
-	Success interface{} `json:"success"`
-	Fail    interface{} `json:"fail"`
-	Time    interface{} `json:"time"`
-	Total   interface{} `json:"total"`
+	Name    string `json:"name"`
+	Success int    `json:"success"`
+	Fail    int    `json:"fail"`
+	Time    int    `json:"time"`
+	Total   int    `json:"total"`
 }
 type TemplateVariable struct {
 	Env     string    `json:"env"`
@@ -80,7 +150,7 @@ func (fn FeishuNotifier) Send() error {
 	if fn.reports.Success != nil && *fn.reports.Success && fn.msg.GetFail() {
 		return nil
 	}
-	fmt.Println("Sending Feishu message:")
+	global.GVA_LOG.Debug("Sending Feishu message:")
 	body := make(map[string]interface{})
 	body["msg_type"] = "interactive"
 	if fn.msg.GetSignature() != "" {
@@ -93,7 +163,7 @@ func (fn FeishuNotifier) Send() error {
 		body["sign"] = sign
 		body["timestamp"] = timestamp
 	}
-	body["card"] = fn.getCard()
+	body["card"] = getCard(fn.reports)
 
 	contentType := "application/json"
 	reqJSON, err := json.Marshal(body)
@@ -124,9 +194,9 @@ func (fn FeishuNotifier) Send() error {
 	return nil
 }
 
-func (fn FeishuNotifier) getCard() FSCard {
+func getCard(reports *interfacecase.ApiReport) FSCard {
 	var templateID FSTemplate
-	if fn.reports.Success != nil && *fn.reports.Success {
+	if reports.Success != nil && *reports.Success {
 		templateID = FSTemplateSuccess
 	} else {
 		templateID = FSTemplateFail
@@ -134,13 +204,13 @@ func (fn FeishuNotifier) getCard() FSCard {
 	data := FSData{
 		TemplateID: templateID,
 		TemplateVariable: TemplateVariable{
-			Env:    fn.reports.ApiEnvName,
+			Env:    reports.ApiEnvName,
 			Detail: "",
-			Title:  fn.reports.Name,
+			Title:  reports.Name,
 		},
 	}
 	var contents []Content
-	for _, v := range fn.reports.Details {
+	for _, v := range reports.Details {
 		var statMap, timerMap map[string]interface{}
 		err := json.Unmarshal(v.Stat, &statMap)
 		if err != nil {
@@ -160,9 +230,9 @@ func (fn FeishuNotifier) getCard() FSCard {
 		}
 		content := Content{
 			Name:    v.Name,
-			Total:   statMap["total"],
-			Fail:    statMap["failures"],
-			Success: statMap["successes"],
+			Total:   int(statMap["total"].(float64)),
+			Fail:    int(statMap["failures"].(float64)),
+			Success: int(statMap["successes"].(float64)),
 			Time:    int(durationValue),
 		}
 		contents = append(contents, content)
