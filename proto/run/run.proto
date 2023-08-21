@@ -37,7 +37,19 @@ message RunCaseReq{
   uint32 env = 9;
   uint32 reportID = 10;
   CaseType case_type = 11;
+  msg msg = 12;
 }
+
+message msg{
+  uint64 id = 1;
+  string name = 2;
+  string type = 3;
+  string typeName = 4;
+  string webhook = 5;
+  string signature = 6;
+  bool fail = 7;
+}
+
 
 enum CaseType{
   CaseTypeDefault = 0; // 默认

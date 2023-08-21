@@ -2,6 +2,7 @@ package runTestCase
 
 import (
 	"encoding/json"
+	"github.com/test-instructor/yangfan/proto/run"
 	"os"
 
 	"github.com/test-instructor/yangfan/hrp"
@@ -11,6 +12,7 @@ import (
 
 type ReportOperation struct {
 	report *interfacecase.ApiReport
+	msg    *run.Msg
 }
 
 func (r *ReportOperation) CreateReport() {
@@ -90,6 +92,13 @@ func (r *ReportOperation) UpdateReport(reports *interfacecase.ApiReport) {
 		}
 	}
 	global.GVA_DB.Save(&reports)
+	if r.msg != nil {
+		r.SendMsg(reports)
+	}
+}
+
+func (r *ReportOperation) SendMsg(reports *interfacecase.ApiReport) {
+
 }
 
 func (r *ReportOperation) Recover(msg string) {

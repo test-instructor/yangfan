@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/test-instructor/yangfan/proto/run"
+	"go.uber.org/zap"
 	"os"
 	"testing"
 
@@ -13,12 +15,13 @@ import (
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
 )
 
-func NewRunTag(runCaseReq request.RunCaseReq, runType interfacecase.RunType) TestCase {
+func NewRunTag(runCaseReq request.RunCaseReq, runType interfacecase.RunType, msg *run.Msg) TestCase {
 	return &runTag{
 		CaseID:     runCaseReq.CaseID,
 		caseType:   interfacecase.CaseTypeTag,
 		runCaseReq: runCaseReq,
 		runType:    runType,
+		msg:        msg,
 	}
 }
 
@@ -31,6 +34,7 @@ type runTag struct {
 	tcm             ApisCaseModel
 	d               debugTalkOperation
 	envVars         map[string]string
+	msg             *run.Msg
 }
 
 func (r *runTag) LoadCase() (err error) {
@@ -114,6 +118,7 @@ func (r *runTag) LoadCase() (err error) {
 			ApiEnvID:   r.runCaseReq.Env,
 			Hostname:   hostname,
 		},
+		msg: r.msg,
 	}
 	r.reportOperation.CreateReport()
 	return nil
@@ -128,7 +133,10 @@ func (r *runTag) RunCase() (err error) {
 		SetFailfast(false).
 		RunJsons(r.tcm.Case...)
 	var report interfacecase.ApiReport
-	json.Unmarshal(reportHRP, &report)
+	err = json.Unmarshal(reportHRP, &report)
+	if err != nil {
+		global.GVA_LOG.Error("报告解析失败", zap.Error(err))
+	}
 	r.reportOperation.UpdateReport(&report)
 	if err != nil {
 		return err

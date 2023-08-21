@@ -26,7 +26,7 @@ func (r runServer) getRunCase(req *run.RunCaseReq) (runCaseReq request.RunCaseRe
 	return
 }
 
-func (r runServer) RunApi(ctx context.Context, req *run.RunCaseReq) (resp *run.RunCaseResponse, err error) {
+func (r runServer) RunApi(_ context.Context, req *run.RunCaseReq) (resp *run.RunCaseResponse, err error) {
 	runCaseReq := r.getRunCase(req)
 	api := runTestCase.NewRunApi(runCaseReq, interfacecase.RunType(req.RunType))
 	report, err := runTestCase.RunTestCase(api)
@@ -37,7 +37,7 @@ func (r runServer) RunApi(ctx context.Context, req *run.RunCaseReq) (resp *run.R
 	return
 }
 
-func (r runServer) RunStep(ctx context.Context, req *run.RunCaseReq) (resp *run.RunCaseResponse, err error) {
+func (r runServer) RunStep(_ context.Context, req *run.RunCaseReq) (resp *run.RunCaseResponse, err error) {
 	runCaseReq := r.getRunCase(req)
 	api := runTestCase.NewRunStep(runCaseReq, interfacecase.RunType(req.RunType))
 	report, err := runTestCase.RunTestCase(api)
@@ -48,7 +48,7 @@ func (r runServer) RunStep(ctx context.Context, req *run.RunCaseReq) (resp *run.
 	return
 }
 
-func (r runServer) RunCase(ctx context.Context, req *run.RunCaseReq) (resp *run.RunCaseResponse, err error) {
+func (r runServer) RunCase(_ context.Context, req *run.RunCaseReq) (resp *run.RunCaseResponse, err error) {
 	runCaseReq := r.getRunCase(req)
 	api := runTestCase.NewRunCase(runCaseReq, interfacecase.RunType(req.RunType))
 	report, err := runTestCase.RunTestCase(api)
@@ -59,7 +59,7 @@ func (r runServer) RunCase(ctx context.Context, req *run.RunCaseReq) (resp *run.
 	return
 }
 
-func (r runServer) RunBoomerDebug(ctx context.Context, req *run.RunCaseReq) (resp *run.RunCaseResponse, err error) {
+func (r runServer) RunBoomerDebug(_ context.Context, req *run.RunCaseReq) (resp *run.RunCaseResponse, err error) {
 	runCaseReq := r.getRunCase(req)
 	api := runTestCase.NewBoomerDebug(runCaseReq, interfacecase.RunType(req.RunType))
 	report, err := runTestCase.RunTestCase(api)
@@ -70,9 +70,9 @@ func (r runServer) RunBoomerDebug(ctx context.Context, req *run.RunCaseReq) (res
 	return
 }
 
-func (r runServer) RunTimerTask(ctx context.Context, req *run.RunCaseReq) (resp *run.RunCaseResponse, err error) {
+func (r runServer) RunTimerTask(_ context.Context, req *run.RunCaseReq) (resp *run.RunCaseResponse, err error) {
 	runCaseReq := r.getRunCase(req)
-	api := runTestCase.NewRunTask(runCaseReq, interfacecase.RunType(req.RunType))
+	api := runTestCase.NewRunTask(runCaseReq, interfacecase.RunType(req.RunType), req.Msg)
 	report, err := runTestCase.RunTestCase(api)
 	resp = new(run.RunCaseResponse)
 	if err == nil {
@@ -81,9 +81,9 @@ func (r runServer) RunTimerTask(ctx context.Context, req *run.RunCaseReq) (resp 
 	return
 }
 
-func (r runServer) RunTimerTag(ctx context.Context, req *run.RunCaseReq) (resp *run.RunCaseResponse, err error) {
+func (r runServer) RunTimerTag(_ context.Context, req *run.RunCaseReq) (resp *run.RunCaseResponse, err error) {
 	runCaseReq := r.getRunCase(req)
-	api := runTestCase.NewRunTag(runCaseReq, interfacecase.RunType(req.RunType))
+	api := runTestCase.NewRunTag(runCaseReq, interfacecase.RunType(req.RunType), req.Msg)
 	report, err := runTestCase.RunTestCase(api)
 	resp = new(run.RunCaseResponse)
 	if err == nil {
