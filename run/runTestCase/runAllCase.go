@@ -46,13 +46,13 @@ func RunBoomer(runCaseReq request.RunCaseReq, runType interfacecase.RunType) (re
 }
 
 func RunTimerTask(runCaseReq request.RunCaseReq, runType interfacecase.RunType) (reports *interfacecase.ApiReport, err error) {
-	api := NewRunTask(runCaseReq, runType)
+	api := NewRunTask(runCaseReq, runType, nil)
 	report, err := RunTestCase(api)
 	return report, nil
 }
 
 func RunTimerTag(runCaseReq request.RunCaseReq, runType interfacecase.RunType) (reports *interfacecase.ApiReport, err error) {
-	api := NewRunTag(runCaseReq, runType)
+	api := NewRunTag(runCaseReq, runType, nil)
 	report, err := RunTestCase(api)
 	return report, nil
 }

@@ -26,8 +26,8 @@ enum RunningType{
 }
 
 message RunCaseReq{
-  uint32 apiID  = 1;
-  uint32  configID =2;
+  uint32 apiID = 1;
+  uint32  configID = 2;
   uint32 caseID = 3;
   RunType run_type = 4;
   uint32 taskID = 5;
@@ -43,13 +43,19 @@ message RunCaseReq{
 message msg{
   uint64 id = 1;
   string name = 2;
-  string type = 3;
+  NotifierType type = 3;
   string typeName = 4;
   string webhook = 5;
   string signature = 6;
   bool fail = 7;
 }
 
+enum NotifierType {
+  Default = 0;
+  Feishu = 1;
+  Dingtalk = 2;
+  Wechat = 3;
+}
 
 enum CaseType{
   CaseTypeDefault = 0; // 默认

@@ -95,7 +95,7 @@ func FormatResponse(raw interface{}) interface{} {
 }
 
 func CreateFolder(folderPath string) error {
-	global.GVA_LOG.Info("create folder", zap.String("path", folderPath))
+	//global.GVA_LOG.Info("create folder", zap.String("path", folderPath))
 	err := os.MkdirAll(folderPath, os.ModePerm)
 	if err != nil {
 		global.GVA_LOG.Error("create folder failed", zap.Error(err))

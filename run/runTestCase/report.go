@@ -2,8 +2,10 @@ package runTestCase
 
 import (
 	"encoding/json"
-	"github.com/test-instructor/yangfan/proto/run"
 	"os"
+
+	"github.com/test-instructor/yangfan/proto/run"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp"
 	"github.com/test-instructor/yangfan/server/global"
@@ -70,6 +72,11 @@ func resetReport(reports *interfacecase.ApiReport) {
 
 func (r *ReportOperation) UpdateReport(reports *interfacecase.ApiReport) {
 	//修正测试报告，hrp的测试报告数据不兼容
+	defer func() {
+		if r.msg != nil {
+			r.SendMsg(reports)
+		}
+	}()
 	resetReport(reports)
 	reports.Name = r.report.Name
 	reports.ID = r.report.ID
@@ -92,13 +99,14 @@ func (r *ReportOperation) UpdateReport(reports *interfacecase.ApiReport) {
 		}
 	}
 	global.GVA_DB.Save(&reports)
-	if r.msg != nil {
-		r.SendMsg(reports)
-	}
+
 }
 
 func (r *ReportOperation) SendMsg(reports *interfacecase.ApiReport) {
-
+	err := NewNotifier(r.msg, reports).Send()
+	if err != nil {
+		global.GVA_LOG.Error("消息发送失败", zap.Error(err))
+	}
 }
 
 func (r *ReportOperation) Recover(msg string) {

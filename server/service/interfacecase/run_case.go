@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/test-instructor/yangfan/proto/master"
 	"github.com/test-instructor/yangfan/proto/run"
 	"github.com/test-instructor/yangfan/server/global"
@@ -44,10 +45,19 @@ func (r *RunCaseService) getRunCase(runCaseReq request.RunCaseReq) (req *run.Run
 }
 
 func (r *RunCaseService) setRunCaseMsg(req *run.RunCaseReq, msg *interfacecase.ApiMessage) {
+	var Type run.NotifierType
+	switch msg.Type {
+	case interfacecase.MessageTypeFeishu:
+		Type = run.NotifierType_Feishu
+	case interfacecase.MessageTypeDingtalk:
+		Type = run.NotifierType_Dingtalk
+	default:
+		Type = run.NotifierType_Default
+	}
 	req.Msg = &run.Msg{
 		Id:        uint64(msg.ID),
 		Name:      msg.Name,
-		Type:      string(msg.Type),
+		Type:      Type,
 		TypeName:  msg.TypeName,
 		Webhook:   msg.WebHook,
 		Signature: msg.Signature,
@@ -102,7 +112,7 @@ func (r *RunCaseService) RunBoomer(runCase request.RunCaseReq, runType interface
 	return
 }
 
-func (r *RunCaseService) RunMasterBoomer(runCase request.RunCaseReq, runType interfacecase.RunType) (*interfacecase.ApiReport, error) {
+func (r *RunCaseService) RunMasterBoomer(runCase request.RunCaseReq, _ interfacecase.RunType) (*interfacecase.ApiReport, error) {
 	global.GVA_LOG.Debug("RunMasterBoomer", zap.Any("master host", fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Master, global.GVA_CONFIG.YangFan.MasterBoomerProt)))
 
 	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Master, global.GVA_CONFIG.YangFan.MasterBoomerProt))
@@ -173,7 +183,7 @@ func (r *RunCaseService) RunTimerTask(runCase request.RunCaseReq) {
 	if runCase.TaskID > 0 {
 		req := r.getRunCase(runCase)
 		var task interfacecase.ApiTimerTask
-		err = global.GVA_DB.Model(&interfacecase.ApiTimerTask{}).Where("id = ?", runCase.TaskID).First(&task).Error
+		err = global.GVA_DB.Model(&interfacecase.ApiTimerTask{}).Preload("ApiMessage").Where("id = ?", runCase.TaskID).First(&task).Error
 		if err == nil && task.ApiMessage != nil {
 			r.setRunCaseMsg(req, task.ApiMessage)
 		}
