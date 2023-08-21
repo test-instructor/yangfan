@@ -2,15 +2,14 @@ package initialize
 
 import (
 	"fmt"
+	ifc "github.com/test-instructor/yangfan/server/service/interfacecase"
 	"strconv"
 
 	"github.com/robfig/cron/v3"
 
-	"github.com/test-instructor/yangfan/server/model/interfacecase"
-	"github.com/test-instructor/yangfan/server/service/interfacecase/runTestCase"
-
 	"github.com/test-instructor/yangfan/server/config"
 	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"github.com/test-instructor/yangfan/server/utils"
 )
 
@@ -42,7 +41,7 @@ func TimerTaskCase() {
 		Where("Status = ?", true).
 		Find(&timerTaskCase)
 	for _, task := range timerTaskCase {
-		id, err := global.GVA_Timer.AddTaskByFunc(strconv.Itoa(int(task.ID)), task.RunTime, runTestCase.RunTimerTaskBack(task.ID), cron.WithSeconds())
+		id, err := global.GVA_Timer.AddTaskByFunc(strconv.Itoa(int(task.ID)), task.RunTime, ifc.RunTimerTaskBack(task.ID), cron.WithSeconds())
 		if err != nil {
 			return
 		}

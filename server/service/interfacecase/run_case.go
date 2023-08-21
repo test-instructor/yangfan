@@ -43,6 +43,18 @@ func (r *RunCaseService) getRunCase(runCaseReq request.RunCaseReq) (req *run.Run
 	return
 }
 
+func (r *RunCaseService) setRunCaseMsg(req *run.RunCaseReq, msg *interfacecase.ApiMessage) {
+	req.Msg = &run.Msg{
+		Id:        uint64(msg.ID),
+		Name:      msg.Name,
+		Type:      string(msg.Type),
+		TypeName:  msg.TypeName,
+		Webhook:   msg.WebHook,
+		Signature: msg.Signature,
+		Fail:      msg.Fail,
+	}
+}
+
 func (r *RunCaseService) RunTestCaseStep(runCase request.RunCaseReq) (reports *interfacecase.ApiReport, err error) {
 	err = r.newClient()
 	if err != nil {
@@ -159,20 +171,51 @@ func (r *RunCaseService) RunTimerTask(runCase request.RunCaseReq) {
 		return
 	}
 	if runCase.TaskID > 0 {
-		_, err := r.c.RunClient.RunTimerTask(context.Background(), r.getRunCase(runCase))
+		req := r.getRunCase(runCase)
+		var task interfacecase.ApiTimerTask
+		err = global.GVA_DB.Model(&interfacecase.ApiTimerTask{}).Where("id = ?", runCase.TaskID).First(&task).Error
+		if err == nil && task.ApiMessage != nil {
+			r.setRunCaseMsg(req, task.ApiMessage)
+		}
+		_, err = r.c.RunClient.RunTimerTask(context.Background(), req)
 		if err != nil {
 			return
 		}
 		return
 	}
 	if runCase.TagID > 0 {
-		_, err := r.c.RunClient.RunTimerTag(context.Background(), r.getRunCase(runCase))
+		req := r.getRunCase(runCase)
+		if runCase.ApiMessageID > 0 {
+			var msg interfacecase.ApiMessage
+			err = global.GVA_DB.Model(&interfacecase.ApiMessage{}).Where("id = ?", runCase.ApiMessageID).First(&msg).Error
+			if err == nil && msg.ID > 0 {
+				r.setRunCaseMsg(req, &msg)
+			}
+		}
+		_, err := r.c.RunClient.RunTimerTag(context.Background(), req)
 		if err != nil {
 			return
 		}
 		return
 	}
 	return
+}
+
+func (r *RunCaseService) RunTimerTaskBack(taskID uint) {
+
+	req := request.RunCaseReq{
+		TagID:   taskID,
+		RunType: uint(interfacecase.RunTypeRunTimer),
+	}
+	r.RunTimerTask(req)
+
+}
+
+func RunTimerTaskBack(taskID uint) func() {
+	return func() {
+		var r RunCaseService
+		r.RunTimerTaskBack(taskID)
+	}
 }
 
 func (r *RunCaseService) RunApi(runCase request.RunCaseReq) (report *interfacecase.ApiReport, err error) {
