@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/test-instructor/yangfan/proto/run"
@@ -25,176 +26,32 @@ type Notifier interface {
 	Send() error
 }
 
-type WeChatNotifier struct {
-	msg     *run.Msg
-	reports *interfacecase.ApiReport
-}
+type NotifierDefault struct{}
 
-func (wn WeChatNotifier) Send() error {
-	// 实现企业微信消息发送逻辑
-	fmt.Println("Sending WeChat message:")
-	return nil
-}
-
-type DingTalkNotifier struct {
-	msg     *run.Msg
-	reports *interfacecase.ApiReport
-}
-
-func (dn DingTalkNotifier) Send() error {
-	if dn.reports.Success != nil && *dn.reports.Success && dn.msg.GetFail() {
-		return nil
-	}
-	global.GVA_LOG.Debug("Sending DingTalk message:")
-	body := make(map[string]interface{})
-	body["msgtype"] = "actionCard"
-	var actionCard = make(map[string]interface{})
-	var success = "失败"
-	if *dn.reports.Success {
-		success = "成功"
-	}
-	title := fmt.Sprintf("【%s】%s | %s", dn.reports.Name, success, dn.reports.ApiEnvName)
-	actionCard["title"] = title
-	text := fmt.Sprintf("# <font color=#FF0000>%s</font>\n\n", title)
-	if *dn.reports.Success {
-		text = fmt.Sprintf("# <font color=#0000FF>%s</font>\n\n", title)
-	}
-	data := getCard(dn.reports)
-	tableContent := dn.generateTableContent(data.Data.TemplateVariable.Content)
-	text += fmt.Sprintf("<table><tr><th style=\"min-width: 80px; max-width: 240px;\">用例名称</th>"+
-		"<th style=\"min-width: 80px; max-width: 240px;\">成功数</th>"+
-		"<th style=\"min-width: 80px; max-width: 240px;\">失败数</th>"+
-		"<th style=\"min-width: 80px; max-width: 240px;\">耗时</th></tr>%s</table>", tableContent)
-	actionCard["text"] = text
-
-	btn := make(map[string]interface{})
-	btn["title"] = "查看详情"
-	btn["actionURL"] = ""
-	actionCard["btns"] = []interface{}{btn}
-	actionCard["btnOrientation"] = "0"
-	actionCard["hideAvatar"] = "0"
-	actionCard["btnBackgroundColor"] = "#FF9900"
-	body["actionCard"] = actionCard
-
-	contentType := "application/json"
-	reqJSON, err := json.Marshal(body)
+func (NotifierDefault) genSign(secret string, timestamp int64) (string, error) {
+	//timestamp + key 做sha256, 再进行base64 encode
+	stringToSign := fmt.Sprintf("%v", timestamp) + "\n" + secret
+	var data []byte
+	h := hmac.New(sha256.New, []byte(stringToSign))
+	_, err := h.Write(data)
 	if err != nil {
-		global.GVA_LOG.Error("Error marshaling JSON:", zap.Error(err))
-		return err
+		return "", err
 	}
-	// 发起 POST 请求
-	global.GVA_LOG.Debug("请求数据", zap.Any("reqJSON", string(reqJSON)))
-	bodyByte := bytes.NewBuffer(reqJSON)
-	req, err := http.NewRequest(http.MethodPost, dn.msg.GetWebhook(), bodyByte)
-	if err != nil {
-		global.GVA_LOG.Error("Error creating request:", zap.Error(err))
-	}
-	req.Header.Set("Content-Type", contentType)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		global.GVA_LOG.Error("Error sending POST request:", zap.Error(err))
-	}
-	defer resp.Body.Close()
-
-	global.GVA_LOG.Debug("请求数据", zap.Any("header", resp.Request.Header))
-	global.GVA_LOG.Debug("响应数据", zap.Any("Status", resp.Status))
-	return nil
+	signature := base64.StdEncoding.EncodeToString(h.Sum(nil))
+	return signature, nil
 }
 
-func (dn DingTalkNotifier) generateTableContent(data []Content) (tableContent string) {
-
-	for _, row := range data {
-		tableContent += "<tr>"
-		tableContent += fmt.Sprintf("<td>%s</td>", row.Name)
-		tableContent += fmt.Sprintf("<td>%d</td>", row.Total)
-		tableContent += fmt.Sprintf("<td>%d</td>", row.Fail)
-		tableContent += fmt.Sprintf("<td>%d秒</td>", row.Time)
-		tableContent += "</tr>"
-	}
-
-	return tableContent
+func (NotifierDefault) genSignDingTalk(secret string, timestamp int64) (string, error) {
+	//timestamp + key 做sha256, 再进行base64 encode
+	stringToSign := fmt.Sprintf("%d\n%s", timestamp, secret)
+	mac := hmac.New(sha256.New, []byte(secret))
+	mac.Write([]byte(stringToSign))
+	signData := mac.Sum(nil)
+	signature := url.QueryEscape(base64.StdEncoding.EncodeToString(signData))
+	return signature, nil
 }
 
-type FSCard struct {
-	Type string `json:"type"`
-	Data FSData `json:"data"`
-}
-
-type FSData struct {
-	TemplateID       FSTemplate       `json:"template_id"`
-	TemplateVariable TemplateVariable `json:"template_variable"`
-}
-type Content struct {
-	Name    string `json:"name"`
-	Success int    `json:"success"`
-	Fail    int    `json:"fail"`
-	Time    int    `json:"time"`
-	Total   int    `json:"total"`
-}
-type TemplateVariable struct {
-	Env     string    `json:"env"`
-	Detail  string    `json:"detail"`
-	Content []Content `json:"content"`
-	Title   string    `json:"title"`
-}
-
-type FeishuNotifier struct {
-	msg     *run.Msg
-	reports *interfacecase.ApiReport
-}
-
-func (fn FeishuNotifier) Send() error {
-	// 实现飞书消息发送逻辑
-	if fn.reports.Success != nil && *fn.reports.Success && fn.msg.GetFail() {
-		return nil
-	}
-	global.GVA_LOG.Debug("Sending Feishu message:")
-	body := make(map[string]interface{})
-	body["msg_type"] = "interactive"
-	if fn.msg.GetSignature() != "" {
-		timestamp := time.Now().Unix()
-		sign, err := fn.genSign(fn.msg.GetSignature(), timestamp)
-		if err != nil {
-			global.GVA_LOG.Error("签名失败", zap.Error(err))
-			return err
-		}
-		body["sign"] = sign
-		body["timestamp"] = timestamp
-	}
-	body["card"] = getCard(fn.reports)
-
-	contentType := "application/json"
-	reqJSON, err := json.Marshal(body)
-	if err != nil {
-		global.GVA_LOG.Error("Error marshaling JSON:", zap.Error(err))
-		return err
-	}
-	// 发起 POST 请求
-	global.GVA_LOG.Debug("请求数据", zap.Any("reqJSON", string(reqJSON)))
-
-	bodyByte := bytes.NewBuffer(reqJSON)
-	req, err := http.NewRequest(http.MethodPost, fn.msg.GetWebhook(), bodyByte)
-	if err != nil {
-		global.GVA_LOG.Error("Error creating request:", zap.Error(err))
-	}
-	req.Header.Set("Content-Type", contentType)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		global.GVA_LOG.Error("Error sending POST request:", zap.Error(err))
-	}
-	defer resp.Body.Close()
-
-	global.GVA_LOG.Debug("请求数据", zap.Any("header", resp.Request.Header))
-	global.GVA_LOG.Debug("响应数据", zap.Any("Status", resp.Status))
-
-	return nil
-}
-
-func getCard(reports *interfacecase.ApiReport) FSCard {
+func (NotifierDefault) getCard(reports *interfacecase.ApiReport) FSCard {
 	var templateID FSTemplate
 	if reports.Success != nil && *reports.Success {
 		templateID = FSTemplateSuccess
@@ -245,17 +102,186 @@ func getCard(reports *interfacecase.ApiReport) FSCard {
 	return card
 }
 
-func (fn FeishuNotifier) genSign(secret string, timestamp int64) (string, error) {
-	//timestamp + key 做sha256, 再进行base64 encode
-	stringToSign := fmt.Sprintf("%v", timestamp) + "\n" + secret
-	var data []byte
-	h := hmac.New(sha256.New, []byte(stringToSign))
-	_, err := h.Write(data)
-	if err != nil {
-		return "", err
+func (NotifierDefault) generateTableContent(data []Content) (tableContent string) {
+
+	for _, row := range data {
+		tableContent += "<tr>"
+		tableContent += fmt.Sprintf("<td>%s</td>", row.Name)
+		tableContent += fmt.Sprintf("<td>%d</td>", row.Total)
+		tableContent += fmt.Sprintf("<td>%d</td>", row.Fail)
+		tableContent += fmt.Sprintf("<td>%d秒</td>", row.Time)
+		tableContent += "</tr>"
 	}
-	signature := base64.StdEncoding.EncodeToString(h.Sum(nil))
-	return signature, nil
+	tableContent = fmt.Sprintf("<table><tr><th style=\"min-width: 80px; max-width: 240px;\">用例名称</th>"+
+		"<th style=\"min-width: 80px; max-width: 240px;\">成功数</th>"+
+		"<th style=\"min-width: 80px; max-width: 240px;\">失败数</th>"+
+		"<th style=\"min-width: 80px; max-width: 240px;\">耗时</th></tr>%s</table>", tableContent)
+
+	return tableContent
+}
+
+type WeChatNotifier struct {
+	msg     *run.Msg
+	reports *interfacecase.ApiReport
+}
+
+func (wn WeChatNotifier) Send() error {
+	// 实现企业微信消息发送逻辑
+	fmt.Println("Sending WeChat message:")
+	return nil
+}
+
+type DingTalkNotifier struct {
+	msg     *run.Msg
+	reports *interfacecase.ApiReport
+	NotifierDefault
+}
+
+func (dn DingTalkNotifier) Send() error {
+	if dn.reports.Success != nil && *dn.reports.Success && dn.msg.GetFail() {
+		return nil
+	}
+	global.GVA_LOG.Debug("Sending DingTalk message:")
+	body := make(map[string]interface{})
+	body["msgtype"] = "actionCard"
+	url := dn.msg.GetWebhook()
+	if dn.msg.GetSignature() != "" {
+		timestamp := time.Now().UnixMilli()
+		sign, err := dn.genSignDingTalk(dn.msg.GetSignature(), timestamp)
+		if err != nil {
+			global.GVA_LOG.Error("签名失败", zap.Error(err))
+			return err
+		}
+		url += fmt.Sprintf("&timestamp=%d&sign=%s", timestamp, sign)
+	}
+	var actionCard = make(map[string]interface{})
+	var success = "失败"
+	if *dn.reports.Success {
+		success = "成功"
+	}
+	title := fmt.Sprintf("【%s】%s | %s", dn.reports.Name, success, dn.reports.ApiEnvName)
+	actionCard["title"] = title
+	text := fmt.Sprintf("# <font color=#FF0000>%s</font>\n\n", title)
+	if *dn.reports.Success {
+		text = fmt.Sprintf("# <font color=#0000FF>%s</font>\n\n", title)
+	}
+	data := dn.getCard(dn.reports)
+	text += dn.generateTableContent(data.Data.TemplateVariable.Content)
+	actionCard["text"] = text
+
+	btn := make(map[string]interface{})
+	btn["title"] = "查看详情"
+	btn["actionURL"] = ""
+	actionCard["btns"] = []interface{}{btn}
+	actionCard["btnOrientation"] = "0"
+	actionCard["hideAvatar"] = "0"
+	actionCard["btnBackgroundColor"] = "#FF9900"
+	body["actionCard"] = actionCard
+
+	contentType := "application/json"
+	reqJSON, err := json.Marshal(body)
+	if err != nil {
+		global.GVA_LOG.Error("Error marshaling JSON:", zap.Error(err))
+		return err
+	}
+	// 发起 POST 请求
+	global.GVA_LOG.Debug("请求数据", zap.Any("reqJSON", string(reqJSON)))
+	bodyByte := bytes.NewBuffer(reqJSON)
+	req, err := http.NewRequest(http.MethodPost, url, bodyByte)
+	if err != nil {
+		global.GVA_LOG.Error("Error creating request:", zap.Error(err))
+	}
+	req.Header.Set("Content-Type", contentType)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		global.GVA_LOG.Error("Error sending POST request:", zap.Error(err))
+	}
+	defer resp.Body.Close()
+
+	global.GVA_LOG.Debug("请求数据", zap.Any("header", resp.Request.Header))
+	global.GVA_LOG.Debug("响应数据", zap.Any("Status", resp.Status))
+	return nil
+}
+
+type FSCard struct {
+	Type string `json:"type"`
+	Data FSData `json:"data"`
+	NotifierDefault
+}
+
+type FSData struct {
+	TemplateID       FSTemplate       `json:"template_id"`
+	TemplateVariable TemplateVariable `json:"template_variable"`
+}
+type Content struct {
+	Name    string `json:"name"`
+	Success int    `json:"success"`
+	Fail    int    `json:"fail"`
+	Time    int    `json:"time"`
+	Total   int    `json:"total"`
+}
+type TemplateVariable struct {
+	Env     string    `json:"env"`
+	Detail  string    `json:"detail"`
+	Content []Content `json:"content"`
+	Title   string    `json:"title"`
+}
+
+type FeishuNotifier struct {
+	msg     *run.Msg
+	reports *interfacecase.ApiReport
+	NotifierDefault
+}
+
+func (fn FeishuNotifier) Send() error {
+	// 实现飞书消息发送逻辑
+	if fn.reports.Success != nil && *fn.reports.Success && fn.msg.GetFail() {
+		return nil
+	}
+	global.GVA_LOG.Debug("Sending Feishu message:")
+	body := make(map[string]interface{})
+	body["msg_type"] = "interactive"
+	if fn.msg.GetSignature() != "" {
+		timestamp := time.Now().Unix()
+		sign, err := fn.genSign(fn.msg.GetSignature(), timestamp)
+		if err != nil {
+			global.GVA_LOG.Error("签名失败", zap.Error(err))
+			return err
+		}
+		body["sign"] = sign
+		body["timestamp"] = timestamp
+	}
+	body["card"] = fn.getCard(fn.reports)
+
+	contentType := "application/json"
+	reqJSON, err := json.Marshal(body)
+	if err != nil {
+		global.GVA_LOG.Error("Error marshaling JSON:", zap.Error(err))
+		return err
+	}
+	// 发起 POST 请求
+	global.GVA_LOG.Debug("请求数据", zap.Any("reqJSON", string(reqJSON)))
+
+	bodyByte := bytes.NewBuffer(reqJSON)
+	req, err := http.NewRequest(http.MethodPost, fn.msg.GetWebhook(), bodyByte)
+	if err != nil {
+		global.GVA_LOG.Error("Error creating request:", zap.Error(err))
+	}
+	req.Header.Set("Content-Type", contentType)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		global.GVA_LOG.Error("Error sending POST request:", zap.Error(err))
+	}
+	defer resp.Body.Close()
+
+	global.GVA_LOG.Debug("请求数据", zap.Any("header", resp.Request.Header))
+	global.GVA_LOG.Debug("响应数据", zap.Any("Status", resp.Status))
+
+	return nil
 }
 
 func NewNotifier(msg *run.Msg, reports *interfacecase.ApiReport) Notifier {
