@@ -57,7 +57,7 @@ func (dn DingTalkNotifier) Send() error {
 	actionCard["btnBackgroundColor"] = "#FF9900"
 	body["actionCard"] = actionCard
 
-	err := dn.SendMessage(body, dn.msg)
+	err := dn.SendMessage(body, dn.msg, dn.reports.ProjectID)
 	return err
 
 }

@@ -282,7 +282,7 @@ func (NotifierDefault) generateTableContent(data []Content) (tableContent string
 	return tableContent
 }
 
-func (NotifierDefault) SendMessage(body interface{}, msg *run.Msg) error {
+func (n NotifierDefault) SendMessage(body interface{}, msg *run.Msg, projectID uint) error {
 	reqJSON, err := json.Marshal(body)
 	if err != nil {
 		global.GVA_LOG.Error("Error marshaling JSON:", zap.Error(err))
@@ -308,7 +308,6 @@ func (NotifierDefault) SendMessage(body interface{}, msg *run.Msg) error {
 
 		}
 	}(resp.Body)
-	fmt.Println(resp.Status)
 
 	var responseBody map[string]interface{}
 	err = json.NewDecoder(resp.Body).Decode(&responseBody)
@@ -323,12 +322,33 @@ func (NotifierDefault) SendMessage(body interface{}, msg *run.Msg) error {
 		global.GVA_LOG.Error("Error encoding JSON response body:", zap.Error(err))
 		return err
 	}
-	fmt.Println(string(jsonResponse))
+	global.GVA_LOG.Debug(string(jsonResponse))
+	n.msgLog(msg, resp.StatusCode, projectID, string(jsonResponse))
 	return nil
 }
 
-type FeishuNotifier struct {
-	msg     *run.Msg
-	reports *interfacecase.ApiReport
-	NotifierDefault
+func (NotifierDefault) msgLog(msg *run.Msg, status int, projectID uint, respMessage string) {
+	var msgLog = interfacecase.ApiMessageLog{}
+	msgLog.ProjectID = projectID
+	msgLog.StatusCode = status
+	msgLog.ApiMessageID = uint(msg.Id)
+	msgLog.Message = respMessage
+	if status == 200 {
+		msgLog.Status = true
+	}
+	global.GVA_DB.Create(&msgLog)
+
+}
+
+func NewNotifier(msg *run.Msg, reports *interfacecase.ApiReport) Notifier {
+	switch msg.GetType() {
+	case run.NotifierType_Wechat:
+		return WeChatNotifier{msg: msg, reports: reports}
+	case run.NotifierType_Dingtalk:
+		return DingTalkNotifier{msg: msg, reports: reports}
+	case run.NotifierType_Feishu:
+		return FeishuNotifier{msg: msg, reports: reports}
+	default:
+		return nil
+	}
 }

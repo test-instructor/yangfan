@@ -28,4 +28,5 @@ type ApiMessageLog struct {
 	ApiMessage   ApiMessage `json:"api_message,omitempty" form:"api_message"`
 	Message      string     `json:"message,omitempty" form:"message" gorm:"column:message;comment:消息内容;type:text"`
 	Status       bool       `json:"status,omitempty" form:"status" gorm:"column:status;comment:消息发送状态;"`
+	StatusCode   int        `json:"status_code,omitempty" form:"status_code" gorm:"column:status_code;comment:消息发送状态码;"`
 }

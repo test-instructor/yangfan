@@ -27,6 +27,9 @@ type WeChatNotifier struct {
 
 func (wn WeChatNotifier) Send() error {
 	// 实现企业微信消息发送逻辑
+	if wn.reports.Success != nil && *wn.reports.Success && wn.msg.GetFail() {
+		return nil
+	}
 	data := wn.getCard(wn.reports)
 	htmlContent := wn.generateTableContent(data.Data.TemplateVariable.Content)
 	outputPath := "output1.png"
@@ -38,7 +41,7 @@ func (wn WeChatNotifier) Send() error {
 		body := make(map[string]interface{})
 		body["msgtype"] = "image"
 		body["image"] = wn.getImage(outputPath)
-		err = wn.SendMessage(body, wn.msg)
+		err = wn.SendMessage(body, wn.msg, wn.reports.ProjectID)
 	}
 	return err
 }

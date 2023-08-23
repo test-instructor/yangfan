@@ -9,6 +9,12 @@ import (
 	"go.uber.org/zap"
 )
 
+type FeishuNotifier struct {
+	msg     *run.Msg
+	reports *interfacecase.ApiReport
+	NotifierDefault
+}
+
 func (fn FeishuNotifier) Send() error {
 	// 实现飞书消息发送逻辑
 	if fn.reports.Success != nil && *fn.reports.Success && fn.msg.GetFail() {
@@ -28,20 +34,7 @@ func (fn FeishuNotifier) Send() error {
 		body["timestamp"] = timestamp
 	}
 	body["card"] = fn.getCard(fn.reports)
-	err := fn.SendMessage(body, fn.msg)
+	err := fn.SendMessage(body, fn.msg, fn.reports.ProjectID)
 
 	return err
-}
-
-func NewNotifier(msg *run.Msg, reports *interfacecase.ApiReport) Notifier {
-	switch msg.GetType() {
-	case run.NotifierType_Wechat:
-		return WeChatNotifier{msg: msg, reports: reports}
-	case run.NotifierType_Dingtalk:
-		return DingTalkNotifier{msg: msg, reports: reports}
-	case run.NotifierType_Feishu:
-		return FeishuNotifier{msg: msg, reports: reports}
-	default:
-		return nil
-	}
 }
