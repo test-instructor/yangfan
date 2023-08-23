@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"math"
 	"os"
+	"time"
 	"unicode/utf8"
 
 	"github.com/chromedp/cdproto/emulation"
@@ -35,7 +36,14 @@ func (wn WeChatNotifier) Send() error {
 	}
 	data := wn.getCard(wn.reports)
 	htmlContent := wn.generateTableContent(data.Data.TemplateVariable.Content)
-	outputPath := "output1.png"
+	outputPath := fmt.Sprintf("%d.png", time.Now().UnixNano())
+	defer func() {
+		err := os.Remove(outputPath)
+		if err != nil {
+			global.GVA_LOG.Error("Error deleting file:", zap.Error(err))
+			return
+		}
+	}()
 	height := wn.getImageSize(data.Data.TemplateVariable.Content)
 	err := wn.html2png(htmlContent, outputPath, height)
 	if err != nil {
