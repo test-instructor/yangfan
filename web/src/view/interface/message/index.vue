@@ -215,6 +215,7 @@ const dialogForm = ref({
 const typeList = ref([
   { label: "钉钉", value: "dingtalk" },
   { label: "飞书", value: "feishu" },
+  { label: "微信", value: "wechat" },
 ]);
 
 const failList = ref([

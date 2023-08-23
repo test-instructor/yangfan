@@ -51,6 +51,8 @@ func (r *RunCaseService) setRunCaseMsg(req *run.RunCaseReq, msg *interfacecase.A
 		Type = run.NotifierType_Feishu
 	case interfacecase.MessageTypeDingtalk:
 		Type = run.NotifierType_Dingtalk
+	case interfacecase.MessageTypeWechat:
+		Type = run.NotifierType_Wechat
 	default:
 		Type = run.NotifierType_Default
 	}
