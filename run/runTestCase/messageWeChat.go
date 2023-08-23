@@ -19,6 +19,9 @@ import (
 	"go.uber.org/zap"
 )
 
+const blueColor = "#0000FF"
+const redColor = "#FF0000"
+
 type WeChatNotifier struct {
 	msg     *run.Msg
 	reports *interfacecase.ApiReport
@@ -94,7 +97,10 @@ func (wn WeChatNotifier) html2png(html string, path string, height int) error {
 }
 
 func (wn WeChatNotifier) generateTableContent(data []Content) (tableContent string) {
-
+	titleColor := blueColor
+	if wn.reports.Success != nil && !*wn.reports.Success {
+		titleColor = redColor
+	}
 	for _, row := range data {
 		tableContent += "<tr>"
 		tableContent += fmt.Sprintf("<td>%s</td>", row.Name)
@@ -103,12 +109,14 @@ func (wn WeChatNotifier) generateTableContent(data []Content) (tableContent stri
 		tableContent += fmt.Sprintf("<td>%d秒</td>", row.Time)
 		tableContent += "</tr>"
 	}
+	title := fmt.Sprintf("<h2 style=\"color: %s;\">%s %s | %s</h2>", titleColor, wn.reports.Name, wn.getExecutionStatusText(*wn.reports.Success), wn.reports.ApiEnvName)
+
 	tableContent = fmt.Sprintf("<!DOCTYPE html><html><head><style>body {margin: 20; padding: 0;}"+
 		"table {font-size: 15;border-collapse: collapse;}"+
-		"th, td {border: 1px solid black;padding: 8px;text-align: center;}</style></head><body><table>"+
+		"th, td {border: 1px solid black;padding: 8px;text-align: center;}</style></head><body>%s<table>"+
 		"<tr><th style=\"width: 200px;\">用例名称</th><th style=\"width: 80px;\">成功数</th>"+
 		"<th style=\"width: 80px;\">失败数</th><th style=\"width: 80px;\">耗时</th></tr>%s"+
-		"</table></body></html>", tableContent)
+		"</table></body></html>", title, tableContent)
 	return tableContent
 }
 
@@ -132,7 +140,7 @@ func (wn WeChatNotifier) StringWidth(s string) int {
 }
 
 func (wn WeChatNotifier) getImageSize(datas []Content) (height int) {
-	height = 55 + 38*len(datas)
+	height = 125 + 38*len(datas)
 	for _, data := range datas {
 		wn.StringWidth(data.Name)
 		lineCount := int(math.Ceil(float64(wn.StringWidth(data.Name))/float64(24))) - 1
@@ -169,4 +177,11 @@ func (wn WeChatNotifier) getImage(filePath string) (image Image) {
 	// 将图片内容转换为Base64编码
 	image.Base64 = base64.StdEncoding.EncodeToString(imageData)
 	return
+}
+
+func (wn WeChatNotifier) getExecutionStatusText(status bool) string {
+	if status {
+		return "成功"
+	}
+	return "失败"
 }

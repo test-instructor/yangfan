@@ -287,8 +287,6 @@ func (n NotifierDefault) SendMessage(body interface{}, msg *run.Msg, projectID u
 	if err != nil {
 		global.GVA_LOG.Error("Error marshaling JSON:", zap.Error(err))
 	}
-	// 发起 POST 请求
-	global.GVA_LOG.Debug("请求数据", zap.Any("reqJSON", string(reqJSON)))
 
 	bodyByte := bytes.NewBuffer(reqJSON)
 	req, err := http.NewRequest(http.MethodPost, msg.Webhook, bodyByte)
