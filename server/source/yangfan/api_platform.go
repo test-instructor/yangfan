@@ -267,6 +267,9 @@ func RegisterApis() {
 		{ApiGroup: "消息通知", Method: "PUT", Path: "/message/:project/updateMessage", Description: "更新Message"},
 		{ApiGroup: "消息通知", Method: "GET", Path: "/message/:project/findMessage", Description: "根据ID获取Message"},
 		{ApiGroup: "消息通知", Method: "GET", Path: "/message/:project/getMessageList", Description: "获取Message列表"},
+
+		{ApiGroup: "CI", Method: "GET", Path: "/ci/runTag", Description: "运行tag"},
+		{ApiGroup: "CI", Method: "GET", Path: "/ci/getReport", Description: "获取测试报告"},
 	}
 
 	var count int64
