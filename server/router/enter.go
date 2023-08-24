@@ -18,6 +18,7 @@ type RouterGroup struct {
 	Performance   interfacecase.PerformanceRouterGroup
 	Environment   interfacecase.EnvironmentRouterGroup
 	Message       interfacecase.MessageRouterGroup
+	CI            interfacecase.ApiCIRouter
 }
 
 var RouterGroupApp = new(RouterGroup)
