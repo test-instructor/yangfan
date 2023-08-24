@@ -47,6 +47,7 @@ type Operation struct {
 	Running    RunningType `json:"running"`
 	SpawnCount int64       `json:"spawnCount"`
 	SpawnRate  float64     `json:"spawnRate"`
+	Interval   *Interval   `json:"interval"`
 }
 
 type RunCaseReq struct {
@@ -61,4 +62,10 @@ type RunCaseReq struct {
 	Env          uint      `json:"env" form:"env"`
 	ReportID     uint      `json:"reportID" form:"reportID"`
 	ApiMessageID uint      `json:"api_message_id" gorm:"comment:消息发送;"`
+}
+
+type Interval struct {
+	IntervalTime   int64 `json:"intervalTime"`
+	IntervalCount  int64 `json:"intervalCount"`
+	IntervalNumber int64 `json:"intervalNumber"`
 }

@@ -173,7 +173,9 @@ mkdir -p ./data/grafana/provisioning/yangfan-json
 
 
 # 下载 compose.yaml 脚本
-wget "http://docs.yangfan.gd.cn/install/compose.yaml" --no-check-certificate -O compose.yaml
+compose_yaml="./compose.yaml"
+
+wget "http://docs.yangfan.gd.cn/install/compose.yaml" --no-check-certificate -O "$compose_yaml"
 if [ $? -ne "0" ]; then
     abort "下载 compose.yaml 脚本失败"
 else

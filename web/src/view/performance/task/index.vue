@@ -199,19 +199,37 @@
       title="启动压测"
     >
       <el-form :model="runnerConfig" label-position="right" label-width="160px">
-        <el-form-item label="并发用户数：">
+        <el-form-item label="初始并发用户数：">
+          <el-input-number v-model="spawnCount" :min="1" :max="9999999" />
+        </el-form-item>
+        <el-form-item label="初始每秒增加用户数：">
+          <el-input-number v-model="spawnRate" :min="1" :max="9999999" />
+        </el-form-item>
+        <el-form-item label="启用阶梯式压测：">
+          <el-switch
+            v-model="step_pressure"
+            class="ml-2"
+            style="
+              --el-switch-on-color: #13ce66;
+              --el-switch-off-color: #ff4949;
+            "
+            inline-prompt
+          />
+        </el-form-item>
+        <el-form-item label="最大用户数：" v-if="step_pressure">
+          <el-input-number v-model="intervalCount" :min="1" />
+        </el-form-item>
+        <el-form-item> </el-form-item>
+        <el-form-item label="并发时长(分钟)：" v-if="step_pressure">
           <el-input-number
-            v-model="runnerConfig.spawnCount"
+            v-model="intervalTime"
             :min="1"
+            :step="1"
             step-strictly
           />
         </el-form-item>
-        <el-form-item label="初始每秒增加用户数：">
-          <el-input-number
-            v-model="runnerConfig.spawnRate"
-            :min="1"
-            step-strictly
-          />
+        <el-form-item label="阶梯数：" v-if="step_pressure">
+          <el-input-number v-model="intervalNumber" :min="1" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -233,7 +251,7 @@ export default {
 </script>
 
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { getApiConfigList } from "@/api/apiConfig";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {
@@ -269,6 +287,12 @@ let runnerConfig = {
   spawnRate: 1,
 };
 const configID = ref();
+const step_pressure = ref(false);
+const intervalTime = ref(1);
+const intervalCount = ref(1);
+const intervalNumber = ref(1);
+const spawnCount = ref(1);
+const spawnRate = ref(1);
 
 // =========== 表格控制部分 ===========
 const page = ref(1);
@@ -326,10 +350,18 @@ const runCaseConfig = async () => {
     run_type: 6,
     operation: {
       running: 1,
-      spawnCount: runnerConfig.spawnCount,
-      spawnRate: runnerConfig.spawnRate,
+      spawnCount: spawnCount.value,
+      spawnRate: spawnRate.value,
     },
   };
+  if (step_pressure.value) {
+    data.operation.interval = {
+      intervalTime: intervalTime.value,
+      intervalCount: intervalCount.value,
+      intervalNumber: intervalNumber.value,
+    };
+  }
+  console.log(data);
   const res = await runBoomer(data);
   if (res.code === 0) {
     closeRunner();
@@ -420,6 +452,12 @@ const closeRunner = () => {
     spawnCount: 1,
     spawnRate: 1,
   };
+  step_pressure.value = false;
+  intervalTime.value = 3;
+  intervalCount.value = 1;
+  intervalNumber.value = 1;
+  spawnCount.value = 1;
+  spawnRate.value = 1;
   dialogRunner.value = false;
 };
 

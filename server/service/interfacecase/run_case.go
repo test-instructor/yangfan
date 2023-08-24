@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
+	"time"
 
 	"github.com/test-instructor/yangfan/proto/master"
 	"github.com/test-instructor/yangfan/proto/run"
@@ -18,6 +20,9 @@ import (
 type RunCaseService struct {
 	c *client.Client
 }
+
+var interval bool
+var look sync.Mutex
 
 // RunTestCase TestCase排序
 
@@ -116,7 +121,16 @@ func (r *RunCaseService) RunBoomer(runCase request.RunCaseReq, runType interface
 
 func (r *RunCaseService) RunMasterBoomer(runCase request.RunCaseReq, _ interfacecase.RunType) (*interfacecase.ApiReport, error) {
 	global.GVA_LOG.Debug("RunMasterBoomer", zap.Any("master host", fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Master, global.GVA_CONFIG.YangFan.MasterBoomerProt)))
-
+	defer func() {
+		if runCase.Operation.Interval != nil && runCase.Operation.Interval.IntervalCount > 0 && runCase.Operation.Interval.IntervalNumber > 0 && runCase.Operation.Interval.IntervalTime > 0 {
+			go func() {
+				err := r.intervalRebalance(runCase)
+				if err != nil {
+					global.GVA_LOG.Error("设置阶梯级压测失败")
+				}
+			}()
+		}
+	}()
 	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Master, global.GVA_CONFIG.YangFan.MasterBoomerProt))
 	if err != nil {
 		global.GVA_LOG.Error("RunMasterBoomer", zap.Any("err host", errors.New(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Master, global.GVA_CONFIG.YangFan.MasterBoomerProt))))
@@ -141,7 +155,90 @@ func (r *RunCaseService) RunMasterBoomer(runCase request.RunCaseReq, _ interface
 	return nil, err
 }
 
+func (r *RunCaseService) intervalRebalance(runCase request.RunCaseReq) (err error) {
+	ctx := context.Background()
+	if runCase.Operation.Interval != nil && runCase.Operation.Interval.IntervalCount > 0 && runCase.Operation.Interval.IntervalNumber > 0 && runCase.Operation.Interval.IntervalTime > 0 {
+		global.GVA_LOG.Debug("阶梯压测原始数据", zap.Any("Interval", runCase.Operation.Interval))
+		// 压测过程中暂时不支持阶梯压测
+		//look.Lock()
+		//if !interval {
+		//	global.GVA_LOG.Info("加锁设置退出状态")
+		//	interval = true
+		//}
+		//look.Unlock()
+		quotientTime := runCase.Operation.Interval.IntervalTime * 60 / runCase.Operation.Interval.IntervalNumber
+		remainderTime := runCase.Operation.Interval.IntervalTime * 60 % runCase.Operation.Interval.IntervalNumber
+
+		if runCase.Operation.Interval.IntervalCount <= runCase.Operation.SpawnCount {
+			msg := "最大用户数不能小于初始用户数"
+			global.GVA_LOG.Error(msg)
+			return errors.New(msg)
+		}
+		intervalCount := runCase.Operation.Interval.IntervalCount - runCase.Operation.SpawnCount
+		quotientCount := intervalCount / runCase.Operation.Interval.IntervalNumber
+		remainderCount := intervalCount % runCase.Operation.Interval.IntervalNumber
+
+		if quotientTime == 0 || quotientCount == 0 {
+			msg := "参数设置有误，无法进行阶梯压测"
+			global.GVA_LOG.Error(msg)
+			return errors.New(msg)
+		}
+
+		intervalTimeList := make([]int64, runCase.Operation.Interval.IntervalNumber)
+		intervalCountList := make([]int64, runCase.Operation.Interval.IntervalNumber)
+		for i := int64(0); i < runCase.Operation.Interval.IntervalNumber; i++ {
+			intervalTimeList[i] = quotientTime
+			intervalCountList[i] = quotientCount
+		}
+		for i := int64(0); i < remainderTime; i++ {
+			intervalTimeList[i]++
+		}
+		for i := int64(0); i < remainderCount; i++ {
+			intervalCountList[i]++
+		}
+		global.GVA_LOG.Debug("阶梯级时间间隔：", zap.Any("intervalTimeList", intervalTimeList))
+		global.GVA_LOG.Debug("阶梯级用户数量：", zap.Any("intervalCountList", intervalCountList))
+		for {
+			c, _ := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Master, global.GVA_CONFIG.YangFan.MasterBoomerProt))
+			masterResp, _ := c.MasterClient.Master(ctx, &master.MasterReq{})
+			if masterResp.GetCurrentUsers() >= int32(runCase.Operation.SpawnCount) {
+				userCount := int64(masterResp.GetCurrentUsers())
+				for i := 0; i < int(runCase.Operation.Interval.IntervalNumber); i++ {
+					c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Master, global.GVA_CONFIG.YangFan.MasterBoomerProt))
+					look.Lock()
+					if interval {
+						interval = false
+						return nil
+					}
+					look.Unlock()
+					userCount += intervalCountList[i]
+
+					_, err = c.MasterClient.Rebalance(context.Background(), &master.RebalanceReq{
+						SpawnCount: int64(userCount),
+						SpawnRate:  float64(userCount),
+					})
+					if err != nil {
+						global.GVA_LOG.Error("设置阶梯级压测失败", zap.Any("第N次失败", i), zap.Error(err))
+					}
+					global.GVA_LOG.Debug("设置阶梯级数据：",
+						zap.Any("阶梯级数：", runCase.Operation.Interval.IntervalNumber),
+						zap.Any("当前阶梯：", i),
+						zap.Any("间隔时间：", intervalTimeList[i]),
+						zap.Any("并发用户数：", intervalCountList[i]))
+					time.Sleep(time.Second * time.Duration(intervalTimeList[i]))
+					if i+1 == int(runCase.Operation.Interval.IntervalNumber) {
+						_, _ = c.MasterClient.Stop(ctx, &master.StopReq{})
+					}
+				}
+			}
+			time.Sleep(time.Second * 3)
+		}
+	}
+	return err
+}
+
 func (r *RunCaseService) Rebalance(runCase request.RunCaseReq) (*interfacecase.ApiReport, error) {
+	interval = true
 	c, err := client.NewClient(fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Master, global.GVA_CONFIG.YangFan.MasterBoomerProt))
 	if err != nil {
 		return nil, err
@@ -154,13 +251,14 @@ func (r *RunCaseService) Rebalance(runCase request.RunCaseReq) (*interfacecase.A
 		var report interfacecase.ApiReport
 		global.GVA_DB.Model(&interfacecase.ApiReport{}).Order("id desc").First(&report)
 		if err == nil {
-			return &report, nil
+			return nil, nil
 		}
 	}
 	return nil, nil
 }
 
 func (r *RunCaseService) Stop(runCase request.RunCaseReq) (err error) {
+	interval = true
 	defer func() {
 		if err == nil || err.Error() == "rpc error: code = Unknown desc = already stopped" {
 			err = global.GVA_DB.Model(&interfacecase.PerformanceReport{}).Where("id = ?", runCase.ReportID).Update("state", interfacecase.StateStopped).Error
