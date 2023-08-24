@@ -1,6 +1,8 @@
 package config
 
 type YangFan struct {
+	Front                     string `mapstructure:"front" json:"front" yaml:"front"`
+	Report                    string `mapstructure:"report" json:"report" yaml:"report"`
 	Background                string `mapstructure:"background" json:"background" yaml:"background"`
 	BackgroundGrpcPort        string `mapstructure:"background-grpc-port" json:"background-grpc-port" yaml:"background-grpc-port"`
 	Master                    string `mapstructure:"master" json:"master" yaml:"master"`

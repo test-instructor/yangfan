@@ -14,9 +14,7 @@ import (
 	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/chromedp"
-	"github.com/test-instructor/yangfan/proto/run"
 	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"go.uber.org/zap"
 )
 
@@ -24,8 +22,6 @@ const blueColor = "#0000FF"
 const redColor = "#FF0000"
 
 type WeChatNotifier struct {
-	msg     *run.Msg
-	reports *interfacecase.ApiReport
 	NotifierDefault
 }
 
@@ -34,7 +30,7 @@ func (wn WeChatNotifier) Send() error {
 	if wn.reports.Success != nil && *wn.reports.Success && wn.msg.GetFail() {
 		return nil
 	}
-	data := wn.getCard(wn.reports)
+	data := wn.getCard()
 	htmlContent := wn.generateTableContent(data.Data.TemplateVariable.Content)
 	outputPath := fmt.Sprintf("%d.png", time.Now().UnixNano())
 	defer func() {
@@ -52,7 +48,7 @@ func (wn WeChatNotifier) Send() error {
 		body := make(map[string]interface{})
 		body["msgtype"] = "image"
 		body["image"] = wn.getImage(outputPath)
-		err = wn.SendMessage(body, wn.msg, wn.reports.ProjectID)
+		err = wn.SendMessage(body)
 	}
 	return err
 }

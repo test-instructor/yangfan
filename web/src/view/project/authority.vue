@@ -179,8 +179,6 @@ const getTableData = async () => {
       }
     });
   }
-  console.log("tableData.value", tableData.value);
-  console.log("table.data.list", table.data.list);
 };
 
 const init = () => {
@@ -201,7 +199,6 @@ const handleChecked = async (row) => {
   row.status.forEach((item) => {
     params[item] = true;
   });
-  console.log("params", params);
   const res = await setUserProjectAuth(params);
   if (res.code === 0) {
     ElMessage.success("设置成功");
@@ -220,8 +217,6 @@ const deleteUser = (row) => {
         sys_user_id: row.SysUserID,
         project_id: row.ProjectID,
       };
-      console.log("row", row);
-      console.log("deleteData", deleteData);
       const res = await deleteUserProjectAuth(deleteData);
       if (res.code === 0) {
         ElMessage({
@@ -280,7 +275,6 @@ const setKeyFun = async () => {
   });
   if (res.code === 0) {
     dialogForm.value = res.data;
-    console.log(dialogForm.value);
   }
 };
 </script>

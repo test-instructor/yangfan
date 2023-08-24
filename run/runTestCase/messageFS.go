@@ -3,15 +3,11 @@ package runTestCase
 import (
 	"time"
 
-	"github.com/test-instructor/yangfan/proto/run"
 	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"go.uber.org/zap"
 )
 
 type FeishuNotifier struct {
-	msg     *run.Msg
-	reports *interfacecase.ApiReport
 	NotifierDefault
 }
 
@@ -33,8 +29,8 @@ func (fn FeishuNotifier) Send() error {
 		body["sign"] = sign
 		body["timestamp"] = timestamp
 	}
-	body["card"] = fn.getCard(fn.reports)
-	err := fn.SendMessage(body, fn.msg, fn.reports.ProjectID)
+	body["card"] = fn.getCard()
+	err := fn.SendMessage(body)
 
 	return err
 }

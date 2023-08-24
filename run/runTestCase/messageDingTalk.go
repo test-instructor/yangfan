@@ -4,15 +4,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/test-instructor/yangfan/proto/run"
 	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"go.uber.org/zap"
 )
 
 type DingTalkNotifier struct {
-	msg     *run.Msg
-	reports *interfacecase.ApiReport
 	NotifierDefault
 }
 
@@ -44,20 +40,20 @@ func (dn DingTalkNotifier) Send() error {
 	if *dn.reports.Success {
 		text = fmt.Sprintf("# <font color=#0000FF>%s</font>\n\n", title)
 	}
-	data := dn.getCard(dn.reports)
+	data := dn.getCard()
 	text += dn.generateTableContent(data.Data.TemplateVariable.Content)
 	actionCard["text"] = text
 
 	btn := make(map[string]interface{})
 	btn["title"] = "查看详情"
-	btn["actionURL"] = ""
+	btn["actionURL"] = dn.getReportUrl()
 	actionCard["btns"] = []interface{}{btn}
 	actionCard["btnOrientation"] = "0"
 	actionCard["hideAvatar"] = "0"
 	actionCard["btnBackgroundColor"] = "#FF9900"
 	body["actionCard"] = actionCard
 
-	err := dn.SendMessage(body, dn.msg, dn.reports.ProjectID)
+	err := dn.SendMessage(body)
 	return err
 
 }

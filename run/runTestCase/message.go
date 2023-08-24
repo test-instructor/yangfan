@@ -188,9 +188,12 @@ func (d Devices) String() string {
 	return strings.Join(ss, "\n")
 }
 
-type NotifierDefault struct{}
+type NotifierDefault struct {
+	msg     *run.Msg
+	reports *interfacecase.ApiReport
+}
 
-func (NotifierDefault) genSign(secret string, timestamp int64) (string, error) {
+func (n NotifierDefault) genSign(secret string, timestamp int64) (string, error) {
 	//timestamp + key 做sha256, 再进行base64 encode
 	stringToSign := fmt.Sprintf("%v", timestamp) + "\n" + secret
 	var data []byte
@@ -203,7 +206,7 @@ func (NotifierDefault) genSign(secret string, timestamp int64) (string, error) {
 	return signature, nil
 }
 
-func (NotifierDefault) genSignDingTalk(secret string, timestamp int64) (string, error) {
+func (n NotifierDefault) genSignDingTalk(secret string, timestamp int64) (string, error) {
 	//timestamp + key 做sha256, 再进行base64 encode
 	stringToSign := fmt.Sprintf("%d\n%s", timestamp, secret)
 	mac := hmac.New(sha256.New, []byte(secret))
@@ -213,9 +216,9 @@ func (NotifierDefault) genSignDingTalk(secret string, timestamp int64) (string, 
 	return signature, nil
 }
 
-func (NotifierDefault) getCard(reports *interfacecase.ApiReport) FSCard {
+func (n NotifierDefault) getCard() FSCard {
 	var templateID FSTemplate
-	if reports.Success != nil && *reports.Success {
+	if n.reports.Success != nil && *n.reports.Success {
 		templateID = FSTemplateSuccess
 	} else {
 		templateID = FSTemplateFail
@@ -223,13 +226,13 @@ func (NotifierDefault) getCard(reports *interfacecase.ApiReport) FSCard {
 	data := FSData{
 		TemplateID: templateID,
 		TemplateVariable: TemplateVariable{
-			Env:    reports.ApiEnvName,
-			Detail: "",
-			Title:  reports.Name,
+			Env:    n.reports.ApiEnvName,
+			Detail: n.getReportUrl(),
+			Title:  n.reports.Name,
 		},
 	}
 	var contents []Content
-	for _, v := range reports.Details {
+	for _, v := range n.reports.Details {
 		var statMap, timerMap map[string]interface{}
 		err := json.Unmarshal(v.Stat, &statMap)
 		if err != nil {
@@ -264,7 +267,7 @@ func (NotifierDefault) getCard(reports *interfacecase.ApiReport) FSCard {
 	return card
 }
 
-func (NotifierDefault) generateTableContent(data []Content) (tableContent string) {
+func (n NotifierDefault) generateTableContent(data []Content) (tableContent string) {
 
 	for _, row := range data {
 		tableContent += "<tr>"
@@ -282,14 +285,14 @@ func (NotifierDefault) generateTableContent(data []Content) (tableContent string
 	return tableContent
 }
 
-func (n NotifierDefault) SendMessage(body interface{}, msg *run.Msg, projectID uint) error {
+func (n NotifierDefault) SendMessage(body interface{}) error {
 	reqJSON, err := json.Marshal(body)
 	if err != nil {
 		global.GVA_LOG.Error("Error marshaling JSON:", zap.Error(err))
 	}
 
 	bodyByte := bytes.NewBuffer(reqJSON)
-	req, err := http.NewRequest(http.MethodPost, msg.Webhook, bodyByte)
+	req, err := http.NewRequest(http.MethodPost, n.msg.Webhook, bodyByte)
 	if err != nil {
 		global.GVA_LOG.Error("Error creating request:", zap.Error(err))
 	}
@@ -321,15 +324,15 @@ func (n NotifierDefault) SendMessage(body interface{}, msg *run.Msg, projectID u
 		return err
 	}
 	global.GVA_LOG.Debug(string(jsonResponse))
-	n.msgLog(msg, resp.StatusCode, projectID, string(jsonResponse))
+	n.msgLog(resp.StatusCode, string(jsonResponse))
 	return nil
 }
 
-func (NotifierDefault) msgLog(msg *run.Msg, status int, projectID uint, respMessage string) {
+func (n NotifierDefault) msgLog(status int, respMessage string) {
 	var msgLog = interfacecase.ApiMessageLog{}
-	msgLog.ProjectID = projectID
+	msgLog.ProjectID = n.reports.ProjectID
 	msgLog.StatusCode = status
-	msgLog.ApiMessageID = uint(msg.Id)
+	msgLog.ApiMessageID = uint(n.msg.Id)
 	msgLog.Message = respMessage
 	if status == 200 {
 		msgLog.Status = true
@@ -338,14 +341,23 @@ func (NotifierDefault) msgLog(msg *run.Msg, status int, projectID uint, respMess
 
 }
 
+func (n NotifierDefault) getReportUrl() string {
+	reportUrl := strings.TrimSuffix(global.GVA_CONFIG.YangFan.Front, "/")
+	if !strings.HasPrefix(reportUrl, "http://") && !strings.HasPrefix(reportUrl, "https://") {
+		reportUrl = "http://" + reportUrl
+	}
+	reportUrl = fmt.Sprintf("%s/#/layout/interfaces/reportDetail/%d", reportUrl, n.reports.ID)
+	return reportUrl
+}
 func NewNotifier(msg *run.Msg, reports *interfacecase.ApiReport) Notifier {
+	var NotifierDefault = NotifierDefault{msg: msg, reports: reports}
 	switch msg.GetType() {
 	case run.NotifierType_Wechat:
-		return WeChatNotifier{msg: msg, reports: reports}
+		return WeChatNotifier{NotifierDefault}
 	case run.NotifierType_Dingtalk:
-		return DingTalkNotifier{msg: msg, reports: reports}
+		return DingTalkNotifier{NotifierDefault}
 	case run.NotifierType_Feishu:
-		return FeishuNotifier{msg: msg, reports: reports}
+		return FeishuNotifier{NotifierDefault}
 	default:
 		return nil
 	}
