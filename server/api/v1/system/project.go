@@ -107,6 +107,28 @@ func (projectApi *ProjectApi) SetUserProjectAuth(c *gin.Context) {
 	}
 }
 
+func (projectApi *ProjectApi) SetKey(c *gin.Context) {
+	var sp system.Project
+	_ = c.ShouldBindJSON(&sp)
+	if err, data := projectService.SetKey(sp); err != nil {
+		global.GVA_LOG.Error("设置密钥失败!", zap.Error(err))
+		response.FailWithMessage("设置密钥失败", c)
+	} else {
+		response.OkWithData(data, c)
+	}
+}
+
+func (projectApi *ProjectApi) FindKey(c *gin.Context) {
+	var sp system.Project
+	_ = c.ShouldBindQuery(&sp)
+	if err, data := projectService.FindKey(sp); err != nil {
+		global.GVA_LOG.Error("设置密钥失败!", zap.Error(err))
+		response.FailWithMessage("设置密钥失败", c)
+	} else {
+		response.OkWithData(data, c)
+	}
+}
+
 func (projectApi *ProjectApi) DeleteProjectAuth(c *gin.Context) {
 	var sua system.SysUserProject
 	_ = c.ShouldBindJSON(&sua)

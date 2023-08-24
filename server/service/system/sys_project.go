@@ -1,11 +1,18 @@
 package system
 
 import (
+	"crypto/md5"
+	"encoding/hex"
+	"fmt"
+	"time"
+
+	"github.com/google/uuid"
 	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/model/common/request"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	"github.com/test-instructor/yangfan/server/model/system"
 	interfacecaseReq "github.com/test-instructor/yangfan/server/model/system/request"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -125,6 +132,56 @@ func (projectService *ProjectService) SetUserProjectAuth(sup system.SysUserProje
 		Where("sys_user_id = ? AND project_id = ?", sup.SysUserID, sup.ProjectID).
 		Save(&sup).Error
 	return err
+}
+
+func (projectService *ProjectService) SetKey(sp system.Project) (err error, data map[string]string) {
+	secret, UUID, err := projectService.generateSecret()
+	if err != nil {
+		global.GVA_LOG.Error("Error:", zap.Error(err))
+	}
+	data = make(map[string]string)
+	data["secret"] = secret
+	data["uuid"] = UUID
+	err = global.GVA_DB.Model(&system.Project{}).
+		Where("id = ?", sp.ID).
+		First(&sp).Error
+	if err != nil {
+		global.GVA_LOG.Error("Error:", zap.Error(err))
+		return
+	}
+	err = global.GVA_DB.Model(&sp).UpdateColumns(system.Project{Secret: secret, UUID: UUID}).Error
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	return
+}
+
+func (projectService *ProjectService) FindKey(sp system.Project) (err error, data map[string]string) {
+
+	data = make(map[string]string)
+	err = global.GVA_DB.Model(&system.Project{}).
+		Where("id = ?", sp.ID).
+		First(&sp).Error
+	if err != nil {
+		global.GVA_LOG.Error("Error:", zap.Error(err))
+		return
+	}
+	data["secret"] = sp.Secret
+	data["uuid"] = sp.UUID
+	return
+}
+
+func (projectService *ProjectService) generateSecret() (string, string, error) {
+	newUUID, err := uuid.NewRandom()
+	if err != nil {
+		return "", "", err
+	}
+	timestamp := time.Now().UnixNano() / int64(time.Millisecond)
+	data := fmt.Sprintf("%s%d", newUUID.String(), timestamp)
+
+	hash := md5.Sum([]byte(data))
+	return hex.EncodeToString(hash[:]), newUUID.String(), nil
 }
 
 func (projectService *ProjectService) DeleteProjectAuth(sup system.SysUserProject) (err error) {

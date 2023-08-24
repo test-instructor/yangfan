@@ -15,4 +15,6 @@ type Project struct {
 	Describe string `json:"describe" form:"describe" gorm:"column:describe;comment:;"`
 	//SysUserID uint
 	SysUser []SysUser `json:"sys_user" gorm:"many2many:SysUserProject;"`
+	UUID    string    `json:"uuid" gorm:"column:uuid;comment:;"`
+	Secret  string    `json:"secret" gorm:"column:secret;comment:;"`
 }

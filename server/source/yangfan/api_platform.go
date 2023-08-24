@@ -1,9 +1,10 @@
 package yangfan
 
 import (
+	"time"
+
 	system2 "github.com/test-instructor/yangfan/server/service/system"
 	"go.uber.org/zap"
-	"time"
 
 	"gorm.io/gorm"
 
@@ -247,6 +248,8 @@ func RegisterApis() {
 		{ApiGroup: "项目管理", Method: "POST", Path: "/project/setUserProjectAuth", Description: "设置用户项目权限"},
 		{ApiGroup: "项目管理", Method: "DELETE", Path: "/project/deleteUserProjectAuth", Description: "删除项目成员"},
 		{ApiGroup: "项目管理", Method: "GET", Path: "/project/getProjectUserList", Description: "获取项目用户列表"},
+		{ApiGroup: "项目管理", Method: "POST", Path: "/project/setKey", Description: "设置项目密钥"},
+		{ApiGroup: "项目管理", Method: "GET", Path: "/project/findKey", Description: "查询项目密钥"},
 
 		{ApiGroup: "环境变量", Method: "POST", Path: "/env/:project/createEnv", Description: "新增环境"},
 		{ApiGroup: "环境变量", Method: "PUT", Path: "/env/:project/updateEnv", Description: "修改环境"},

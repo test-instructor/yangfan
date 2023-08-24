@@ -104,6 +104,21 @@ export const getProjectUserList = (params) => {
   });
 };
 
+export const setKey = (data) => {
+  return service({
+    url: "/project/setKey",
+    method: "post",
+    data,
+  });
+};
+
+export const findKey = (params) => {
+  return service({
+    url: "/project/findKey",
+    method: "get",
+    params,
+  });
+};
 export const setUserProjectAuth = (data) => {
   return service({
     url: "/project/setUserProjectAuth",

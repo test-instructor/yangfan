@@ -22,10 +22,12 @@ func (s *ProjectRouter) InitProjectRouter(Router *gin.RouterGroup) {
 		projectRouter.PUT("updateProject", projectApi.UpdateProject)                // 更新Project
 		projectRouter.POST("setUserProjectAuth", projectApi.SetUserProjectAuth)     // 设置用户项目权限
 		projectRouter.DELETE("deleteUserProjectAuth", projectApi.DeleteProjectAuth) // 删除用户项目权限
+		projectRouter.POST("setKey", projectApi.SetKey)                             // 设置项目密钥
 	}
 	{
 		projectRouterWithoutRecord.GET("findProject", projectApi.FindProject)               // 根据ID获取Project
 		projectRouterWithoutRecord.GET("getProjectList", projectApi.GetProjectList)         // 获取Project列表
 		projectRouterWithoutRecord.GET("getProjectUserList", projectApi.GetProjectUserList) // 获取项目用户列表
+		projectRouterWithoutRecord.GET("findKey", projectApi.FindKey)
 	}
 }

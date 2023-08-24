@@ -5,21 +5,15 @@
         <el-form-item label="项目成员">
           <el-input v-model="searchInfo.name" placeholder="搜索条件" />
         </el-form-item>
-        <!--        <el-form-item label="管理员">-->
-        <!--          <el-input v-model="searchInfo.admin" placeholder="搜索条件" />-->
-        <!--        </el-form-item>-->
-        <!--        <el-form-item label="创建人">-->
-        <!--          <el-input v-model="searchInfo.creator" placeholder="搜索条件" />-->
-        <!--        </el-form-item>-->
-        <!--        <el-form-item label="项目描述">-->
-        <!--          <el-input v-model="searchInfo.describe" placeholder="搜索条件" />-->
-        <!--        </el-form-item>-->
         <el-form-item>
           <el-button icon="search" size="mini" type="primary" @click="onSubmit"
             >查询</el-button
           >
           <el-button icon="refresh" size="mini" @click="onReset"
             >重置</el-button
+          >
+          <el-button icon="key" size="mini" type="primary" @click="onCIKey"
+            >CI密钥</el-button
           >
         </el-form-item>
       </el-form>
@@ -62,7 +56,41 @@
           </template>
         </el-table-column>
       </el-table>
+      <div class="gva-pagination">
+        <el-pagination
+          layout="total, sizes, prev, pager, next, jumper"
+          :current-page="page"
+          :page-size="pageSize"
+          :page-sizes="[10, 30, 50, 100]"
+          :total="total"
+          @current-change="handleCurrentChange"
+          @size-change="handleSizeChange"
+        />
+      </div>
     </div>
+    <el-dialog
+      title="CI密钥"
+      :before-close="closeDialogCI"
+      v-model="ciKeyDialog"
+      width="40%"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+    >
+      <el-button type="primary" @click="omSetKey"
+        ><span>{{ buttonName() }}</span></el-button
+      >
+      <el-form :model="dialogForm" label-width="100px" style="margin-top: 20px">
+        <el-form-item label="UUID:" prop="signature">
+          <el-input v-model="dialogForm.uuid" disabled />
+        </el-form-item>
+        <el-form-item label="SecretKey:" prop="signature">
+          <el-input v-model="dialogForm.secret" disabled />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="closeDialogCI">确定</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
@@ -72,6 +100,8 @@ import {
   deleteUserProjectAuth,
   getProjectUserList,
   setUserProjectAuth,
+  setKey,
+  findKey,
 } from "@/api/project";
 import { ElMessage, ElMessageBox } from "element-plus";
 
@@ -82,9 +112,23 @@ const pageSize = ref(10);
 const tableData = ref([]);
 const searchInfo = ref({});
 const checkboxGroup = ref([]);
+const projectID = ref(0);
 
 const checkboxGroupFunc = (row) => {
   return checkboxGroup.value;
+};
+
+const dialogForm = ref({
+  uuid: "",
+  secret: "",
+});
+
+const buttonName = () => {
+  if (dialogForm.value.uuid !== "") {
+    return "重置密钥";
+  } else {
+    return "创建密钥";
+  }
 };
 
 const checkboxValue = (row, key) => {
@@ -96,6 +140,15 @@ const onReset = () => {
   searchInfo.value = {};
 };
 
+const ciKeyDialog = ref(false);
+const onCIKey = async () => {
+  let res = await findKey({ ID: projectID.value });
+  if (res.code === 0) {
+    dialogForm.value = res.data;
+  }
+  ciKeyDialog.value = true;
+};
+
 // 搜索
 const onSubmit = () => {
   page.value = 1;
@@ -104,9 +157,8 @@ const onSubmit = () => {
 };
 
 const getTableData = async () => {
-  let project = JSON.parse(window.localStorage.getItem("project")).ID;
   const table = await getProjectUserList({
-    projectId: project,
+    projectId: projectID.value,
     page: page.value,
     pageSize: pageSize.value,
     ...searchInfo.value,
@@ -130,7 +182,13 @@ const getTableData = async () => {
   console.log("tableData.value", tableData.value);
   console.log("table.data.list", table.data.list);
 };
-getTableData();
+
+const init = () => {
+  projectID.value = JSON.parse(window.localStorage.getItem("project")).ID;
+  getTableData();
+};
+
+init();
 
 const handleChecked = async (row) => {
   let params = {
@@ -182,6 +240,48 @@ const deleteUser = (row) => {
         message: "已取消删除",
       });
     });
+};
+
+const handleCurrentChange = (val) => {
+  page.value = val;
+  getTableData();
+};
+
+const handleSizeChange = (val) => {
+  pageSize.value = val;
+  getTableData();
+};
+
+const closeDialogCI = () => {
+  ciKeyDialog.value = false;
+};
+
+const omSetKey = async () => {
+  if (dialogForm.value.uuid === "") {
+    await setKeyFun();
+  } else {
+    ElMessageBox.confirm(
+      "继续此操作将更新 UUID 和 SecretKey。更新后可能会影响已接入的 CI 流程调用，是否继续？",
+      "提示",
+      {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }
+    ).then(async () => {
+      await setKeyFun();
+    });
+  }
+};
+
+const setKeyFun = async () => {
+  let res = await setKey({
+    ID: projectID.value,
+  });
+  if (res.code === 0) {
+    dialogForm.value = res.data;
+    console.log(dialogForm.value);
+  }
 };
 </script>
 
