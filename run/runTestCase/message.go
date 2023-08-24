@@ -7,10 +7,15 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
-	"time"
+	"reflect"
+	"regexp"
+	"strconv"
+	"strings"
 
+	"github.com/chromedp/chromedp/device"
 	"github.com/test-instructor/yangfan/proto/run"
 	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
@@ -22,8 +27,165 @@ type FSTemplate string
 const FSTemplateFail FSTemplate = "ctp_AAmIkXEaoPea"
 const FSTemplateSuccess FSTemplate = "ctp_AAmjuIxqEQjK"
 
+type Devices []Device
+type Device struct {
+	id   int
+	info device.Info
+}
 type Notifier interface {
 	Send() error
+}
+type Image struct {
+	Base64 string `json:"base64"`
+	MD5    string `json:"md5"`
+}
+type FSCard struct {
+	Type string `json:"type"`
+	Data FSData `json:"data"`
+	NotifierDefault
+}
+type FSData struct {
+	TemplateID       FSTemplate       `json:"template_id"`
+	TemplateVariable TemplateVariable `json:"template_variable"`
+}
+type Content struct {
+	Name    string `json:"name"`
+	Success int    `json:"success"`
+	Fail    int    `json:"fail"`
+	Time    int    `json:"time"`
+	Total   int    `json:"total"`
+}
+type TemplateVariable struct {
+	Env     string    `json:"env"`
+	Detail  string    `json:"detail"`
+	Content []Content `json:"content"`
+	Title   string    `json:"title"`
+}
+
+func init() {
+	t := reflect.TypeOf(device.Reset)
+	defer func() { recover() }() // exit loop if "index-out-of-range"
+	for i := 1; ; i++ {
+		infoType := reflect.New(t)
+		infoType.Elem().SetInt(int64(i))
+		devices = append(devices, Device{
+			id:   i,
+			info: infoType.MethodByName("Device").Interface().(func() device.Info)(),
+		})
+	}
+}
+
+func jsonStringify(s string) string {
+	b, err := json.Marshal(s)
+	if err != nil {
+		return ""
+	}
+	return string(b)
+}
+
+var devices Devices
+
+func (d *Device) Device() device.Info {
+	return d.info
+}
+
+func (d *Device) Set(i string) error { // flag.Value
+	_d := devices.NewDeviceByName(i)
+	if _d == nil {
+		n, _ := strconv.Atoi(i)
+		_d = devices.NewDeviceById(n)
+	}
+	if _d == nil {
+		query, _ := url.ParseQuery(i)
+		for key := range query {
+			value := query.Get(key)
+			switch strings.ToLower(key) {
+			case "name":
+				d.info.Name = value
+			case "useragent":
+				d.info.UserAgent = value
+			case "width":
+				n, _ := strconv.Atoi(value)
+				d.info.Width = int64(n)
+			case "height":
+				n, _ := strconv.Atoi(value)
+				d.info.Height = int64(n)
+			case "scale":
+				n, _ := strconv.ParseFloat(value, 64)
+				d.info.Scale = n
+			case "landscape":
+				d.info.Landscape = value == "true"
+			case "mobile":
+				d.info.Mobile = value == "true"
+			case "touch":
+				d.info.Touch = value == "true"
+			}
+		}
+	} else {
+		d.updateFrom(_d)
+	}
+	return nil
+}
+
+func (d *Device) String() string { // flag.Value
+	return ""
+}
+
+func (d *Device) MultilineString() string {
+	return "Name: " + d.info.Name + "\n" +
+		"User-Agent: " + d.info.UserAgent + "\n" +
+		"Width: " + strconv.Itoa(int(d.info.Width)) + "\n" +
+		"Height: " + strconv.Itoa(int(d.info.Height)) + "\n" +
+		"Scale: " + strconv.FormatFloat(d.info.Scale, 'f', -1, 64) + "\n" +
+		"Landscape: " + strconv.FormatBool(d.info.Landscape) + "\n" +
+		"Mobile: " + strconv.FormatBool(d.info.Mobile) + "\n" +
+		"Touch: " + strconv.FormatBool(d.info.Touch)
+}
+
+func (d *Device) MultilineStringIndent(n int) string {
+	return regexp.MustCompile("(?m)^").ReplaceAllString(d.MultilineString(), strings.Repeat(" ", n))
+}
+
+func (d *Device) updateFrom(o *Device) {
+	d.info.Name = o.info.Name
+	d.info.UserAgent = o.info.UserAgent
+	d.info.Width = o.info.Width
+	d.info.Height = o.info.Height
+	d.info.Scale = o.info.Scale
+	d.info.Landscape = o.info.Landscape
+	d.info.Mobile = o.info.Mobile
+	d.info.Touch = o.info.Touch
+}
+
+func (d Devices) NewDeviceByName(name string) *Device {
+	for _, _d := range d {
+		if _d.info.Name == name {
+			d := &Device{}
+			d.updateFrom(&_d)
+			return d
+		}
+	}
+	return nil
+}
+
+func (d Devices) NewDeviceById(i int) *Device {
+	for _, _d := range d {
+		if _d.id == i {
+			d := &Device{}
+			d.updateFrom(&_d)
+			return d
+		}
+	}
+	return nil
+}
+
+func (d Devices) String() string {
+	var ss []string
+	for _, d := range d {
+		s := fmt.Sprintf("%2d  %-40s  %-10s  %0.2fx", d.id, d.info.Name, fmt.Sprintf("%dx%d", d.info.Width, d.info.Height), d.info.Scale)
+		ss = append(ss, s)
+	}
+	return strings.Join(ss, "\n")
 }
 
 type NotifierDefault struct{}
@@ -120,168 +282,60 @@ func (NotifierDefault) generateTableContent(data []Content) (tableContent string
 	return tableContent
 }
 
-type WeChatNotifier struct {
-	msg     *run.Msg
-	reports *interfacecase.ApiReport
-}
-
-func (wn WeChatNotifier) Send() error {
-	// 实现企业微信消息发送逻辑
-	fmt.Println("Sending WeChat message:")
-	return nil
-}
-
-type DingTalkNotifier struct {
-	msg     *run.Msg
-	reports *interfacecase.ApiReport
-	NotifierDefault
-}
-
-func (dn DingTalkNotifier) Send() error {
-	if dn.reports.Success != nil && *dn.reports.Success && dn.msg.GetFail() {
-		return nil
-	}
-	global.GVA_LOG.Debug("Sending DingTalk message:")
-	body := make(map[string]interface{})
-	body["msgtype"] = "actionCard"
-	url := dn.msg.GetWebhook()
-	if dn.msg.GetSignature() != "" {
-		timestamp := time.Now().UnixMilli()
-		sign, err := dn.genSignDingTalk(dn.msg.GetSignature(), timestamp)
-		if err != nil {
-			global.GVA_LOG.Error("签名失败", zap.Error(err))
-			return err
-		}
-		url += fmt.Sprintf("&timestamp=%d&sign=%s", timestamp, sign)
-	}
-	var actionCard = make(map[string]interface{})
-	var success = "失败"
-	if *dn.reports.Success {
-		success = "成功"
-	}
-	title := fmt.Sprintf("【%s】%s | %s", dn.reports.Name, success, dn.reports.ApiEnvName)
-	actionCard["title"] = title
-	text := fmt.Sprintf("# <font color=#FF0000>%s</font>\n\n", title)
-	if *dn.reports.Success {
-		text = fmt.Sprintf("# <font color=#0000FF>%s</font>\n\n", title)
-	}
-	data := dn.getCard(dn.reports)
-	text += dn.generateTableContent(data.Data.TemplateVariable.Content)
-	actionCard["text"] = text
-
-	btn := make(map[string]interface{})
-	btn["title"] = "查看详情"
-	btn["actionURL"] = ""
-	actionCard["btns"] = []interface{}{btn}
-	actionCard["btnOrientation"] = "0"
-	actionCard["hideAvatar"] = "0"
-	actionCard["btnBackgroundColor"] = "#FF9900"
-	body["actionCard"] = actionCard
-
-	contentType := "application/json"
+func (n NotifierDefault) SendMessage(body interface{}, msg *run.Msg, projectID uint) error {
 	reqJSON, err := json.Marshal(body)
 	if err != nil {
 		global.GVA_LOG.Error("Error marshaling JSON:", zap.Error(err))
-		return err
 	}
-	// 发起 POST 请求
-	global.GVA_LOG.Debug("请求数据", zap.Any("reqJSON", string(reqJSON)))
+
 	bodyByte := bytes.NewBuffer(reqJSON)
-	req, err := http.NewRequest(http.MethodPost, url, bodyByte)
+	req, err := http.NewRequest(http.MethodPost, msg.Webhook, bodyByte)
 	if err != nil {
 		global.GVA_LOG.Error("Error creating request:", zap.Error(err))
 	}
-	req.Header.Set("Content-Type", contentType)
+	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		global.GVA_LOG.Error("Error sending POST request:", zap.Error(err))
 	}
-	defer resp.Body.Close()
-
-	global.GVA_LOG.Debug("请求数据", zap.Any("header", resp.Request.Header))
-	global.GVA_LOG.Debug("响应数据", zap.Any("Status", resp.Status))
-	return nil
-}
-
-type FSCard struct {
-	Type string `json:"type"`
-	Data FSData `json:"data"`
-	NotifierDefault
-}
-
-type FSData struct {
-	TemplateID       FSTemplate       `json:"template_id"`
-	TemplateVariable TemplateVariable `json:"template_variable"`
-}
-type Content struct {
-	Name    string `json:"name"`
-	Success int    `json:"success"`
-	Fail    int    `json:"fail"`
-	Time    int    `json:"time"`
-	Total   int    `json:"total"`
-}
-type TemplateVariable struct {
-	Env     string    `json:"env"`
-	Detail  string    `json:"detail"`
-	Content []Content `json:"content"`
-	Title   string    `json:"title"`
-}
-
-type FeishuNotifier struct {
-	msg     *run.Msg
-	reports *interfacecase.ApiReport
-	NotifierDefault
-}
-
-func (fn FeishuNotifier) Send() error {
-	// 实现飞书消息发送逻辑
-	if fn.reports.Success != nil && *fn.reports.Success && fn.msg.GetFail() {
-		return nil
-	}
-	global.GVA_LOG.Debug("Sending Feishu message:")
-	body := make(map[string]interface{})
-	body["msg_type"] = "interactive"
-	if fn.msg.GetSignature() != "" {
-		timestamp := time.Now().Unix()
-		sign, err := fn.genSign(fn.msg.GetSignature(), timestamp)
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
 		if err != nil {
-			global.GVA_LOG.Error("签名失败", zap.Error(err))
-			return err
-		}
-		body["sign"] = sign
-		body["timestamp"] = timestamp
-	}
-	body["card"] = fn.getCard(fn.reports)
 
-	contentType := "application/json"
-	reqJSON, err := json.Marshal(body)
+		}
+	}(resp.Body)
+
+	var responseBody map[string]interface{}
+	err = json.NewDecoder(resp.Body).Decode(&responseBody)
 	if err != nil {
-		global.GVA_LOG.Error("Error marshaling JSON:", zap.Error(err))
+		global.GVA_LOG.Error("Error decoding JSON response body:", zap.Error(err))
 		return err
 	}
-	// 发起 POST 请求
-	global.GVA_LOG.Debug("请求数据", zap.Any("reqJSON", string(reqJSON)))
 
-	bodyByte := bytes.NewBuffer(reqJSON)
-	req, err := http.NewRequest(http.MethodPost, fn.msg.GetWebhook(), bodyByte)
+	// 将内容转换为 JSON 格式的字符串
+	jsonResponse, err := json.MarshalIndent(responseBody, "", "    ")
 	if err != nil {
-		global.GVA_LOG.Error("Error creating request:", zap.Error(err))
+		global.GVA_LOG.Error("Error encoding JSON response body:", zap.Error(err))
+		return err
 	}
-	req.Header.Set("Content-Type", contentType)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		global.GVA_LOG.Error("Error sending POST request:", zap.Error(err))
-	}
-	defer resp.Body.Close()
-
-	global.GVA_LOG.Debug("请求数据", zap.Any("header", resp.Request.Header))
-	global.GVA_LOG.Debug("响应数据", zap.Any("Status", resp.Status))
-
+	global.GVA_LOG.Debug(string(jsonResponse))
+	n.msgLog(msg, resp.StatusCode, projectID, string(jsonResponse))
 	return nil
+}
+
+func (NotifierDefault) msgLog(msg *run.Msg, status int, projectID uint, respMessage string) {
+	var msgLog = interfacecase.ApiMessageLog{}
+	msgLog.ProjectID = projectID
+	msgLog.StatusCode = status
+	msgLog.ApiMessageID = uint(msg.Id)
+	msgLog.Message = respMessage
+	if status == 200 {
+		msgLog.Status = true
+	}
+	global.GVA_DB.Create(&msgLog)
+
 }
 
 func NewNotifier(msg *run.Msg, reports *interfacecase.ApiReport) Notifier {

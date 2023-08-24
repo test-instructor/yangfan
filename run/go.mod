@@ -3,6 +3,7 @@ module github.com/test-instructor/yangfan/run
 go 1.19
 
 require (
+	github.com/chromedp/chromedp v0.9.2
 	github.com/rs/zerolog v1.29.1
 	github.com/test-instructor/yangfan/hrp v0.0.0-20230521151452-07d562821462
 	github.com/test-instructor/yangfan/proto v0.0.0-20230610181159-dd4af0d2a21f
