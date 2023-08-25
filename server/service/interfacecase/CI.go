@@ -22,10 +22,12 @@ func (ci *ApiCIService) RunTag(tagReq interfacecaseReq.CIRun) (error, interface{
 	key := uuid.NewV4()
 	fmt.Print(key.String())
 	arc := interfacecase.ApiReportCI{
-		TagID:     tagReq.TagID,
-		EnvID:     tagReq.EnvID,
-		ProjectID: tagReq.ProjectID,
-		Key:       key.String(),
+		TagID:       tagReq.TagID,
+		EnvID:       tagReq.EnvID,
+		ProjectID:   tagReq.ProjectID,
+		Key:         key.String(),
+		Other:       tagReq.Other,
+		CallbackUrl: tagReq.CallbackUrl,
 	}
 	err := global.GVA_DB.Create(&arc).Error
 	if err != nil {

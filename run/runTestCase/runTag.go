@@ -1,9 +1,12 @@
 package runTestCase
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"testing"
 
@@ -145,6 +148,54 @@ func (r *runTag) setCIReport() {
 	if err != nil {
 		global.GVA_LOG.Error("CI报告更新失败", zap.Error(err))
 	}
+	if ci.CallbackUrl != "" {
+		err := global.GVA_DB.Preload("Report").First(&ci, "id = ? ", ci.ID).Error
+		if err != nil {
+			global.GVA_LOG.Error("CI报告获取失败", zap.Error(err))
+			return
+		}
+		resp := sendReport(ci.Report, ci.CallbackUrl)
+		global.GVA_DB.Model(&ci).UpdateColumns(interfacecase.ApiReportCI{CallbackResponse: resp})
+	}
+}
+
+func sendReport(body interface{}, url string) string {
+	reqJSON, err := json.Marshal(body)
+	if err != nil {
+		global.GVA_LOG.Error("Error marshaling JSON:", zap.Error(err))
+	}
+
+	bodyByte := bytes.NewBuffer(reqJSON)
+	req, err := http.NewRequest(http.MethodPost, url, bodyByte)
+	if err != nil {
+		global.GVA_LOG.Error("Error creating request:", zap.Error(err))
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		global.GVA_LOG.Error("Error sending POST request:", zap.Error(err))
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+
+		}
+	}(resp.Body)
+	var responseBody map[string]interface{}
+	err = json.NewDecoder(resp.Body).Decode(&responseBody)
+	if err != nil {
+		global.GVA_LOG.Error("Error decoding JSON response body:", zap.Error(err))
+		return ""
+	}
+	jsonResponse, err := json.MarshalIndent(responseBody, "", "    ")
+	if err != nil {
+		global.GVA_LOG.Error("Error encoding JSON response body:", zap.Error(err))
+		return ""
+	}
+	global.GVA_LOG.Debug(string(jsonResponse))
+	return string(jsonResponse)
 }
 
 func (r *runTag) RunCase() (err error) {
