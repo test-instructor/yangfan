@@ -15,13 +15,13 @@ import (
 type OperationRecordApi struct{}
 
 // CreateSysOperationRecord @Tags SysOperationRecord
-// @Summary 创建SysOperationRecord
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body system.SysOperationRecord true "创建SysOperationRecord"
-// @Success 200 {object} response.Response{msg=string} "创建SysOperationRecord"
-// @Router /sysOperationRecord/createSysOperationRecord [post]
+//	@Summary	创建SysOperationRecord
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		system.SysOperationRecord		true	"创建SysOperationRecord"
+//	@Success	200		{object}	response.Response{msg=string}	"创建SysOperationRecord"
+//	@Router		/sysOperationRecord/createSysOperationRecord [post]
 func (s *OperationRecordApi) CreateSysOperationRecord(c *gin.Context) {
 	var sysOperationRecord system.SysOperationRecord
 	_ = c.ShouldBindJSON(&sysOperationRecord)
@@ -34,13 +34,13 @@ func (s *OperationRecordApi) CreateSysOperationRecord(c *gin.Context) {
 }
 
 // DeleteSysOperationRecord @Tags SysOperationRecord
-// @Summary 删除SysOperationRecord
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body system.SysOperationRecord true "SysOperationRecord模型"
-// @Success 200 {object} response.Response{msg=string} "删除SysOperationRecord"
-// @Router /sysOperationRecord/deleteSysOperationRecord [delete]
+//	@Summary	删除SysOperationRecord
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		system.SysOperationRecord		true	"SysOperationRecord模型"
+//	@Success	200		{object}	response.Response{msg=string}	"删除SysOperationRecord"
+//	@Router		/sysOperationRecord/deleteSysOperationRecord [delete]
 func (s *OperationRecordApi) DeleteSysOperationRecord(c *gin.Context) {
 	var sysOperationRecord system.SysOperationRecord
 	_ = c.ShouldBindJSON(&sysOperationRecord)
@@ -53,13 +53,13 @@ func (s *OperationRecordApi) DeleteSysOperationRecord(c *gin.Context) {
 }
 
 // DeleteSysOperationRecordByIds @Tags SysOperationRecord
-// @Summary 批量删除SysOperationRecord
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body request.IdsReq true "批量删除SysOperationRecord"
-// @Success 200 {object} response.Response{msg=string} "批量删除SysOperationRecord"
-// @Router /sysOperationRecord/deleteSysOperationRecordByIds [delete]
+//	@Summary	批量删除SysOperationRecord
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		request.IdsReq					true	"批量删除SysOperationRecord"
+//	@Success	200		{object}	response.Response{msg=string}	"批量删除SysOperationRecord"
+//	@Router		/sysOperationRecord/deleteSysOperationRecordByIds [delete]
 func (s *OperationRecordApi) DeleteSysOperationRecordByIds(c *gin.Context) {
 	var IDS request.IdsReq
 	_ = c.ShouldBindJSON(&IDS)
@@ -72,13 +72,13 @@ func (s *OperationRecordApi) DeleteSysOperationRecordByIds(c *gin.Context) {
 }
 
 // FindSysOperationRecord @Tags SysOperationRecord
-// @Summary 用id查询SysOperationRecord
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data query system.SysOperationRecord true "Id"
-// @Success 200 {object} response.Response{data=map[string]interface{},msg=string} "用id查询SysOperationRecord"
-// @Router /sysOperationRecord/findSysOperationRecord [get]
+//	@Summary	用id查询SysOperationRecord
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	query		system.SysOperationRecord									true	"Id"
+//	@Success	200		{object}	response.Response{data=map[string]interface{},msg=string}	"用id查询SysOperationRecord"
+//	@Router		/sysOperationRecord/findSysOperationRecord [get]
 func (s *OperationRecordApi) FindSysOperationRecord(c *gin.Context) {
 	var sysOperationRecord system.SysOperationRecord
 	_ = c.ShouldBindQuery(&sysOperationRecord)
@@ -95,13 +95,13 @@ func (s *OperationRecordApi) FindSysOperationRecord(c *gin.Context) {
 }
 
 // GetSysOperationRecordList @Tags SysOperationRecord
-// @Summary 分页获取SysOperationRecord列表
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data query request.SysOperationRecordSearch true "页码, 每页大小, 搜索条件"
-// @Success 200 {object} response.Response{data=response.PageResult,msg=string} "分页获取SysOperationRecord列表,返回包括列表,总数,页码,每页数量"
-// @Router /sysOperationRecord/getSysOperationRecordList [get]
+//	@Summary	分页获取SysOperationRecord列表
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	query		request.SysOperationRecordSearch						true	"页码, 每页大小, 搜索条件"
+//	@Success	200		{object}	response.Response{data=response.PageResult,msg=string}	"分页获取SysOperationRecord列表,返回包括列表,总数,页码,每页数量"
+//	@Router		/sysOperationRecord/getSysOperationRecordList [get]
 func (s *OperationRecordApi) GetSysOperationRecordList(c *gin.Context) {
 	var pageInfo systemReq.SysOperationRecordSearch
 	_ = c.ShouldBindQuery(&pageInfo)

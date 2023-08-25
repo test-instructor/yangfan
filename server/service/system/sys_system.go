@@ -19,7 +19,7 @@ func (systemConfigService *SystemConfigService) GetSystemConfig() (conf config.S
 	return global.GVA_CONFIG, nil
 }
 
-// @description   set system config,
+//	@description	set system config,
 //@author: [piexlmax](https://github.com/piexlmax)
 //@function: SetSystemConfig
 //@description: 设置配置文件

@@ -19,14 +19,14 @@ type ApiConfigApi struct {
 var acService = service.ServiceGroupApp.InterfacecaseServiceGroup.ApiConfigService
 
 // CreateApiConfig 创建ApiConfig
-// @Tags ApiConfig
-// @Summary 创建ApiConfig
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body interfacecase.ApiConfig true "创建ApiConfig"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
-// @Router /ac/createApiConfig [post]
+//	@Tags		ApiConfig
+//	@Summary	创建ApiConfig
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		interfacecase.ApiConfig	true	"创建ApiConfig"
+//	@Success	200		{string}	string					"{"success":true,"data":{},"msg":"获取成功"}"
+//	@Router		/ac/createApiConfig [post]
 func (acApi *ApiConfigApi) CreateApiConfig(c *gin.Context) {
 	var ac interfacecase.ApiConfig
 	err := c.ShouldBindJSON(&ac)
@@ -46,14 +46,14 @@ func (acApi *ApiConfigApi) CreateApiConfig(c *gin.Context) {
 }
 
 // DeleteApiConfig 删除ApiConfig
-// @Tags ApiConfig
-// @Summary 删除ApiConfig
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body interfacecase.ApiConfig true "删除ApiConfig"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
-// @Router /ac/deleteApiConfig [delete]
+//	@Tags		ApiConfig
+//	@Summary	删除ApiConfig
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		interfacecase.ApiConfig	true	"删除ApiConfig"
+//	@Success	200		{string}	string					"{"success":true,"data":{},"msg":"删除成功"}"
+//	@Router		/ac/deleteApiConfig [delete]
 func (acApi *ApiConfigApi) DeleteApiConfig(c *gin.Context) {
 	var ac interfacecase.ApiConfig
 	_ = c.ShouldBindJSON(&ac)
@@ -68,14 +68,14 @@ func (acApi *ApiConfigApi) DeleteApiConfig(c *gin.Context) {
 }
 
 // DeleteApiConfigByIds 批量删除ApiConfig
-// @Tags ApiConfig
-// @Summary 批量删除ApiConfig
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body request.IdsReq true "批量删除ApiConfig"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"批量删除成功"}"
-// @Router /ac/deleteApiConfigByIds [delete]
+//	@Tags		ApiConfig
+//	@Summary	批量删除ApiConfig
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		request.IdsReq	true	"批量删除ApiConfig"
+//	@Success	200		{string}	string			"{"success":true,"data":{},"msg":"批量删除成功"}"
+//	@Router		/ac/deleteApiConfigByIds [delete]
 func (acApi *ApiConfigApi) DeleteApiConfigByIds(c *gin.Context) {
 	var IDS request.IdsReq
 	_ = c.ShouldBindJSON(&IDS)
@@ -88,14 +88,14 @@ func (acApi *ApiConfigApi) DeleteApiConfigByIds(c *gin.Context) {
 }
 
 // UpdateApiConfig 更新ApiConfig
-// @Tags ApiConfig
-// @Summary 更新ApiConfig
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body interfacecase.ApiConfig true "更新ApiConfig"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
-// @Router /ac/updateApiConfig [put]
+//	@Tags		ApiConfig
+//	@Summary	更新ApiConfig
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		interfacecase.ApiConfig	true	"更新ApiConfig"
+//	@Success	200		{string}	string					"{"success":true,"data":{},"msg":"更新成功"}"
+//	@Router		/ac/updateApiConfig [put]
 func (acApi *ApiConfigApi) UpdateApiConfig(c *gin.Context) {
 	var ac interfacecase.ApiConfig
 	_ = c.ShouldBindJSON(&ac)
@@ -113,14 +113,14 @@ func (acApi *ApiConfigApi) UpdateApiConfig(c *gin.Context) {
 }
 
 // FindApiConfig 用id查询ApiConfig
-// @Tags ApiConfig
-// @Summary 用id查询ApiConfig
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data query interfacecase.ApiConfig true "用id查询ApiConfig"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
-// @Router /ac/findApiConfig [get]
+//	@Tags		ApiConfig
+//	@Summary	用id查询ApiConfig
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	query		interfacecase.ApiConfig	true	"用id查询ApiConfig"
+//	@Success	200		{string}	string					"{"success":true,"data":{},"msg":"查询成功"}"
+//	@Router		/ac/findApiConfig [get]
 func (acApi *ApiConfigApi) FindApiConfig(c *gin.Context) {
 	var ac interfacecase.ApiConfig
 	_ = c.ShouldBindQuery(&ac)
@@ -134,14 +134,14 @@ func (acApi *ApiConfigApi) FindApiConfig(c *gin.Context) {
 }
 
 // GetApiConfigList 分页获取ApiConfig列表
-// @Tags ApiConfig
-// @Summary 分页获取ApiConfig列表
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data query interfacecaseReq.ApiConfigSearch true "分页获取ApiConfig列表"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
-// @Router /ac/getApiConfigList [get]
+//	@Tags		ApiConfig
+//	@Summary	分页获取ApiConfig列表
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	query		interfacecaseReq.ApiConfigSearch	true	"分页获取ApiConfig列表"
+//	@Success	200		{string}	string								"{"success":true,"data":{},"msg":"获取成功"}"
+//	@Router		/ac/getApiConfigList [get]
 func (acApi *ApiConfigApi) GetApiConfigList(c *gin.Context) {
 	var pageInfo interfacecaseReq.ApiConfigSearch
 	_ = c.ShouldBindQuery(&pageInfo)

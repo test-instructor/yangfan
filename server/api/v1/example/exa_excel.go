@@ -20,13 +20,13 @@ type ExcelApi struct{}
 // /excel/downloadTemplate 接口，用于下载resource/excel目录下的 ExcelTemplate.xlsx 文件，作为导入的模板
 
 // ExportExcel @Tags excel
-// @Summary 导出Excel
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce  application/octet-stream
-// @Param data body example.ExcelInfo true "导出Excel文件信息"
-// @Success 200
-// @Router /excel/exportExcel [post]
+//	@Summary	导出Excel
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/octet-stream
+//	@Param		data	body	example.ExcelInfo	true	"导出Excel文件信息"
+//	@Success	200
+//	@Router		/excel/exportExcel [post]
 func (e *ExcelApi) ExportExcel(c *gin.Context) {
 	var excelInfo example.ExcelInfo
 	_ = c.ShouldBindJSON(&excelInfo)
@@ -46,13 +46,13 @@ func (e *ExcelApi) ExportExcel(c *gin.Context) {
 }
 
 // ImportExcel @Tags excel
-// @Summary 导入Excel文件
-// @Security ApiKeyAuth
-// @accept multipart/form-data
-// @Produce  application/json
-// @Param file formData file true "导入Excel文件"
-// @Success 200 {object} response.Response{msg=string} "导入Excel文件"
-// @Router /excel/importExcel [post]
+//	@Summary	导入Excel文件
+//	@Security	ApiKeyAuth
+//	@accept		multipart/form-data
+//	@Produce	application/json
+//	@Param		file	formData	file							true	"导入Excel文件"
+//	@Success	200		{object}	response.Response{msg=string}	"导入Excel文件"
+//	@Router		/excel/importExcel [post]
 func (e *ExcelApi) ImportExcel(c *gin.Context) {
 	_, header, err := c.Request.FormFile("file")
 	if err != nil {
@@ -65,11 +65,11 @@ func (e *ExcelApi) ImportExcel(c *gin.Context) {
 }
 
 // LoadExcel @Tags excel
-// @Summary 加载Excel数据
-// @Security ApiKeyAuth
-// @Produce  application/json
-// @Success 200 {object} response.Response{data=response.PageResult,msg=string} "加载Excel数据,返回包括列表,总数,页码,每页数量"
-// @Router /excel/loadExcel [get]
+//	@Summary	加载Excel数据
+//	@Security	ApiKeyAuth
+//	@Produce	application/json
+//	@Success	200	{object}	response.Response{data=response.PageResult,msg=string}	"加载Excel数据,返回包括列表,总数,页码,每页数量"
+//	@Router		/excel/loadExcel [get]
 func (e *ExcelApi) LoadExcel(c *gin.Context) {
 	menus, err := excelService.ParseExcel2InfoList()
 	if err != nil {
@@ -86,13 +86,13 @@ func (e *ExcelApi) LoadExcel(c *gin.Context) {
 }
 
 // DownloadTemplate @Tags excel
-// @Summary 下载模板
-// @Security ApiKeyAuth
-// @accept multipart/form-data
-// @Produce  application/json
-// @Param fileName query string true "模板名称"
-// @Success 200
-// @Router /excel/downloadTemplate [get]
+//	@Summary	下载模板
+//	@Security	ApiKeyAuth
+//	@accept		multipart/form-data
+//	@Produce	application/json
+//	@Param		fileName	query	string	true	"模板名称"
+//	@Success	200
+//	@Router		/excel/downloadTemplate [get]
 func (e *ExcelApi) DownloadTemplate(c *gin.Context) {
 	fileName := c.Query("fileName")
 	filePath := global.GVA_CONFIG.Excel.Dir + fileName

@@ -24,14 +24,14 @@ type AutoCodeApi struct{}
 var caser = cases.Title(language.English)
 
 // PreviewTemp
-// @Tags AutoCode
-// @Summary 预览创建后的代码
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body system.AutoCodeStruct true "预览创建代码"
-// @Success 200 {object} response.Response{data=map[string]interface{},msg=string} "预览创建后的代码"
-// @Router /autoCode/preview [post]
+//	@Tags		AutoCode
+//	@Summary	预览创建后的代码
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		system.AutoCodeStruct										true	"预览创建代码"
+//	@Success	200		{object}	response.Response{data=map[string]interface{},msg=string}	"预览创建后的代码"
+//	@Router		/autoCode/preview [post]
 func (autoApi *AutoCodeApi) PreviewTemp(c *gin.Context) {
 	var a system.AutoCodeStruct
 	_ = c.ShouldBindJSON(&a)
@@ -51,14 +51,14 @@ func (autoApi *AutoCodeApi) PreviewTemp(c *gin.Context) {
 }
 
 // CreateTemp
-// @Tags AutoCode
-// @Summary 自动代码模板
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body system.AutoCodeStruct true "创建自动代码"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"创建成功"}"
-// @Router /autoCode/createTemp [post]
+//	@Tags		AutoCode
+//	@Summary	自动代码模板
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		system.AutoCodeStruct	true	"创建自动代码"
+//	@Success	200		{string}	string					"{"success":true,"data":{},"msg":"创建成功"}"
+//	@Router		/autoCode/createTemp [post]
 func (autoApi *AutoCodeApi) CreateTemp(c *gin.Context) {
 	var a system.AutoCodeStruct
 	_ = c.ShouldBindJSON(&a)
@@ -99,13 +99,13 @@ func (autoApi *AutoCodeApi) CreateTemp(c *gin.Context) {
 }
 
 // GetDB
-// @Tags AutoCode
-// @Summary 获取当前所有数据库
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Success 200 {object} response.Response{data=map[string]interface{},msg=string} "获取当前所有数据库"
-// @Router /autoCode/getDatabase [get]
+//	@Tags		AutoCode
+//	@Summary	获取当前所有数据库
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Success	200	{object}	response.Response{data=map[string]interface{},msg=string}	"获取当前所有数据库"
+//	@Router		/autoCode/getDatabase [get]
 func (autoApi *AutoCodeApi) GetDB(c *gin.Context) {
 	dbs, err := autoCodeService.Database().GetDB()
 	if err != nil {
@@ -117,13 +117,13 @@ func (autoApi *AutoCodeApi) GetDB(c *gin.Context) {
 }
 
 // GetTables
-// @Tags AutoCode
-// @Summary 获取当前数据库所有表
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Success 200 {object} response.Response{data=map[string]interface{},msg=string} "获取当前数据库所有表"
-// @Router /autoCode/getTables [get]
+//	@Tags		AutoCode
+//	@Summary	获取当前数据库所有表
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Success	200	{object}	response.Response{data=map[string]interface{},msg=string}	"获取当前数据库所有表"
+//	@Router		/autoCode/getTables [get]
 func (autoApi *AutoCodeApi) GetTables(c *gin.Context) {
 	dbName := c.DefaultQuery("dbName", global.GVA_CONFIG.Mysql.Dbname)
 	tables, err := autoCodeService.Database().GetTables(dbName)
@@ -136,13 +136,13 @@ func (autoApi *AutoCodeApi) GetTables(c *gin.Context) {
 }
 
 // GetColumn
-// @Tags AutoCode
-// @Summary 获取当前表所有字段
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Success 200 {object} response.Response{data=map[string]interface{},msg=string} "获取当前表所有字段"
-// @Router /autoCode/getColumn [get]
+//	@Tags		AutoCode
+//	@Summary	获取当前表所有字段
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Success	200	{object}	response.Response{data=map[string]interface{},msg=string}	"获取当前表所有字段"
+//	@Router		/autoCode/getColumn [get]
 func (autoApi *AutoCodeApi) GetColumn(c *gin.Context) {
 	dbName := c.DefaultQuery("dbName", global.GVA_CONFIG.Mysql.Dbname)
 	tableName := c.Query("tableName")
@@ -156,14 +156,14 @@ func (autoApi *AutoCodeApi) GetColumn(c *gin.Context) {
 }
 
 // CreatePackage
-// @Tags AutoCode
-// @Summary 创建package
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body system.SysAutoCode true "创建package"
-// @Success 200 {object} response.Response{data=map[string]interface{},msg=string} "创建package成功"
-// @Router /autoCode/createPackage [post]
+//	@Tags		AutoCode
+//	@Summary	创建package
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		system.SysAutoCode											true	"创建package"
+//	@Success	200		{object}	response.Response{data=map[string]interface{},msg=string}	"创建package成功"
+//	@Router		/autoCode/createPackage [post]
 func (autoApi *AutoCodeApi) CreatePackage(c *gin.Context) {
 	var a system.SysAutoCode
 	_ = c.ShouldBindJSON(&a)
@@ -181,13 +181,13 @@ func (autoApi *AutoCodeApi) CreatePackage(c *gin.Context) {
 }
 
 // GetPackage
-// @Tags AutoCode
-// @Summary 获取package
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Success 200 {object} response.Response{data=map[string]interface{},msg=string} "创建package成功"
-// @Router /autoCode/getPackage [post]
+//	@Tags		AutoCode
+//	@Summary	获取package
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Success	200	{object}	response.Response{data=map[string]interface{},msg=string}	"创建package成功"
+//	@Router		/autoCode/getPackage [post]
 func (autoApi *AutoCodeApi) GetPackage(c *gin.Context) {
 	pkgs, err := autoCodeService.GetPackage()
 	if err != nil {
@@ -199,14 +199,14 @@ func (autoApi *AutoCodeApi) GetPackage(c *gin.Context) {
 }
 
 // DelPackage
-// @Tags AutoCode
-// @Summary 删除package
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body system.SysAutoCode true "创建package"
-// @Success 200 {object} response.Response{data=map[string]interface{},msg=string} "删除package成功"
-// @Router /autoCode/delPackage [post]
+//	@Tags		AutoCode
+//	@Summary	删除package
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		system.SysAutoCode											true	"创建package"
+//	@Success	200		{object}	response.Response{data=map[string]interface{},msg=string}	"删除package成功"
+//	@Router		/autoCode/delPackage [post]
 func (autoApi *AutoCodeApi) DelPackage(c *gin.Context) {
 	var a system.SysAutoCode
 	_ = c.ShouldBindJSON(&a)
@@ -220,14 +220,14 @@ func (autoApi *AutoCodeApi) DelPackage(c *gin.Context) {
 }
 
 // AutoPlug
-// @Tags AutoCode
-// @Summary 创建插件模板
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body system.SysAutoCode true "创建插件模板"
-// @Success 200 {object} response.Response{data=map[string]interface{},msg=string} "创建插件模板成功"
-// @Router /autoCode/createPlug [post]
+//	@Tags		AutoCode
+//	@Summary	创建插件模板
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		system.SysAutoCode											true	"创建插件模板"
+//	@Success	200		{object}	response.Response{data=map[string]interface{},msg=string}	"创建插件模板成功"
+//	@Router		/autoCode/createPlug [post]
 func (autoApi *AutoCodeApi) AutoPlug(c *gin.Context) {
 	var a system.AutoPlugReq
 	_ = c.ShouldBindJSON(&a)

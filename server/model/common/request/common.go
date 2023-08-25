@@ -17,7 +17,7 @@ func (r *GetById) Uint() uint {
 }
 
 type IdsReq struct {
-	Ids []int `json:"ids" form:"ids"`
+	Ids []int `json:"ids" form:"ids"` // id列表
 }
 
 // GetAuthorityId Get role by id structure
@@ -28,11 +28,11 @@ type GetAuthorityId struct {
 type Empty struct{}
 
 type ApiCaseIdReq struct {
-	ID     uint   `json:"ID" form:"ID"`
-	ApiID  uint   `json:"apiID" form:"apiID"`
-	CaseID uint   `json:"caseID" form:"caseID"`
-	Type   string `json:"type" form:"type"`
-	Detail bool   `json:"detail" form:"detail"`
+	ID     uint   `json:"ID" form:"ID"`         // 主键ID
+	ApiID  uint   `json:"apiID" form:"apiID"`   // 接口ID
+	CaseID uint   `json:"caseID" form:"caseID"` // 用例ID
+	Type   string `json:"type" form:"type"`     // 类型
+	Detail bool   `json:"detail" form:"detail"` // 是否详情
 }
 
 type RunningType int
@@ -44,29 +44,29 @@ var (
 )
 
 type Operation struct {
-	Running    RunningType `json:"running"`
-	SpawnCount int64       `json:"spawnCount"`
-	SpawnRate  float64     `json:"spawnRate"`
-	Interval   *Interval   `json:"interval"`
+	Running    RunningType `json:"running"`    // 运行类型
+	SpawnCount int64       `json:"spawnCount"` // 并发数
+	SpawnRate  float64     `json:"spawnRate"`  // 并发率
+	Interval   *Interval   `json:"interval"`   // 间隔
 }
 
 type RunCaseReq struct {
-	ApiID        uint      `json:"apiID" form:"apiID"`
-	ConfigID     uint      `json:"configID" form:"configID"`
-	CaseID       uint      `json:"caseID" form:"caseID"`
-	RunType      uint      `json:"run_type" form:"run_type"`
-	TaskID       uint      `json:"taskID" form:"taskID"`
-	Operation    Operation `json:"operation"`
-	TagID        uint      `json:"tagID" form:"TagID"`
-	ProjectID    uint      `json:"-"`
-	Env          uint      `json:"env" form:"env"`
-	ReportID     uint      `json:"reportID" form:"reportID"`
-	ApiMessageID uint      `json:"api_message_id" gorm:"comment:消息发送;"`
-	ReportCIID   uint      `json:"ci_id" yaml:"ci_id"`
+	ApiID        uint      `json:"apiID" form:"apiID"`                  // 接口ID
+	ConfigID     uint      `json:"configID" form:"configID"`            // 配置ID
+	CaseID       uint      `json:"caseID" form:"caseID"`                // 用例ID
+	RunType      uint      `json:"run_type" form:"run_type"`            // 运行类型
+	TaskID       uint      `json:"taskID" form:"taskID"`                // 任务ID
+	Operation    Operation `json:"operation"`                           // 操作
+	TagID        uint      `json:"tagID" form:"TagID"`                  // 标签ID
+	ProjectID    uint      `json:"-"`                                   // 项目ID
+	Env          uint      `json:"env" form:"env"`                      // 环境ID
+	ReportID     uint      `json:"reportID" form:"reportID"`            // 报告ID
+	ApiMessageID uint      `json:"api_message_id" gorm:"comment:消息发送;"` // 消息ID
+	ReportCIID   uint      `json:"ci_id" yaml:"ci_id"`                  // CI ID
 }
 
 type Interval struct {
-	IntervalTime   int64 `json:"intervalTime"`
-	IntervalCount  int64 `json:"intervalCount"`
-	IntervalNumber int64 `json:"intervalNumber"`
+	IntervalTime   int64 `json:"intervalTime"`   // 间隔时间
+	IntervalCount  int64 `json:"intervalCount"`  // 间隔次数
+	IntervalNumber int64 `json:"intervalNumber"` // 间隔数量
 }

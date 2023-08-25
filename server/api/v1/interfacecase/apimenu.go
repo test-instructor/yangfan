@@ -18,14 +18,14 @@ type ApiMenuApi struct {
 var apicaseService = service.ServiceGroupApp.InterfacecaseServiceGroup.ApiMenuService
 
 // CreateApiMenu 创建ApiMenu
-// @Tags ApiMenu
-// @Summary 创建ApiMenu
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body interfacecase.ApiMenu true "创建ApiMenu"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
-// @Router /apicase/createApiMenu [post]
+//	@Tags		ApiMenu
+//	@Summary	创建ApiMenu
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		interfacecase.ApiMenu	true	"创建ApiMenu"
+//	@Success	200		{string}	string					"{"success":true,"data":{},"msg":"获取成功"}"
+//	@Router		/apicase/createApiMenu [post]
 func getMenuList(c *gin.Context) {
 	menuType := c.Request.FormValue("menutype")
 	if treeList, err := apicaseService.GetMenu(0, menuType, utils.GetUserProject(c)); err != nil {
@@ -53,14 +53,14 @@ func (apiCaseApi *ApiMenuApi) CreateApiMenu(c *gin.Context) {
 }
 
 // DeleteApiMenu 删除ApiMenu
-// @Tags ApiMenu
-// @Summary 删除ApiMenu
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body interfacecase.ApiMenu true "删除ApiMenu"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
-// @Router /apicase/deleteApiMenu [delete]
+//	@Tags		ApiMenu
+//	@Summary	删除ApiMenu
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		interfacecase.ApiMenu	true	"删除ApiMenu"
+//	@Success	200		{string}	string					"{"success":true,"data":{},"msg":"删除成功"}"
+//	@Router		/apicase/deleteApiMenu [delete]
 func (apiCaseApi *ApiMenuApi) DeleteApiMenu(c *gin.Context) {
 	var apicase interfacecase.ApiMenu
 	_ = c.ShouldBindJSON(&apicase)
@@ -77,14 +77,14 @@ func (apiCaseApi *ApiMenuApi) DeleteApiMenu(c *gin.Context) {
 }
 
 // DeleteApiMenuByIds 批量删除ApiMenu
-// @Tags ApiMenu
-// @Summary 批量删除ApiMenu
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body request.IdsReq true "批量删除ApiMenu"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"批量删除成功"}"
-// @Router /apicase/deleteApiMenuByIds [delete]
+//	@Tags		ApiMenu
+//	@Summary	批量删除ApiMenu
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		request.IdsReq	true	"批量删除ApiMenu"
+//	@Success	200		{string}	string			"{"success":true,"data":{},"msg":"批量删除成功"}"
+//	@Router		/apicase/deleteApiMenuByIds [delete]
 func (apiCaseApi *ApiMenuApi) DeleteApiMenuByIds(c *gin.Context) {
 	var IDS request.IdsReq
 	_ = c.ShouldBindJSON(&IDS)
@@ -97,14 +97,14 @@ func (apiCaseApi *ApiMenuApi) DeleteApiMenuByIds(c *gin.Context) {
 }
 
 // UpdateApiMenu 更新ApiMenu
-// @Tags ApiMenu
-// @Summary 更新ApiMenu
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body interfacecase.ApiMenu true "更新ApiMenu"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
-// @Router /apicase/updateApiMenu [put]
+//	@Tags		ApiMenu
+//	@Summary	更新ApiMenu
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		interfacecase.ApiMenu	true	"更新ApiMenu"
+//	@Success	200		{string}	string					"{"success":true,"data":{},"msg":"更新成功"}"
+//	@Router		/apicase/updateApiMenu [put]
 func (apiCaseApi *ApiMenuApi) UpdateApiMenu(c *gin.Context) {
 	var apicase interfacecase.ApiMenu
 	_ = c.ShouldBindJSON(&apicase)
@@ -118,14 +118,14 @@ func (apiCaseApi *ApiMenuApi) UpdateApiMenu(c *gin.Context) {
 }
 
 // FindApiMenu 用id查询ApiMenu
-// @Tags ApiMenu
-// @Summary 用id查询ApiMenu
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data query interfacecase.ApiMenu true "用id查询ApiMenu"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
-// @Router /apicase/findApiMenu [get]
+//	@Tags		ApiMenu
+//	@Summary	用id查询ApiMenu
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	query		interfacecase.ApiMenu	true	"用id查询ApiMenu"
+//	@Success	200		{string}	string					"{"success":true,"data":{},"msg":"查询成功"}"
+//	@Router		/apicase/findApiMenu [get]
 func (apiCaseApi *ApiMenuApi) FindApiMenu(c *gin.Context) {
 	var apicase interfacecase.ApiMenu
 	_ = c.ShouldBindQuery(&apicase)
@@ -139,13 +139,13 @@ func (apiCaseApi *ApiMenuApi) FindApiMenu(c *gin.Context) {
 }
 
 // GetApiMenuList 分页获取ApiMenu列表
-// @Tags ApiMenu
-// @Summary 分页获取ApiMenu列表
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
-// @Router /apicase/getApiMenuList [get]
+//	@Tags		ApiMenu
+//	@Summary	分页获取ApiMenu列表
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Success	200	{string}	string	"{"success":true,"data":{},"msg":"获取成功"}"
+//	@Router		/apicase/getApiMenuList [get]
 func (apiCaseApi *ApiMenuApi) GetApiMenuList(c *gin.Context) {
 
 	/*var interfaceTemp InterfaceTemplate

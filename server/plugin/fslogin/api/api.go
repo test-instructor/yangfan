@@ -14,11 +14,11 @@ import (
 
 type FsLoginApi struct{}
 
-// @Tags FsLogin
-// @Summary 请手动填写接口功能
-// @Produce  application/json
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"发送成功"}"
-// @Router /fsLogin/login [get]
+//	@Tags		FsLogin
+//	@Summary	请手动填写接口功能
+//	@Produce	application/json
+//	@Success	200	{string}	string	"{"success":true,"data":{},"msg":"发送成功"}"
+//	@Router		/fsLogin/login [get]
 func (p *FsLoginApi) Login(c *gin.Context) {
 	code, _ := c.GetQuery("code")
 	token, _ := c.GetQuery("state")

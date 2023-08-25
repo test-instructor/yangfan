@@ -22,14 +22,14 @@ type InterfaceTemplateApi struct {
 var apicaseServices = service.ServiceGroupApp.InterfacecaseServiceGroup.InterfaceTemplateService
 
 // CreateInterfaceTemplate 创建InterfaceTemplate
-// @Tags InterfaceTemplate
-// @Summary 创建InterfaceTemplate
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body interfacecase.ApiStep true "创建InterfaceTemplate"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
-// @Router /apicase/createInterfaceTemplate [post]
+//	@Tags		InterfaceTemplate
+//	@Summary	创建InterfaceTemplate
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		interfacecase.ApiStep	true	"创建InterfaceTemplate"
+//	@Success	200		{string}	string					"{"success":true,"data":{},"msg":"获取成功"}"
+//	@Router		/apicase/createInterfaceTemplate [post]
 func (apiCaseApi *InterfaceTemplateApi) CreateInterfaceTemplate(c *gin.Context) {
 	var apicase interfacecase.ApiStep
 	_ = c.ShouldBindJSON(&apicase)
@@ -48,14 +48,14 @@ func (apiCaseApi *InterfaceTemplateApi) CreateInterfaceTemplate(c *gin.Context) 
 }
 
 // DeleteInterfaceTemplate 删除InterfaceTemplate
-// @Tags InterfaceTemplate
-// @Summary 删除InterfaceTemplate
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body interfacecase.ApiStep true "删除InterfaceTemplate"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
-// @Router /apicase/deleteInterfaceTemplate [delete]
+//	@Tags		InterfaceTemplate
+//	@Summary	删除InterfaceTemplate
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		interfacecase.ApiStep	true	"删除InterfaceTemplate"
+//	@Success	200		{string}	string					"{"success":true,"data":{},"msg":"删除成功"}"
+//	@Router		/apicase/deleteInterfaceTemplate [delete]
 func (apiCaseApi *InterfaceTemplateApi) DeleteInterfaceTemplate(c *gin.Context) {
 	var apicase interfacecase.ApiStep
 	_ = c.ShouldBindJSON(&apicase)
@@ -70,14 +70,14 @@ func (apiCaseApi *InterfaceTemplateApi) DeleteInterfaceTemplate(c *gin.Context) 
 }
 
 // DeleteInterfaceTemplateByIds 批量删除InterfaceTemplate
-// @Tags InterfaceTemplate
-// @Summary 批量删除InterfaceTemplate
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body request.IdsReq true "批量删除InterfaceTemplate"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"批量删除成功"}"
-// @Router /apicase/deleteInterfaceTemplateByIds [delete]
+//	@Tags		InterfaceTemplate
+//	@Summary	批量删除InterfaceTemplate
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		request.IdsReq	true	"批量删除InterfaceTemplate"
+//	@Success	200		{string}	string			"{"success":true,"data":{},"msg":"批量删除成功"}"
+//	@Router		/apicase/deleteInterfaceTemplateByIds [delete]
 func (apiCaseApi *InterfaceTemplateApi) DeleteInterfaceTemplateByIds(c *gin.Context) {
 	var IDS request.IdsReq
 	_ = c.ShouldBindJSON(&IDS)
@@ -90,14 +90,14 @@ func (apiCaseApi *InterfaceTemplateApi) DeleteInterfaceTemplateByIds(c *gin.Cont
 }
 
 // UpdateInterfaceTemplate 更新InterfaceTemplate
-// @Tags InterfaceTemplate
-// @Summary 更新InterfaceTemplate
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body interfacecase.ApiStep true "更新InterfaceTemplate"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
-// @Router /apicase/updateInterfaceTemplate [put]
+//	@Tags		InterfaceTemplate
+//	@Summary	更新InterfaceTemplate
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		interfacecase.ApiStep	true	"更新InterfaceTemplate"
+//	@Success	200		{string}	string					"{"success":true,"data":{},"msg":"更新成功"}"
+//	@Router		/apicase/updateInterfaceTemplate [put]
 func (apiCaseApi *InterfaceTemplateApi) UpdateInterfaceTemplate(c *gin.Context) {
 	var apicase interfacecase.ApiStep
 	_ = c.ShouldBindJSON(&apicase)
@@ -116,14 +116,14 @@ func (apiCaseApi *InterfaceTemplateApi) UpdateInterfaceTemplate(c *gin.Context) 
 }
 
 // FindInterfaceTemplate 用id查询InterfaceTemplate
-// @Tags InterfaceTemplate
-// @Summary 用id查询InterfaceTemplate
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data query interfacecase.ApiStep true "用id查询InterfaceTemplate"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
-// @Router /apicase/findInterfaceTemplate [get]
+//	@Tags		InterfaceTemplate
+//	@Summary	用id查询InterfaceTemplate
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	query		interfacecase.ApiStep	true	"用id查询InterfaceTemplate"
+//	@Success	200		{string}	string					"{"success":true,"data":{},"msg":"查询成功"}"
+//	@Router		/apicase/findInterfaceTemplate [get]
 func (apiCaseApi *InterfaceTemplateApi) FindInterfaceTemplate(c *gin.Context) {
 	var apicase interfacecase.ApiStep
 	_ = c.ShouldBindQuery(&apicase)
@@ -137,14 +137,14 @@ func (apiCaseApi *InterfaceTemplateApi) FindInterfaceTemplate(c *gin.Context) {
 }
 
 // GetInterfaceTemplateList 分页获取InterfaceTemplate列表
-// @Tags InterfaceTemplate
-// @Summary 分页获取InterfaceTemplate列表
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data query interfacecaseReq.InterfaceTemplateSearch true "分页获取InterfaceTemplate列表"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
-// @Router /apicase/getInterfaceTemplateList [get]
+//	@Tags		InterfaceTemplate
+//	@Summary	分页获取InterfaceTemplate列表
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	query		interfacecaseReq.InterfaceTemplateSearch	true	"分页获取InterfaceTemplate列表"
+//	@Success	200		{string}	string										"{"success":true,"data":{},"msg":"获取成功"}"
+//	@Router		/apicase/getInterfaceTemplateList [get]
 func (apiCaseApi *InterfaceTemplateApi) GetInterfaceTemplateList(c *gin.Context) {
 	var pageInfo interfacecaseReq.InterfaceTemplateSearch
 	_ = c.ShouldBindQuery(&pageInfo)

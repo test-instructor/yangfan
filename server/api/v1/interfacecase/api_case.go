@@ -21,14 +21,14 @@ type ApiCaseApi struct {
 var apiCaseService = service.ServiceGroupApp.InterfacecaseServiceGroup.ApiCaseService
 
 // CreateApiCase 创建ApiCase
-// @Tags ApiCase
-// @Summary 创建ApiCase
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body interfacecase.ApiCase true "创建ApiCase"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
-// @Router /testCase/createApiCase [post]
+//	@Tags		ApiCase
+//	@Summary	创建ApiCase
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		interfacecase.ApiCase	true	"创建ApiCase"
+//	@Success	200		{string}	string					"{"success":true,"data":{},"msg":"获取成功"}"
+//	@Router		/testCase/createApiCase [post]
 func (apiCase *ApiCaseApi) CreateApiCase(c *gin.Context) {
 	var testCase interfacecase.ApiCase
 	_ = c.ShouldBindJSON(&testCase)
@@ -46,14 +46,14 @@ func (apiCase *ApiCaseApi) CreateApiCase(c *gin.Context) {
 }
 
 // DeleteApiCase 删除ApiCase
-// @Tags ApiCase
-// @Summary 删除ApiCase
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body interfacecase.ApiCase true "删除ApiCase"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
-// @Router /testCase/deleteApiCase [delete]
+//	@Tags		ApiCase
+//	@Summary	删除ApiCase
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		interfacecase.ApiCase	true	"删除ApiCase"
+//	@Success	200		{string}	string					"{"success":true,"data":{},"msg":"删除成功"}"
+//	@Router		/testCase/deleteApiCase [delete]
 func (apiCase *ApiCaseApi) DeleteApiCase(c *gin.Context) {
 	var testCase interfacecase.ApiCase
 	_ = c.ShouldBindJSON(&testCase)
@@ -68,14 +68,14 @@ func (apiCase *ApiCaseApi) DeleteApiCase(c *gin.Context) {
 }
 
 // DeleteApiCaseByIds 批量删除ApiCase
-// @Tags ApiCase
-// @Summary 批量删除ApiCase
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body request.IdsReq true "批量删除ApiCase"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"批量删除成功"}"
-// @Router /testCase/deleteApiCaseByIds [delete]
+//	@Tags		ApiCase
+//	@Summary	批量删除ApiCase
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		request.IdsReq	true	"批量删除ApiCase"
+//	@Success	200		{string}	string			"{"success":true,"data":{},"msg":"批量删除成功"}"
+//	@Router		/testCase/deleteApiCaseByIds [delete]
 func (apiCase *ApiCaseApi) DeleteApiCaseByIds(c *gin.Context) {
 	var IDS request.IdsReq
 	_ = c.ShouldBindJSON(&IDS)
@@ -88,14 +88,14 @@ func (apiCase *ApiCaseApi) DeleteApiCaseByIds(c *gin.Context) {
 }
 
 // UpdateApiCase 更新ApiCase
-// @Tags ApiCase
-// @Summary 更新ApiCase
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body interfacecase.ApiCase true "更新ApiCase"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
-// @Router /testCase/updateApiCase [put]
+//	@Tags		ApiCase
+//	@Summary	更新ApiCase
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		interfacecase.ApiCase	true	"更新ApiCase"
+//	@Success	200		{string}	string					"{"success":true,"data":{},"msg":"更新成功"}"
+//	@Router		/testCase/updateApiCase [put]
 func (apiCase *ApiCaseApi) UpdateApiCase(c *gin.Context) {
 	var testCase interfacecase.ApiCase
 	_ = c.ShouldBindJSON(&testCase)
@@ -215,14 +215,14 @@ func (apiCase *ApiCaseApi) SetApisCase(c *gin.Context) {
 }
 
 // FindApiCase 用id查询ApiCase
-// @Tags ApiCase
-// @Summary 用id查询ApiCase
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data query interfacecase.ApiCase true "用id查询ApiCase"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
-// @Router /testCase/findApiCase [get]
+//	@Tags		ApiCase
+//	@Summary	用id查询ApiCase
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	query		interfacecase.ApiCase	true	"用id查询ApiCase"
+//	@Success	200		{string}	string					"{"success":true,"data":{},"msg":"查询成功"}"
+//	@Router		/testCase/findApiCase [get]
 func (apiCase *ApiCaseApi) FindApiCase(c *gin.Context) {
 	var testCase request.ApiCaseIdReq
 	_ = c.ShouldBindQuery(&testCase)
@@ -235,14 +235,14 @@ func (apiCase *ApiCaseApi) FindApiCase(c *gin.Context) {
 }
 
 // GetApiCaseList 分页获取ApiCase列表
-// @Tags ApiCase
-// @Summary 分页获取ApiCase列表
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data query interfacecaseReq.ApiCaseSearch true "分页获取ApiCase列表"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
-// @Router /testCase/getApiCaseList [get]
+//	@Tags		ApiCase
+//	@Summary	分页获取ApiCase列表
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	query		interfacecaseReq.ApiCaseSearch	true	"分页获取ApiCase列表"
+//	@Success	200		{string}	string							"{"success":true,"data":{},"msg":"获取成功"}"
+//	@Router		/testCase/getApiCaseList [get]
 func (apiCase *ApiCaseApi) GetApiCaseList(c *gin.Context) {
 	var pageInfo interfacecaseReq.ApiCaseSearch
 	_ = c.ShouldBindQuery(&pageInfo)

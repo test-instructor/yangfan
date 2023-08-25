@@ -17,11 +17,11 @@ import (
 )
 
 // Login @Tags Base
-// @Summary 用户登录
-// @Produce  application/json
-// @Param data body systemReq.Login true "用户名, 密码, 验证码"
-// @Success 200 {object} response.Response{data=systemRes.LoginResponse,msg=string} "返回包括用户信息,token,过期时间"
-// @Router /base/login [post]
+//	@Summary	用户登录
+//	@Produce	application/json
+//	@Param		data	body		systemReq.Login												true	"用户名, 密码, 验证码"
+//	@Success	200		{object}	response.Response{data=systemRes.LoginResponse,msg=string}	"返回包括用户信息,token,过期时间"
+//	@Router		/base/login [post]
 func (b *BaseApi) Login(c *gin.Context) {
 	var l systemReq.Login
 	_ = c.ShouldBindJSON(&l)
@@ -106,11 +106,11 @@ func (b *BaseApi) TokenNext(c *gin.Context, user system.SysUser) {
 }
 
 // Register @Tags SysUser
-// @Summary 用户注册账号
-// @Produce  application/json
-// @Param data body systemReq.Register true "用户名, 昵称, 密码, 角色ID"
-// @Success 200 {object} response.Response{data=systemRes.SysUserResponse,msg=string} "用户注册账号,返回包括用户信息"
-// @Router /user/admin_register [post]
+//	@Summary	用户注册账号
+//	@Produce	application/json
+//	@Param		data	body		systemReq.Register												true	"用户名, 昵称, 密码, 角色ID"
+//	@Success	200		{object}	response.Response{data=systemRes.SysUserResponse,msg=string}	"用户注册账号,返回包括用户信息"
+//	@Router		/user/admin_register [post]
 func (b *BaseApi) Register(c *gin.Context) {
 	var r systemReq.Register
 	_ = c.ShouldBindJSON(&r)
@@ -152,12 +152,12 @@ func (b *BaseApi) Register(c *gin.Context) {
 }
 
 // ChangePassword @Tags SysUser
-// @Summary 用户修改密码
-// @Security ApiKeyAuth
-// @Produce  application/json
-// @Param data body systemReq.ChangePasswordReq true "用户名, 原密码, 新密码"
-// @Success 200 {object} response.Response{msg=string} "用户修改密码"
-// @Router /user/changePassword [post]
+//	@Summary	用户修改密码
+//	@Security	ApiKeyAuth
+//	@Produce	application/json
+//	@Param		data	body		systemReq.ChangePasswordReq		true	"用户名, 原密码, 新密码"
+//	@Success	200		{object}	response.Response{msg=string}	"用户修改密码"
+//	@Router		/user/changePassword [post]
 func (b *BaseApi) ChangePassword(c *gin.Context) {
 	var req systemReq.ChangePasswordReq
 	_ = c.ShouldBindJSON(&req)
@@ -176,13 +176,13 @@ func (b *BaseApi) ChangePassword(c *gin.Context) {
 }
 
 // GetUserList @Tags SysUser
-// @Summary 分页获取用户列表
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body request.PageInfo true "页码, 每页大小"
-// @Success 200 {object} response.Response{data=response.PageResult,msg=string} "分页获取用户列表,返回包括列表,总数,页码,每页数量"
-// @Router /user/getUserList [post]
+//	@Summary	分页获取用户列表
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		request.PageInfo										true	"页码, 每页大小"
+//	@Success	200		{object}	response.Response{data=response.PageResult,msg=string}	"分页获取用户列表,返回包括列表,总数,页码,每页数量"
+//	@Router		/user/getUserList [post]
 func (b *BaseApi) GetUserList(c *gin.Context) {
 	var pageInfo request.PageInfo
 	_ = c.ShouldBindJSON(&pageInfo)
@@ -204,13 +204,13 @@ func (b *BaseApi) GetUserList(c *gin.Context) {
 }
 
 // SetUserAuthority @Tags SysUser
-// @Summary 更改用户权限
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body systemReq.SetUserAuth true "用户UUID, 角色ID"
-// @Success 200 {object} response.Response{msg=string} "设置用户权限"
-// @Router /user/setUserAuthority [post]
+//	@Summary	更改用户权限
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		systemReq.SetUserAuth			true	"用户UUID, 角色ID"
+//	@Success	200		{object}	response.Response{msg=string}	"设置用户权限"
+//	@Router		/user/setUserAuthority [post]
 func (b *BaseApi) SetUserAuthority(c *gin.Context) {
 	var sua systemReq.SetUserAuth
 	_ = c.ShouldBindJSON(&sua)
@@ -239,13 +239,13 @@ func (b *BaseApi) SetUserAuthority(c *gin.Context) {
 }
 
 // SetUserAuthorities @Tags SysUser
-// @Summary 设置用户权限
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body systemReq.SetUserAuthorities true "用户UUID, 角色ID"
-// @Success 200 {object} response.Response{msg=string} "设置用户权限"
-// @Router /user/setUserAuthorities [post]
+//	@Summary	设置用户权限
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		systemReq.SetUserAuthorities	true	"用户UUID, 角色ID"
+//	@Success	200		{object}	response.Response{msg=string}	"设置用户权限"
+//	@Router		/user/setUserAuthorities [post]
 func (b *BaseApi) SetUserAuthorities(c *gin.Context) {
 	var sua systemReq.SetUserAuthorities
 	_ = c.ShouldBindJSON(&sua)
@@ -258,13 +258,13 @@ func (b *BaseApi) SetUserAuthorities(c *gin.Context) {
 }
 
 // SetUserProjects @Tags SysUser
-// @Summary 设置用户权限
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body systemReq.SetUserProjects true "用户UUID, 项目ID"
-// @Success 200 {string} string "{"success":true,"data":{},"msg":"修改成功"}"
-// @Router /user/setUserProjects [post]
+//	@Summary	设置用户权限
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		systemReq.SetUserProjects	true	"用户UUID, 项目ID"
+//	@Success	200		{string}	string						"{"success":true,"data":{},"msg":"修改成功"}"
+//	@Router		/user/setUserProjects [post]
 func (b *BaseApi) SetUserProjects(c *gin.Context) {
 	var sua systemReq.SetUserProjects
 	_ = c.ShouldBindJSON(&sua)
@@ -277,13 +277,13 @@ func (b *BaseApi) SetUserProjects(c *gin.Context) {
 }
 
 // DeleteUser @Tags SysUser
-// @Summary 删除用户
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body request.GetById true "用户ID"
-// @Success 200 {object} response.Response{msg=string} "删除用户"
-// @Router /user/deleteUser [delete]
+//	@Summary	删除用户
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		request.GetById					true	"用户ID"
+//	@Success	200		{object}	response.Response{msg=string}	"删除用户"
+//	@Router		/user/deleteUser [delete]
 func (b *BaseApi) DeleteUser(c *gin.Context) {
 	var reqId request.GetById
 	_ = c.ShouldBindJSON(&reqId)
@@ -305,13 +305,13 @@ func (b *BaseApi) DeleteUser(c *gin.Context) {
 }
 
 // SetUserInfo @Tags SysUser
-// @Summary 设置用户信息
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body system.SysUser true "ID, 用户名, 昵称, 头像链接"
-// @Success 200 {object} response.Response{data=map[string]interface{},msg=string} "设置用户信息"
-// @Router /user/setUserInfo [put]
+//	@Summary	设置用户信息
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		system.SysUser												true	"ID, 用户名, 昵称, 头像链接"
+//	@Success	200		{object}	response.Response{data=map[string]interface{},msg=string}	"设置用户信息"
+//	@Router		/user/setUserInfo [put]
 func (b *BaseApi) SetUserInfo(c *gin.Context) {
 	var user systemReq.ChangeUserInfo
 	_ = c.ShouldBindJSON(&user)
@@ -348,13 +348,13 @@ func (b *BaseApi) SetUserInfo(c *gin.Context) {
 }
 
 // SetSelfInfo @Tags SysUser
-// @Summary 设置用户信息
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body system.SysUser true "ID, 用户名, 昵称, 头像链接"
-// @Success 200 {object} response.Response{data=map[string]interface{},msg=string} "设置用户信息"
-// @Router /user/SetSelfInfo [put]
+//	@Summary	设置用户信息
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		system.SysUser												true	"ID, 用户名, 昵称, 头像链接"
+//	@Success	200		{object}	response.Response{data=map[string]interface{},msg=string}	"设置用户信息"
+//	@Router		/user/SetSelfInfo [put]
 func (b *BaseApi) SetSelfInfo(c *gin.Context) {
 	var user systemReq.ChangeUserInfo
 	_ = c.ShouldBindJSON(&user)
@@ -378,12 +378,12 @@ func (b *BaseApi) SetSelfInfo(c *gin.Context) {
 }
 
 // GetUserInfo @Tags SysUser
-// @Summary 获取用户信息
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Success 200 {object} response.Response{data=map[string]interface{},msg=string} "获取用户信息"
-// @Router /user/getUserInfo [get]
+//	@Summary	获取用户信息
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Success	200	{object}	response.Response{data=map[string]interface{},msg=string}	"获取用户信息"
+//	@Router		/user/getUserInfo [get]
 func (b *BaseApi) GetUserInfo(c *gin.Context) {
 	uuid := utils.GetUserUuid(c)
 	if ReqUser, err := userService.GetUserInfo(uuid); err != nil {
@@ -395,12 +395,12 @@ func (b *BaseApi) GetUserInfo(c *gin.Context) {
 }
 
 // ResetPassword @Tags SysUser
-// @Summary 重置用户密码
-// @Security ApiKeyAuth
-// @Produce  application/json
-// @Param data body system.SysUser true "ID"
-// @Success 200 {object} response.Response{msg=string} "重置用户密码"
-// @Router /user/resetPassword [post]
+//	@Summary	重置用户密码
+//	@Security	ApiKeyAuth
+//	@Produce	application/json
+//	@Param		data	body		system.SysUser					true	"ID"
+//	@Success	200		{object}	response.Response{msg=string}	"重置用户密码"
+//	@Router		/user/resetPassword [post]
 func (b *BaseApi) ResetPassword(c *gin.Context) {
 	var user system.SysUser
 	_ = c.ShouldBindJSON(&user)
