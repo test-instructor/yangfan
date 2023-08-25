@@ -46,6 +46,7 @@ func (r *RunCaseService) getRunCase(runCaseReq request.RunCaseReq) (req *run.Run
 	req.ProjectID = uint32(runCaseReq.ProjectID)
 	req.TaskID = uint32(runCaseReq.TaskID)
 	req.Env = uint32(runCaseReq.Env)
+	req.CI = uint32(runCaseReq.ReportCIID)
 	return
 }
 

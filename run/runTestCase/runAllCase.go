@@ -51,7 +51,7 @@ func RunTimerTask(runCaseReq request.RunCaseReq, runType interfacecase.RunType) 
 	return report, nil
 }
 
-func RunTimerTag(runCaseReq request.RunCaseReq, runType interfacecase.RunType) (reports *interfacecase.ApiReport, err error) {
+func RunTimerTagCI(runCaseReq request.RunCaseReq, runType interfacecase.RunType) (reports *interfacecase.ApiReport, err error) {
 	api := NewRunTag(runCaseReq, runType, nil)
 	report, err := RunTestCase(api)
 	return report, nil

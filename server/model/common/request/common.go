@@ -62,6 +62,7 @@ type RunCaseReq struct {
 	Env          uint      `json:"env" form:"env"`
 	ReportID     uint      `json:"reportID" form:"reportID"`
 	ApiMessageID uint      `json:"api_message_id" gorm:"comment:消息发送;"`
+	ReportCIID   uint      `json:"ci_id" yaml:"ci_id"`
 }
 
 type Interval struct {

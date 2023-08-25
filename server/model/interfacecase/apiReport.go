@@ -18,7 +18,8 @@ const (
 	CaseTypeTask        CaseType = 4 // 定时任务运行
 	CaseTypeBoomerDebug CaseType = 5 // 性能任务调试
 	CaseTypeBoomer      CaseType = 6 // 性能任务运行
-	CaseTypeTag         CaseType = 7 // 性能任务运行
+	CaseTypeTag         CaseType = 7 // 标签运行
+	CaseTypeCI          CaseType = 8 // CI运行
 	RunTypeDebug        RunType  = 1 // 调试模式
 	RunTypeRuning       RunType  = 2 // 立即运行
 	RunTypeRunBack      RunType  = 3 // 后台运行

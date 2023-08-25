@@ -23,6 +23,7 @@ func (r runServer) getRunCase(req *run.RunCaseReq) (runCaseReq request.RunCaseRe
 	runCaseReq.ProjectID = uint(req.ProjectID)
 	runCaseReq.TagID = uint(req.TagID)
 	runCaseReq.Env = uint(req.Env)
+	runCaseReq.ReportCIID = uint(req.CI)
 	return
 }
 

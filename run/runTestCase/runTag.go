@@ -16,12 +16,17 @@ import (
 )
 
 func NewRunTag(runCaseReq request.RunCaseReq, runType interfacecase.RunType, msg *run.Msg) TestCase {
+	caseType := interfacecase.CaseTypeTag
+	if runCaseReq.ReportCIID > 0 {
+		caseType = interfacecase.CaseTypeCI
+	}
 	return &runTag{
 		CaseID:     runCaseReq.CaseID,
-		caseType:   interfacecase.CaseTypeTag,
+		caseType:   caseType,
 		runCaseReq: runCaseReq,
 		runType:    runType,
 		msg:        msg,
+		ReportCIID: runCaseReq.ReportCIID,
 	}
 }
 
@@ -35,6 +40,7 @@ type runTag struct {
 	d               debugTalkOperation
 	envVars         map[string]string
 	msg             *run.Msg
+	ReportCIID      uint
 }
 
 func (r *runTag) LoadCase() (err error) {
@@ -121,7 +127,21 @@ func (r *runTag) LoadCase() (err error) {
 		msg: r.msg,
 	}
 	r.reportOperation.CreateReport()
+	r.setCIReport()
 	return nil
+}
+
+func (r *runTag) setCIReport() {
+	if r.caseType != interfacecase.CaseTypeCI {
+		return
+	}
+	var ci interfacecase.ApiReportCI
+	err := global.GVA_DB.Model(interfacecase.ApiReportCI{}).First(&ci, "id = ?", r.ReportCIID).Error
+	if err != nil {
+		return
+	}
+	ci.ReportID = r.reportOperation.report.ID
+	global.GVA_DB.Model(interfacecase.ApiReportCI{}).Save(&ci)
 }
 
 func (r *runTag) RunCase() (err error) {

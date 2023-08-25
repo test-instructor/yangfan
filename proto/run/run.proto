@@ -38,6 +38,7 @@ message RunCaseReq{
   uint32 reportID = 10;
   CaseType case_type = 11;
   msg msg = 12;
+  uint32 CI = 13;
 }
 
 message msg{
