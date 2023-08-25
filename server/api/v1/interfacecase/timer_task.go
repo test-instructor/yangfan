@@ -24,7 +24,7 @@ var taskService = service.ServiceGroupApp.InterfacecaseServiceGroup.TimerTaskSer
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data body interfacecase.TimerTask true "创建TimerTask"
+// @Param data body interfacecase.ApiTimerTask true "创建TimerTask"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /task/createTimerTask [post]
 func (taskApi *TimerTaskApi) CreateTimerTask(c *gin.Context) {
@@ -46,7 +46,7 @@ func (taskApi *TimerTaskApi) CreateTimerTask(c *gin.Context) {
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data body interfacecase.TimerTask true "删除TimerTask"
+// @Param data body interfacecase.ApiTimerTask true "删除TimerTask"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
 // @Router /task/deleteTimerTask [delete]
 func (taskApi *TimerTaskApi) DeleteTimerTask(c *gin.Context) {
@@ -88,7 +88,7 @@ func (taskApi *TimerTaskApi) DeleteTimerTaskByIds(c *gin.Context) {
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data body interfacecase.TimerTask true "更新TimerTask"
+// @Param data body interfacecase.ApiTimerTask true "更新TimerTask"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
 // @Router /task/updateTimerTask [put]
 func (taskApi *TimerTaskApi) UpdateTimerTask(c *gin.Context) {
@@ -207,7 +207,7 @@ func (taskApi *TimerTaskApi) SetTaskCase(c *gin.Context) {
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data query interfacecase.TimerTask true "用id查询TimerTask"
+// @Param data query interfacecase.ApiTimerTask true "用id查询TimerTask"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
 // @Router /task/findTimerTask [get]
 func (taskApi *TimerTaskApi) FindTimerTask(c *gin.Context) {

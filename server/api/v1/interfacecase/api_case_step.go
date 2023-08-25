@@ -26,7 +26,7 @@ var testCaseService = service.ServiceGroupApp.InterfacecaseServiceGroup.TestCase
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data body interfacecase.TestCase true "创建TestCase"
+// @Param data body interfacecase.ApiCaseStep true "创建TestCase"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /apicase/createTestCase [post]
 func (apiCase *ApiCase) CreateTestCaseStep(c *gin.Context) {
@@ -53,7 +53,7 @@ func (apiCase *ApiCase) CreateTestCaseStep(c *gin.Context) {
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data body interfacecase.TestCase true "删除TestCase"
+// @Param data body interfacecase.ApiCaseStep true "删除TestCase"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
 // @Router /apicase/deleteTestCase [delete]
 func (apiCase *ApiCase) DeleteTestCaseStep(c *gin.Context) {
@@ -95,7 +95,7 @@ func (apiCase *ApiCase) DeleteTestCaseStepByIds(c *gin.Context) {
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data body interfacecase.TestCase true "更新TestCase"
+// @Param data body interfacecase.ApiCaseStep true "更新TestCase"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
 // @Router /apicase/updateTestCase [put]
 func (apiCase *ApiCase) UpdateTestCaseStep(c *gin.Context) {
@@ -184,7 +184,7 @@ func (apiCase *ApiCase) DelTestCaseStep(c *gin.Context) {
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data query interfacecase.TestCase true "用id查询TestCase"
+// @Param data query interfacecase.ApiCaseStep true "用id查询TestCase"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
 // @Router /apicase/findTestCase [get]
 func (apiCase *ApiCase) FindTestCaseStep(c *gin.Context) {

@@ -13,6 +13,13 @@ type ApiCIApi struct{}
 
 var ciService = service.ServiceGroupApp.InterfacecaseServiceGroup.ApiCIService
 
+// RunTag @Tags RunTag
+// @Summary CI运行标签
+// @accept application/json
+// @Produce application/json
+// @Param data body interfacecaseReq.CIRun true "tag, env, uuid, secret"
+// @Success 200 {object} string "{"code":0,"data":{"key": "f2dc1396-1d3e-4f12-8b9a-f9d35e88cd7e","report": 12},"msg":"运行成功"}
+// @Router /ci/runTag [post]
 func (ci *ApiCIApi) RunTag(c *gin.Context) {
 	var tagReq interfacecaseReq.CIRun
 	_ = c.ShouldBindQuery(&tagReq)

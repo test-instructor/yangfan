@@ -27,7 +27,7 @@ var apicaseServices = service.ServiceGroupApp.InterfacecaseServiceGroup.Interfac
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data body interfacecase.InterfaceTemplate true "创建InterfaceTemplate"
+// @Param data body interfacecase.ApiStep true "创建InterfaceTemplate"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /apicase/createInterfaceTemplate [post]
 func (apiCaseApi *InterfaceTemplateApi) CreateInterfaceTemplate(c *gin.Context) {
@@ -53,7 +53,7 @@ func (apiCaseApi *InterfaceTemplateApi) CreateInterfaceTemplate(c *gin.Context) 
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data body interfacecase.InterfaceTemplate true "删除InterfaceTemplate"
+// @Param data body interfacecase.ApiStep true "删除InterfaceTemplate"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
 // @Router /apicase/deleteInterfaceTemplate [delete]
 func (apiCaseApi *InterfaceTemplateApi) DeleteInterfaceTemplate(c *gin.Context) {
@@ -95,7 +95,7 @@ func (apiCaseApi *InterfaceTemplateApi) DeleteInterfaceTemplateByIds(c *gin.Cont
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data body interfacecase.InterfaceTemplate true "更新InterfaceTemplate"
+// @Param data body interfacecase.ApiStep true "更新InterfaceTemplate"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
 // @Router /apicase/updateInterfaceTemplate [put]
 func (apiCaseApi *InterfaceTemplateApi) UpdateInterfaceTemplate(c *gin.Context) {
@@ -121,7 +121,7 @@ func (apiCaseApi *InterfaceTemplateApi) UpdateInterfaceTemplate(c *gin.Context) 
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data query interfacecase.InterfaceTemplate true "用id查询InterfaceTemplate"
+// @Param data query interfacecase.ApiStep true "用id查询InterfaceTemplate"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
 // @Router /apicase/findInterfaceTemplate [get]
 func (apiCaseApi *InterfaceTemplateApi) FindInterfaceTemplate(c *gin.Context) {
