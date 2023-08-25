@@ -664,6 +664,28 @@ definitions:
       status:
         type: boolean
     type: object
+  interfacecase.ApiCaseRelationship:
+    properties:
+      CreatedAt:
+        description: 创建时间
+        type: string
+      UpdatedAt:
+        description: 更新时间
+        type: string
+      apiCase:
+        $ref: '#/definitions/github_com_test-instructor_yangfan_server_model_interfacecase.ApiCase'
+      apiCaseId:
+        type: integer
+      apiCaseStep:
+        $ref: '#/definitions/interfacecase.ApiCaseStep'
+      apiCaseStepId:
+        type: integer
+      id:
+        description: 主键ID
+        type: integer
+      sort:
+        type: integer
+    type: object
   interfacecase.ApiCaseStep:
     properties:
       CreatedAt:
@@ -1147,6 +1169,17 @@ definitions:
     x-enum-varnames:
     - TransactionStart
     - TransactionEnd
+  interfacecase.addApisCaseReq:
+    properties:
+      case_id:
+        description: 测试步骤id
+        items:
+          type: integer
+        type: array
+      testCase_id:
+        description: 测试用例id
+        type: integer
+    type: object
   request.AddMenuAuthorityInfo:
     properties:
       authorityId:
@@ -1156,6 +1189,24 @@ definitions:
         items:
           $ref: '#/definitions/system.SysBaseMenu'
         type: array
+    type: object
+  request.ApiCaseIdReq:
+    properties:
+      ID:
+        description: 主键ID
+        type: integer
+      apiID:
+        description: 接口ID
+        type: integer
+      caseID:
+        description: 用例ID
+        type: integer
+      detail:
+        description: 是否详情
+        type: boolean
+      type:
+        description: 类型
+        type: string
     type: object
   request.CIRun:
     properties:
@@ -1239,6 +1290,7 @@ definitions:
   request.IdsReq:
     properties:
       ids:
+        description: id列表
         items:
           type: integer
         type: array
@@ -1364,6 +1416,16 @@ definitions:
       path:
         description: api路径
         type: string
+    type: object
+  request.SetTimerCares:
+    properties:
+      caseIds:
+        description: 角色ID
+        items:
+          type: integer
+        type: array
+      id:
+        type: integer
     type: object
   request.SetUserAuth:
     properties:
@@ -5978,6 +6040,51 @@ paths:
       summary: 更新TimerTask
       tags:
       - TimerTask
+  /testCase/addApiTestCase:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: 删除测试用例
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/interfacecase.ApiCaseRelationship'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"success":true,"data":{},"msg":"删除成功"}'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 删除测试步骤
+      tags:
+      - ApiCase
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 测试步骤增加用例
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.ApiCaseIdReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"success":true,"data":{},"msg":"添加用例成功"}'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 测试用例添加步骤
+      tags:
+      - ApiCase
   /testCase/createApiCase:
     post:
       consumes:
@@ -6052,56 +6159,26 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: 创建时间
-        in: query
-        name: CreatedAt
-        type: string
-      - in: query
-        name: CreatedBy
-        type: integer
-      - in: query
-        name: DeleteBy
-        type: integer
-      - in: query
-        name: RunConfigID
-        type: integer
-      - in: query
-        name: UpdateBy
-        type: integer
-      - description: 更新时间
-        in: query
-        name: UpdatedAt
-        type: string
-      - in: query
-        name: api_env_id
-        type: integer
-      - in: query
-        name: api_env_name
-        type: string
-      - in: query
-        name: describe
-        type: string
-      - description: Performance []Performance   `json:"performance,omitempty" form:"performance"
-          gorm:"many2many:PerformanceRelationship;"`
-        in: query
-        name: front_case
-        type: boolean
       - description: 主键ID
         in: query
-        name: id
+        name: ID
         type: integer
-      - in: query
-        name: name
-        type: string
-      - in: query
-        name: project_id
+      - description: 接口ID
+        in: query
+        name: apiID
         type: integer
-      - in: query
-        name: runNumber
+      - description: 用例ID
+        in: query
+        name: caseID
         type: integer
-      - in: query
-        name: status
+      - description: 是否详情
+        in: query
+        name: detail
         type: boolean
+      - description: 类型
+        in: query
+        name: type
+        type: string
       produces:
       - application/json
       responses:
@@ -6189,6 +6266,29 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: 分页获取ApiCase列表
+      tags:
+      - ApiCase
+  /testCase/setApisCase:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 设置测试步骤内容
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.SetTimerCares'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"success":true,"data":{},"msg":"修改成功"}'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 设置测试步骤内容
       tags:
       - ApiCase
   /testCase/updateApiCase:

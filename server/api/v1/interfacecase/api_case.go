@@ -21,6 +21,7 @@ type ApiCaseApi struct {
 var apiCaseService = service.ServiceGroupApp.InterfacecaseServiceGroup.ApiCaseService
 
 // CreateApiCase 创建ApiCase
+//
 //	@Tags		ApiCase
 //	@Summary	创建ApiCase
 //	@Security	ApiKeyAuth
@@ -46,6 +47,7 @@ func (apiCase *ApiCaseApi) CreateApiCase(c *gin.Context) {
 }
 
 // DeleteApiCase 删除ApiCase
+//
 //	@Tags		ApiCase
 //	@Summary	删除ApiCase
 //	@Security	ApiKeyAuth
@@ -68,6 +70,7 @@ func (apiCase *ApiCaseApi) DeleteApiCase(c *gin.Context) {
 }
 
 // DeleteApiCaseByIds 批量删除ApiCase
+//
 //	@Tags		ApiCase
 //	@Summary	批量删除ApiCase
 //	@Security	ApiKeyAuth
@@ -88,6 +91,7 @@ func (apiCase *ApiCaseApi) DeleteApiCaseByIds(c *gin.Context) {
 }
 
 // UpdateApiCase 更新ApiCase
+//
 //	@Tags		ApiCase
 //	@Summary	更新ApiCase
 //	@Security	ApiKeyAuth
@@ -113,6 +117,16 @@ func (apiCase *ApiCaseApi) UpdateApiCase(c *gin.Context) {
 	}
 }
 
+// SortApisCase 测试用例排序
+//
+//	@Tags		ApiCase
+//	@Summary	测试用例排序
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		[]interfacecase.ApiCaseRelationshipf	true	"测试用例排序"
+//	@Success	200		{string}	string									"{"success":true,"data":{},"msg":"更新成功"}"
+//	@Router		/testCase/addApiTestCase [delete]
 func (apiCase *ApiCaseApi) SortApisCase(c *gin.Context) {
 	var testCase []interfacecase.ApiCaseRelationship
 	_ = c.ShouldBindJSON(&testCase)
@@ -125,10 +139,20 @@ func (apiCase *ApiCaseApi) SortApisCase(c *gin.Context) {
 }
 
 type addApisCaseReq struct {
-	TestCaseID uint   `json:"testCase_id"`
-	CaseID     []uint `json:"case_id"`
+	TestCaseID uint   `json:"testCase_id"` // 测试用例id
+	CaseID     []uint `json:"case_id"`     // 测试步骤id
 }
 
+// AddApisCase 添加测试用例
+//
+//	@Tags		ApiCase
+//	@Summary	删除测试步骤
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		addApisCaseReq	true	"删除测试用例"
+//	@Success	200		{string}	string			"{"success":true,"data":{},"msg":"更新成功"}"
+//	@Router		/testCase/addApiTestCase [delete]
 func (apiCase *ApiCaseApi) AddApisCase(c *gin.Context) {
 	var testCase addApisCaseReq
 	_ = c.ShouldBindJSON(&testCase)
@@ -140,6 +164,16 @@ func (apiCase *ApiCaseApi) AddApisCase(c *gin.Context) {
 	}
 }
 
+// DelApisCase 删除测试用例
+//
+//	@Tags		ApiCase
+//	@Summary	删除测试步骤
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		interfacecase.ApiCaseRelationship	true	"删除测试用例"
+//	@Success	200		{string}	string								"{"success":true,"data":{},"msg":"删除成功"}"
+//	@Router		/testCase/addApiTestCase [delete]
 func (apiCase *ApiCaseApi) DelApisCase(c *gin.Context) {
 	var testCase interfacecase.ApiCaseRelationship
 	_ = c.ShouldBindJSON(&testCase)
@@ -161,6 +195,16 @@ type apiTestCase struct {
 	Case interfacecase.ApiCaseStep `json:"case"`
 }
 
+// FindApiTestCase 测试步骤增加用例
+//
+//	@Tags		ApiCase
+//	@Summary	测试步骤增加用例
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		interfacecase.ApiCase	true	"测试步骤增加用例"
+//	@Success	200		{string}	string					"{"success":true,"data":{},"msg":"添加用例成功"}"
+//	@Router		/testCase/addApiTestCase [post]
 func (apiCase *ApiCaseApi) FindApiTestCase(c *gin.Context) {
 	var testCase interfacecase.ApiCase
 	_ = c.ShouldBindQuery(&testCase)
@@ -191,6 +235,16 @@ func (apiCase *ApiCaseApi) FindApiTestCase(c *gin.Context) {
 	}
 }
 
+// AddApiTestCase 测试用例添加步骤
+//
+//	@Tags		ApiCase
+//	@Summary	测试用例添加步骤
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		request.ApiCaseIdReq	true	"测试步骤增加用例"
+//	@Success	200		{string}	string					"{"success":true,"data":{},"msg":"添加用例成功"}"
+//	@Router		/testCase/addApiTestCase [post]
 func (apiCase *ApiCaseApi) AddApiTestCase(c *gin.Context) {
 	var apiCaseID request.ApiCaseIdReq
 	_ = c.ShouldBindJSON(&apiCaseID)
@@ -203,6 +257,16 @@ func (apiCase *ApiCaseApi) AddApiTestCase(c *gin.Context) {
 	}
 }
 
+// SetApisCase 设置测试步骤内容
+//
+//	@Tags		ApiCase
+//	@Summary	设置测试步骤内容
+//	@Security	ApiKeyAuth
+//	@accept		application/json
+//	@Produce	application/json
+//	@Param		data	body		interfacecaseReq.SetTimerCares	true	"设置测试步骤内容"
+//	@Success	200		{string}	string							"{"success":true,"data":{},"msg":"修改成功"}"
+//	@Router		/testCase/setApisCase [post]
 func (apiCase *ApiCaseApi) SetApisCase(c *gin.Context) {
 	var sua interfacecaseReq.SetTimerCares
 	_ = c.ShouldBindJSON(&sua)
@@ -215,12 +279,13 @@ func (apiCase *ApiCaseApi) SetApisCase(c *gin.Context) {
 }
 
 // FindApiCase 用id查询ApiCase
+//
 //	@Tags		ApiCase
 //	@Summary	用id查询ApiCase
 //	@Security	ApiKeyAuth
 //	@accept		application/json
 //	@Produce	application/json
-//	@Param		data	query		interfacecase.ApiCase	true	"用id查询ApiCase"
+//	@Param		data	query		request.ApiCaseIdReq	true	"用id查询ApiCase"
 //	@Success	200		{string}	string					"{"success":true,"data":{},"msg":"查询成功"}"
 //	@Router		/testCase/findApiCase [get]
 func (apiCase *ApiCaseApi) FindApiCase(c *gin.Context) {
@@ -235,6 +300,7 @@ func (apiCase *ApiCaseApi) FindApiCase(c *gin.Context) {
 }
 
 // GetApiCaseList 分页获取ApiCase列表
+//
 //	@Tags		ApiCase
 //	@Summary	分页获取ApiCase列表
 //	@Security	ApiKeyAuth

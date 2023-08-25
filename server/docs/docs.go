@@ -6683,6 +6683,80 @@ const docTemplate = `{
                 }
             }
         },
+        "/testCase/addApiTestCase": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ApiCase"
+                ],
+                "summary": "测试用例添加步骤",
+                "parameters": [
+                    {
+                        "description": "测试步骤增加用例",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.ApiCaseIdReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"添加用例成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ApiCase"
+                ],
+                "summary": "删除测试步骤",
+                "parameters": [
+                    {
+                        "description": "删除测试用例",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/interfacecase.ApiCaseRelationship"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"删除成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/testCase/createApiCase": {
             "post": {
                 "security": [
@@ -6816,82 +6890,33 @@ const docTemplate = `{
                 "summary": "用id查询ApiCase",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "创建时间",
-                        "name": "CreatedAt",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "CreatedBy",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "DeleteBy",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "RunConfigID",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "UpdateBy",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "更新时间",
-                        "name": "UpdatedAt",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "api_env_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "api_env_name",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "describe",
-                        "in": "query"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "Performance []Performance   ` + "`" + `json:\"performance,omitempty\" form:\"performance\" gorm:\"many2many:PerformanceRelationship;\"` + "`" + `",
-                        "name": "front_case",
-                        "in": "query"
-                    },
-                    {
                         "type": "integer",
                         "description": "主键ID",
-                        "name": "id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "name",
+                        "name": "ID",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "name": "project_id",
+                        "description": "接口ID",
+                        "name": "apiID",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "name": "runNumber",
+                        "description": "用例ID",
+                        "name": "caseID",
                         "in": "query"
                     },
                     {
                         "type": "boolean",
-                        "name": "status",
+                        "description": "是否详情",
+                        "name": "detail",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "类型",
+                        "name": "type",
                         "in": "query"
                     }
                 ],
@@ -7023,6 +7048,44 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "{\"success\":true,\"data\":{},\"msg\":\"获取成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/testCase/setApisCase": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ApiCase"
+                ],
+                "summary": "设置测试步骤内容",
+                "parameters": [
+                    {
+                        "description": "设置测试步骤内容",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.SetTimerCares"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"修改成功\"}",
                         "schema": {
                             "type": "string"
                         }
@@ -8535,6 +8598,38 @@ const docTemplate = `{
                 }
             }
         },
+        "interfacecase.ApiCaseRelationship": {
+            "type": "object",
+            "properties": {
+                "CreatedAt": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
+                "UpdatedAt": {
+                    "description": "更新时间",
+                    "type": "string"
+                },
+                "apiCase": {
+                    "$ref": "#/definitions/github_com_test-instructor_yangfan_server_model_interfacecase.ApiCase"
+                },
+                "apiCaseId": {
+                    "type": "integer"
+                },
+                "apiCaseStep": {
+                    "$ref": "#/definitions/interfacecase.ApiCaseStep"
+                },
+                "apiCaseStepId": {
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "主键ID",
+                    "type": "integer"
+                },
+                "sort": {
+                    "type": "integer"
+                }
+            }
+        },
         "interfacecase.ApiCaseStep": {
             "type": "object",
             "properties": {
@@ -9236,6 +9331,22 @@ const docTemplate = `{
                 "TransactionEnd"
             ]
         },
+        "interfacecase.addApisCaseReq": {
+            "type": "object",
+            "properties": {
+                "case_id": {
+                    "description": "测试步骤id",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "testCase_id": {
+                    "description": "测试用例id",
+                    "type": "integer"
+                }
+            }
+        },
         "request.AddMenuAuthorityInfo": {
             "type": "object",
             "properties": {
@@ -9248,6 +9359,31 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/system.SysBaseMenu"
                     }
+                }
+            }
+        },
+        "request.ApiCaseIdReq": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "description": "主键ID",
+                    "type": "integer"
+                },
+                "apiID": {
+                    "description": "接口ID",
+                    "type": "integer"
+                },
+                "caseID": {
+                    "description": "用例ID",
+                    "type": "integer"
+                },
+                "detail": {
+                    "description": "是否详情",
+                    "type": "boolean"
+                },
+                "type": {
+                    "description": "类型",
+                    "type": "string"
                 }
             }
         },
@@ -9370,6 +9506,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "ids": {
+                    "description": "id列表",
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -9546,6 +9683,21 @@ const docTemplate = `{
                 "path": {
                     "description": "api路径",
                     "type": "string"
+                }
+            }
+        },
+        "request.SetTimerCares": {
+            "type": "object",
+            "properties": {
+                "caseIds": {
+                    "description": "角色ID",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "id": {
+                    "type": "integer"
                 }
             }
         },
