@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/test-instructor/yangfan/proto/run"
-	"go.uber.org/zap"
 	"os"
 	"testing"
+
+	"github.com/test-instructor/yangfan/proto/run"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/hrp"
 	"github.com/test-instructor/yangfan/server/global"
@@ -127,7 +128,6 @@ func (r *runTag) LoadCase() (err error) {
 		msg: r.msg,
 	}
 	r.reportOperation.CreateReport()
-	r.setCIReport()
 	return nil
 }
 
@@ -141,7 +141,10 @@ func (r *runTag) setCIReport() {
 		return
 	}
 	ci.ReportID = r.reportOperation.report.ID
-	global.GVA_DB.Model(interfacecase.ApiReportCI{}).Save(&ci)
+	err = global.GVA_DB.Model(interfacecase.ApiReportCI{}).Where("id = ?", ci.ID).Save(&ci).Error
+	if err != nil {
+		global.GVA_LOG.Error("CI报告更新失败", zap.Error(err))
+	}
 }
 
 func (r *runTag) RunCase() (err error) {
@@ -161,6 +164,7 @@ func (r *runTag) RunCase() (err error) {
 	if err != nil {
 		return err
 	}
+	r.setCIReport()
 	return nil
 }
 

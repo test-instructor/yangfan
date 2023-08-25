@@ -36,7 +36,7 @@ type ApiReport struct {
 	Name       string             `json:"name,omitempty"`
 	Success    *bool              `json:"success,omitempty"`
 	Stat       *ApiReportStat     `json:"stat,omitempty"`
-	StatID     uint               `json:"-,omitempty"`
+	StatID     uint               `json:"-"`
 	Time       *ApiReportTime     `json:"time,omitempty"`
 	TimeID     uint               `json:"-"`
 	Platform   datatypes.JSON     `json:"platform,omitempty"`

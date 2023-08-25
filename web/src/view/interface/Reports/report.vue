@@ -294,7 +294,7 @@ const caseType = (t) => {
     return ["任务标签", "#1664FF", "#ffffff"];
   }
   if (t === 8) {
-    return ["CI", "#1664FF", "#ffffff"];
+    return ["CI运行", "#1664FF", "#ffffff"];
   }
   return ["定时任务"];
 };
@@ -306,6 +306,7 @@ const case_type = ref([
   { value: 4, label: "定时任务" },
   { value: 5, label: "性能测试" },
   { value: 7, label: "任务标签" },
+  { value: 8, label: "CI调用" },
 ]);
 
 const run_type = ref([
@@ -314,7 +315,7 @@ const run_type = ref([
   { value: 3, label: "后台运行" },
   { value: 4, label: "定时执行" },
   { value: 5, label: "保存调试" },
-  { value: 6, label: "CI" },
+  { value: 8, label: "CI" },
 ]);
 
 const runType = (t) => {
@@ -333,9 +334,9 @@ const runType = (t) => {
   if (t === 4) {
     return ["定时执行", "#C9E968"];
   }
-  // if (t === 6) {
-  //   return ["CI", "#C9E968"];
-  // }
+  if (t === 8) {
+    return ["CI", "#C9E968"];
+  }
   return 7;
 };
 

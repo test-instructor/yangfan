@@ -14,6 +14,7 @@ func (ci ApiCIRouter) InitApiCIRouter(Router *gin.RouterGroup) {
 	var ciAPi = v1.ApiGroupApp.InterfaceCaseApiGroup.ApiCIApi
 	{
 		ciRouter.GET("runTag", ciAPi.RunTag)
+		ciRouter.POST("runTag", ciAPi.RunTag)
 
 		ciRouter.GET("getReport", ciAPi.GetReport)
 	}

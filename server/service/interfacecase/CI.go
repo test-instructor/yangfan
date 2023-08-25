@@ -3,17 +3,17 @@ package interfacecase
 import (
 	"errors"
 	"fmt"
+
 	uuid "github.com/satori/go.uuid"
 	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/model/common/request"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	interfacecaseReq "github.com/test-instructor/yangfan/server/model/interfacecase/request"
-	"github.com/test-instructor/yangfan/server/service"
 )
 
 type ApiCIService struct{}
 
-var runCaseService = service.ServiceGroupApp.InterfacecaseServiceGroup.RunCaseService
+var runCaseService = RunCaseService{}
 
 func (ci *ApiCIService) RunTag(tagReq interfacecaseReq.CIRun) (error, interface{}) {
 	if tagReq.TagID == 0 || tagReq.ProjectID == 0 || tagReq.EnvID == 0 {
@@ -48,6 +48,17 @@ func (ci *ApiCIService) RunTag(tagReq interfacecaseReq.CIRun) (error, interface{
 }
 
 func (ci *ApiCIService) GetRepost(tagReq interfacecaseReq.CIRun) (error, interface{}) {
-	return nil, nil
+	if tagReq.ReportID == 0 || tagReq.Key == "" {
+		return errors.New("参数设置错误"), nil
+	}
+	var arc interfacecase.ApiReportCI
+	err := global.GVA_DB.Preload("Report").First(&arc, "id = ? and `key` = ?", tagReq.ReportID, tagReq.Key).Error
+	if err != nil {
+		return err, nil
+	}
+	if arc.Report == nil {
+		return errors.New("测试执行中，请稍后查询"), nil
+	}
+	return nil, arc.Report
 
 }

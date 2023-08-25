@@ -12,7 +12,7 @@ type ApiReportCI struct {
 	TaskID    uint           `json:"task" form:"task"`
 	EnvID     uint           `json:"env" form:"env"`
 	ReportID  uint           `json:"report_id" form:"report_id"`
-	Report    ApiReport      `json:"report"`
+	Report    *ApiReport     `json:"report"`
 	Project   system.Project `json:"-"`
 	ProjectID uint           `json:"project_id,omitempty" yaml:"project_id"`
 }

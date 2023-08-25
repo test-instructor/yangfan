@@ -7,6 +7,7 @@ type CIRun struct {
 	UUID      string `json:"uuid" form:"uuid"`
 	Secret    string `json:"secret" form:"secret"`
 	ProjectID uint   `json:"project" form:"project"`
-	MessageID uint   `json:"message" form:"message"`
+	MessageID uint   `json:"api_message_id" form:"api_message_id"`
 	ReportID  uint   `json:"report" form:"report"`
+	Key       string `json:"key" form:"key"`
 }

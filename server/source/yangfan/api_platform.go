@@ -269,6 +269,7 @@ func RegisterApis() {
 		{ApiGroup: "消息通知", Method: "GET", Path: "/message/:project/getMessageList", Description: "获取Message列表"},
 
 		{ApiGroup: "CI", Method: "GET", Path: "/ci/runTag", Description: "运行tag"},
+		{ApiGroup: "CI", Method: "POST", Path: "/ci/runTag", Description: "运行tag"},
 		{ApiGroup: "CI", Method: "GET", Path: "/ci/getReport", Description: "获取测试报告"},
 	}
 
