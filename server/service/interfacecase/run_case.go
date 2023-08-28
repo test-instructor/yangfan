@@ -227,9 +227,9 @@ func (r *RunCaseService) intervalRebalance(runCase request.RunCaseReq) (err erro
 						zap.Any("间隔时间：", intervalTimeList[i]),
 						zap.Any("并发用户数：", intervalCountList[i]))
 					time.Sleep(time.Second * time.Duration(intervalTimeList[i]))
-					if i+1 == int(runCase.Operation.Interval.IntervalNumber) {
-						_, _ = c.MasterClient.Stop(ctx, &master.StopReq{})
-					}
+					//if i+1 == int(runCase.Operation.Interval.IntervalNumber) {
+					//	_, _ = c.MasterClient.Stop(ctx, &master.StopReq{})
+					//}
 				}
 			}
 			time.Sleep(time.Second * 3)
