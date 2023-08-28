@@ -39,9 +39,9 @@ func (ci *ApiCIService) RunTag(tagReq interfacecaseReq.CIRun) (error, interface{
 		ProjectID:    tagReq.ProjectID,
 		ReportCIID:   arc.ID,
 		ApiMessageID: tagReq.MessageID,
-		RunType:      8,
+		RunType:      7,
 	}
-	go runCaseService.RunTimerTask(req)
+	go runCaseService.RunTimerTask(req, true)
 	data := make(map[string]interface{})
 	data["report"] = arc.ID
 	data["key"] = arc.Key

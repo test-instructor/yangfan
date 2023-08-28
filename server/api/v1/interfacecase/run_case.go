@@ -104,7 +104,7 @@ func (runCaseApi *RunCaseApi) RunTimerTask(c *gin.Context) {
 	_ = c.ShouldBindJSON(&runApiCase)
 	runApiCase.ProjectID = utils.GetUserProject(c)
 	runApiCase.RunType = uint(interfacecase.RunTypeRunBack)
-	go runCaseService.RunTimerTask(runApiCase)
+	go runCaseService.RunTimerTask(runApiCase, false)
 	response.OkWithData("运行成功", c)
 }
 

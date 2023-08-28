@@ -22,7 +22,7 @@ import (
 func NewRunTag(runCaseReq request.RunCaseReq, runType interfacecase.RunType, msg *run.Msg) TestCase {
 	caseType := interfacecase.CaseTypeTag
 	if runCaseReq.ReportCIID > 0 {
-		caseType = interfacecase.CaseTypeCI
+		runType = interfacecase.RunTypeCI
 	}
 	return &runTag{
 		CaseID:     runCaseReq.CaseID,
@@ -135,7 +135,7 @@ func (r *runTag) LoadCase() (err error) {
 }
 
 func (r *runTag) setCIReport() {
-	if r.caseType != interfacecase.CaseTypeCI {
+	if r.runType != interfacecase.RunTypeCI {
 		return
 	}
 	var ci interfacecase.ApiReportCI

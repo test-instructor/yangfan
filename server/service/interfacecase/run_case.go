@@ -276,7 +276,7 @@ func (r *RunCaseService) Stop(runCase request.RunCaseReq) (err error) {
 	return err
 }
 
-func (r *RunCaseService) RunTimerTask(runCase request.RunCaseReq) {
+func (r *RunCaseService) RunTimerTask(runCase request.RunCaseReq, ci bool) {
 	err := r.newClient()
 	if err != nil {
 		return
@@ -296,6 +296,9 @@ func (r *RunCaseService) RunTimerTask(runCase request.RunCaseReq) {
 	}
 	if runCase.TagID > 0 {
 		req := r.getRunCase(runCase)
+		if ci {
+			req.RunType = run.RunType_RunTypeCI
+		}
 		if runCase.ApiMessageID > 0 {
 			var msg interfacecase.ApiMessage
 			err = global.GVA_DB.Model(&interfacecase.ApiMessage{}).Where("id = ?", runCase.ApiMessageID).First(&msg).Error
@@ -318,7 +321,7 @@ func (r *RunCaseService) RunTimerTaskBack(taskID uint) {
 		TagID:   taskID,
 		RunType: uint(interfacecase.RunTypeRunTimer),
 	}
-	r.RunTimerTask(req)
+	r.RunTimerTask(req, false)
 
 }
 

@@ -71,11 +71,12 @@ enum CaseType{
 
 enum RunType{
   RunTypeDefault = 0; // 默认
-  RunTypeDebug = 1; // 调试模式
-  RunTypeRuning = 2; // 立即运行
-  RunTypeRunBack = 3; // 后台运行
-  RunTypeRunTimer = 4; // 定时执行
-  RunTypeRunSave = 5; // 调试并保存
+  Debug = 1; // 调试模式
+  Runing = 2; // 立即运行
+  RunBack = 3; // 后台运行
+  RunTimer = 4; // 定时执行
+  RunSave = 5; // 调试并保存
+  CI = 6; // 调试并保存
 }
 
 message RunCaseResponse{

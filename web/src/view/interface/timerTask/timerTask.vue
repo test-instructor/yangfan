@@ -328,6 +328,9 @@
               />
             </el-select>
           </el-form-item>
+          <el-form-item label="CI参数：" v-if="isCI">
+            {{ ciValue }}
+          </el-form-item>
         </el-form>
         <div class="dialog-footer">
           <el-button size="small" @click="closeDialogTagRung">取 消</el-button>
@@ -341,6 +344,7 @@
               <el-button type="primary">后台运行</el-button>
             </template>
           </el-popconfirm>
+          <el-button type="primary" @click="showCI">显示CI运行参数</el-button>
         </div>
       </template>
     </el-dialog>
@@ -399,6 +403,26 @@ const formData = ref({
   api_env_id: 0,
   api_message_id: 0,
 });
+const project = JSON.parse(window.localStorage.getItem("project")).ID;
+const isCI = ref(false);
+
+const ciValue = ref({
+  tag: 0,
+  env: 0,
+  message: 0,
+  project: project,
+  uuid: "project uuid",
+  secret: "project secret",
+  callback_url: "http://www.yangfan.gd.cn/",
+  other: {},
+});
+const showCI = () => {
+  isCI.value = true;
+  ciValue.value.tag = Number(runTagId.value);
+  ciValue.value.env = Number(runEnvId.value);
+  ciValue.value.message = api_message_id.value;
+};
+
 const cronVisible = ref(false);
 const cronFun = () => {
   cronVisible.value = true;
@@ -711,6 +735,7 @@ const closeDialogTagRung = () => {
   runTagId.value = "";
   runEnvId.value = "";
   api_message_id.value = null;
+  isCI.value = false;
 };
 
 // 关闭弹窗

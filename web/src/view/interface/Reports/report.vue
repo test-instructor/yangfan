@@ -334,8 +334,8 @@ const runType = (t) => {
   if (t === 4) {
     return ["定时执行", "#C9E968"];
   }
-  if (t === 8) {
-    return ["CI", "#C9E968"];
+  if (t === 6) {
+    return ["CI 调用", "#C9E968"];
   }
   return 7;
 };

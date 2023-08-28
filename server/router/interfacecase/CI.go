@@ -9,8 +9,8 @@ import (
 type ApiCIRouter struct{}
 
 func (ci ApiCIRouter) InitApiCIRouter(Router *gin.RouterGroup) {
-	Router.Group("/ci")
-	ciRouter := Router.Group("")
+
+	ciRouter := Router.Group("/ci")
 	ciRouter.Use(middleware.CIAuth())
 	var ciAPi = v1.ApiGroupApp.InterfaceCaseApiGroup.ApiCIApi
 	{
