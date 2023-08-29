@@ -10,22 +10,22 @@
     @cell-mouse-leave="cellMouseLeave"
     @keyup="validateDatas"
   >
-    <el-table-column fixed label="断言字段" width="200">
+    <el-table-column fixed label="字段" width="200">
       <template #default="scope">
         <el-input
           clearable
           v-model="scope.row.check"
-          placeholder="断言字段"
+          placeholder="字段"
         ></el-input>
       </template>
     </el-table-column>
 
-    <el-table-column label="断言类型" width="250">
+    <el-table-column label="类型" width="250">
       <template #default="scope">
         <el-select
           filterable
           v-model="scope.row.assert"
-          placeholder="请选择断言类型"
+          placeholder="请选择类型"
         >
           <el-option
             v-for="item in validateOptions"
@@ -52,12 +52,12 @@
       </template>
     </el-table-column>
 
-    <el-table-column label="期望返回值" width="300">
+    <el-table-column label="期望数据" width="300">
       <template #default="scope">
         <el-input
           clearable
           v-model="scope.row.expectTemp"
-          placeholder="期望返回值"
+          placeholder="期望数据"
         >
         </el-input>
       </template>
@@ -232,6 +232,7 @@ export default {
         }
       }
       this.$emit("requestValidateData", emitdata);
+      this.$emit("requestSkipData", emitdata);
     },
     querySearch(queryString, cb) {
       let validateOptions = this.validateOptions;

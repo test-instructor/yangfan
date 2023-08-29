@@ -60,6 +60,7 @@ type ApiStep struct {
 	ExportHeader    datatypes.JSON         `json:"export_header,omitempty" gorm:"column:export_header;comment:导出请求头到全局config;type:text"`
 	ExportParameter datatypes.JSON         `json:"export_parameter,omitempty" gorm:"column:export_parameter;comment:导出参数到全局config;type:text"`
 	Retry           uint                   `json:"retry" gorm:"comment:重试次数"`
+	Skip            customType.TypeArgsMap `json:"skip,omitempty" form:"skip" gorm:"column:skip;comment:跳过执行;type:text"`
 
 	Parent    uint    `json:"-"`
 	ApiMenuID uint    `json:"-"`

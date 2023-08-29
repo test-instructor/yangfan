@@ -86,6 +86,16 @@
           </jsons>
         </el-tab-pane>
 
+        <el-tab-pane label="跳过执行" name="skip">
+          <validate
+            @requestSkipData="requestSkipDate"
+            @validates="handleSkip"
+            :validate="reqData ? reqData.skip : []"
+            :heights="heightDiv"
+          >
+          </validate>
+        </el-tab-pane>
+
         <el-tab-pane label="参数提取" name="Extract">
           <extract
             @requestExtractData="requestExtract"
@@ -231,6 +241,7 @@ let export_header = [];
 let export_parameter = [];
 let requestId = [];
 let validateId = [];
+let skipId = [];
 let validate = [];
 let teardownHook = [];
 let setupHook = [];
@@ -240,6 +251,7 @@ let requestJsonData = {};
 let requestFtData = [];
 let requestExtractData = [];
 let requestValidateData = [];
+let requestSkipData = [];
 let requestVariablesData = [];
 let activeTag = "Header";
 const eventMsg = ref();
@@ -252,6 +264,12 @@ const handleRequest = (id) => {
 const handleValidate = (id) => {
   if (id > 0) {
     validateId.push(id);
+  }
+};
+
+const handleSkip = (id) => {
+  if (id > 0) {
+    skipId.push(id);
   }
 };
 
@@ -281,6 +299,7 @@ let reqData = reactive({
   }),
   variables: "",
   variables_json: [],
+  skip: "",
   extract: "",
   extract_json: "",
   validate: "",
@@ -415,6 +434,7 @@ const setReqData = () => {
   reqData.export_header = export_header;
   reqData.export_parameter = export_parameter;
   reqData.retry = formLabelAlign.retry;
+  reqData.skip = requestSkipData;
 };
 
 const saves = () => {
@@ -486,6 +506,12 @@ const requestExtract = (requestExtract) => {
 };
 const requestValidateDate = (requestValidate) => {
   requestValidateData = requestValidate;
+  console.log("requestValidate", requestValidate);
+};
+
+const requestSkipDate = (requestSkip) => {
+  requestSkipData = requestSkip;
+  console.log("requestSkipData", requestSkipData);
 };
 const requestVariables = (requestVariables) => {
   requestVariablesData = requestVariables;
