@@ -59,6 +59,7 @@ type ApiStep struct {
 	Sort            uint                   `json:"sort,omitempty" form:"sort" gorm:"column:sort;"`
 	ExportHeader    datatypes.JSON         `json:"export_header,omitempty" gorm:"column:export_header;comment:导出请求头到全局config;type:text"`
 	ExportParameter datatypes.JSON         `json:"export_parameter,omitempty" gorm:"column:export_parameter;comment:导出参数到全局config;type:text"`
+	Retry           uint                   `json:"retry" gorm:"comment:重试次数"`
 
 	Parent    uint    `json:"-"`
 	ApiMenuID uint    `json:"-"`

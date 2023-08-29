@@ -31,4 +31,5 @@ type ApiConfig struct {
 	Environs       map[string]string   `json:"environs,omitempty" yaml:"environs,omitempty" gorm:"-"` // environment variables
 	CaseID         uint                `json:"case_id,omitempty" gorm:"-"`
 	ReportID       uint                `json:"report_id,omitempty" gorm:"-"`
+	Retry          uint                `json:"retry" gorm:"comment:重试次数"`
 }

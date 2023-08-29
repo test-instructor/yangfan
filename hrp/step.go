@@ -66,6 +66,7 @@ type StepResult struct {
 	ValidatorsNumber uint                   `json:"validate_number,omitempty"`
 
 	Attachments interface{} `json:"attachments,omitempty" yaml:"attachments,omitempty"` // store extra step information, such as error message or screenshots
+	Retry       uint        `json:"retry,omitempty" yaml:"retry,omitempty"`
 }
 
 // TStep represents teststep data structure.

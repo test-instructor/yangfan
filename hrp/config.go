@@ -41,6 +41,7 @@ type TConfig struct {
 	ProjectID uint `json:"project_id"`
 	CaseID    uint `json:"case_id"`
 	ReportID  uint `json:"report_id"`
+	Retry     uint `json:"retry,omitempty" yaml:"retry,omitempty"`
 }
 
 // WithVariables sets variables for current testcase.

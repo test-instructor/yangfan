@@ -3,9 +3,11 @@ package hrp
 import (
 	"crypto/tls"
 	_ "embed"
+	"encoding/json"
 	"net"
 	"net/http"
 	"net/http/cookiejar"
+	"net/textproto"
 	"net/url"
 	"path/filepath"
 	"strings"
@@ -17,6 +19,7 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/model/interfacecase/hrp"
 	"go.uber.org/zap"
 	"golang.org/x/net/http2"
 
@@ -518,13 +521,20 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 			r.sessionVariables[k] = v
 		}
 
-		//var StepResults hrp.StepResultStruct
-		//stepResultStr, _ := json.Marshal(stepResult)
-		//json.Unmarshal(stepResultStr, &StepResults)
-		//for _, v := range step.Struct().ExportHeader {
-		//	headerKey := textproto.CanonicalMIMEHeaderKey(v)
-		//	r.caseRunner.testCase.Config.Headers[headerKey] = StepResults.Data.ReqResps.Request.Headers[headerKey]
-		//}
+		var StepResults hrp.StepResultStruct
+		stepResultStr, _ := json.Marshal(stepResult)
+		json.Unmarshal(stepResultStr, &StepResults)
+		for _, v := range step.Struct().ExportHeader {
+			headerKey := textproto.CanonicalMIMEHeaderKey(v)
+			if r.caseRunner.testCase.Config.Headers == nil {
+				r.caseRunner.testCase.Config.Headers = make(map[string]string)
+			}
+			if r.caseRunner.parsedConfig.Headers == nil {
+				r.caseRunner.parsedConfig.Headers = make(map[string]string)
+			}
+			r.caseRunner.testCase.Config.Headers[headerKey] = StepResults.Data.ReqResps.Request.Headers[headerKey]
+			r.caseRunner.parsedConfig.Headers[headerKey] = StepResults.Data.ReqResps.Request.Headers[headerKey]
+		}
 		//for _, v := range step.Struct().ExportParameter {
 		//	r.caseRunner.testCase.Config.Variables[v] = StepResults.ExportVars[v]
 		//}
