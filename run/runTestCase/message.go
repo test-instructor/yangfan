@@ -272,7 +272,7 @@ func (n NotifierDefault) generateTableContent(data []Content) (tableContent stri
 	for _, row := range data {
 		tableContent += "<tr>"
 		tableContent += fmt.Sprintf("<td>%s</td>", row.Name)
-		tableContent += fmt.Sprintf("<td>%d</td>", row.Total)
+		tableContent += fmt.Sprintf("<td>%d</td>", row.Success)
 		tableContent += fmt.Sprintf("<td>%d</td>", row.Fail)
 		tableContent += fmt.Sprintf("<td>%d秒</td>", row.Time)
 		tableContent += "</tr>"
