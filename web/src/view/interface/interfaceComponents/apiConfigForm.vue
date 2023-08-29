@@ -29,7 +29,7 @@
             placeholder=""
             size="small"
             :min="0"
-            :max="30"
+            :max="50"
           >
           </el-input-number>
         </el-form-item>

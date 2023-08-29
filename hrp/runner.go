@@ -28,6 +28,8 @@ import (
 	"github.com/test-instructor/yangfan/hrp/pkg/uixt"
 )
 
+var retrySleepTimer = 3 * time.Second
+
 // Run starts to run API test with default configs.
 func Run(testcases ...ITestCase) error {
 	t := &testing.T{}
@@ -515,6 +517,7 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 				break
 			}
 			retryNum++
+			time.Sleep(retrySleepTimer)
 		}
 		stepResult.Name = stepName
 		stepResult.Retry = retryNum
