@@ -78,7 +78,7 @@
           </headers>
         </el-tab-pane>
 
-        <el-tab-pane label="Variables" name="Variables">
+        <el-tab-pane label="变量" name="Variables">
           <variables
             :heights="heightDiv"
             @requestVariablesData="variablesVariables"

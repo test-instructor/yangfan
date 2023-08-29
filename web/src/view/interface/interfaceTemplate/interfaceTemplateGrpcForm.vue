@@ -122,7 +122,7 @@
           </div>
         </el-tab-pane>
 
-        <el-tab-pane label="Extract" name="Extract">
+        <el-tab-pane label="参数提取" name="Extract">
           <extract
             @requestExtractData="requestExtract"
             @exportParameter="handleExportParameter"
@@ -133,7 +133,7 @@
           </extract>
         </el-tab-pane>
 
-        <el-tab-pane label="Validate" name="Validate">
+        <el-tab-pane label="断言" name="Validate">
           <validate
             @requestValidateData="requestValidateDate"
             @validates="handleValidate"
@@ -143,7 +143,7 @@
           </validate>
         </el-tab-pane>
 
-        <el-tab-pane label="Variables" name="Variables">
+        <el-tab-pane label="变量" name="Variables">
           <variables
             :heights="heightDiv"
             @requestVariablesData="requestVariables"
