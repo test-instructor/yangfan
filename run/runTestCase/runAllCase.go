@@ -4,6 +4,7 @@ import (
 	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/model/common/request"
 	"github.com/test-instructor/yangfan/server/model/interfacecase"
+	"go.uber.org/zap"
 )
 
 type ToTestCase struct {
@@ -46,6 +47,11 @@ func RunBoomer(runCaseReq request.RunCaseReq, runType interfacecase.RunType) (re
 }
 
 func RunTimerTask(runCaseReq request.RunCaseReq, runType interfacecase.RunType) (reports *interfacecase.ApiReport, err error) {
+	defer func() {
+		if msg := recover(); msg != nil {
+			global.GVA_LOG.Error("测试用例运行时报错：", zap.Any("运行任务标签时出现异常", msg))
+		}
+	}()
 	api := NewRunTask(runCaseReq, runType, nil)
 	report, err := RunTestCase(api)
 	return report, nil
