@@ -94,6 +94,7 @@ type TStep struct {
 	ParntID          uint                   `json:"parntID"`
 	ExportHeader     []string               `json:"export_header"`
 	ExportParameter  []string               `json:"export_parameter"`
+	Retry            uint                   `json:"retry,omitempty" yaml:"retry,omitempty"`
 }
 
 // IStep represents interface for all types for teststeps, includes:

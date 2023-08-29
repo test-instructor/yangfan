@@ -502,9 +502,22 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 		global.GVA_LOG.Info("run step start", zap.String("step", stepName), zap.String("type", string(step.Type())))
 
 		// run step
-		stepResult, err := step.Run(r)
+		// 失败重试
+		var retry = r.caseRunner.parsedConfig.Retry
+		var retryNum uint = 0
+		if step.Struct().Retry > 0 {
+			retry = step.Struct().Retry
+		}
+		var stepResult *StepResult
+		for retryNum <= retry {
+			stepResult, _ = step.Run(r)
+			if stepResult.Success || retryNum >= retry {
+				break
+			}
+			retryNum++
+		}
 		stepResult.Name = stepName
-
+		stepResult.Retry = retryNum
 		// update summary
 		r.summary.Records = append(r.summary.Records, stepResult)
 		r.summary.Stat.Total += 1

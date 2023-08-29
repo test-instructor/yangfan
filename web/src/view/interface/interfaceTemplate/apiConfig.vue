@@ -73,10 +73,12 @@
           prop="setup_case.name"
           width="240"
         />
-        <!--        <el-table-column align="left" label="默认配置" prop="default" width="120">-->
-        <!--          <template #default="scope">-->
-        <!--            <el-tag :type="scope.row.default ? 'success' : 'info'" effect="dark">{{ formatBoolean(scope.row.default) }}</el-tag></template>-->
-        <!--        </el-table-column>-->
+        <el-table-column
+          align="left"
+          label="重试次数"
+          prop="retry"
+          width="120"
+        />
         <el-table-column align="left" label="按钮组">
           <template #default="scope">
             <el-button

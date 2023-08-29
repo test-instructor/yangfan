@@ -2,21 +2,37 @@
   <div>
     <div style="display: flex">
       <div>
-        <span>前置步骤: </span>
-        <el-select
-          v-model="reqData.setup_case_id"
-          class="m-2"
-          placeholder="请选择前置用例"
-          size="large"
-          clearable
-        >
-          <el-option
-            v-for="item in CaseOptions"
-            :label="item.name"
-            :value="item.ID"
-            :key="item.ID"
-          />
-        </el-select>
+        <el-form-item label="前置步骤：">
+          <el-select
+            v-model="reqData.setup_case_id"
+            class="m-2"
+            placeholder="请选择前置用例"
+            size="small"
+            clearable
+          >
+            <el-option
+              v-for="item in CaseOptions"
+              :label="item.name"
+              :value="item.ID"
+              :key="item.ID"
+            />
+          </el-select>
+        </el-form-item>
+      </div>
+
+      <div
+        style="width: 200px; margin-top: 5px; display: flex; margin-left: 20px"
+      >
+        <el-form-item label="重试次数：">
+          <el-input-number
+            v-model="reqData.retry"
+            placeholder=""
+            size="small"
+            :min="0"
+            :max="30"
+          >
+          </el-input-number>
+        </el-form-item>
       </div>
       <div
         style="width: 150px; margin-top: 5px; display: table; margin-left: 20px"
@@ -196,6 +212,7 @@ let reqData = reactive({
   default: false,
   setup_hooks: [],
   teardown_hooks: [],
+  retry: 0,
 });
 
 init();

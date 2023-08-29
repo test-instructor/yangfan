@@ -121,6 +121,7 @@ type ApiReportDetailsRecordsData struct {
 	ExportVars                datatypes.JSON                       `json:"export_vars,omitempty"`
 	ContentSize               int                                  `json:"content_size,omitempty"`
 	ApiReportDetailsRecordsID uint                                 `json:"-"`
+	Retry                     uint                                 `json:"retry,omitempty" yaml:"retry,omitempty"`
 }
 
 type ApiReportDetailsRecordsDataHttpstat struct {

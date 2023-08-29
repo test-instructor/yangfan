@@ -199,6 +199,9 @@
 
       <div style="margin: 20px; overflow: auto; padding-right: 10px">
         <div class="tableDetail">
+          <el-form-item label="重试次数:" v-if="isRetry"
+            ><el-tag>{{ retry }}</el-tag></el-form-item
+          >
           <div>
             <el-button type="info" @click="requestFunc">
               {{ requestTable ? "收起" : "展开" }} Request 详情
@@ -463,6 +466,8 @@ const currentIndex = ref(0);
 
 const drawer = ref(false);
 const activeRow = ref({});
+const retry = ref(0);
+const isRetry = ref(false);
 let requestTimeOption;
 requestTimeOption = {
   tooltip: {
@@ -639,6 +644,10 @@ const openDrawer = async (row) => {
       validators: row.data.validators,
       exportVars: export_vars,
     };
+    retry.value = row.retry;
+    isRetry.value = row.retry > 0;
+    console.log("retry", retry.value, isRetry.value, row.data.retry);
+    console.log("row.data", row.data);
     let series = [];
     if (requestTimeShow.value) {
       series = [

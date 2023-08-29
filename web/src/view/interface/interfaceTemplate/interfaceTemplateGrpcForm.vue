@@ -1,7 +1,19 @@
 <template>
   <div>
     <div>
-      <user-config />
+      <div style="display: flex">
+        <el-form-item label="重试次数：">
+          <el-input-number
+            v-model="formLabelAlign.retry"
+            placeholder=""
+            size="small"
+            :min="0"
+            :max="30"
+          >
+          </el-input-number>
+        </el-form-item>
+        <user-config />
+      </div>
     </div>
     <div style="width: 800px">
       <el-input v-model="formLabelAlign.name" placeholder="请输入接口名称">
@@ -299,6 +311,7 @@ const formLabelAlign = reactive({
   body: "",
   timeout: 0,
   detail: {},
+  retry: 0,
 });
 
 const formGrpc = ref({
@@ -498,6 +511,7 @@ let reqData = reactive({
   ID: 0,
   name: "",
   type: 0,
+  retry: 0,
   export_header: [],
   export_parameter: [],
   gRPC: reactive({
@@ -525,6 +539,7 @@ if (eventType.value === "update") {
   formLabelAlign.url = reqData.gRPC.url;
   formLabelAlign.name = reqData.name;
   formLabelAlign.timeout = reqData.gRPC.timeout;
+  formLabelAlign.retry = reqData.retry;
   if (reqData.gRPC.detail) {
     formGrpc.value = reqData.gRPC.detail;
   }
@@ -628,6 +643,7 @@ const setReqData = () => {
   params.menu = window.localStorage.getItem("menu");
   reqData.export_header = export_header;
   reqData.export_parameter = export_parameter;
+  reqData.retry = formLabelAlign.retry;
 };
 
 const saves = () => {

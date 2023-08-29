@@ -1,6 +1,16 @@
 <template>
   <div>
-    <div>
+    <div style="display: flex">
+      <el-form-item label="重试次数：">
+        <el-input-number
+          v-model="formLabelAlign.retry"
+          placeholder=""
+          size="small"
+          :min="0"
+          :max="30"
+        >
+        </el-input-number>
+      </el-form-item>
       <user-config />
     </div>
     <div style="width: 800px">
@@ -177,6 +187,7 @@ const props = defineProps({
     validate: "",
     hooks: "",
     apiMenuID: "",
+    retry: 0,
   }),
 });
 
@@ -199,6 +210,7 @@ const formLabelAlign = reactive({
   http2: false,
   allow_redirects: false,
   verify: false,
+  retry: 0,
 });
 // eslint-disable-next-line no-unused-vars
 // const httpOptions = await getDict('method')
@@ -247,6 +259,7 @@ let reqData = reactive({
   ID: 0,
   name: "",
   type: 0,
+  retry: 0,
   export_header: [],
   export_parameter: [],
   request: reactive({
@@ -285,6 +298,7 @@ if (eventType.value === "update") {
   formLabelAlign.verify = reqData.request.verify;
   formLabelAlign.allow_redirects = reqData.request.allow_redirects;
   formLabelAlign.http2 = reqData.request.http2;
+  formLabelAlign.retry = reqData.retry;
 }
 
 const closeDialog = () => {
@@ -400,6 +414,7 @@ const setReqData = () => {
   params.menu = window.localStorage.getItem("menu");
   reqData.export_header = export_header;
   reqData.export_parameter = export_parameter;
+  reqData.retry = formLabelAlign.retry;
 };
 
 const saves = () => {
