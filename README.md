@@ -9,7 +9,7 @@
 - [测试平台接入HttpRunner V4](https://www.yuque.com/docs/share/bb392180-8ea9-46a0-a27b-bb4fbec3450e?#)
 # 支持功能
 - [x] 用户管理
-- [x] 项目管理
+- [x] 项目管理，用户在项目的权限、CI密钥设置
 - [x] 环境管理
 - [x] 接口管理
 - [x] 测试用例管理
@@ -19,17 +19,19 @@
 - [x] 定时任务并发执行，定时任务可以根据用户设置并发数，节省等待时间
 - [x] 生成测试报告
 - [x] 网络性能采集：在场景化接口测试的基础上，可额外采集网络链路性能指标（DNS 解析、TCP 连接、SSL 握手、网络传输等）
-- [x] 数据驱动`parameterize`
 - [x] python 函数驱动
 - [X] 安装python第三方库，服务器第一次启动时默认安装所有第三方库
+- [x] 已支持协议：`HTTP/2`、`Grpc`
+- [x] 支持用例导入，`json`、`postman`、`swagger`等
+- [x] 性能测试，支持多机负载测试，通过k8s部署可以实现动态扩缩容
+- [x] 多种部署方式，docker构建和远程镜像库、一键部署脚本、k8s部署
+- [x] 测试报告通知，目前支持飞书、钉钉和企业微信的消息通知
+- [x] CI执行
 - [ ] 支持sql操作
 - [ ] 可视化数据报表
 - [ ] 数据驱动`parameterize`,页面操作
 - [ ] go 函数驱动
 - [ ] 支持更多协议，`WebSocket`、`TCP`、`RPC`等
-- [x] 已支持协议：`HTTP/2`、`Grpc`
-- [x] 支持用例导入，`json`、`postman`、`swagger`等
-- [x] 性能测试
 - [ ] web UI 自动化测试
 
 # 在线demo
@@ -44,11 +46,41 @@
 
 # 项目概况
 
+登录页面
+
 ![login.png](docs/img/login.png)
-![config](docs/img/config.png)
-![api](docs/img/api.png)
-![step](docs/img/step.png)
-![case](docs/img/case.png)
-![timer](docs/img/timer.png)
-![report](docs/img/report.png)
-![reportDetail](docs/img/reportDetail.png)
+环境变量
+
+![image-20230829174440747](http://qiniu.yangfan.gd.cn/markdown/image-20230829174440747.png)
+
+配置管理
+
+![image-20230829174458214](http://qiniu.yangfan.gd.cn/markdown/image-20230829174458214.png)
+
+消息通知
+
+![image-20230829174516343](http://qiniu.yangfan.gd.cn/markdown/image-20230829174516343.png)
+
+接口管理
+
+![image-20230829174531185](http://qiniu.yangfan.gd.cn/markdown/image-20230829174531185.png)
+
+测试步骤
+
+![image-20230829174557399](http://qiniu.yangfan.gd.cn/markdown/image-20230829174557399.png)
+
+定时任务
+
+![image-20230829174610942](http://qiniu.yangfan.gd.cn/markdown/image-20230829174610942.png)
+
+测试报告
+
+![image-20230829174720649](http://qiniu.yangfan.gd.cn/markdown/image-20230829174720649.png)
+
+测试报告详情
+
+![image-20230829174738189](http://qiniu.yangfan.gd.cn/markdown/image-20230829174738189.png)
+
+性能测试报告
+
+![image-20230829174902698](http://qiniu.yangfan.gd.cn/markdown/image-20230829174902698.png)
