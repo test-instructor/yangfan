@@ -21,12 +21,6 @@ func (r *ReportOperation) CreateReport() {
 	global.GVA_DB.Create(&r.report)
 }
 
-type Stat struct {
-	Total     int `json:"total"`
-	Failures  int `json:"failures"`
-	Successes int `json:"successes"`
-}
-
 func resetReport(reports *interfacecase.ApiReport) {
 
 	//修正测试报告
@@ -35,34 +29,50 @@ func resetReport(reports *interfacecase.ApiReport) {
 	testcaseStatus := true
 	for k, v := range reports.Details {
 		var statStep hrp.TestStepStat
-		stepStatus := true
+		var stepStatus bool
 		for _, v2 := range v.Records {
 			apiSuccess := 0
 			apiFail := 0
+			apiError := 0
+			apiSkip := 0
 			for _, v2 := range v2.Data {
 				if v2.Success == true {
-					apiSuccess++
+					if v2.Skip {
+						apiSkip++
+					} else {
+						apiSuccess++
+					}
+					stepStatus = true
 				} else {
-					apiFail++
+					if v2.Attachment != "" {
+						apiError++
+					} else {
+						apiFail++
+					}
 					stepStatus = false
 				}
 			}
 			statStep.Successes += apiSuccess
 			statStep.Failures += apiFail
-			statStep.Total = apiSuccess + apiFail
+			statStep.Error += apiError
+			statStep.Skip += apiSkip
+			statStep.Total = apiSuccess + apiFail + apiError + apiSkip
 		}
 		statString, _ := json.Marshal(statStep)
 		reports.Details[k].Success = stepStatus
 		reports.Details[k].Stat = statString
-		if stepStatus == true {
+		if stepStatus {
 			statTestcases.Success++
 		} else {
 			statTestcases.Fail++
 			testcaseStatus = false
 		}
+
 		statTeststeps.Successes += statStep.Successes
 		statTeststeps.Failures += statStep.Failures
-		statTeststeps.Total = statTeststeps.Successes + statTeststeps.Failures
+		statTeststeps.Error += statStep.Error
+		statTeststeps.Skip += statStep.Skip
+		statTeststeps.Total = statStep.Successes + statStep.Failures + statStep.Error + statStep.Skip
 		statTestcases.Total = statTestcases.Success + statTestcases.Fail
 	}
 	*reports.Success = testcaseStatus

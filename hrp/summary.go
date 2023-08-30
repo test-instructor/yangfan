@@ -131,6 +131,8 @@ type TestStepStat struct {
 	Total     int `json:"total" yaml:"total"`
 	Successes int `json:"successes" yaml:"successes"`
 	Failures  int `json:"failures" yaml:"failures"`
+	Error     int `json:"error"`
+	Skip      int `json:"skip"`
 }
 
 type TestCaseTime struct {
@@ -175,6 +177,7 @@ type SessionData struct {
 	ReqResps   *ReqResps           `json:"req_resps" yaml:"req_resps"`
 	Address    *Address            `json:"address,omitempty" yaml:"address,omitempty"` // TODO
 	Validators []*ValidationResult `json:"validators,omitempty" yaml:"validators,omitempty"`
+	Skip       bool                `json:"skip" yaml:"skip"`
 }
 
 type ReqResps struct {

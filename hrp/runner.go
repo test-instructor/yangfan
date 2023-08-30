@@ -519,6 +519,9 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 			retryNum++
 			time.Sleep(retrySleepTimer)
 		}
+		if stepResult.Skip {
+
+		}
 		stepResult.Name = stepName
 		stepResult.Retry = retryNum
 		// update summary

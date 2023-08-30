@@ -434,7 +434,7 @@ const setReqData = () => {
   reqData.export_header = export_header;
   reqData.export_parameter = export_parameter;
   reqData.retry = formLabelAlign.retry;
-  reqData.skip = resetSkip(requestSkipData);
+  reqData.skip = requestSkipData;
 };
 
 const resetSkip = (requestSkipData) => {

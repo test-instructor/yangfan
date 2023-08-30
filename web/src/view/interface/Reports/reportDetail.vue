@@ -23,13 +23,16 @@
                   </el-table-column>
                   <el-table-column title="name" align="center" width="100">
                     <template #default="scope">
-                      <el-tag
-                        v-if="scope.row.str === 'fail'"
-                        type="danger"
-                        :effect="scope.row.name === 0 ? '' : 'dark'"
-                        >{{ scope.row.name }}</el-tag
-                      >
+                      <el-tag v-if="scope.row.str === 'fail'" type="warning">{{
+                        scope.row.name
+                      }}</el-tag>
                       <el-tag v-if="scope.row.str === 'success'" type="success">
+                        {{ scope.row.name }}
+                      </el-tag>
+                      <el-tag v-if="scope.row.str === 'error'" type="danger">
+                        {{ scope.row.name }}
+                      </el-tag>
+                      <el-tag v-if="scope.row.str === 'skip'" type="info">
                         {{ scope.row.name }}
                       </el-tag>
                       <el-tag v-if="scope.row.str === 'total'">
@@ -62,7 +65,7 @@
             >
           </template>
         </el-table-column>
-        <el-table-column property="name" label="用例名称" width="390">
+        <el-table-column property="name" label="用例名称" width="350">
           <template #default="scope">
             <el-tag type="danger" v-if="setupCaseShow(scope.row)">{{
               "前置步骤"
@@ -82,13 +85,23 @@
         </el-table-column>
         <el-table-column
           property="stat.successes"
-          label="成功用例"
-          width="100"
+          label="成功"
+          width="60"
         ></el-table-column>
         <el-table-column
           property="stat.failures"
-          label="失败用例"
-          width="100"
+          label="失败"
+          width="60"
+        ></el-table-column>
+        <el-table-column
+          property="stat.error"
+          label="错误"
+          width="60"
+        ></el-table-column>
+        <el-table-column
+          property="stat.skip"
+          label="跳过"
+          width="60"
         ></el-table-column>
         <el-table-column width="79">
           <template #default="scope">
@@ -138,9 +151,9 @@
                     <el-table-column width="70">
                       <template #default="scope">
                         <el-tag
-                          :type="scope.row.success ? 'success' : 'danger'"
+                          :type="shouStatus(scope.row)[0]"
                           effect="dark"
-                          >{{ scope.row.success ? "成功" : "失败" }}</el-tag
+                          >{{ shouStatus(scope.row)[1] }}</el-tag
                         >
                       </template>
                     </el-table-column>
@@ -246,7 +259,7 @@
           </el-table>
         </div>
 
-        <div class="tableDetail">
+        <div class="tableDetail" v-if="responseShow">
           <div>
             <el-button type="info" @click="responseFunc">
               {{ responseTable ? "收起" : "展开" }} Response 详情
@@ -322,7 +335,10 @@
           </el-table>
         </div>
 
-        <div v-if="activeRow.exportVars.length > 0" class="tableDetail">
+        <div
+          v-if="activeRow.exportVars && activeRow.exportVars.length > 0"
+          class="tableDetail"
+        >
           <div>
             <el-button type="info" @click="exportFunc">
               {{ exportTable ? "收起" : "展开" }} 提取参数详情
@@ -499,6 +515,7 @@ requestTimeOption = {
 };
 const tableDatas = ref();
 const requestTimeShow = ref(false);
+const responseShow = ref(false);
 const tableKeyToValue = (data) => {
   let tableData = [];
   for (let k in data) {
@@ -567,7 +584,14 @@ const openDrawer = async (row) => {
   }
   console.log("row:::", row);
   if (row.data) {
-    requestTimeShow.value = row.data.req_resps.response.proto !== "gRPC";
+    requestTimeShow.value = false;
+    responseShow.value = false;
+    if (row.data.req_resps.response != null) {
+      responseShow.value = true;
+      requestTimeShow.value = row.data.req_resps.response.proto !== "gRPC";
+    }
+    console.log("=============responseShow.value", responseShow.value);
+    console.log("=============requestTimeShow.value", requestTimeShow.value);
     drawer.value = true;
     validatorsTable.value = true;
     responseTable.value = true;
@@ -610,32 +634,34 @@ const openDrawer = async (row) => {
           isTable: true,
         });
       }
-      responseData.push({
-        key: "status_code",
-        value: row.data.req_resps.response.status_code,
-      });
-      if (row.data.req_resps.response.err) {
+      if (responseShow.value) {
         responseData.push({
-          key: "err",
-          value: row.data.req_resps.response.err,
+          key: "status_code",
+          value: row.data.req_resps.response.status_code,
         });
-      }
-      responseData.push({
-        key: "body",
-        value: row.data.req_resps.response.body,
-      });
-      if (row.data.req_resps.response.cookies) {
+        if (row.data.req_resps.response.err) {
+          responseData.push({
+            key: "err",
+            value: row.data.req_resps.response.err,
+          });
+        }
         responseData.push({
-          key: "cookies",
-          value: row.data.req_resps.response.cookies,
+          key: "body",
+          value: row.data.req_resps.response.body,
+        });
+        if (row.data.req_resps.response.cookies) {
+          responseData.push({
+            key: "cookies",
+            value: row.data.req_resps.response.cookies,
+            isTable: true,
+          });
+        }
+        responseData.push({
+          key: "headers",
+          value: row.data.req_resps.response.headers,
           isTable: true,
         });
       }
-      responseData.push({
-        key: "headers",
-        value: row.data.req_resps.response.headers,
-        isTable: true,
-      });
     }
     let export_vars = tableKeyToValue(row.export_vars);
     activeRow.value = {
@@ -644,6 +670,7 @@ const openDrawer = async (row) => {
       validators: row.data.validators,
       exportVars: export_vars,
     };
+    console.log("row.data.req_resps", row.data.req_resps);
     retry.value = row.retry;
     isRetry.value = row.retry > 0;
     console.log("retry", retry.value, isRetry.value, row.data.retry);
@@ -763,6 +790,20 @@ const getTestCaseDetailFunc = async (testCaseID) => {
   getTestCaseDetailData();
 };
 
+const shouStatus = (row) => {
+  console.log("row.skip", row);
+  if (row.success) {
+    if (row.skip) {
+      return ["info", "跳过"];
+    }
+    return ["success", "成功"];
+  }
+  if (row.attachments && row.attachments != "") {
+    return ["danger", "错误"];
+  }
+  return ["warning", "失败"];
+};
+
 const getTestCaseDetailData = async () => {
   for (var i = 0; i < reportData.value.details.length; i++) {
     for (var j = 0; j < reportData.value.details[i].records.length; j++) {
@@ -843,7 +884,9 @@ const initData = async () => {
   ];
   testStepsData.value = [
     { value: reportData.value.stat.teststeps["successes"], name: "成功" },
+    { value: reportData.value.stat.teststeps["error"], name: "错误" },
     { value: reportData.value.stat.teststeps["failures"], name: "失败" },
+    { value: reportData.value.stat.teststeps["skip"], name: "跳过" },
   ];
   const tesecase = ref([]);
   const apicase = ref([]);
@@ -868,6 +911,18 @@ const initData = async () => {
     name: reportData.value.stat.teststeps["failures"],
     key: "stepTotal",
     str: "fail",
+  });
+  apicase.value.push({
+    label: "错误接口数",
+    name: reportData.value.stat.teststeps["error"],
+    key: "stepTotal",
+    str: "error",
+  });
+  apicase.value.push({
+    label: "错误接口数",
+    name: reportData.value.stat.teststeps["skip"],
+    key: "stepTotal",
+    str: "skip",
   });
 
   tesecase.value.push({
@@ -928,15 +983,16 @@ pieOption = {
   title: {
     text: "用例运行情况",
     left: "8%",
+    top: "0%",
   },
   tooltip: {
     trigger: "item",
   },
   legend: {
-    top: "0%",
+    top: "8%",
     right: "8%",
   },
-  color: ["#91cc75", "#ee6666", "yellow", "blue", "purple"],
+  color: ["#67C23A", "#F56C6C", "#E6A23C", "#909399", "purple"],
   series: [
     {
       name: "用例运行情况",
@@ -966,17 +1022,16 @@ let testStepChart = null;
 currentInstance = getCurrentInstance();
 onMounted(async () => {
   pieOption.series[0].data = testCasesData.value;
-  pieOption.series[0].name = "用例运行情况";
+  pieOption.series[0].name = "用例";
   const testCaseDom = document.getElementById("testcases");
   testCaseChart = echarts.init(testCaseDom, null, {
     renderer: "canvas",
     useDirtyRect: false,
   });
   testCaseChart.setOption(pieOption);
-
   pieOption.series[0].data = testStepsData.value;
   pieOption.series[0].name = "接口运行情况";
-  pieOption.title.text = "接口运行情况";
+  pieOption.title.text = "用例运行情况";
   const testStepDom = document.getElementById("testSteps");
   testStepChart = echarts.init(testStepDom, null, {
     renderer: "canvas",
@@ -989,12 +1044,14 @@ watch(testStepsData, () => {
   pieOption.series[0].data = testCasesData.value;
   pieOption.series[0].name = "用例运行情况";
   testCaseChart.setOption(pieOption);
+  pieOption.title.text = "接口接口运行情况";
   pieOption.series = [
     {
       data: testStepsData.value,
       name: "接口运行情况",
     },
   ];
+  console.log("testStepsData.value", testStepsData.value);
   testStepChart.setOption(pieOption);
 });
 

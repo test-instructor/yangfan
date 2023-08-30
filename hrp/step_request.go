@@ -410,29 +410,27 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 	if step.Request.Timeout != 0 {
 		client.Timeout = time.Duration(step.Request.Timeout*1000) * time.Millisecond
 	}
-
-	skipObj, err := newSkipObject(r.caseRunner.hrpRunner.t, parser)
-	if err != nil {
-		err = errors.Wrap(err, "init skip error")
-	}
-	err = skipObj.Validate(step.Skip, stepVariables)
-	start := time.Now()
-	var resp *http.Response
 	var skip bool
-	if err != nil {
-		resp, err = client.Do(rb.req)
+	if step.Skip != nil {
+		skipObj, err := newSkipObject(r.caseRunner.hrpRunner.t, parser)
+		if err != nil {
+			err = errors.Wrap(err, "init skip error")
+		}
+		err = skipObj.Validate(step.Skip, stepVariables)
+		if err == nil {
+			skip = true
+		}
+	}
+	if !skip {
+		start := time.Now()
+		// do request action
+		resp, err := client.Do(rb.req)
 		if err != nil {
 			return stepResult, errors.Wrap(err, "do request failed")
 		}
 		if resp != nil {
 			defer resp.Body.Close()
 		}
-	} else {
-		skip = true
-	}
-	// do request action
-
-	if !skip {
 		// decode response body in br/gzip/deflate formats
 		err = decodeResponseBody(resp)
 		if err != nil {
@@ -466,7 +464,6 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 		// add response object to step variables, could be used in teardown hooks
 		stepVariables["hrp_step_response"] = respObj.respObjMeta
 		stepVariables["response"] = respObj.respObjMeta
-		stepResult.Skip = skip
 
 		// deal with teardown hooks
 		for _, teardownHook := range step.TeardownHooks {
@@ -501,7 +498,20 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 		}
 		stepResult.ContentSize = resp.ContentLength
 		stepResult.Data = sessionData
+	} else {
+		sessionData.ReqResps.Request = rb.requestMap
+		sessionData.Success = true
+		stepResult.Success = true
+		sessionData.Skip = true
+		stepResult.Data = sessionData
+		stepResult.Skip = true
 	}
+	defer func() {
+		if sessionData.ReqResps.Request == nil {
+			sessionData.ReqResps.Request = rb.requestMap
+			stepResult.Data = sessionData
+		}
+	}()
 
 	return stepResult, err
 }

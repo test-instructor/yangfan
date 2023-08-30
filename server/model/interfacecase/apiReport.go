@@ -77,6 +77,8 @@ type ApiReportStatTeststeps struct {
 	Total     int `json:"total"`
 	Successes int `json:"successes"`
 	Failures  int `json:"failures"`
+	Error     int `json:"error"`
+	Skip      int `json:"skip"`
 }
 
 type ApiReportDetails struct {
@@ -122,6 +124,7 @@ type ApiReportDetailsRecordsData struct {
 	ContentSize               int                                  `json:"content_size,omitempty"`
 	ApiReportDetailsRecordsID uint                                 `json:"-"`
 	Retry                     uint                                 `json:"retry,omitempty" yaml:"retry,omitempty"`
+	Skip                      bool                                 `json:"skip" yaml:"skip"`
 }
 
 type ApiReportDetailsRecordsDataHttpstat struct {
