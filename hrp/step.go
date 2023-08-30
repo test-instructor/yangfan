@@ -67,6 +67,7 @@ type StepResult struct {
 
 	Attachments interface{} `json:"attachments,omitempty" yaml:"attachments,omitempty"` // store extra step information, such as error message or screenshots
 	Retry       uint        `json:"retry,omitempty" yaml:"retry,omitempty"`
+	Skip        bool        `json:"skip" yaml:"skip"`
 }
 
 // TStep represents teststep data structure.
@@ -95,6 +96,7 @@ type TStep struct {
 	ExportHeader     []string               `json:"export_header"`
 	ExportParameter  []string               `json:"export_parameter"`
 	Retry            uint                   `json:"retry,omitempty" yaml:"retry,omitempty"`
+	Skip             []interface{}          `json:"skip" yaml:"skip"`
 }
 
 // IStep represents interface for all types for teststeps, includes:

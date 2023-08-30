@@ -308,3 +308,148 @@ func validateUI(ud *uixt.DriverExt, iValidators []interface{}) (validateResults 
 	}
 	return validateResults, nil
 }
+
+func newSkipObject(t *testing.T, parser *Parser) (*skipObject, error) {
+	return &skipObject{
+		t:           t,
+		parser:      parser,
+		respObjMeta: nil,
+	}, nil
+}
+
+type skipObject struct {
+	t                 *testing.T
+	parser            *Parser
+	respObjMeta       interface{}
+	validationResults []*ValidationResult
+}
+
+func (v *skipObject) Validate(iValidators []interface{}, variablesMapping map[string]interface{}) (err error) {
+	for _, Validators := range iValidators {
+		iValidator := Validators.(map[string]interface{})
+		validator := Validator{
+			Check:   iValidator["check"].(string),
+			Assert:  iValidator["assert"].(string),
+			Message: iValidator["msg"].(string),
+			Expect:  iValidator["check"],
+		}
+		// parse check value
+		checkItem := validator.Check
+		checkValue := v.searchField(checkItem, variablesMapping)
+
+		// get assert method
+		assertMethod := validator.Assert
+		assertFunc, ok := builtin.Assertions[assertMethod]
+		if !ok {
+			return errors.New(fmt.Sprintf("unexpected assertMethod: %v", assertMethod))
+		}
+
+		// parse expected value
+		expectValue, err := v.parser.Parse(validator.Expect, variablesMapping)
+		if err != nil {
+			return err
+		}
+		validResult := &ValidationResult{
+			Validator: Validator{
+				Check:   validator.Check,
+				Expect:  expectValue,
+				Assert:  assertMethod,
+				Message: validator.Message,
+			},
+			CheckValue:  checkValue,
+			CheckResult: "fail",
+		}
+
+		// do assertion
+		result := assertFunc(v.t, checkValue, expectValue)
+		if result {
+			validResult.CheckResult = "pass"
+		}
+		v.validationResults = append(v.validationResults, validResult)
+		global.GVA_LOG.Info("[Validate] validate result",
+			zap.String("checkExpr", validator.Check),
+			zap.String("assertMethod", assertMethod),
+			zap.Any("expectValue", expectValue),
+			zap.Any("expectValueType", builtin.InterfaceType(expectValue)),
+			zap.Any("checkValue", checkValue),
+			zap.Any("checkValueType", builtin.InterfaceType(checkValue)),
+			zap.Bool("result", result),
+			zap.String("validate", checkItem),
+		)
+		if !result {
+			global.GVA_LOG.Error("[Validate] assert failed",
+				zap.String("checkExpr", validator.Check),
+				zap.String("assertMethod", assertMethod),
+				zap.Any("expectValue", expectValue),
+				zap.Any("expectValueType", builtin.InterfaceType(expectValue)),
+				zap.Any("checkValue", checkValue),
+				zap.Any("checkValueType", builtin.InterfaceType(checkValue)),
+				zap.Bool("result", result),
+				zap.String("validate", checkItem),
+			)
+			return errors.New("step validation failed")
+		}
+	}
+	return nil
+}
+
+func (v *skipObject) searchField(field string, variablesMapping map[string]interface{}) interface{} {
+	var result interface{} = field
+	if strings.Contains(field, "$") {
+		// parse reference variables in field before search
+		var err error
+		result, err = v.parser.Parse(field, variablesMapping)
+		if err != nil {
+			global.GVA_LOG.Error("[searchField] fail to parse field before search", zap.String("field", field), zap.Error(err))
+		}
+	}
+	// search field using jmespath or regex if parsed field is still string and contains specified fieldTags
+	if parsedField, ok := result.(string); ok && checkSearchField(parsedField) {
+		if strings.Contains(field, textExtractorSubRegexp) {
+			result = v.searchRegexp(parsedField)
+		} else {
+			result = v.searchJmespath(parsedField)
+		}
+	}
+	return result
+}
+
+func (v *skipObject) searchJmespath(expr string) interface{} {
+	checkValue, err := jmespath.Search(expr, v.respObjMeta)
+	if err != nil {
+		global.GVA_LOG.Error("[searchJmespath] search jmespath failed", zap.String("expr", expr), zap.Error(err))
+		return expr // jmespath not found, return the expression
+	}
+	if number, ok := checkValue.(builtinJSON.Number); ok {
+		checkNumber, err := parseJSONNumber(number)
+		if err != nil {
+			global.GVA_LOG.Error("[searchJmespath] convert json number failed", zap.String("expr", expr), zap.Error(err))
+		}
+		return checkNumber
+	}
+	return checkValue
+}
+
+func (v *skipObject) searchRegexp(expr string) interface{} {
+	respMap, ok := v.respObjMeta.(map[string]interface{})
+	if !ok {
+		global.GVA_LOG.Error("[searchRegexp] convert respObjMeta to map failed", zap.Any("resp", v.respObjMeta))
+		return expr
+	}
+	bodyStr, ok := respMap["body"].(string)
+	if !ok {
+		global.GVA_LOG.Error("[searchRegexp] convert body to string failed", zap.Any("resp", respMap))
+		return expr
+	}
+	regexpCompile, err := regexp.Compile(expr)
+	if err != nil {
+		global.GVA_LOG.Error("[searchRegexp] compile regexp failed", zap.String("expr", expr), zap.Error(err))
+		return expr
+	}
+	match := regexpCompile.FindStringSubmatch(bodyStr)
+	if len(match) > 1 {
+		return match[1] // return first matched result in parentheses
+	}
+	global.GVA_LOG.Error("[searchRegexp] search regexp failed", zap.String("expr", expr), zap.Any("match", match), zap.Any("resp", respMap))
+	return expr
+}

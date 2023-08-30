@@ -411,83 +411,97 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 		client.Timeout = time.Duration(step.Request.Timeout*1000) * time.Millisecond
 	}
 
-	// do request action
+	skipObj, err := newSkipObject(r.caseRunner.hrpRunner.t, parser)
+	if err != nil {
+		err = errors.Wrap(err, "init skip error")
+	}
+	err = skipObj.Validate(step.Skip, stepVariables)
 	start := time.Now()
-	resp, err := client.Do(rb.req)
+	var resp *http.Response
+	var skip bool
 	if err != nil {
-		return stepResult, errors.Wrap(err, "do request failed")
+		resp, err = client.Do(rb.req)
+		if err != nil {
+			return stepResult, errors.Wrap(err, "do request failed")
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
+	} else {
+		skip = true
 	}
-	if resp != nil {
+	// do request action
+
+	if !skip {
+		// decode response body in br/gzip/deflate formats
+		err = decodeResponseBody(resp)
+		if err != nil {
+			return stepResult, errors.Wrap(err, "decode response body failed")
+		}
 		defer resp.Body.Close()
-	}
 
-	// decode response body in br/gzip/deflate formats
-	err = decodeResponseBody(resp)
-	if err != nil {
-		return stepResult, errors.Wrap(err, "decode response body failed")
-	}
-	defer resp.Body.Close()
+		// log & print response
+		if r.caseRunner.hrpRunner.requestsLogOn {
+			if err := printResponse(resp); err != nil {
+				global.GVA_LOG.Error("printResponse err", zap.Any("err", err))
+				return stepResult, err
+			}
+		}
 
-	// log & print response
-	if r.caseRunner.hrpRunner.requestsLogOn {
-		if err := printResponse(resp); err != nil {
-			global.GVA_LOG.Error("printResponse err", zap.Any("err", err))
+		// new response object
+		respObj, err := newHttpResponseObject(r.caseRunner.hrpRunner.t, parser, resp)
+		if err != nil {
+			err = errors.Wrap(err, "init ResponseObject error")
 			return stepResult, err
 		}
-	}
 
-	// new response object
-	respObj, err := newHttpResponseObject(r.caseRunner.hrpRunner.t, parser, resp)
-	if err != nil {
-		err = errors.Wrap(err, "init ResponseObject error")
-		return
-	}
-
-	stepResult.Elapsed = time.Since(start).Milliseconds()
-	if r.caseRunner.hrpRunner.httpStatOn {
-		// resp.Body has been ReadAll
-		httpStat.Finish()
-		stepResult.HttpStat = httpStat.Durations()
-		httpStat.Print()
-	}
-
-	// add response object to step variables, could be used in teardown hooks
-	stepVariables["hrp_step_response"] = respObj.respObjMeta
-	stepVariables["response"] = respObj.respObjMeta
-
-	// deal with teardown hooks
-	for _, teardownHook := range step.TeardownHooks {
-		res, err := parser.Parse(teardownHook, stepVariables)
-		if err != nil {
-			continue
+		stepResult.Elapsed = time.Since(start).Milliseconds()
+		if r.caseRunner.hrpRunner.httpStatOn {
+			// resp.Body has been ReadAll
+			httpStat.Finish()
+			stepResult.HttpStat = httpStat.Durations()
+			httpStat.Print()
 		}
-		resMpa, ok := res.(map[string]interface{})
-		if ok {
-			stepVariables["response"] = resMpa
-			respObj.respObjMeta = resMpa
+
+		// add response object to step variables, could be used in teardown hooks
+		stepVariables["hrp_step_response"] = respObj.respObjMeta
+		stepVariables["response"] = respObj.respObjMeta
+		stepResult.Skip = skip
+
+		// deal with teardown hooks
+		for _, teardownHook := range step.TeardownHooks {
+			res, err := parser.Parse(teardownHook, stepVariables)
+			if err != nil {
+				continue
+			}
+			resMpa, ok := res.(map[string]interface{})
+			if ok {
+				stepVariables["response"] = resMpa
+				respObj.respObjMeta = resMpa
+			}
 		}
+
+		sessionData.ReqResps.Request = rb.requestMap
+		sessionData.ReqResps.Response = builtin.FormatResponse(respObj.respObjMeta)
+
+		// extract variables from response
+		extractors := step.Extract
+		extractMapping := respObj.Extract(extractors, stepVariables)
+		stepResult.ExportVars = extractMapping
+
+		// override step variables with extracted variables
+		stepVariables = mergeVariables(stepVariables, extractMapping)
+
+		// validate response
+		err = respObj.Validate(step.Validators, stepVariables)
+		sessionData.Validators = respObj.validationResults
+		if err == nil {
+			sessionData.Success = true
+			stepResult.Success = true
+		}
+		stepResult.ContentSize = resp.ContentLength
+		stepResult.Data = sessionData
 	}
-
-	sessionData.ReqResps.Request = rb.requestMap
-	sessionData.ReqResps.Response = builtin.FormatResponse(respObj.respObjMeta)
-
-	// extract variables from response
-	extractors := step.Extract
-	extractMapping := respObj.Extract(extractors, stepVariables)
-	stepResult.ExportVars = extractMapping
-
-	// override step variables with extracted variables
-	stepVariables = mergeVariables(stepVariables, extractMapping)
-
-	// validate response
-	err = respObj.Validate(step.Validators, stepVariables)
-	sessionData.Validators = respObj.validationResults
-	if err == nil {
-		sessionData.Success = true
-		stepResult.Success = true
-	}
-	stepResult.ContentSize = resp.ContentLength
-	stepResult.Data = sessionData
 
 	return stepResult, err
 }

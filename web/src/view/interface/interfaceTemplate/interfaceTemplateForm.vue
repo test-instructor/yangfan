@@ -434,7 +434,21 @@ const setReqData = () => {
   reqData.export_header = export_header;
   reqData.export_parameter = export_parameter;
   reqData.retry = formLabelAlign.retry;
-  reqData.skip = requestSkipData;
+  reqData.skip = resetSkip(requestSkipData);
+};
+
+const resetSkip = (requestSkipData) => {
+  let skipData = [];
+  requestSkipData.forEach((item, index, arr) => {
+    let skip = {
+      check: item.check,
+      assert: item.assert,
+      expect: item.expect,
+      msg: item.msg,
+    };
+    skipData.push(skip);
+  });
+  return skipData;
 };
 
 const saves = () => {
