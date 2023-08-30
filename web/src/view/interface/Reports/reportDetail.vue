@@ -582,8 +582,7 @@ const openDrawer = async (row) => {
       row = res.data.data;
     }
   }
-  console.log("row:::", row);
-  if (row.data) {
+  if (row.attachments === "") {
     requestTimeShow.value = false;
     responseShow.value = false;
     if (row.data.req_resps.response != null) {

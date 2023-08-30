@@ -305,6 +305,21 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 		// update testcase summary
 		if err != nil {
 			stepResult.Attachments = err.Error()
+			dataMap := make(map[string]interface{})
+			dataMap["skip"] = false
+			dataMap["success"] = false
+			dataMap["req_resps"] = struct {
+				Request interface{}
+			}{
+				Request: struct {
+					Url    interface{}
+					Method interface{}
+				}{
+					Url:    step.Request.URL,
+					Method: step.Request.Method,
+				},
+			}
+			stepResult.Data = dataMap
 		}
 	}()
 
