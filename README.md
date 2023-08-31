@@ -51,40 +51,40 @@
 ![login.png](docs/img/login.png)
 环境变量
 
-![image-20230829174440747](http://qiniu.yangfan.gd.cn/markdown/image-20230829174440747.png)
+![image-20230829174440747](docs/img/image-20230829174440747.png)
 
 配置管理
 
-![image-20230829174458214](http://qiniu.yangfan.gd.cn/markdown/image-20230829174458214.png)
+![image-20230829174458214](docs/img/image-20230829174458214.png)
 
 消息通知
 
-![image-20230829174516343](http://qiniu.yangfan.gd.cn/markdown/image-20230829174516343.png)
+![image-20230829174516343](docs/img/image-20230829174516343.png)
 
 接口管理
 
-![image-20230829174531185](http://qiniu.yangfan.gd.cn/markdown/image-20230829174531185.png)
+![image-20230829174531185](docs/img/image-20230829174531185.png)
 
 测试步骤
 
-![image-20230829174557399](http://qiniu.yangfan.gd.cn/markdown/image-20230829174557399.png)
+![image-20230829174557399](docs/img/image-20230829174557399.png)
 
 定时任务
 
-![image-20230829174610942](http://qiniu.yangfan.gd.cn/markdown/image-20230829174610942.png)
+![image-20230829174610942](docs/img/image-20230829174610942.png)
 
 测试报告
 
-![image-20230829174720649](http://qiniu.yangfan.gd.cn/markdown/image-20230829174720649.png)
+![image-20230829174720649](docs/img/image-20230829174720649.png)
 
 测试报告详情
 
-![image-20230830202631438](http://qiniu.yangfan.gd.cn/markdown/image-20230830202631438.png)
+![image-20230830202631438](docs/img/image-20230830202631438.png)
 
 测试报告详情
 
-![image-20230829174738189](http://qiniu.yangfan.gd.cn/markdown/image-20230829174738189.png)
+![image-20230829174738189](docs/img/image-20230829174738189.png)
 
 性能测试报告
 
-![image-20230829174902698](http://qiniu.yangfan.gd.cn/markdown/image-20230829174902698.png)
+![image-20230829174902698](docs/img/image-20230829174902698.png)
