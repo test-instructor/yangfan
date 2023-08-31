@@ -79,6 +79,10 @@
 
 测试报告详情
 
+![image-20230830202631438](http://qiniu.yangfan.gd.cn/markdown/image-20230830202631438.png)
+
+测试报告详情
+
 ![image-20230829174738189](http://qiniu.yangfan.gd.cn/markdown/image-20230829174738189.png)
 
 性能测试报告
