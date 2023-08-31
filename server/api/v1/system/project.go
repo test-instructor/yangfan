@@ -17,6 +17,7 @@ type ProjectApi struct {
 var projectService = service.ServiceGroupApp.SystemServiceGroup.ProjectService
 
 // CreateProject 创建Project
+//
 //	@Tags		Project
 //	@Summary	创建Project
 //	@Security	ApiKeyAuth
@@ -37,6 +38,7 @@ func (projectApi *ProjectApi) CreateProject(c *gin.Context) {
 }
 
 // DeleteProject 删除Project
+//
 //	@Tags		Project
 //	@Summary	删除Project
 //	@Security	ApiKeyAuth
@@ -57,6 +59,7 @@ func (projectApi *ProjectApi) DeleteProject(c *gin.Context) {
 }
 
 // DeleteProjectByIds 批量删除Project
+//
 //	@Tags		Project
 //	@Summary	批量删除Project
 //	@Security	ApiKeyAuth
@@ -77,6 +80,7 @@ func (projectApi *ProjectApi) DeleteProjectByIds(c *gin.Context) {
 }
 
 // UpdateProject 更新Project
+//
 //	@Tags		Project
 //	@Summary	更新Project
 //	@Security	ApiKeyAuth
@@ -130,9 +134,12 @@ func (projectApi *ProjectApi) FindKey(c *gin.Context) {
 }
 
 func (projectApi *ProjectApi) DeleteProjectAuth(c *gin.Context) {
-	var sua system.SysUserProject
-	_ = c.ShouldBindJSON(&sua)
-	if err := projectService.DeleteProjectAuth(sua); err != nil {
+	var sua map[string]uint
+	err := c.ShouldBindJSON(&sua)
+	if err != nil {
+		global.GVA_LOG.Error("出错了", zap.Error(err))
+	}
+	if err := projectService.DeleteProjectAuth(sua["sys_user_id"], sua["project_id"]); err != nil {
 		global.GVA_LOG.Error("修改失败!", zap.Error(err))
 		response.FailWithMessage("修改失败", c)
 	} else {
@@ -141,6 +148,7 @@ func (projectApi *ProjectApi) DeleteProjectAuth(c *gin.Context) {
 }
 
 // FindProject 用id查询Project
+//
 //	@Tags		Project
 //	@Summary	用id查询Project
 //	@Security	ApiKeyAuth
@@ -161,6 +169,7 @@ func (projectApi *ProjectApi) FindProject(c *gin.Context) {
 }
 
 // GetProjectList 分页获取Project列表
+//
 //	@Tags		Project
 //	@Summary	分页获取Project列表
 //	@Security	ApiKeyAuth

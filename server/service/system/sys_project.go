@@ -184,10 +184,10 @@ func (projectService *ProjectService) generateSecret() (string, string, error) {
 	return hex.EncodeToString(hash[:]), newUUID.String(), nil
 }
 
-func (projectService *ProjectService) DeleteProjectAuth(sup system.SysUserProject) (err error) {
+func (projectService *ProjectService) DeleteProjectAuth(uid uint, pid uint) (err error) {
 	err = global.GVA_DB.Model(&system.SysUserProject{}).
-		Where("sys_user_id = ? AND project_id = ?", sup.SysUserID, sup.ProjectID).
-		Delete(&sup).Error
+		Where("sys_user_id = ? AND project_id = ?", uid, pid).
+		Delete(&system.SysUserProject{}).Error
 	return err
 }
 
@@ -220,8 +220,7 @@ func (projectService *ProjectService) GetProjectUserList(info interfacecaseReq.S
 	offset := info.PageSize * (info.Page - 1)
 	db := global.GVA_DB.Model(&system.SysUserProject{}).Preload("SysUser").
 		Joins("RIGHT JOIN sys_users ON sys_user_project.sys_user_id = sys_users.id").
-		Where("project_id = ? AND sys_user_id != 0", info.ProjectId)
-
+		Where("project_id = ? AND sys_user_id != 0 AND sys_users.deleted_at IS NULL", info.ProjectId)
 	var users []system.SysUserProject
 	err = db.Count(&total).Error
 	if err != nil {
