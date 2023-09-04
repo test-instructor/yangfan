@@ -83,6 +83,7 @@ type TStep struct {
 	WebSocket        *WebSocketAction       `json:"websocket,omitempty" yaml:"websocket,omitempty"`
 	Android          *MobileStep            `json:"android,omitempty" yaml:"android,omitempty"`
 	IOS              *MobileStep            `json:"ios,omitempty" yaml:"ios,omitempty"`
+	Mqtt             *MqttStep              `json:"mqtt" yaml:"mqtt"`
 	GRPC             *Grpc                  `json:"gRPC,omitempty" yaml:"gRPC,omitempty"`
 	Variables        map[string]interface{} `json:"variables,omitempty" yaml:"variables,omitempty"`
 	SetupHooks       []string               `json:"setup_hooks,omitempty" yaml:"setup_hooks,omitempty"`

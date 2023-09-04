@@ -1,0 +1,15 @@
+version: '3'
+services:
+  emqx:
+    container_name: emqx
+    image: emqx/emqx:5.0.26
+    ports:
+      - "1883:1883"
+      - "8083:8083"
+      - "8084:8084"
+      - "8883:8883"
+      - "18083:18083"
+    restart: always
+    environment:
+      - MQTT_USERNAME=yangfan
+      - MQTT_PASSWORD=O9ghh0hNSKPdkEBU
