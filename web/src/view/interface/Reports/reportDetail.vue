@@ -576,13 +576,14 @@ const shouStep = (data) => {
 const openDrawer = async (row) => {
   let row_id = row.ID;
   row = reportDataDetail.get(row_id);
+  console.log("row_id", row);
   if (!row) {
     let res = await getReportDetail({ ID: row_id });
     if (res.code === 0) {
       row = res.data.data;
     }
   }
-  if (row.attachments === "") {
+  if (!row.attachments || row.attachments === "") {
     requestTimeShow.value = false;
     responseShow.value = false;
     if (row.data.req_resps.response != null) {
