@@ -146,7 +146,7 @@
                     id="apiTableData"
                     :data="scope.row.data"
                     :show-header="false"
-                    v-if="shouStep(scope.row.data)"
+                    v-if="shouStep(scope.row)"
                   >
                     <el-table-column width="70">
                       <template #default="scope">
@@ -569,14 +569,17 @@ const setupCaseShow = (row) => {
   );
 };
 
-const shouStep = (data) => {
-  return data.length > 0;
+const shouStep = (row) => {
+  if (row.data && row.data.length > 0) {
+    return true;
+  } else {
+    return false;
+  }
 };
 
 const openDrawer = async (row) => {
   let row_id = row.ID;
   row = reportDataDetail.get(row_id);
-  console.log("row_id", row);
   if (!row) {
     let res = await getReportDetail({ ID: row_id });
     if (res.code === 0) {
@@ -590,8 +593,6 @@ const openDrawer = async (row) => {
       responseShow.value = true;
       requestTimeShow.value = row.data.req_resps.response.proto !== "gRPC";
     }
-    console.log("=============responseShow.value", responseShow.value);
-    console.log("=============requestTimeShow.value", requestTimeShow.value);
     drawer.value = true;
     validatorsTable.value = true;
     responseTable.value = true;
@@ -670,11 +671,8 @@ const openDrawer = async (row) => {
       validators: row.data.validators,
       exportVars: export_vars,
     };
-    console.log("row.data.req_resps", row.data.req_resps);
     retry.value = row.retry;
     isRetry.value = row.retry > 0;
-    console.log("retry", retry.value, isRetry.value, row.data.retry);
-    console.log("row.data", row.data);
     let series = [];
     if (requestTimeShow.value) {
       series = [
@@ -769,16 +767,20 @@ const getTestCaseDetailFunc = async (testCaseID) => {
       item.records.forEach((items, indexs, arrs) => {
         let stepName =
           res.data.reapicase.details[index].records[indexs].name + " - ";
-        res.data.reapicase.details[index].records[indexs].data.forEach(
-          (item2, index2) => {
-            let casename =
-              res.data.reapicase.details[index].records[indexs].data[index2]
-                .name;
-            res.data.reapicase.details[index].records[indexs].data[
-              index2
-            ].name = casename.substring(stepName.length);
-          }
-        );
+        let step_type =
+          res.data.reapicase.details[index].records[indexs].step_type;
+        if (step_type !== "transaction") {
+          res.data.reapicase.details[index].records[indexs].data.forEach(
+            (item2, index2) => {
+              let casename =
+                res.data.reapicase.details[index].records[indexs].data[index2]
+                  .name;
+              res.data.reapicase.details[index].records[indexs].data[
+                index2
+              ].name = casename.substring(stepName.length);
+            }
+          );
+        }
       });
       reportData.value = reapicase;
       return false;
@@ -791,7 +793,6 @@ const getTestCaseDetailFunc = async (testCaseID) => {
 };
 
 const shouStatus = (row) => {
-  console.log("row.skip", row);
   if (row.success) {
     if (row.skip) {
       return ["info", "跳过"];
@@ -807,15 +808,18 @@ const shouStatus = (row) => {
 const getTestCaseDetailData = async () => {
   for (var i = 0; i < reportData.value.details.length; i++) {
     for (var j = 0; j < reportData.value.details[i].records.length; j++) {
-      for (
-        var k = 0;
-        k < reportData.value.details[i].records[j].data.length;
-        k++
-      ) {
-        let data = reportData.value.details[i].records[j].data[k];
-        let res = await getReportDetail({ ID: data.ID });
-        if (res.code === 0) {
-          reportDataDetail.set(data.ID, res.data.data);
+      let step_type = reportData.value.details[i].records[j].step_type;
+      if (step_type !== "transaction") {
+        for (
+          var k = 0;
+          k < reportData.value.details[i].records[j].data.length;
+          k++
+        ) {
+          let data = reportData.value.details[i].records[j].data[k];
+          let res = await getReportDetail({ ID: data.ID });
+          if (res.code === 0) {
+            reportDataDetail.set(data.ID, res.data.data);
+          }
         }
       }
     }
@@ -1051,7 +1055,6 @@ watch(testStepsData, () => {
       name: "接口运行情况",
     },
   ];
-  console.log("testStepsData.value", testStepsData.value);
   testStepChart.setOption(pieOption);
 });
 
