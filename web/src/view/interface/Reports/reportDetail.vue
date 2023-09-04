@@ -769,7 +769,10 @@ const getTestCaseDetailFunc = async (testCaseID) => {
           res.data.reapicase.details[index].records[indexs].name + " - ";
         let step_type =
           res.data.reapicase.details[index].records[indexs].step_type;
-        if (step_type !== "transaction") {
+        if (
+          step_type.toLowerCase() !== "transaction" &&
+          step_type.toLowerCase() !== "rendezvous"
+        ) {
           res.data.reapicase.details[index].records[indexs].data.forEach(
             (item2, index2) => {
               let casename =
@@ -809,7 +812,10 @@ const getTestCaseDetailData = async () => {
   for (var i = 0; i < reportData.value.details.length; i++) {
     for (var j = 0; j < reportData.value.details[i].records.length; j++) {
       let step_type = reportData.value.details[i].records[j].step_type;
-      if (step_type !== "transaction") {
+      if (
+        step_type.toLowerCase() !== "transaction" &&
+        step_type.toLowerCase() !== "rendezvous"
+      ) {
         for (
           var k = 0;
           k < reportData.value.details[i].records[j].data.length;

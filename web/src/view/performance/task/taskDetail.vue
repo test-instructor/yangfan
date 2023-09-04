@@ -21,9 +21,9 @@
           <el-button type="primary" @click="addTransaction" round
             >添加事务</el-button
           >
-          <!--          <el-button type="primary" @click="addRendezvous" round-->
-          <!--            >添加集合</el-button-->
-          <!--          >-->
+          <el-button type="primary" @click="addRendezvous" round
+            >添加集合</el-button
+          >
         </el-form-item>
       </el-form>
     </div>
