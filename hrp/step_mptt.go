@@ -2,7 +2,7 @@ package hrp
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 )
 
 type MqttMessageType string
@@ -60,6 +60,6 @@ func convertMqttMessage(msgType MqttMessageType, msg string) (interface{}, error
 	case MtString:
 		return msg, nil
 	default:
-		return nil, fmt.Errorf("Unsupported body type: %s", msg)
+		return nil, errors.New("unsupported body type")
 	}
 }
