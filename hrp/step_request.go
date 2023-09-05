@@ -506,6 +506,9 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 
 		// validate response
 		err = respObj.Validate(step.Validators, stepVariables)
+		if err != nil {
+			global.GVA_LOG.Warn("断言失败", zap.Error(err), zap.Any("断言内容", step.Validators), zap.Any("可用参数", stepVariables))
+		}
 		sessionData.Validators = respObj.validationResults
 		if err == nil {
 			sessionData.Success = true
