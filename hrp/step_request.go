@@ -505,6 +505,7 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 		stepVariables = mergeVariables(stepVariables, extractMapping)
 		global.GVA_LOG.Debug("合并参数", zap.Any("", stepVariables))
 		// validate response
+		global.GVA_LOG.Debug("断言内容", zap.Any("", step.Validators))
 		err = respObj.Validate(step.Validators, stepVariables)
 		if err != nil {
 			global.GVA_LOG.Warn("断言失败", zap.Error(err), zap.Any("断言内容", step.Validators), zap.Any("可用参数", stepVariables))
