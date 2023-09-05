@@ -3,6 +3,7 @@ package system
 import (
 	"errors"
 	"fmt"
+
 	uuid "github.com/satori/go.uuid"
 	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/model/common/request"
@@ -69,14 +70,16 @@ func (userService *UserService) Login(u *system.SysUser) (userInter *system.SysU
 		}
 	}
 	var sup []system.SysUserProject
-	var projects []system.Project
+	var projects []*system.Project
 	err = global.GVA_DB.Model(&system.SysUserProject{}).Preload("Project").Where("sys_user_id = ?", user.ID).Find(&sup).Error
 	if err != nil {
 		return nil, err
 	}
 
 	for _, s := range sup {
-		projects = append(projects, *s.Project)
+		if s.Project != nil {
+			projects = append(projects, s.Project)
+		}
 	}
 	user.Projects = projects
 
@@ -122,14 +125,16 @@ func (userService *UserService) GetUserInfoList(info request.PageInfo) (list int
 	err = db.Limit(limit).Offset(offset).Preload("Projects").Preload("Authorities").Preload("Authority").Find(&userList).Error
 	for i := 0; i < len(userList); i++ {
 		var sup []system.SysUserProject
-		var projects []system.Project
+		var projects []*system.Project
 		err = global.GVA_DB.Model(&system.SysUserProject{}).Preload("Project").Where("sys_user_id = ?", userList[i].ID).Find(&sup).Error
 		if err != nil {
 			continue
 		}
 		for _, s := range sup {
 			if s.Project != nil {
-				projects = append(projects, *s.Project)
+				if s.Project != nil {
+					projects = append(projects, s.Project)
+				}
 			}
 		}
 		userList[i].Projects = projects
@@ -245,11 +250,13 @@ func (userService *UserService) GetUserInfo(uuid uuid.UUID) (user system.SysUser
 	}
 
 	var sup []system.SysUserProject
-	var projects []system.Project
+	var projects []*system.Project
 	global.GVA_DB.Model(&system.SysUserProject{}).Preload("Project").Where("sys_user_id = ?", reqUser.ID).Find(&sup)
 
 	for _, s := range sup {
-		projects = append(projects, *s.Project)
+		if s.Project != nil {
+			projects = append(projects, s.Project)
+		}
 	}
 	reqUser.Projects = projects
 

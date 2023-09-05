@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+
 	global2 "github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/model/system"
 	"github.com/test-instructor/yangfan/server/plugin/fslogin/global"
@@ -29,7 +30,7 @@ func (e *FsLoginService) LoginOrRegister(FsUserInfo model.FsUserInfo) (gvaInfo s
 					AuthorityId: global.GlobalConfig.AuthorityID,
 				},
 			},
-			Projects: []system.Project{
+			Projects: []*system.Project{
 				{
 					GVA_MODEL: global2.GVA_MODEL{
 						ID: global.GlobalConfig.ProjectID,

@@ -17,6 +17,7 @@ import (
 )
 
 // Login @Tags Base
+//
 //	@Summary	用户登录
 //	@Produce	application/json
 //	@Param		data	body		systemReq.Login												true	"用户名, 密码, 验证码"
@@ -106,6 +107,7 @@ func (b *BaseApi) TokenNext(c *gin.Context, user system.SysUser) {
 }
 
 // Register @Tags SysUser
+//
 //	@Summary	用户注册账号
 //	@Produce	application/json
 //	@Param		data	body		systemReq.Register												true	"用户名, 昵称, 密码, 角色ID"
@@ -124,10 +126,10 @@ func (b *BaseApi) Register(c *gin.Context) {
 			AuthorityId: v,
 		})
 	}
-	var projects []system.Project
+	var projects []*system.Project
 	for _, v := range r.ProjectIds {
 		projectId, _ := strconv.Atoi(v)
-		projects = append(projects, system.Project{
+		projects = append(projects, &system.Project{
 			GVA_MODEL: global.GVA_MODEL{
 				ID: uint(projectId),
 			},
@@ -152,6 +154,7 @@ func (b *BaseApi) Register(c *gin.Context) {
 }
 
 // ChangePassword @Tags SysUser
+//
 //	@Summary	用户修改密码
 //	@Security	ApiKeyAuth
 //	@Produce	application/json
@@ -176,6 +179,7 @@ func (b *BaseApi) ChangePassword(c *gin.Context) {
 }
 
 // GetUserList @Tags SysUser
+//
 //	@Summary	分页获取用户列表
 //	@Security	ApiKeyAuth
 //	@accept		application/json
@@ -204,6 +208,7 @@ func (b *BaseApi) GetUserList(c *gin.Context) {
 }
 
 // SetUserAuthority @Tags SysUser
+//
 //	@Summary	更改用户权限
 //	@Security	ApiKeyAuth
 //	@accept		application/json
@@ -239,6 +244,7 @@ func (b *BaseApi) SetUserAuthority(c *gin.Context) {
 }
 
 // SetUserAuthorities @Tags SysUser
+//
 //	@Summary	设置用户权限
 //	@Security	ApiKeyAuth
 //	@accept		application/json
@@ -258,6 +264,7 @@ func (b *BaseApi) SetUserAuthorities(c *gin.Context) {
 }
 
 // SetUserProjects @Tags SysUser
+//
 //	@Summary	设置用户权限
 //	@Security	ApiKeyAuth
 //	@accept		application/json
@@ -277,6 +284,7 @@ func (b *BaseApi) SetUserProjects(c *gin.Context) {
 }
 
 // DeleteUser @Tags SysUser
+//
 //	@Summary	删除用户
 //	@Security	ApiKeyAuth
 //	@accept		application/json
@@ -305,6 +313,7 @@ func (b *BaseApi) DeleteUser(c *gin.Context) {
 }
 
 // SetUserInfo @Tags SysUser
+//
 //	@Summary	设置用户信息
 //	@Security	ApiKeyAuth
 //	@accept		application/json
@@ -348,6 +357,7 @@ func (b *BaseApi) SetUserInfo(c *gin.Context) {
 }
 
 // SetSelfInfo @Tags SysUser
+//
 //	@Summary	设置用户信息
 //	@Security	ApiKeyAuth
 //	@accept		application/json
@@ -378,6 +388,7 @@ func (b *BaseApi) SetSelfInfo(c *gin.Context) {
 }
 
 // GetUserInfo @Tags SysUser
+//
 //	@Summary	获取用户信息
 //	@Security	ApiKeyAuth
 //	@accept		application/json
@@ -395,6 +406,7 @@ func (b *BaseApi) GetUserInfo(c *gin.Context) {
 }
 
 // ResetPassword @Tags SysUser
+//
 //	@Summary	重置用户密码
 //	@Security	ApiKeyAuth
 //	@Produce	application/json
