@@ -194,7 +194,10 @@ func (v *responseObject) Validate(iValidators []interface{}, variablesMapping ma
 
 		// do assertion
 		global.GVA_LOG.Debug("assertFunc", zap.Any("checkValue", checkValue), zap.Any("expectValue", expectValue))
-		result := assertFunc(v.t, checkValue, expectValue)
+		var result bool
+		if !(checkValue == nil && expectValue != nil) {
+			result = assertFunc(v.t, checkValue, expectValue)
+		}
 		if result {
 			validResult.CheckResult = "pass"
 		}
