@@ -63,7 +63,6 @@
           <el-button
             size="mini"
             type="danger"
-            v-show="lenData > 1"
             @click="handleDelete(scope.$index, scope.row)"
           >
             <i size="mini" class="iconfont icon-delete"></i>
@@ -167,6 +166,9 @@ export default {
     handleDelete(index, row) {
       this.tableData.splice(index, 1);
       this.extractData();
+      if (this.tableData.length === 0) {
+        this.handleEdit();
+      }
     },
     // 抽取格式化
     parseExtract() {

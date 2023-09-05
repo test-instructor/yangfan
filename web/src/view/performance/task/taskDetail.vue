@@ -21,9 +21,9 @@
           <el-button type="primary" @click="addTransaction" round
             >添加事务</el-button
           >
-          <!--          <el-button type="primary" @click="addRendezvous" round-->
-          <!--            >添加集合</el-button-->
-          <!--          >-->
+          <el-button type="primary" @click="addRendezvous" round
+            >添加集合</el-button
+          >
         </el-form-item>
       </el-form>
     </div>
@@ -71,10 +71,19 @@
 
         <el-table-column align="right" label="按钮组" min-width="150px">
           <template #default="scope">
+            <!--            <el-button-->
+            <!--              type="text"-->
+            <!--              icon="document"-->
+            <!--              size="mini"-->
+            <!--              v-if="!detailShow(scope.row)"-->
+            <!--              @click="editRow(scope.row)"-->
+            <!--              >变更</el-button-->
+            <!--            >-->
             <el-button
               type="text"
               icon="document"
               size="mini"
+              v-if="detailShow(scope.row)"
               @click="detailRow(scope.row)"
               >详情</el-button
             >
@@ -293,7 +302,7 @@ const taskRendezvous = ref(false);
 const dialogTitle = ref(false);
 const type = ref("");
 const heightDiv = ref();
-const taskName = ref();
+const taskName = ref("");
 let caseID = [];
 let sortIdList = "";
 heightDiv.value = window.screen.height - 480;
@@ -328,7 +337,9 @@ const init = () => {
     task_id.value = 6;
   }
   if (task_id.value) {
-    getTaskCaseDetailFunc(task_id.value);
+    if (tableData.value.length < 1) {
+      getTaskCaseDetailFunc(task_id.value);
+    }
   }
 };
 const TransactionStart = ref([]);
@@ -433,12 +444,23 @@ const deleteRow = (row) => {
   });
 };
 
-const detailRow = async (row) => {
+const detailShow = (row) => {
+  console.log("row", row);
+  return !(
+    row.ApiCaseStep.api_step_type && row.ApiCaseStep.api_step_type !== ""
+  );
+};
+
+const editRow = async (row) => {
   if (row.ApiCaseStep.api_step_type) {
-    // const res = await findPerformanceStep({ ID: row.ApiCaseStep.ID });
-    // if (res.code === 0) {
-    // }
-  } else {
+    let res = await findPerformanceStep({ ID: row.ApiCaseStep.ID });
+    if (res.code === 0) {
+      console.log("res", res);
+    }
+  }
+};
+const detailRow = async (row) => {
+  if (row.ApiCaseStepId && row.ApiCaseStepId > 0) {
     await router.push({
       name: "testCaseStepDetail",
       params: {

@@ -41,7 +41,7 @@ func getCaseStepHrp(stepId uint) (*interfacecase.HrpCaseStep, error) {
 	global.GVA_LOG.Debug("hrpTestCase")
 	global.GVA_LOG.Debug(fmt.Sprintf("getCaseStepHrp 1 %v", setupCase))
 	for k, _ := range setupCase.TStep {
-		if setupCase.TStep[k].Transaction != nil || setupCase.TStep[k].Rendezvous != nil || setupCase.TStep[k].ThinkTime != nil {
+		if setupCase.TStep[k].Transaction != nil && setupCase.TStep[k].Rendezvous != nil && setupCase.TStep[k].ThinkTime != nil {
 			hrpCase = &interfacecase.HrpCaseStep{
 				ID:          setupCase.ID,
 				Name:        setupCase.Name,
