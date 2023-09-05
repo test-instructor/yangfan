@@ -929,7 +929,7 @@ const initData = async () => {
     str: "error",
   });
   apicase.value.push({
-    label: "错误接口数",
+    label: "跳过接口数",
     name: reportData.value.stat.teststeps["skip"],
     key: "stepTotal",
     str: "skip",
