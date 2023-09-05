@@ -517,8 +517,8 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 			sessionData.Success = true
 			stepResult.Success = true
 		}
+		global.GVA_LOG.Debug("设置测试报告长度", zap.Any("", resp.ContentLength))
 		stepResult.ContentSize = resp.ContentLength
-		global.GVA_LOG.Debug("设置测试报告长度", zap.Any("", stepResult.ContentSize))
 		stepResult.Data = sessionData
 		global.GVA_LOG.Debug("设置测试报告data", zap.Any("", stepResult.Data))
 	} else {
