@@ -500,22 +500,27 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 		extractors := step.Extract
 		extractMapping := respObj.Extract(extractors, stepVariables)
 		stepResult.ExportVars = extractMapping
-
+		global.GVA_LOG.Debug("提取的参数", zap.Any("", extractMapping))
 		// override step variables with extracted variables
 		stepVariables = mergeVariables(stepVariables, extractMapping)
-
+		global.GVA_LOG.Debug("合并参数", zap.Any("", stepVariables))
 		// validate response
 		err = respObj.Validate(step.Validators, stepVariables)
 		if err != nil {
 			global.GVA_LOG.Warn("断言失败", zap.Error(err), zap.Any("断言内容", step.Validators), zap.Any("可用参数", stepVariables))
+		} else {
+			global.GVA_LOG.Debug("断言成功")
 		}
 		sessionData.Validators = respObj.validationResults
+		global.GVA_LOG.Debug("设置测试报告断言内容", zap.Any("", sessionData.Validators))
 		if err == nil {
 			sessionData.Success = true
 			stepResult.Success = true
 		}
 		stepResult.ContentSize = resp.ContentLength
+		global.GVA_LOG.Debug("设置测试报告长度", zap.Any("", stepResult.ContentSize))
 		stepResult.Data = sessionData
+		global.GVA_LOG.Debug("设置测试报告data", zap.Any("", stepResult.Data))
 	} else {
 		sessionData.ReqResps.Request = rb.requestMap
 		sessionData.Success = true
