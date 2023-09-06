@@ -329,6 +329,7 @@ func RegisterMenus() {
 		{GVA_MODEL: global.GVA_MODEL{ID: 82, CreatedAt: time.Time{}, UpdatedAt: time.Time{}, DeletedAt: gorm.DeletedAt{}}, MenuLevel: 0, Hidden: false, ParentId: "83", Path: "message", Name: "message", Component: "view/interface/message/index.vue", Sort: 800, Meta: system.Meta{KeepAlive: true, Title: "消息通知", Icon: "message"}},
 		{GVA_MODEL: global.GVA_MODEL{ID: 62, CreatedAt: time.Time{}, UpdatedAt: time.Time{}, DeletedAt: gorm.DeletedAt{}}, MenuLevel: 0, Hidden: false, ParentId: "83", Path: "py_pkg", Name: "py_pkg", Component: "view/py_pkg/py_pkg.vue", Sort: 900, Meta: system.Meta{KeepAlive: true, Title: "py库管理", Icon: "office-building"}},
 		{GVA_MODEL: global.GVA_MODEL{ID: 84, CreatedAt: time.Time{}, UpdatedAt: time.Time{}, DeletedAt: gorm.DeletedAt{}}, MenuLevel: 0, Hidden: false, ParentId: "83", Path: "env-manage", Name: "env-manage", Component: "view/interface/environment/env.vue", Sort: 200, Meta: system.Meta{KeepAlive: true, Title: "环境管理", Icon: "discount"}},
+		{GVA_MODEL: global.GVA_MODEL{ID: 85, CreatedAt: time.Time{}, UpdatedAt: time.Time{}, DeletedAt: gorm.DeletedAt{}}, MenuLevel: 0, Hidden: false, ParentId: "83", Path: "env-mock", Name: "env-mock", Component: "view/interface/environment/mock.vue", Sort: 400, Meta: system.Meta{KeepAlive: true, Title: "mock", Icon: "data-board"}},
 	}
 	baseMenuService := system2.BaseMenuService{}
 	for i := 0; i < len(entities); i++ {
