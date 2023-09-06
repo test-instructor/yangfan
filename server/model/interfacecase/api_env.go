@@ -22,3 +22,11 @@ type ApiEnvDetail struct {
 	Name  string            `json:"name,omitempty" form:"name"`
 	Value datatypes.JSONMap `json:"value"`
 }
+
+type ApiEnvMock struct {
+	global.GVA_MODEL
+	Operator
+	Name       string `json:"name,omitempty" form:"name"`
+	Url        string `json:"url,omitempty" form:"url"`
+	StatusCode int    `json:"status_code,omitempty" form:"status_code"`
+}
