@@ -15,3 +15,9 @@ type EnvVariableSearch struct {
 	interfacecase.ApiEnvDetail
 	request.PageInfo
 }
+
+type EnvMockSearch struct {
+	ShowKey bool `json:"show_key,omitempty" form:"show_key"`
+	interfacecase.ApiEnvMock
+	request.PageInfo
+}

@@ -169,3 +169,20 @@ func (env *EnvironmentAPi) FindEnvMock(c *gin.Context) {
 		response.OkWithData(gin.H{"env": env}, c)
 	}
 }
+
+func (env *EnvironmentAPi) GetEnvMockList(c *gin.Context) {
+	var pageInfo interfacecaseReq.EnvMockSearch
+	_ = c.ShouldBindQuery(&pageInfo)
+	pageInfo.ProjectID = utils.GetUserProject(c)
+	if err, list, total := environmentService.GetEnvMockList(pageInfo); err != nil {
+		global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		response.FailWithMessage("查询失败", c)
+	} else {
+		response.OkWithDetailed(response.PageResult{
+			List:     list,
+			Total:    total,
+			Page:     pageInfo.Page,
+			PageSize: pageInfo.PageSize,
+		}, "获取成功", c)
+	}
+}

@@ -118,3 +118,37 @@ func (env *EnvironmentService) FindEnvMock(id uint) (err error, envMock interfac
 		Where("id = ?", id).First(&envMock).Error
 	return
 }
+
+func (env *EnvironmentService) GetEnvMockList(info interfacecaseReq.EnvMockSearch) (err error, list interface{}, total int64) {
+	limit := info.PageSize
+	offset := info.PageSize * (info.Page - 1)
+	// 创建db
+	db := global.GVA_DB.Model(&interfacecase.ApiEnvDetail{})
+	var envs []interfacecase.ApiEnvDetail
+	db.Where("project_id = ?", info.ProjectID)
+	if info.Name != "" {
+		db.Where("name LIKE ?", "%"+info.Name+"%")
+	}
+	if info.Url != "" {
+		db.Where("`key` LIKE ?", "%"+info.Url+"%")
+	}
+	if info.StatusCode > 0 {
+		db.Where("status_code = ? ?", info.StatusCode)
+	}
+	err = db.Debug().Count(&total).Error
+	if err != nil {
+		return
+	}
+	err = db.Limit(limit).Offset(offset).Order("ID desc").Find(&envs).Error
+	if err != nil {
+		return
+	}
+	if info.ShowKey {
+		var keys []string
+		for i, _ := range envs {
+			keys = append(keys, envs[i].Key)
+		}
+		return nil, keys, total
+	}
+	return err, envs, total
+}

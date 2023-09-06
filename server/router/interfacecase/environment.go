@@ -38,5 +38,6 @@ func (env *EnvironmentRouter) InitEnvironmentRouter(Router *gin.RouterGroup) {
 	{
 		// mokc api
 		envRouterWithoutRecord.GET("findEnvMock", envApi.FindEnvMock)
+		envRouterWithoutRecord.GET("getEnvMockList", envApi.GetEnvMockList)
 	}
 }
