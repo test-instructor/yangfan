@@ -24,10 +24,19 @@ func (env *EnvironmentRouter) InitEnvironmentRouter(Router *gin.RouterGroup) {
 		envRouter.POST("createEnvVariable", envApi.CreateEnvVariable)
 	}
 	{
+		// mokc api
+		envRouter.POST("createEnvMock", envApi.CreateEnvMock)
+		envRouter.DELETE("deleteEnvMock", envApi.DeleteEnvMock)
+	}
+	{
 		envRouterWithoutRecord.GET("findEnv", envApi.FindEnv)
 		envRouterWithoutRecord.GET("getEnvList", envApi.GetEnvList)
 
 		envRouterWithoutRecord.GET("findEnvVariable", envApi.FindEnvVariable)
 		envRouterWithoutRecord.GET("getEnvVariableList", envApi.GetEnvVariableList)
+	}
+	{
+		// mokc api
+		envRouterWithoutRecord.GET("findEnvMock", envApi.FindEnvMock)
 	}
 }

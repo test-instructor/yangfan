@@ -101,3 +101,20 @@ func (env *EnvironmentService) GetEnvVariableList(info interfacecaseReq.EnvVaria
 	}
 	return err, envs, total
 }
+
+func (env *EnvironmentService) CreateEnvMock(envVar interfacecase.ApiEnvMock) (err error) {
+	// 创建db
+	err = global.GVA_DB.Save(&envVar).Error
+	return err
+}
+
+func (env *EnvironmentService) DeleteEnvMock(environment interfacecase.ApiEnvMock) (err error) {
+	err = global.GVA_DB.Delete(&environment).Error
+	return err
+}
+
+func (env *EnvironmentService) FindEnvMock(id uint) (err error, envMock interfacecase.ApiEnvMock) {
+	err = global.GVA_DB.
+		Where("id = ?", id).First(&envMock).Error
+	return
+}

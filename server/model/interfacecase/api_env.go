@@ -26,7 +26,8 @@ type ApiEnvDetail struct {
 type ApiEnvMock struct {
 	global.GVA_MODEL
 	Operator
-	Name       string `json:"name,omitempty" form:"name"`
-	Url        string `json:"url,omitempty" form:"url"`
-	StatusCode int    `json:"status_code,omitempty" form:"status_code"`
+	Name       string            `json:"name,omitempty" form:"name"`
+	Url        string            `json:"url,omitempty" form:"url"`
+	StatusCode int               `json:"status_code,omitempty" form:"status_code"`
+	Value      datatypes.JSONMap `json:"value"`
 }

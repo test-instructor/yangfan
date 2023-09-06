@@ -134,3 +134,38 @@ func (env *EnvironmentAPi) GetEnvVariableList(c *gin.Context) {
 		}, "获取成功", c)
 	}
 }
+
+func (env *EnvironmentAPi) CreateEnvMock(c *gin.Context) {
+	var envVar interfacecase.ApiEnvMock
+	_ = c.ShouldBindJSON(&envVar)
+	envVar.ProjectID = utils.GetUserProject(c)
+	if err := environmentService.CreateEnvMock(envVar); err != nil {
+		global.GVA_LOG.Error("操作失败!", zap.Error(err))
+		response.FailWithMessage("操作失败", c)
+	} else {
+		response.OkWithMessage("操作成功", c)
+	}
+}
+
+func (env *EnvironmentAPi) DeleteEnvMock(c *gin.Context) {
+	var environment interfacecase.ApiEnvMock
+	_ = c.ShouldBindJSON(&environment)
+	environment.DeleteBy = utils.GetUserIDAddress(c)
+	if err := environmentService.DeleteEnvMock(environment); err != nil {
+		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		response.FailWithMessage("删除失败", c)
+	} else {
+		response.OkWithMessage("删除成功", c)
+	}
+}
+
+func (env *EnvironmentAPi) FindEnvMock(c *gin.Context) {
+	var environment interfacecase.ApiEnvMock
+	_ = c.ShouldBindQuery(&environment)
+	if err, env := environmentService.FindEnvMock(environment.ID); err != nil {
+		global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		response.FailWithMessage("查询失败", c)
+	} else {
+		response.OkWithData(gin.H{"env": env}, c)
+	}
+}
