@@ -160,12 +160,6 @@ func (v *responseObject) Extract(extractors map[string]string, variablesMapping 
 }
 
 func (v *responseObject) Validate(iValidators []interface{}, variablesMapping map[string]interface{}) (err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			// 发生了 panic，将其转化为错误信息
-			err = fmt.Errorf("panic occurred: %v", r)
-		}
-	}()
 	for _, iValidator := range iValidators {
 		validator, ok := iValidator.(Validator)
 		if !ok {
@@ -197,6 +191,14 @@ func (v *responseObject) Validate(iValidators []interface{}, variablesMapping ma
 			CheckValue:  checkValue,
 			CheckResult: "fail",
 		}
+
+		defer func() {
+			if r := recover(); r != nil {
+				// 发生了 panic，将其转化为错误信息
+				err = fmt.Errorf("panic occurred: %v", r)
+				v.validationResults = append(v.validationResults, validResult)
+			}
+		}()
 
 		// do assertion
 		global.GVA_LOG.Debug("assertFunc", zap.Any("checkValue", checkValue), zap.Any("expectValue", expectValue))
