@@ -177,7 +177,8 @@ func (v *responseObject) Validate(iValidators []interface{}, variablesMapping ma
 		}
 
 		// parse expected value
-		expectValue, err := v.parser.Parse(validator.Expect, variablesMapping)
+		var expectValue interface{}
+		expectValue, err = v.parser.Parse(validator.Expect, variablesMapping)
 		if err != nil {
 			return err
 		}
