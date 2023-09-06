@@ -160,6 +160,12 @@ func (v *responseObject) Extract(extractors map[string]string, variablesMapping 
 }
 
 func (v *responseObject) Validate(iValidators []interface{}, variablesMapping map[string]interface{}) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			// 发生了 panic，将其转化为错误信息
+			err = fmt.Errorf("panic occurred: %v", r)
+		}
+	}()
 	for _, iValidator := range iValidators {
 		validator, ok := iValidator.(Validator)
 		if !ok {
@@ -201,6 +207,9 @@ func (v *responseObject) Validate(iValidators []interface{}, variablesMapping ma
 		if result {
 			validResult.CheckResult = "pass"
 		}
+		global.GVA_LOG.Debug("result", zap.Bool("result", result))
+		global.GVA_LOG.Debug("v.validationResults", zap.Any("", v.validationResults))
+		global.GVA_LOG.Debug("v.validResult", zap.Any("", validResult))
 		v.validationResults = append(v.validationResults, validResult)
 		global.GVA_LOG.Info("[Validate] validate result",
 			zap.String("checkExpr", validator.Check),
