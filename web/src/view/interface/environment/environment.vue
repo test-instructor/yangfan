@@ -21,27 +21,11 @@
               >重置</el-button
             >
           </el-form-item>
-          <el-form-item>
-            <el-button
-              icon="plus"
-              size="mini"
-              type="primary"
-              @click="openDialogEnv()"
-              >环境管理</el-button
-            >
-          </el-form-item>
         </el-form>
       </div>
     </div>
     <div class="gva-table-box">
       <div class="gva-btn-list">
-        <el-button
-          icon="plus"
-          size="mini"
-          type="primary"
-          @click="openDialogEnv()"
-          >环境管理</el-button
-        >
         <el-button
           icon="plus"
           size="mini"
