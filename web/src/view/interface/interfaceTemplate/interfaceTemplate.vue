@@ -559,6 +559,10 @@ heightDiv.value =
 
 // 打开弹窗
 const openDialog = () => {
+  if (!treeID || treeID < 1) {
+    ElMessage.error("请创建节点后在进行接口创建的操作");
+    return;
+  }
   type.value = "create";
   dialogTitle.value = "新增接口";
   requestTYpe.value = "http";
@@ -566,6 +570,10 @@ const openDialog = () => {
 };
 
 const openDialogGrpc = () => {
+  if (!treeID || treeID < 1) {
+    ElMessage.error("请创建节点后在进行接口创建的操作");
+    return;
+  }
   typeGrpc.value = "create";
   dialogTitleGrpc.value = "新增接口Grpc";
   interfaceTempleFormVisibleGrpc.value = true;

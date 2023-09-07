@@ -135,6 +135,7 @@ export default {
         });
     },
     open(node, data) {
+      this.$emit("getTreeID", 0);
       this.$confirm(
         `节点${data.label}及子节点和对应的数据将被删除, 是否继续?`,
         "删除节点",
