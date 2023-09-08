@@ -7,6 +7,8 @@ type MessageType string
 const MessageTypeFeishu MessageType = "feishu"
 const MessageTypeDingtalk MessageType = "dingtalk"
 const MessageTypeWechat MessageType = "wechat"
+const MessageTypeWechatText MessageType = "wechat_text"
+const MessageTypeDingtalkText MessageType = "dingtalk_text"
 
 var _ = []MessageType{MessageTypeFeishu, MessageTypeDingtalk}
 

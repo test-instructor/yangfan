@@ -59,6 +59,10 @@ func (r *RunCaseService) setRunCaseMsg(req *run.RunCaseReq, msg *interfacecase.A
 		Type = run.NotifierType_Dingtalk
 	case interfacecase.MessageTypeWechat:
 		Type = run.NotifierType_Wechat
+	case interfacecase.MessageTypeWechatText:
+		Type = run.NotifierType_WechatText
+	case interfacecase.MessageTypeDingtalkText:
+		Type = run.NotifierType_DingtalkText
 	default:
 		Type = run.NotifierType_Default
 	}
@@ -297,7 +301,7 @@ func (r *RunCaseService) RunTimerTask(runCase request.RunCaseReq, ci bool) {
 	if runCase.TagID > 0 {
 		req := r.getRunCase(runCase)
 		if ci {
-			req.RunType = run.RunType_RunTypeCI
+			req.RunType = run.RunType_CI
 		}
 		if runCase.ApiMessageID > 0 {
 			var msg interfacecase.ApiMessage

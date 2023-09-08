@@ -21,6 +21,53 @@ import (
 const blueColor = "#0000FF"
 const redColor = "#FF0000"
 
+type WeChatNotifierText struct {
+	NotifierDefault
+}
+
+func (wn WeChatNotifierText) Send() (err error) {
+	if wn.reports.Success != nil && *wn.reports.Success && wn.msg.GetFail() {
+		return nil
+	}
+	body := make(map[string]interface{})
+	markdown := make(map[string]interface{})
+	body["msgtype"] = "markdown"
+
+	// 根据状态设置标题
+	var msg string
+	if wn.reports.Success != nil && *wn.reports.Success {
+		msg += fmt.Sprintf("<font color=\"info\">【定时执行测试】 %s | %s</font>\n\n", "成功", wn.reports.ApiEnvName)
+	} else {
+		msg += fmt.Sprintf("<font color=\"warning\">【定时执行测试】 %s | %s</font>\n\n", "失败", wn.reports.ApiEnvName)
+	}
+	card := wn.getCard()
+
+	for _, v := range card.Data.TemplateVariable.Content {
+		msg += fmt.Sprintf(">用例名称:<font color=\"comment\">%s</font>\t", v.Name)
+		msg += fmt.Sprintf("成功用例数:<font color=\"comment\">%d</font>\n>", v.Success)
+		if v.Skip > 0 {
+			msg += fmt.Sprintf("跳过用例数:<font color=\"comment\">%d</font>\t", v.Skip)
+		}
+
+		if v.Skip > 0 {
+			msg += fmt.Sprintf("失败用例数:<font color=\"comment\">%d</font>\t", v.Fail)
+		}
+
+		if v.Skip > 0 {
+			msg += fmt.Sprintf("错误用例数:<font color=\"comment\">%d</font>\t", v.Error)
+		}
+		msg += fmt.Sprintf("耗时:<font color=\"comment\">%d秒</font>\n\n", v.Time)
+
+	}
+
+	msg += fmt.Sprintf("\n测试报告详情:%s\n", wn.getReportUrl())
+	//msg += fmt.Sprintf("\n[测试报告详情](%s)\n", wn.getReportUrl())
+	markdown["content"] = msg
+	body["markdown"] = markdown
+	err = wn.SendMessage(body)
+	return nil
+}
+
 type WeChatNotifier struct {
 	NotifierDefault
 }

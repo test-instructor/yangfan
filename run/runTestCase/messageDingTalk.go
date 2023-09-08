@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/test-instructor/yangfan/proto/run"
 	"github.com/test-instructor/yangfan/server/global"
 	"go.uber.org/zap"
 )
 
 type DingTalkNotifier struct {
 	NotifierDefault
+	Type run.NotifierType
 }
 
 func (dn DingTalkNotifier) Send() error {
@@ -36,13 +38,26 @@ func (dn DingTalkNotifier) Send() error {
 	}
 	title := fmt.Sprintf("【%s】%s | %s", dn.reports.Name, success, dn.reports.ApiEnvName)
 	actionCard["title"] = title
-	text := fmt.Sprintf("# <font color=#FF0000>%s</font>\n\n", title)
-	if *dn.reports.Success {
-		text = fmt.Sprintf("# <font color=#0000FF>%s</font>\n\n", title)
+	if dn.Type == run.NotifierType_Dingtalk {
+		text := fmt.Sprintf("# <font color=#FF0000>%s</font>\n\n", title)
+		if *dn.reports.Success {
+			text = fmt.Sprintf("# <font color=#0000FF>%s</font>\n\n", title)
+		}
+		data := dn.getCard()
+		text += dn.generateTableContent(data.Data.TemplateVariable.Content)
+		actionCard["text"] = text
 	}
-	data := dn.getCard()
-	text += dn.generateTableContent(data.Data.TemplateVariable.Content)
-	actionCard["text"] = text
+	if dn.Type == run.NotifierType_DingtalkText {
+		text := fmt.Sprintf("# <font color=#FF0000>%s</font>\n\n", title)
+		if *dn.reports.Success {
+			text = fmt.Sprintf("# <font color=#0000FF>%s</font>\n\n", title)
+		}
+		card := dn.getCard()
+		for _, content := range card.Data.TemplateVariable.Content {
+			text += fmt.Sprintf("用例：%s,成功用例：%d,失败用例：%d,耗时：%ds秒\n\n", content.Name, content.Success, content.Fail, content.Time)
+		}
+		actionCard["text"] = text
+	}
 
 	btn := make(map[string]interface{})
 	btn["title"] = "查看详情"
@@ -55,5 +70,4 @@ func (dn DingTalkNotifier) Send() error {
 
 	err := dn.SendMessage(body)
 	return err
-
 }

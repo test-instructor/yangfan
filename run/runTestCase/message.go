@@ -54,6 +54,8 @@ type Content struct {
 	Fail    int    `json:"fail"`
 	Time    int    `json:"time"`
 	Total   int    `json:"total"`
+	Error   int    `json:"error"`
+	Skip    int    `json:"skip"`
 }
 type TemplateVariable struct {
 	Env     string    `json:"env"`
@@ -255,6 +257,8 @@ func (n NotifierDefault) getCard() FSCard {
 			Total:   int(statMap["total"].(float64)),
 			Fail:    int(statMap["failures"].(float64)),
 			Success: int(statMap["successes"].(float64)),
+			Error:   int(statMap["error"].(float64)),
+			Skip:    int(statMap["skip"].(float64)),
 			Time:    int(durationValue),
 		}
 		contents = append(contents, content)
@@ -349,13 +353,33 @@ func (n NotifierDefault) getReportUrl() string {
 	reportUrl = fmt.Sprintf("%s/#/layout/interfaces/reportDetail/%d", reportUrl, n.reports.ID)
 	return reportUrl
 }
+
+func (n NotifierDefault) getMessageText() (msg string) {
+	card := n.getCard()
+	// 根据状态设置标题
+	if n.reports.Success != nil && *n.reports.Success {
+		msg += fmt.Sprintf("<font color=\"info\">【定时执行测试】 %s | %s</font>\n\n", "成功", card.Data.TemplateVariable.Env)
+	} else {
+		msg += fmt.Sprintf("<font color=\"warning\">橙红色</font>【定时执行测试】 %s | %s</font>\n\n", "失败", card.Data.TemplateVariable.Env)
+	}
+	msg += fmt.Sprintf(">执行用例数:<font color=\"comment\">%d</font>\n", n.reports.Stat.TestCases.Total)
+	msg += fmt.Sprintf(">成功用例数:<font color=\"comment\">%d</font>\n", n.reports.Stat.TestCases.Success)
+	msg += fmt.Sprintf(">失败用例数:<font color=\"comment\">%d</font>\n", n.reports.Stat.TestCases.Fail)
+	msg += fmt.Sprintf("\n[测试报告详情](%s)\n", n.getReportUrl())
+
+	return
+}
 func NewNotifier(msg *run.Msg, reports *interfacecase.ApiReport) Notifier {
 	var NotifierDefault = NotifierDefault{msg: msg, reports: reports}
 	switch msg.GetType() {
 	case run.NotifierType_Wechat:
 		return WeChatNotifier{NotifierDefault}
+	case run.NotifierType_WechatText:
+		return WeChatNotifierText{NotifierDefault}
 	case run.NotifierType_Dingtalk:
-		return DingTalkNotifier{NotifierDefault}
+		return DingTalkNotifier{NotifierDefault, run.NotifierType_Dingtalk}
+	case run.NotifierType_DingtalkText:
+		return DingTalkNotifier{NotifierDefault, run.NotifierType_DingtalkText}
 	case run.NotifierType_Feishu:
 		return FeishuNotifier{NotifierDefault}
 	default:

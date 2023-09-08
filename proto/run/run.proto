@@ -56,6 +56,8 @@ enum NotifierType {
   Feishu = 1;
   Dingtalk = 2;
   Wechat = 3;
+  DingtalkText = 4;
+  WechatText = 5;
 }
 
 enum CaseType{

@@ -1,62 +1,74 @@
 <template>
-  <el-table
-    highlight-current-row
-    :cell-style="{ paddingTop: '4px', paddingBottom: '4px' }"
-    strpe
-    :data="envTableData"
-    @cell-mouse-enter="cellMouseEnter"
-    @cell-mouse-leave="cellMouseLeave"
-    max-height="500"
-  >
-    <el-table-column label="环境名称" width="300">
-      <template #default="scope">
-        <el-input
-          v-model="scope.row.name"
-          placeholder="请输入环境名称"
-          :disabled="!showBtn(scope.row)"
-        ></el-input>
-      </template>
-    </el-table-column>
+  <div>
+    <div class="gva-search-box">
+      <el-form class="demo-form-inline">
+        <el-form-item>
+          <el-button size="mini" @click="onAddItem" type="primary">{{
+            "添加环境"
+          }}</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+    <div class="gva-table-box">
+      <el-table
+        highlight-current-row
+        :cell-style="{ paddingTop: '4px', paddingBottom: '4px' }"
+        strpe
+        :data="envTableData"
+        @cell-mouse-enter="cellMouseEnter"
+        @cell-mouse-leave="cellMouseLeave"
+        max-height="500"
+      >
+        <el-table-column label="环境名称" width="300">
+          <template #default="scope">
+            <el-input
+              v-model="scope.row.name"
+              placeholder="请输入环境名称"
+              :disabled="!showBtn(scope.row)"
+            ></el-input>
+          </template>
+        </el-table-column>
 
-    <el-table-column label="备注信息">
-      <template #default="scope">
-        <el-input
-          v-model="scope.row.remarks"
-          placeholder="请输入备注信息"
-          :disabled="!showBtn(scope.row)"
-        ></el-input>
-      </template>
-    </el-table-column>
+        <el-table-column label="备注信息">
+          <template #default="scope">
+            <el-input
+              v-model="scope.row.remarks"
+              placeholder="请输入备注信息"
+              :disabled="!showBtn(scope.row)"
+            ></el-input>
+          </template>
+        </el-table-column>
 
-    <el-table-column label="操作" mini-width="100">
-      <template #default="scope">
-        <el-button
-          class="mt-4"
-          @click="editEnv(scope.row)"
-          v-if="!showBtn(scope.row)"
-          >{{ "编辑" }}</el-button
-        >
-        <el-button
-          class="mt-4"
-          @click="cancelEnv(scope.row)"
-          v-if="showCancelBtn(scope.row)"
-          >{{ "取消" }}</el-button
-        >
-        <el-button
-          class="mt-4"
-          @click="saveEnv(scope.$index, scope.row)"
-          v-if="showBtn(scope.row)"
-          >{{ "保存" }}</el-button
-        >
-        <el-button class="mt-4" @click="deleteEnvs(scope.$index, scope.row)">{{
-          "删除"
-        }}</el-button>
-      </template>
-    </el-table-column>
-  </el-table>
-  <el-button class="mt-4" style="width: 100%" @click="onAddItem">{{
-    "添加环境"
-  }}</el-button>
+        <el-table-column label="操作" mini-width="100">
+          <template #default="scope">
+            <el-button
+              class="mt-4"
+              @click="editEnv(scope.row)"
+              v-if="!showBtn(scope.row)"
+              >{{ "编辑" }}</el-button
+            >
+            <el-button
+              class="mt-4"
+              @click="cancelEnv(scope.row)"
+              v-if="showCancelBtn(scope.row)"
+              >{{ "取消" }}</el-button
+            >
+            <el-button
+              class="mt-4"
+              @click="saveEnv(scope.$index, scope.row)"
+              v-if="showBtn(scope.row)"
+              >{{ "保存" }}</el-button
+            >
+            <el-button
+              class="mt-4"
+              @click="deleteEnvs(scope.$index, scope.row)"
+              >{{ "删除" }}</el-button
+            >
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+  </div>
 </template>
 
 <script>
