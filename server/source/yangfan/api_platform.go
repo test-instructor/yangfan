@@ -272,10 +272,10 @@ func RegisterApis() {
 		{ApiGroup: "CI", Method: "POST", Path: "/ci/runTag", Description: "运行tag"},
 		{ApiGroup: "CI", Method: "GET", Path: "/ci/getReport", Description: "获取测试报告"},
 
-		{ApiGroup: "mock", Method: "GET", Path: "/env/:project/findEnvMock", Description: "通过id查询mock数据"},
-		{ApiGroup: "mock", Method: "POST", Path: "/env/:project/createEnvMock", Description: "创建mock数据"},
-		{ApiGroup: "mock", Method: "DELETE", Path: "/env/:project/deleteEnvMock", Description: "删除mock数据"},
-		{ApiGroup: "mock", Method: "GET", Path: "/env/:project/getEnvVariableList", Description: "查询变量列表"},
+		//{ApiGroup: "mock", Method: "GET", Path: "/env/:project/findEnvMock", Description: "通过id查询mock数据"},
+		//{ApiGroup: "mock", Method: "POST", Path: "/env/:project/createEnvMock", Description: "创建mock数据"},
+		//{ApiGroup: "mock", Method: "DELETE", Path: "/env/:project/deleteEnvMock", Description: "删除mock数据"},
+		//{ApiGroup: "mock", Method: "GET", Path: "/env/:project/getEnvVariableList", Description: "查询变量列表"},
 	}
 
 	var count int64
