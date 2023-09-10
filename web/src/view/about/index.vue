@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-row :gutter="10">
-      <el-col :span="12">
+      <el-col :span="16">
         <el-card>
           <template #header>
             <el-divider>扬帆测试平台</el-divider>
@@ -30,7 +30,7 @@
           </div>
         </el-card>
       </el-col>
-      <el-col :span="12">
+      <el-col :span="8">
         <el-card>
           <template #header>
             <div>提交记录</div>
@@ -142,7 +142,7 @@ loadMembers();
 }
 
 img {
-  width: 270px;
-  height: auto;
+  width: 360px;
+  height: 520px;
 }
 </style>
