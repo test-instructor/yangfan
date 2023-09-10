@@ -29,7 +29,7 @@ func resetReport(reports *interfacecase.ApiReport) {
 	testcaseStatus := true
 	for k, v := range reports.Details {
 		var statStep hrp.TestStepStat
-		var stepStatus bool
+		var stepStatus = true
 		for _, v2 := range v.Records {
 			apiSuccess := 0
 			apiFail := 0
@@ -42,7 +42,6 @@ func resetReport(reports *interfacecase.ApiReport) {
 					} else {
 						apiSuccess++
 					}
-					stepStatus = true
 				} else {
 					if v2.Attachment != "" {
 						apiError++
