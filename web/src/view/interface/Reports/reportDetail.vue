@@ -40,16 +40,18 @@
           type="info"
           size="small"
           class="extra-small-button"
-          @click="set_status_info"
-          v-if="set_status_info"
+          @click="set_status_skip"
+          v-if="status_skip"
+          color="#0DA5AA"
           >跳过</el-button
         >
         <el-button
           type="info"
           size="small"
           class="extra-small-button"
-          @click="set_status_info"
-          v-if="!set_status_info"
+          @click="set_status_skip"
+          v-if="!status_skip"
+          color="#0DA5AA"
           plain
           >跳过</el-button
         >
@@ -240,6 +242,14 @@
                         <el-tag
                           :type="shouStatus(scope.row)[0]"
                           effect="dark"
+                          v-if="shouStatus(scope.row)[0] !== 'info'"
+                          >{{ shouStatus(scope.row)[1] }}</el-tag
+                        >
+                        <el-tag
+                          color="#0DA5AA"
+                          v-if="shouStatus(scope.row)[0] === 'info'"
+                          effect="dark"
+                          :hit="false"
                           >{{ shouStatus(scope.row)[1] }}</el-tag
                         >
                       </template>
@@ -901,28 +911,6 @@ const shouStatus = (row) => {
   return ["warning", "失败"];
 };
 
-const show_column = (row) => {
-  if (row.success) {
-    if (row.skip) {
-      return !status_skip.value;
-    }
-    if (status_success.value) {
-      return true;
-    }
-    return false;
-  }
-  if (row.attachments && row.attachments !== "") {
-    if (status_error.value) {
-      return true;
-    }
-    return false;
-  }
-  if (status_fail.value) {
-    return true;
-  }
-  return false;
-};
-
 const getTestCaseDetailData = async () => {
   for (var i = 0; i < reportData.value.details.length; i++) {
     for (var j = 0; j < reportData.value.details[i].records.length; j++) {
@@ -1229,8 +1217,6 @@ const set_row_records = (row) => {
         }
       }
     });
-    console.log("records.value[index]", records.value[index].data);
-    console.log("records.value[index]-records_data", records_data.value);
     records.value[index].data = records_data.value;
   });
 };
@@ -1250,10 +1236,26 @@ const set_status_all = () => {
   status_skip.value = true;
   status_error.value = true;
   status_fail.value = true;
+  reset_report();
   print_status();
 };
 
+const reset_report = () => {
+  let table = currentInstance.refs.reportDataId;
+  const row = ref();
+  reportData.value.details.map((item) => {
+    table.toggleRowExpansion(item, false);
+    if (currentIndex.value === item.ID) {
+      row.value = JSON.parse(JSON.stringify(item));
+      currentIndex.value = 0;
+    }
+  });
+  table.toggleRowExpansion(row.value);
+  // toggleExpand(row);
+};
+
 const set_status_other = () => {
+  reset_report();
   if (status_all.value) {
     status_all.value = false;
     status_success.value = false;
@@ -1271,7 +1273,7 @@ const set_status_success = () => {
   }
   print_status();
 };
-const set_status_info = () => {
+const set_status_skip = () => {
   set_status_other();
   status_skip.value = !status_skip.value;
   if (!set_status_detection()) {
@@ -1307,11 +1309,11 @@ const set_status_detection = () => {
 };
 
 const print_status = () => {
-  console.log("全部", status_all.value);
-  console.log("成功", status_success.value);
-  console.log("跳过", status_skip.value);
-  console.log("失败", status_error.value);
-  console.log("错误", status_fail.value);
+  // console.log("全部", status_all.value);
+  // console.log("成功", status_success.value);
+  // console.log("跳过", status_skip.value);
+  // console.log("失败", status_error.value);
+  // console.log("错误", status_fail.value);
 };
 </script>
 
