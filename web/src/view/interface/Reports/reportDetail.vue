@@ -1215,14 +1215,14 @@ const set_row_records = (row) => {
         }
       } else {
         if (
-          status_fail.value &&
+          status_error.value &&
           items.attachments &&
           items.attachments !== ""
         ) {
           records_data.value.push(JSON.parse(JSON.stringify(items)));
         }
         if (
-          status_error.value &&
+          status_fail.value &&
           (!items.attachments || items.attachments === "")
         ) {
           records_data.value.push(JSON.parse(JSON.stringify(items)));
