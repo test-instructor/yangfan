@@ -71,7 +71,7 @@ func resetReport(reports *interfacecase.ApiReport) {
 		statTeststeps.Failures += statStep.Failures
 		statTeststeps.Error += statStep.Error
 		statTeststeps.Skip += statStep.Skip
-		statTeststeps.Total = statStep.Successes + statStep.Failures + statStep.Error + statStep.Skip
+		statTeststeps.Total += statStep.Successes + statStep.Failures + statStep.Error + statStep.Skip
 		statTestcases.Total = statTestcases.Success + statTestcases.Fail
 	}
 	*reports.Success = testcaseStatus
