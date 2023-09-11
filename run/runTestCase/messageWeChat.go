@@ -155,8 +155,10 @@ func (wn WeChatNotifier) generateTableContent(data []Content) (tableContent stri
 	for _, row := range data {
 		tableContent += "<tr>"
 		tableContent += fmt.Sprintf("<td>%s</td>", row.Name)
-		tableContent += fmt.Sprintf("<td>%d</td>", row.Total)
+		tableContent += fmt.Sprintf("<td>%d</td>", row.Success)
+		tableContent += fmt.Sprintf("<td>%d</td>", row.Skip)
 		tableContent += fmt.Sprintf("<td>%d</td>", row.Fail)
+		tableContent += fmt.Sprintf("<td>%d</td>", row.Error)
 		tableContent += fmt.Sprintf("<td>%d秒</td>", row.Time)
 		tableContent += "</tr>"
 	}
@@ -165,8 +167,9 @@ func (wn WeChatNotifier) generateTableContent(data []Content) (tableContent stri
 	tableContent = fmt.Sprintf("<!DOCTYPE html><html><head><style>body {margin: 20; padding: 0;}"+
 		"table {font-size: 15;border-collapse: collapse;}"+
 		"th, td {border: 1px solid black;padding: 8px;text-align: center;}</style></head><body>%s<table>"+
-		"<tr><th style=\"width: 200px;\">用例名称</th><th style=\"width: 80px;\">成功数</th>"+
-		"<th style=\"width: 80px;\">失败数</th><th style=\"width: 80px;\">耗时</th></tr>%s"+
+		"<tr><th style=\"width: 180px;\">用例名称</th><th style=\"width: 42px;\">成功</th>"+
+		"<th style=\"width: 42px;\">跳过</th><th style=\"width: 42px;\">失败</th>"+
+		"<th style=\"width: 42px;\">错误</th><th style=\"width: 55px;\">耗时</th></tr>%s"+
 		"</table></body></html>", title, tableContent)
 	return tableContent
 }
