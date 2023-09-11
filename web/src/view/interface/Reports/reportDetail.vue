@@ -458,6 +458,12 @@ const reportDetailFunc = (dataType) => {
   if (dataType === "response") {
     dialogTitle.value = "response json 数据";
     dialogData.value = dialogDataResponse.value;
+
+    try {
+      dialogData.value.body = JSON.parse(dialogDataResponse.value.body);
+    } catch (error) {
+      // 如果无法解析为JSON，则保留原有格式
+    }
   }
   dialogFormDetail.value = true;
 };
