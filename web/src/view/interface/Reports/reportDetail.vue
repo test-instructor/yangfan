@@ -1,6 +1,94 @@
 <template>
   <div style="display: flex">
     <div class="dashboard-line-box">
+      <div style="margin-bottom: 8px">
+        <el-button
+          type="primary"
+          size="small"
+          class="extra-small-button"
+          @click="set_status_all"
+          v-if="status_all"
+          >全部</el-button
+        >
+        <el-button
+          type="primary"
+          size="small"
+          class="extra-small-button"
+          @click="set_status_all"
+          plain
+          v-if="!status_all"
+          >全部</el-button
+        >
+        <el-button
+          type="success"
+          size="small"
+          class="extra-small-button"
+          @click="set_status_success"
+          v-if="status_success"
+          >成功</el-button
+        >
+        <el-button
+          type="success"
+          size="small"
+          class="extra-small-button"
+          @click="set_status_success"
+          v-if="!status_success"
+          plain
+          >成功</el-button
+        >
+        <el-button
+          type="info"
+          size="small"
+          class="extra-small-button"
+          @click="set_status_info"
+          v-if="set_status_info"
+          >跳过</el-button
+        >
+        <el-button
+          type="info"
+          size="small"
+          class="extra-small-button"
+          @click="set_status_info"
+          v-if="!set_status_info"
+          plain
+          >跳过</el-button
+        >
+        <el-button
+          type="warning"
+          size="small"
+          class="extra-small-button"
+          @click="set_status_fail"
+          v-if="status_fail"
+          >失败</el-button
+        >
+        <el-button
+          type="warning"
+          size="small"
+          class="extra-small-button"
+          @click="set_status_fail"
+          v-if="!status_fail"
+          plain
+          >失败</el-button
+        >
+        <el-button
+          type="danger"
+          size="small"
+          class="extra-small-button"
+          @click="set_status_error"
+          v-if="status_error"
+          >错误</el-button
+        >
+        <el-button
+          type="danger"
+          size="small"
+          class="extra-small-button"
+          @click="set_status_error"
+          v-if="!status_error"
+          plain
+          >错误</el-button
+        >
+      </div>
+
       <div id="caseDetail">
         <el-table
           border
@@ -115,7 +203,7 @@
             <el-table
               :show-header="false"
               id="apiTableData"
-              :data="scope.row.records"
+              :data="records"
               :default-expand-all="true"
               style="padding-left: 15px"
             >
@@ -146,7 +234,6 @@
                     id="apiTableData"
                     :data="scope.row.data"
                     :show-header="false"
-                    v-if="shouStep(scope.row)"
                   >
                     <el-table-column width="70">
                       <template #default="scope">
@@ -808,10 +895,32 @@ const shouStatus = (row) => {
     }
     return ["success", "成功"];
   }
-  if (row.attachments && row.attachments != "") {
+  if (row.attachments && row.attachments !== "") {
     return ["danger", "错误"];
   }
   return ["warning", "失败"];
+};
+
+const show_column = (row) => {
+  if (row.success) {
+    if (row.skip) {
+      return !status_skip.value;
+    }
+    if (status_success.value) {
+      return true;
+    }
+    return false;
+  }
+  if (row.attachments && row.attachments !== "") {
+    if (status_error.value) {
+      return true;
+    }
+    return false;
+  }
+  if (status_fail.value) {
+    return true;
+  }
+  return false;
 };
 
 const getTestCaseDetailData = async () => {
@@ -1070,7 +1179,10 @@ watch(testStepsData, () => {
   testStepChart.setOption(pieOption);
 });
 
+const row_records = ref({});
+const records = ref([]);
 const toggleExpand = (row) => {
+  set_row_records(row);
   let table = currentInstance.refs.reportDataId;
   reportData.value.details.map((item) => {
     if (row.ID !== item.ID) {
@@ -1085,9 +1197,121 @@ const toggleExpand = (row) => {
   }
 };
 
+const set_row_records = (row) => {
+  if (!row_records[row.ID]) {
+    row_records[row.ID] = JSON.parse(JSON.stringify(row.records));
+  }
+  records.value = JSON.parse(JSON.stringify(row_records[row.ID]));
+  let records_temp = JSON.parse(JSON.stringify(records.value));
+  records_temp.forEach((item, index) => {
+    const records_data = ref([]);
+    item.data.forEach((items, indexs) => {
+      if (items.success) {
+        if (status_success.value && !items.skip) {
+          records_data.value.push(JSON.parse(JSON.stringify(items)));
+        }
+        if (status_skip.value && items.skip) {
+          records_data.value.push(JSON.parse(JSON.stringify(items)));
+        }
+      } else {
+        if (
+          status_fail.value &&
+          items.attachments &&
+          items.attachments !== ""
+        ) {
+          records_data.value.push(JSON.parse(JSON.stringify(items)));
+        }
+        if (
+          status_error.value &&
+          (!items.attachments || items.attachments === "")
+        ) {
+          records_data.value.push(JSON.parse(JSON.stringify(items)));
+        }
+      }
+    });
+    console.log("records.value[index]", records.value[index].data);
+    console.log("records.value[index]-records_data", records_data.value);
+    records.value[index].data = records_data.value;
+  });
+};
+
 const dialogClose = () => {
   dialogFormDetail.value = false;
   dialogData.value = {};
+};
+const status_all = ref(true);
+const status_success = ref(true);
+const status_skip = ref(true);
+const status_error = ref(true);
+const status_fail = ref(true);
+const set_status_all = () => {
+  status_all.value = true;
+  status_success.value = true;
+  status_skip.value = true;
+  status_error.value = true;
+  status_fail.value = true;
+  print_status();
+};
+
+const set_status_other = () => {
+  if (status_all.value) {
+    status_all.value = false;
+    status_success.value = false;
+    status_skip.value = false;
+    status_error.value = false;
+    status_fail.value = false;
+  }
+};
+
+const set_status_success = () => {
+  set_status_other();
+  status_success.value = !status_success.value;
+  if (!set_status_detection()) {
+    status_success.value = true;
+  }
+  print_status();
+};
+const set_status_info = () => {
+  set_status_other();
+  status_skip.value = !status_skip.value;
+  if (!set_status_detection()) {
+    status_skip.value = true;
+  }
+  print_status();
+};
+const set_status_fail = () => {
+  set_status_other();
+  status_fail.value = !status_fail.value;
+  if (!set_status_detection()) {
+    status_fail.value = true;
+  }
+  print_status();
+};
+const set_status_error = () => {
+  set_status_other();
+  status_error.value = !status_error.value;
+  if (!set_status_detection()) {
+    status_error.value = true;
+  }
+  print_status();
+};
+
+const set_status_detection = () => {
+  return (
+    status_all.value ||
+    status_success.value ||
+    status_skip.value ||
+    status_error.value ||
+    status_fail.value
+  );
+};
+
+const print_status = () => {
+  console.log("全部", status_all.value);
+  console.log("成功", status_success.value);
+  console.log("跳过", status_skip.value);
+  console.log("失败", status_error.value);
+  console.log("错误", status_fail.value);
 };
 </script>
 
@@ -1151,5 +1375,16 @@ const dialogClose = () => {
 
 .el-table__body {
   width: 100% !important;
+}
+
+.status_tag {
+  margin-bottom: 8px;
+  margin-left: 5px;
+  margin-right: 8px;
+}
+
+.extra-small-button {
+  font-size: 12px;
+  padding: 15px;
 }
 </style>
