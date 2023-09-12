@@ -208,3 +208,8 @@ func (testCaseService *PerformanceService) FindReport(pReportReq interfacecaseRe
 
 	return err, pReport
 }
+
+func (testCaseService *PerformanceService) Create(testCase interfacecase.PerformanceCase) (err error) {
+	err = global.GVA_DB.Create(&testCase).Error
+	return err
+}

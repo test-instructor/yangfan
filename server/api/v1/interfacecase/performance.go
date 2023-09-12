@@ -218,3 +218,16 @@ func (apiCase *PerformanceApi) FindReport(c *gin.Context) {
 		}, c)
 	}
 }
+
+func (apiCase *PerformanceApi) Create(c *gin.Context) {
+	var testCase interfacecase.PerformanceCase
+	_ = c.ShouldBindJSON(&testCase)
+	testCase.ProjectID = utils.GetUserProject(c)
+	testCase.CreatedBy = utils.GetUserIDAddress(c)
+	if err := performanceService.Create(testCase); err != nil {
+		global.GVA_LOG.Error("创建失败!", zap.Error(err))
+		response.FailWithMessage("创建失败", c)
+	} else {
+		response.OkWithMessage("创建成功", c)
+	}
+}

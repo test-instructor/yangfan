@@ -32,7 +32,7 @@ func (s *PerformanceRouter) InitPerformanceRouter(Router *gin.RouterGroup) {
 		performanceRouter.DELETE("deleteReport", performanceApi.DeleteReport)
 
 		// 性能测试多用例
-		performanceRouter.POST("case/create", performanceApi.DeleteReport)         // 创建
+		performanceRouter.POST("case/create", performanceApi.CreatePerformance)    // 创建
 		performanceRouter.POST("case/update", performanceApi.DeleteReport)         // 更新
 		performanceRouter.DELETE("case/delete", performanceApi.DeleteReport)       // 删除
 		performanceRouter.POST("case/child/add", performanceApi.DeleteReport)      // 添加子用例
