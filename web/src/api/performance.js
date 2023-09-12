@@ -135,3 +135,72 @@ export const findReport = (params) => {
     params,
   });
 };
+
+export const childCreate = (data) => {
+  return service({
+    url: baseURL + "/case/create",
+    method: "post",
+    data,
+  });
+};
+export const childUpdate = (data) => {
+  return service({
+    url: baseURL + "/case/update",
+    method: "post",
+    data,
+  });
+};
+
+export const pDelete = (data) => {
+  return service({
+    url: baseURL + "/case/delete",
+    method: "delete",
+    data,
+  });
+};
+
+export const childAdd = (data) => {
+  return service({
+    url: baseURL + "/case/child/add",
+    method: "post",
+    data,
+  });
+};
+
+export const childSort = (data) => {
+  return service({
+    url: baseURL + "/case/child/sort",
+    method: "post",
+    data,
+  });
+};
+
+export const childDelete = (data) => {
+  return service({
+    url: baseURL + "/case/child/delete",
+    method: "delete",
+    data,
+  });
+};
+
+export const pFind = (params) => {
+  return service({
+    url: baseURL + "/case/find",
+    method: "get",
+    params,
+  });
+};
+export const pList = (params) => {
+  return service({
+    url: baseURL + "/case/list",
+    method: "get",
+    params,
+  });
+};
+export const childTask = (params) => {
+  return service({
+    url: baseURL + "/case/child/task",
+    method: "get",
+    params,
+  });
+};
