@@ -187,6 +187,17 @@ func RegisterApis() {
 		{ApiGroup: "性能测试", Method: "DELETE", Path: "/performance/:project/deletePerformance", Description: "删除性能任务"},
 		{ApiGroup: "性能测试", Method: "GET", Path: "/performance/:project/findPerformance", Description: "通过id查找性能任务"},
 
+		{ApiGroup: "性能测试用例", Method: "POST", Path: "/performance/:project/case/create", Description: "创建性能测试用例"},
+		{ApiGroup: "性能测试用例", Method: "POST", Path: "/performance/:project/case/update", Description: "更新性能测试用例"},
+		{ApiGroup: "性能测试用例", Method: "DELETE", Path: "/performance/:project/case/delete", Description: "删除性能测试用例"},
+		{ApiGroup: "性能测试用例", Method: "POST", Path: "/performance/:project/case/child/add", Description: "添加性能测试用例(子用例)"},
+		{ApiGroup: "性能测试用例", Method: "POST", Path: "/performance/:project/case/child/sort", Description: "性能测试用例排序(子用例)"},
+		{ApiGroup: "性能测试用例", Method: "DELETE", Path: "/performance/:project/case/child/delete", Description: "删除性能测试用例(子用例)"},
+
+		{ApiGroup: "性能测试用例", Method: "GET", Path: "/performance/:project/case/find", Description: "通过id获取性能测试用例"},
+		{ApiGroup: "性能测试用例", Method: "GET", Path: "/performance/:project/case/list", Description: "性能测试用例列表"},
+		{ApiGroup: "性能测试用例", Method: "GET", Path: "/performance/:project/case/child/task", Description: "性能测试用例列表(子用例)"},
+
 		{ApiGroup: "接口分组树形菜单", Method: "GET", Path: "/case/:project/getApiMenuList", Description: "获取接口菜单列表"},
 		{ApiGroup: "接口分组树形菜单", Method: "POST", Path: "/case/:project/createApiMenu", Description: "新增接口菜单"},
 		{ApiGroup: "接口分组树形菜单", Method: "DELETE", Path: "/case/:project/deleteApiMenu", Description: "删除接口菜单"},

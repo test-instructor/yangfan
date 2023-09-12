@@ -30,7 +30,14 @@ func (s *PerformanceRouter) InitPerformanceRouter(Router *gin.RouterGroup) {
 		performanceRouter.GET("findPerformanceStep", performanceApi.FindPerformanceStep)
 		performanceRouter.GET("getReportList", performanceApi.GetReportList)
 		performanceRouter.DELETE("deleteReport", performanceApi.DeleteReport)
-		//performanceRouter.POST("addTaskTestCase", taskApi.AddTaskTestCase)
+
+		// 性能测试多用例
+		performanceRouter.POST("case/create", performanceApi.DeleteReport)         // 创建
+		performanceRouter.POST("case/update", performanceApi.DeleteReport)         // 更新
+		performanceRouter.DELETE("case/delete", performanceApi.DeleteReport)       // 删除
+		performanceRouter.POST("case/child/add", performanceApi.DeleteReport)      // 添加子用例
+		performanceRouter.POST("case/child/sort", performanceApi.DeleteReport)     // 子用例排序
+		performanceRouter.DELETE("case/child/delete", performanceApi.DeleteReport) // 子用例删除
 		//performanceRouter.POST("setTaskCase", taskApi.SetTaskCase)
 	}
 	{
@@ -38,5 +45,10 @@ func (s *PerformanceRouter) InitPerformanceRouter(Router *gin.RouterGroup) {
 		//performanceRouterWithoutRecord.GET("getTimerTaskList", taskApi.GetTimerTaskList) // 获取TimerTask列表
 		performanceRouterWithoutRecord.GET("getPerformanceList", performanceApi.GetPerformanceList) // 新建Performance
 		performanceRouterWithoutRecord.GET("findReport", performanceApi.FindReport)
+
+		// 性能测试多用例
+		performanceRouterWithoutRecord.GET("case/find", performanceApi.FindReport)       // 通过id查找
+		performanceRouterWithoutRecord.GET("case/list", performanceApi.FindReport)       // 获取列表
+		performanceRouterWithoutRecord.GET("case/child/task", performanceApi.FindReport) // 用例列表
 	}
 }

@@ -77,6 +77,8 @@ func RegisterTables(db *gorm.DB) {
 
 		// 性能测试模块
 		interfacecase.Performance{},
+		interfacecase.PerformanceCase{},
+		interfacecase.PerformanceCaseRelationship{},
 		interfacecase.PerformanceReport{},
 		interfacecase.PerformanceReportDetail{},
 		interfacecase.PerformanceRelationship{},

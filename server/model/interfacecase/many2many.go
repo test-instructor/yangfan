@@ -41,3 +41,11 @@ type ApiTimerTaskRelationship struct {
 	ApiCaseId      uint `gorm:"comment:测试用例"`
 	Sort           uint `gorm:"comment:排序"`
 }
+
+type PerformanceCaseRelationship struct {
+	global.GVA_MODEL
+	Performance       Performance
+	PerformanceId     uint
+	PerformanceCase   PerformanceCase
+	PerformanceCaseId uint
+}
