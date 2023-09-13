@@ -68,6 +68,7 @@ func (s *StepTestCaseWithOptionalArgs) Run(r *SessionRunner) (stepResult *StepRe
 	}()
 
 	stepTestCase := s.step.TestCase.(*TestCase)
+	stepTestCase.Config = r.caseRunner.testCase.Config
 
 	// copy testcase to avoid data racing
 	copiedTestCase := &TestCase{}

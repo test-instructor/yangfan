@@ -448,7 +448,8 @@ func (r *CaseRunner) parseConfig() error {
 // in order to avoid data racing
 func (r *CaseRunner) NewSession() *SessionRunner {
 	sessionRunner := &SessionRunner{
-		caseRunner: r,
+		caseRunner:   r,
+		configHeader: make(map[string]string),
 	}
 	sessionRunner.resetSession()
 	return sessionRunner
@@ -467,6 +468,7 @@ type SessionRunner struct {
 	wsConnMap         map[string]*websocket.Conn // save all websocket connections
 	pongResponseChan  chan string                // channel used to receive pong response message
 	closeResponseChan chan *wsCloseRespObject    // channel used to receive close response message
+	configHeader      map[string]string
 }
 
 func (r *SessionRunner) resetSession() {
@@ -484,6 +486,9 @@ func (r *SessionRunner) resetSession() {
 // givenVars is used for data driven
 func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 	config := r.caseRunner.testCase.Config
+	if config.Headers == nil {
+		config.Headers = r.configHeader
+	}
 	global.GVA_LOG.Info("run testcase start", zap.String("testcase", config.Name))
 
 	// reset session runner
@@ -541,8 +546,11 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 			if r.caseRunner.parsedConfig.Variables == nil {
 				r.caseRunner.parsedConfig.Variables = make(map[string]interface{})
 			}
-			r.caseRunner.parsedConfig.Variables[k] = v
+			if r.caseRunner.testCase.Config.Variables == nil {
+				r.caseRunner.testCase.Config.Variables = make(map[string]interface{})
+			}
 			r.caseRunner.testCase.Config.Variables[k] = v
+			r.caseRunner.parsedConfig.Variables[k] = v
 		}
 
 		var StepResults hrp.StepResultStruct
@@ -556,6 +564,7 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 			if r.caseRunner.parsedConfig.Headers == nil {
 				r.caseRunner.parsedConfig.Headers = make(map[string]string)
 			}
+			r.configHeader[headerKey] = StepResults.Data.ReqResps.Request.Headers[headerKey]
 			r.caseRunner.testCase.Config.Headers[headerKey] = StepResults.Data.ReqResps.Request.Headers[headerKey]
 			r.caseRunner.parsedConfig.Headers[headerKey] = StepResults.Data.ReqResps.Request.Headers[headerKey]
 		}
@@ -564,14 +573,16 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 		//}
 
 		if err == nil {
-			global.GVA_LOG.Error("run step end",
+			global.GVA_LOG.Info("run step end",
 				zap.String("step", stepResult.Name), zap.String("type", string(stepResult.StepType)),
 				zap.Bool("success", true), zap.Any("exportVars", stepResult.ExportVars))
-			continue
+			//continue
 		}
 
 		// failed
-		global.GVA_LOG.Error("run step end", zap.String("step", stepResult.Name), zap.String("type", string(stepResult.StepType)), zap.Bool("success", false))
+		if err != nil {
+			global.GVA_LOG.Error("run step end", zap.String("step", stepResult.Name), zap.String("type", string(stepResult.StepType)), zap.Bool("success", false))
+		}
 		// check if failfast
 		if r.caseRunner.hrpRunner.failfast {
 			return errors.Wrap(err, "abort running due to failfast setting")
@@ -591,7 +602,7 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 		}
 	}()
 
-	global.GVA_LOG.Error("run testcase end", zap.String("testcase", config.Name))
+	global.GVA_LOG.Info("run testcase end", zap.String("testcase", config.Name))
 	return nil
 }
 
