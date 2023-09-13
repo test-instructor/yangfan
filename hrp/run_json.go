@@ -7,8 +7,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
-	"sync"
 	"time"
 
 	"github.com/pkg/errors"
@@ -39,66 +37,49 @@ func (r *HRPRunner) RunJsons(testcases ...ITestCase) (data []byte, err error) {
 	}
 
 	var runErr error
-	// run testcase one by one
-	var wg sync.WaitGroup
-	cpu := 2
-	if runtime.NumCPU() >= 4 {
-		cpu = runtime.NumCPU() - 2
-	}
-	//cpu = 1
-	intChan := make(chan int, cpu)
-	defer close(intChan)
-	wg.Add(len(testcases))
+
 	for _, testCase := range testCases {
 		// each testcase has its own case runner
-		go func(testcase *TestCase) {
-			defer wg.Done()
-			intChan <- 1
-			defer func() {
-				<-intChan
-			}()
-			caseRunner, err := r.NewCaseRunner(testcase)
-			if err != nil {
-				global.GVA_LOG.Error("run json failed to init case runner", zap.Error(err))
-				return
+		caseRunner, err := r.NewCaseRunner(testCase)
+		if err != nil {
+			global.GVA_LOG.Error("run json failed to init case runner", zap.Error(err))
+			return nil, err
+		}
+
+		// release UI driver session
+		defer func() {
+			for _, client := range r.uiClients {
+				client.Driver.DeleteSession()
 			}
+		}()
 
-			// release UI driver session
-			defer func() {
-				for _, client := range r.uiClients {
-					client.Driver.DeleteSession()
-				}
-			}()
+		for it := caseRunner.parametersIterator; it.HasNext(); {
+			sessionRunner := caseRunner.NewSession()
+			err1 := sessionRunner.Start(it.Next())
+			if err1 != nil {
+				global.GVA_LOG.Error("run json failed to run testcase", zap.Error(err1))
+				runErr = err1
+			}
+			caseSummary, err2 := sessionRunner.GetSummary()
+			caseSummary.CaseID = testCase.ID
+			//for k, _ := range caseSummary.Records {
+			//	caseSummary.Records[k].ValidatorsNumber = testcase.TestSteps[k].Struct().ValidatorsNumber
+			//}
 
-			for it := caseRunner.parametersIterator; it.HasNext(); {
-				sessionRunner := caseRunner.NewSession()
-				err1 := sessionRunner.Start(it.Next())
+			//把header、Extract导出到上一级配置（caseRunner.testCase.Config）中
+			//caseRunner.testCase.Config
+			caseSummary.Name = testCase.Name
+			s.appendCaseSummary(caseSummary)
+			if err2 != nil {
+				global.GVA_LOG.Error("run json failed to get summary", zap.Error(err2))
 				if err1 != nil {
-					global.GVA_LOG.Error("run json failed to run testcase", zap.Error(err1))
-					runErr = err1
-				}
-				caseSummary, err2 := sessionRunner.GetSummary()
-				caseSummary.CaseID = testcase.ID
-				//for k, _ := range caseSummary.Records {
-				//	caseSummary.Records[k].ValidatorsNumber = testcase.TestSteps[k].Struct().ValidatorsNumber
-				//}
-
-				//把header、Extract导出到上一级配置（caseRunner.testCase.Config）中
-				//caseRunner.testCase.Config
-				caseSummary.Name = testcase.Name
-				s.appendCaseSummary(caseSummary)
-				if err2 != nil {
-					global.GVA_LOG.Error("run json failed to get summary", zap.Error(err2))
-					if err1 != nil {
-						runErr = errors.Wrap(err1, err2.Error())
-					} else {
-						runErr = err2
-					}
+					runErr = errors.Wrap(err1, err2.Error())
+				} else {
+					runErr = err2
 				}
 			}
-		}(testCase)
+		}
 	}
-	wg.Wait()
 	s.Time.Duration = time.Since(s.Time.StartAt).Seconds()
 
 	// save summary

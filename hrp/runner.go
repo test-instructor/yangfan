@@ -538,6 +538,11 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 		// update extracted variables
 		for k, v := range stepResult.ExportVars {
 			r.sessionVariables[k] = v
+			if r.caseRunner.parsedConfig.Variables == nil {
+				r.caseRunner.parsedConfig.Variables = make(map[string]interface{})
+			}
+			r.caseRunner.parsedConfig.Variables[k] = v
+			r.caseRunner.testCase.Config.Variables[k] = v
 		}
 
 		var StepResults hrp.StepResultStruct
