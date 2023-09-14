@@ -26,6 +26,7 @@
           filterable
           v-model="scope.row.assert"
           placeholder="请选择类型"
+          @change="handleTypeChange()"
         >
           <el-option
             v-for="item in validateOptions"
@@ -40,7 +41,7 @@
 
     <el-table-column label="期望类型" width="110">
       <template #default="scope">
-        <el-select v-model="scope.row.type">
+        <el-select v-model="scope.row.type" @change="handleTypeChange()">
           <el-option
             v-for="item in dataTypeOptions"
             :key="item.value"
@@ -148,6 +149,9 @@ export default {
           validate.value = item.value;
           this.dataTypeOptions.push(validate);
         });
+    },
+    handleTypeChange() {
+      this.variablesDatas();
     },
     validateDatas() {
       let emitdata = [];
