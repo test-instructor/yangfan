@@ -52,8 +52,8 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
 RUN dpkg -i google-chrome-stable_current_amd64.deb
 RUN rm google-chrome-stable_current_amd64.deb
 
-USER root
-RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf
+COPY ./run/set_dns.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/set_dns.sh
 
 ENTRYPOINT ./run -c docker.config.yaml
 
