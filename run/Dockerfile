@@ -52,11 +52,6 @@ RUN wget -N --no-check-certificate https://raw.githubusercontent.com/notetoday/L
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 RUN dpkg -i google-chrome-stable_current_amd64.deb
 RUN rm google-chrome-stable_current_amd64.deb
-
-COPY ./run/set_dns.txt /set_dns.txt
-RUN cat /set_dns.txt >> /etc/resolv.conf
-
-echo "" > /etc/resolv.conf
 ENTRYPOINT ./run -c docker.config.yaml
 
 CMD ["tail", "-f", "/dev/null"]
