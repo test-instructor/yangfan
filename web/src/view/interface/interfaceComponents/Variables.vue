@@ -22,7 +22,7 @@
 
     <el-table-column label="类型" width="120">
       <template #default="scope">
-        <el-select v-model="scope.row.type" @change="handleTypeChange()">
+        <el-select v-model="scope.row.type" @change="variablesDatas()">
           <el-option
             v-for="item in dataTypeOptions"
             :key="item.value"
@@ -112,9 +112,6 @@ export default {
           validate.value = item.value;
           this.dataTypeOptions.push(validate);
         });
-    },
-    handleTypeChange() {
-      this.variablesDatas();
     },
     variablesDatas() {
       let emitdata = [];
