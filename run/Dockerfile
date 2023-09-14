@@ -41,7 +41,8 @@ RUN apt-get update && apt-get install -y \
     libcurl4  \
     libu2f-udev  \
     libvulkan1  \
-    xdg-utils
+    xdg-utils \
+    vim
 
 
 # 设置编码格式
