@@ -785,6 +785,12 @@ const openDrawer = async (row) => {
           stack: "total",
           label: {
             show: true,
+            formatter: function (param) {
+              if (param.value === 0) {
+                return "";
+              }
+              return "DNS 解析";
+            },
           },
           emphasis: {
             focus: "series",
@@ -797,6 +803,12 @@ const openDrawer = async (row) => {
           stack: "total",
           label: {
             show: true,
+            formatter: function (param) {
+              if (param.value === 0) {
+                return "";
+              }
+              return "TCP 连接";
+            },
           },
           emphasis: {
             focus: "series",
@@ -809,6 +821,12 @@ const openDrawer = async (row) => {
           stack: "total",
           label: {
             show: true,
+            formatter: function (param) {
+              if (param.value === 0) {
+                return "";
+              }
+              return "TLS 握手";
+            },
           },
           emphasis: {
             focus: "series",
@@ -821,6 +839,12 @@ const openDrawer = async (row) => {
           stack: "total",
           label: {
             show: true,
+            formatter: function (param) {
+              if (param.value === 0) {
+                return "";
+              }
+              return "服务端处理";
+            },
           },
           emphasis: {
             focus: "series",
@@ -833,6 +857,12 @@ const openDrawer = async (row) => {
           stack: "total",
           label: {
             show: true,
+            formatter: function (param) {
+              if (param.value === 0) {
+                return "";
+              }
+              return "数据传输";
+            },
           },
           emphasis: {
             focus: "series",
