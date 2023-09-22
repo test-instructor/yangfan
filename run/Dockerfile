@@ -42,9 +42,7 @@ RUN apt-get update && apt-get install -y \
     libu2f-udev  \
     libvulkan1  \
     xdg-utils \
-    vim \
-    vi \
-    nano
+    vim
 
 
 # 设置编码格式
