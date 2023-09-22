@@ -23,7 +23,7 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: Build and push python chrome image
         run: |
-          docker build -t server -f base/python-chrome/Dockerfile .
+          docker build -t python -f base/python-chrome/Dockerfile .
           docker tag python ${{ env.REGISTRY }}python:3.10.0.chrome
           docker push ${{ env.REGISTRY }}python:3.10.0.chrome
 
@@ -39,6 +39,6 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: Build and push python image
         run: |
-          docker build -t server -f base/python/Dockerfile .
+          docker build -t python -f base/python/Dockerfile .
           docker tag python ${{ env.REGISTRY }}python:3.10.0
           docker push ${{ env.REGISTRY }}python:3.10.0
