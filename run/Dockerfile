@@ -44,7 +44,6 @@ RUN apt-get update && apt-get install -y \
     xdg-utils \
     vim
 
-
 # 设置编码格式
 RUN wget -N --no-check-certificate https://raw.githubusercontent.com/notetoday/LocaleCN/master/LocaleCN.sh && bash LocaleCN.sh
 
