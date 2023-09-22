@@ -1,22 +1,10 @@
-FROM golang:alpine AS builder
-WORKDIR /go/src/yangfan
+FROM python:3.10-slim
 
-COPY . .
-ENV GO111MODULE=on
-ENV GOPROXY=https://goproxy.cn
-
-RUN go build -o ./run ./run
-
-
-FROM yangfanz/python:3.10.0
 ENV TZ=Asia/Shanghai
-WORKDIR /yangfan
-COPY --from=builder /go/src/yangfan/run .
-COPY --from=builder /go/src/yangfan/get-pip.py .
-COPY --from=builder /go/src/yangfan/hrp/pkg/boomer/data/x509 /root/.hrp/x509
-COPY --from=builder /go/src/yangfan/deploy/docker-compose/config/docker.config.yaml .
+RUN python3 -m venv ~/.hrp/venv
+RUN python3 -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple \
+&& pip3 install funppy -i https://pypi.tuna.tsinghua.edu.cn/simple
 
-ENTRYPOINT ./run -c docker.config.yaml
 
 # 安装Chrome的依赖
 RUN apt-get update && apt-get install -y \
@@ -56,8 +44,4 @@ RUN dpkg -i google-chrome-stable_current_amd64.deb
 RUN rm google-chrome-stable_current_amd64.deb
 
 RUN /bin/sh -c "cat >> /etc/resolv.conf << 'EOF'\n nameserver 223.6.6.6\n EOF"
-
-
-ENTRYPOINT ./run -c docker.config.yaml
-
-CMD ["tail", "-f", "/dev/null"]
+RUN /bin/sh -c "cat >> /etc/resolv.conf << 'EOF'\n nameserver 8.8.8.8\n EOF"
