@@ -41,5 +41,4 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
 RUN dpkg -i google-chrome-stable_current_amd64.deb
 RUN rm google-chrome-stable_current_amd64.deb
 
-RUN /bin/sh -c "cat >> /etc/resolv.conf << 'EOF'\n nameserver 223.6.6.6\n EOF"
-RUN /bin/sh -c "cat >> /etc/resolv.conf << 'EOF'\n nameserver 8.8.8.8\n EOF"
+
