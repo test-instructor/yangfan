@@ -1,4 +1,4 @@
-name: CI
+name: base
 
 on:
   push:
@@ -21,11 +21,11 @@ jobs:
         with:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-      - name: Build and push Docker image
+      - name: Build and push python image
         run: |
-          docker build -t server -f server/Dockerfile .
-          docker tag python ${{ env.REGISTRY }}${{ env.IMAGE_NAME_SERVER }}:${{ env.IMAGE_TAG }}
-          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_SERVER }}:${{ env.IMAGE_TAG }}
-          docker tag python ${{ env.REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:3.10.0
-          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:3.10.0
+          docker build -t server -f base/Dockerfile .
+          docker tag python ${{ env.REGISTRY }}python:${{ env.IMAGE_TAG }}
+          docker push ${{ env.REGISTRY }}python:${{ env.IMAGE_TAG }}
+          docker tag python ${{ env.REGISTRY }}python:3.10.0
+          docker push ${{ env.REGISTRY }}python:3.10.0
 
