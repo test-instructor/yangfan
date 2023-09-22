@@ -9,6 +9,7 @@ env:
   REGISTRY: yangfanz/
   IMAGE_TAG: 3.10.${{ github.run_number }}
 
+
 jobs:
   server:
     name: Building a python image
