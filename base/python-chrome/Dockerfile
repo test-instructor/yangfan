@@ -1,6 +1,11 @@
-FROM python:3.10-slim
+FROM ubuntu:20.04
 
 ENV TZ=Asia/Shanghai
+
+RUN apt-get update -y && \
+    apt-get install -y python3.10 python3.10-venv python3-pip
+
+
 RUN python3 -m venv ~/.hrp/venv
 RUN python3 -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple \
 && pip3 install funppy -i https://pypi.tuna.tsinghua.edu.cn/simple
