@@ -1,49 +1,46 @@
-FROM ubuntu:20.04
+FROM centos:8
 
 ENV TZ=Asia/Shanghai
 
-RUN apt-get update -y && \
-    apt-get install -y python3.10 python3.10-venv python3-pip
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
 
-
+RUN dnf install -y python39
 RUN python3 -m venv ~/.hrp/venv
+
 RUN python3 -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple \
 && pip3 install funppy -i https://pypi.tuna.tsinghua.edu.cn/simple
 
-
-# 安装Chrome的依赖
-RUN apt-get update && apt-get install -y \
-    libxss1 \
-    libasound2 \
-    libatk-bridge2.0-0 \
-    libgtk-3-0 \
-    libnspr4 \
-    libnss3 \
-    libx11-xcb1 \
-    libxkbcommon0 \
-    libxcb-dri3-0 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxfixes3 \
-    libxrandr2 \
-    libgbm1 \
-    libasound2 \
+RUN dnf install -y \
+    libXScrnSaver \
+    alsa-lib \
+    at-spi2-atk \
+    gtk3 \
+    nspr \
+    nss \
+    libX11-xcb \
+    libxkbcommon \
+    libxcb-dri3 \
+    libXcomposite \
+    libXdamage \
+    libXfixes \
+    libXrandr \
+    mesa-libgbm \
     wget \
-    --fix-broken \
-    fonts-liberation  \
-    libcurl4  \
-    libu2f-udev  \
-    libvulkan1  \
+    liberation-fonts-common \
+    liberation-sans-fonts \
+    liberation-serif-fonts \
+    curl \
+    libu2f-host \
+    vulkan \
     xdg-utils \
-    vim
+    vim \
+    && dnf clean all
 
-
-# 设置编码格式
 RUN wget -N --no-check-certificate https://raw.githubusercontent.com/notetoday/LocaleCN/master/LocaleCN.sh && bash LocaleCN.sh
 
-# 下载和安装Chrome
-RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-RUN dpkg -i google-chrome-stable_current_amd64.deb
-RUN rm google-chrome-stable_current_amd64.deb
+RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
+RUN dnf localinstall -y google-chrome-stable_current_x86_64.rpm
+RUN rm google-chrome-stable_current_x86_64.rpm
 
 
