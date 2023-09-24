@@ -6,7 +6,9 @@ RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
 RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
 
 RUN dnf install -y python39 vim
-RUN python3 -m venv ~/.hrp/venv
+
 
 RUN python3 -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple \
 && pip3 install funppy -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+RUN python3 -m venv ~/.hrp/venv
