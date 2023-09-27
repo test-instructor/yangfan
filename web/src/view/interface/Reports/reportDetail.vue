@@ -527,7 +527,6 @@ const testCasesData = ref([]);
 const testStepsData = ref([]);
 const testCaseSimple = ref([]);
 let reportID = 1;
-let project = 0;
 let ci = false;
 let findFunction;
 let getDetailFunction;
@@ -975,9 +974,6 @@ const initData = async () => {
   } else {
     findFunction = findReport;
     getDetailFunction = getReportDetail;
-  }
-  if (route.params.project && route.params.project > 0) {
-    project = route.params.project;
   }
   console.log(findFunction);
   tableDdata.value = reportData.value.details;

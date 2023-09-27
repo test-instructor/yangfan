@@ -63,27 +63,19 @@ func (ci *ApiCIApi) GetReport(c *gin.Context) {
 }
 
 func (ci *ApiCIApi) GetReportDetail(c *gin.Context) {
-	var resp interfacecaseReq.CIRun
-	req, ok := c.Get("req")
-	if !ok {
-		global.GVA_LOG.Error("提取参数失败")
-	}
-	resp = req.(interfacecaseReq.CIRun)
-	if err, data := ciService.GetRepost(resp); err != nil {
-		global.GVA_LOG.Error("运行中!", zap.Error(err))
-		response.FailWithMessage("测试执行中，请稍后查询", c)
+	var resp interfacecase.ApiReport
+	_ = c.ShouldBindQuery(&resp)
+	if err, data := reportService.GetReportDetail(resp.ID); err != nil {
+		global.GVA_LOG.Error("查询出错", zap.Error(err))
+		response.FailWithMessage("查询失败，请稍后查询", c)
 	} else {
-		response.OkWithDetailed(data, "查询成功", c)
+		response.OkWithData(gin.H{"data": data}, c)
 	}
 }
 
 func (ci *ApiCIApi) FindReport(c *gin.Context) {
 	var resp interfacecase.ApiReport
-	req, ok := c.Get("req")
-	if !ok {
-		global.GVA_LOG.Error("提取参数失败")
-	}
-	resp = req.(interfacecase.ApiReport)
+	_ = c.ShouldBindQuery(&resp)
 	if err, reapicase := reportService.FindReport(resp); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)

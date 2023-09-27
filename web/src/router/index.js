@@ -11,7 +11,7 @@ const routes = [
     component: () => import("@/view/init/index.vue"),
   },
   {
-    path: "/response/:project/:report_id/:ci",
+    path: "/response/:report_id/:ci",
     name: "CIResponse",
     component: () => import("@/view/interface/Reports/reportDetail.vue"),
   },
