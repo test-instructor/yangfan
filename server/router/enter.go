@@ -19,6 +19,7 @@ type RouterGroup struct {
 	Environment   interfacecase.EnvironmentRouterGroup
 	Message       interfacecase.MessageRouterGroup
 	CI            interfacecase.ApiCIRouter
+	CIResp        interfacecase.ApiCIRespRouter
 }
 
 var RouterGroupApp = new(RouterGroup)
