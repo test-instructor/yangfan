@@ -17,5 +17,7 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.
 RUN dnf localinstall -y google-chrome-stable_current_x86_64.rpm
 RUN rm google-chrome-stable_current_x86_64.rpm
 
+RUN yum install -y fontconfig langpacks-zh_CN
+ENV LANG=zh_CN.utf8
 
 CMD ["bash"]
