@@ -9,7 +9,7 @@ RUN go build -o ./run ./run
 
 
 FROM yangfanz/python:3.10.0.chrome
-ENV TZ=Asia/Shanghai
+
 WORKDIR /yangfan
 COPY --from=builder /go/src/yangfan/run .
 COPY --from=builder /go/src/yangfan/get-pip.py .
