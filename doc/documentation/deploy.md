@@ -24,29 +24,7 @@ bash -c "$(curl -fsSLk http://docs.yangfan.gd.cn/install/install.sh)"
 > 4. `./config/docker.config.yaml`中的`fs`需要手动修改为飞书登录相关配置，否则无法登录
 > 5. 修改配置后重新执行安装脚本即可
 
-## 本地调试
-### 后端
-1. 下载golang安装 版本号需>=1.18
-    * 国际: https://golang.org/dl/
-    * 国内: https://golang.google.cn/dl/
-2. goland 打开项目根目录
-3. 修改`config.yaml`中的数据库`mysql`、飞书登录`fs`相关配置
-4. 使用软件包进行运行，目前已有的软件包为
-   ```shell
-   github.com/test-instructor/yangfan/server  # 后端服务
-   github.com/test-instructor/yangfan/run     # 用例运行服务
-   github.com/test-instructor/yangfan/master  # 性能测试master服务
-   github.com/test-instructor/yangfan/work    # 性能测试worker服务
-   github.com/test-instructor/yangfan/timer   # 定时任务服务
-   ```
-### 前端
-1. 前往https://nodejs.org/zh-cn/下载当前版本node
-2. 命令行运行 node -v 若控制台输出版本号则前端环境搭建成功
-3. node 版本需大于 16.4
-4. 开发工具推荐vscode https://code.visualstudio.com/
-
-
-## 二、docker 部署
+## docker 部署
 
 * 前端：修改对应`docker-compose`文件中的`ENV_VITE_FS_APP_ID`、`ENV_VITE_FS_LOGIN`
 * 后端：修改`deploy/docker-compose/config/docker.config.yaml`中的数据库`mysql`、飞书登录`fs`相关配置
@@ -64,7 +42,7 @@ bash -c "$(curl -fsSLk http://docs.yangfan.gd.cn/install/install.sh)"
       
    ```
 
-## 三、k8s 部署
+## k8s 部署
 文件目录`./deploy/kubernetes`
 ```shell
 kubernetes
