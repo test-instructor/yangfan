@@ -1,6 +1,7 @@
 
 在前面的章节中，我们了解了每个测试用例的执行都是由一个运行对象`CaseRunner`来管理的。以下是`CaseRunner`的主要执行步骤：
 
+## 用例执行流程
 1. **判断接口可用性：** 通过调用`HasNext`方法判断是否还有待执行的接口。
 2. **创建运行会话：** 通过`NewSession`方法创建一个运行会话，用于执行当前接口。
 3. **启动接口运行：** 通过`Start`方法开始运行当前接口，这包括了解析和处理请求参数、执行`SetupHooks`、发起实际请求、解析响应、执行`TeardownHooks`等步骤。
@@ -42,7 +43,7 @@ for it := caseRunner.parametersIterator; it.HasNext(); {
 
 `SessionRunner` 是一个结构体，它用于管理测试用例执行的会话过程，包含了多个成员变量和方法。以下是 `SessionRunner` 结构体中的成员变量和方法，以及它们的大致作用，由于代码篇幅太长，如果需要看具体方法的源码解析，可以到项目查看：
 
-成员变量：
+## CaseRunner 变量解析：
 
 1. `caseRunner`: 指向执行当前会话的 `CaseRunner` 实例。
 2. `sessionVariables`: 保存会话中的变量和数据，可以在不同步骤之间共享。
@@ -54,7 +55,7 @@ for it := caseRunner.parametersIterator; it.HasNext(); {
 8. `pongResponseChan`: 用于接收` WebSocket` 的 `Pong` 响应消息的通道。
 9. `closeResponseChan`: 用于接收 `WebSocket` 的关闭响应消息的通道。
 
-方法：
+## CaseRunner 方法解析：
 
 1. `resetSession()`: 重置会话，清空会话变量、事务信息等，用于开始新的测试会话。
 2. `inheritConnection(src *SessionRunner)`: 继承另一个 `SessionRunner` 的 `WebSocket` 连接。
@@ -68,7 +69,7 @@ for it := caseRunner.parametersIterator; it.HasNext(); {
 10. `getWsClient(url string) *websocket.Conn`: 获取指定 URL 对应的 `WebSocket` 连接。
 
 总体而言，`SessionRunner` 负责管理测试会话的整个执行过程，包括变量处理、步骤运行、结果统计等，保证了测试执行的可控性和数据共享。
-
+## 部分源码解析
 ```go
 // SessionRunner 用于运行测试用例及其步骤。
 // 每个测试用例都有自己的 SessionRunner 实例，并共享会话变量。

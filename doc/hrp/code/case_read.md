@@ -1,5 +1,7 @@
 根据之前的介绍，我们了解到hrp用例的文件读取是由`loader.go`文件中的`LoadTestCases`函数完成的。该函数接收一个`ITestCase`切片作为输入，并返回一个`TestCase`切片作为输出。在函数内部，通过遍历`ITestCase`切片，将文件内容转换成可执行的测试用例数据。
 
+# 用例类型
+
 ```go
 func LoadTestCases(iTestCases ...ITestCase) ([]*TestCase, error) {
 	for _, iTestCase := range iTestCases {
@@ -38,6 +40,8 @@ type TestCase struct {
 			continue
 		}
 ```
+
+## 读取文件类型的用例
 
 如果`iTestCase`是`*TestCasePath`类型的实例，那么它表示一个文件或文件夹的路径，需要读取其中的测试用例数据。为了实现这一目的，我们使用`os.DirFS`来创建一个虚拟文件系统，并通过`fs.WalkDir`遍历指定路径下的文件和文件夹。在遍历过程中，我们会忽略隐藏文件夹（以点"."开头的文件夹）和非测试用例文件（非 `.yml`、`.yaml` 和 `.json` 后缀的文件），而将符合条件的测试用例文件转换为`*TestCase`结构，并将其添加到`testCases`切片中。这样，我们就能够方便地从指定的文件路径读取测试用例数据，并进行后续的测试执行。
 
@@ -83,6 +87,8 @@ type TestCase struct {
 
 这些步骤相互配合，使我们能够从指定的文件路径中获取测试用例数据，并将其转换为hrp可运行的测试用例对象。这样，我们便能够顺利地将文件中的用例内容读取并集成到整个测试用例列表中，为后续的测试执行做好准备。
 
+## 用例转换
+
 ```go
 // ToTestCase loads testcase path and convert to *TestCase
 func (path *TestCasePath) ToTestCase() (*TestCase, error) {
@@ -115,7 +121,7 @@ func (tc *TCase) ToTestCase(casePath string) (*TestCase, error) {
 	return tc.toTestCase()
 }
 ```
-
+### 读取json、yaml格式的用例
 在`LoadFile`这一步中，逻辑相对较简单。主要是根据不同的文件类型（通过后缀识别），读取文件内容后通过`JSON`转换成对应的结构体。`structObj`作为一个`any`类型参数，可以传入任意类型，在执行时会自动解析到实际参数类型。传入的类型为`TCase`，会自动将配置和测试步骤解析到`structObj`中。
 
 这一步的优化使得我们能够轻松地根据文件后缀识别文件类型，读取文件内容，并将其转换为对应的结构体。这样，我们可以有效地将不同文件格式的用例数据转化成hrp可以理解的内部结构，为后续的用例执行和测试准备奠定了基础。
@@ -172,6 +178,7 @@ func LoadFile(path string, structObj interface{}) (err error) {
 
 这样，通过`tc.toTestCase`的处理，我们可以将`TCase`对象转换成hrp可以识别的`TestCase`测试用例，其中包含了我们所需的自定义类型支持，包括`MQTT`协议。这个过程为我们的测试框架添加了更多灵活性和扩展性，让我们可以更好地适应不同协议和类型的测试需求。
 
+### toTestCase 源码解析
 ```go
 func (tc *TCase) toTestCase() (*TestCase, error) {
 	testCase := &TestCase{
@@ -375,8 +382,8 @@ func (tc *TCase) MakeCompat() (err error) {
 	return nil
 }
 ```
-
-非常好，现在我们对用例的读取和转换流程有了清晰的梳理。让我们再次总结一下整个流程：
+## 小结
+现在我们对用例的读取和转换流程有了清晰的梳理。让我们再次总结一下整个流程：
 
 1. `LoadTestCases`函数作为操作入口，接收一个文件列表作为输入参数，然后遍历该列表中的每个文件路径。
 2. 对于每个文件路径，我们使用`ToTestCase`方法将其转换为一个`TestCase`测试用例对象，并将其添加到用例列表中。

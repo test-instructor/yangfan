@@ -91,14 +91,5 @@ module.exports = {
 
 	head: [
 		['link', {rel: 'icon', href: '/logo.png'}],
-		['script', {}, `
-            var _hmt = _hmt || [];
-            (function() {
-              var hm = document.createElement("script");
-              hm.src = "https://hm.baidu.com/hm.js?13a39a1b1e7fb17e8f806d1fb6207796";
-              var s = document.getElementsByTagName("script")[0]; 
-              s.parentNode.insertBefore(hm, s);
-            })();
-        `],
 	]
 }
