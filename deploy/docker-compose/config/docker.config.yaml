@@ -30,7 +30,7 @@ local:
   path: uploads/file
   store-path: uploads/file
 mysql:
-  path: 177.8.0.2
+  path: yangfan-mysql
   port: "3306"
   config: charset=utf8mb4&parseTime=True&loc=Local
   db-name: yangfan
@@ -76,9 +76,9 @@ zap:
   log-in-console: true
 yang-fan:
   front: "http://localhost:8080"
-  background: "177.8.0.4"
+  background: yangfan-server
   background-grpc-port: 7967
-  master: "177.8.0.8"
+  master: yangfan-master
   master-boomer-prot: 9093
   master-server-prot: 7966
   prometheus-pushgateway-url: http://pushgateway:9091/
@@ -87,5 +87,5 @@ yang-fan:
   grafana-dashboard-name: yangfan-for-distributed-load-testing
   grafana-dashboard-stats: WLVhzvOg56Mg
   grafana-dashboard-stats-name: yangfan-for-node-status
-  run-server: 177.8.0.10
+  run-server: yangfan-run
   run-server-grpc-port: 7968

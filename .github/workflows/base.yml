@@ -1,0 +1,44 @@
+name: base
+
+on:
+  push:
+    branches:
+      - feature/basedocker
+
+env:
+  REGISTRY: yangfanz/
+  IMAGE_TAG: 3.10.${{ github.run_number }}
+
+
+jobs:
+  python-chrome:
+    name: Building a python chrome image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Login to Docker Container Registry
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: Build and push python chrome image
+        run: |
+          docker build -t python -f base/python-chrome/Dockerfile .
+          docker tag python ${{ env.REGISTRY }}python:3.10.0.chrome
+          docker push ${{ env.REGISTRY }}python:3.10.0.chrome
+
+  python:
+    name: Building a python image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Login to Docker Container Registry
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: Build and push python image
+        run: |
+          docker build -t python -f base/python/Dockerfile .
+          docker tag python ${{ env.REGISTRY }}python:3.10.0
+          docker push ${{ env.REGISTRY }}python:3.10.0

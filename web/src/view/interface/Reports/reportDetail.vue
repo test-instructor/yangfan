@@ -479,6 +479,7 @@
 <script setup>
 import tableKeyValue from "@/view/interface/Reports/tableKeyValue.vue";
 
+import { findCIReport, getCIReportDetail } from "@/api/ci";
 import { findReport, getReportDetail } from "@/api/report";
 
 name = "ReportDetail";
@@ -526,6 +527,9 @@ const testCasesData = ref([]);
 const testStepsData = ref([]);
 const testCaseSimple = ref([]);
 let reportID = 1;
+let ci = false;
+let findFunction;
+let getDetailFunction;
 const validatorsTable = ref(true);
 const responseTable = ref(true);
 const requestTable = ref(true);
@@ -684,7 +688,7 @@ const openDrawer = async (row) => {
   let row_id = row.ID;
   row = reportDataDetail.get(row_id);
   if (!row) {
-    let res = await getReportDetail({ ID: row_id });
+    let res = await getDetailFunction({ ID: row_id });
     if (res.code === 0) {
       row = res.data.data;
     }
@@ -892,7 +896,7 @@ const openDrawer = async (row) => {
 };
 
 const getTestCaseDetailFunc = async (testCaseID) => {
-  const res = await findReport({ ID: testCaseID });
+  const res = await findFunction({ ID: testCaseID });
   let reset = true;
   if (res.code === 0) {
     let reapicase = JSON.parse(JSON.stringify(res.data.reapicase));
@@ -955,7 +959,7 @@ const getTestCaseDetailData = async () => {
           k++
         ) {
           let data = reportData.value.details[i].records[j].data[k];
-          let res = await getReportDetail({ ID: data.ID });
+          let res = await getDetailFunction({ ID: data.ID });
           if (res.code === 0) {
             reportDataDetail.set(data.ID, res.data.data);
           }
@@ -983,6 +987,7 @@ const runTime = (row, column) => {
 };
 
 const tableDdata = ref([]);
+
 const initData = async () => {
   testStepsData.value = [];
   testStepsData.value = [];
@@ -990,6 +995,17 @@ const initData = async () => {
   if (route.params.report_id > 0) {
     reportID = route.params.report_id;
   }
+  console.log("=========ci", route.params.ci);
+  if (route.params.ci && route.params.ci > 0) {
+    ci = true;
+    console.log("=========ci");
+    findFunction = findCIReport;
+    getDetailFunction = getCIReportDetail;
+  } else {
+    findFunction = findReport;
+    getDetailFunction = getReportDetail;
+  }
+  console.log(findFunction);
   tableDdata.value = reportData.value.details;
   await getTestCaseDetailFunc(reportID);
   testCaseSimple.value.push({
@@ -1112,7 +1128,6 @@ const columns = reactive([
   },
 ]);
 
-initData();
 watch(
   () => route.params.report_id,
   () => {
@@ -1121,6 +1136,7 @@ watch(
     }
   }
 );
+initData();
 
 pieOption = {
   title: {

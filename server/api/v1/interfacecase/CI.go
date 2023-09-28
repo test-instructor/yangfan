@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/test-instructor/yangfan/server/global"
 	"github.com/test-instructor/yangfan/server/model/common/response"
+	"github.com/test-instructor/yangfan/server/model/interfacecase"
 	interfacecaseReq "github.com/test-instructor/yangfan/server/model/interfacecase/request"
 	"github.com/test-instructor/yangfan/server/service"
 	"go.uber.org/zap"
@@ -58,5 +59,27 @@ func (ci *ApiCIApi) GetReport(c *gin.Context) {
 		response.FailWithMessage("测试执行中，请稍后查询", c)
 	} else {
 		response.OkWithDetailed(data, "查询成功", c)
+	}
+}
+
+func (ci *ApiCIApi) GetReportDetail(c *gin.Context) {
+	var resp interfacecase.ApiReport
+	_ = c.ShouldBindQuery(&resp)
+	if err, data := reportService.GetReportDetail(resp.ID); err != nil {
+		global.GVA_LOG.Error("查询出错", zap.Error(err))
+		response.FailWithMessage("查询失败，请稍后查询", c)
+	} else {
+		response.OkWithData(gin.H{"data": data}, c)
+	}
+}
+
+func (ci *ApiCIApi) FindReport(c *gin.Context) {
+	var resp interfacecase.ApiReport
+	_ = c.ShouldBindQuery(&resp)
+	if err, reapicase := reportService.FindReport(resp); err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithData(gin.H{"reapicase": reapicase}, c)
 	}
 }
