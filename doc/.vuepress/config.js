@@ -51,6 +51,17 @@ module.exports = {
 						{title: '部署服务', path: '/documentation/deploy'},
 						{title: '开发调试', path: '/documentation/debug'},
 					],
+				},{
+					title: '操作手册',
+					collapsable: true,
+					children: [
+						{title: '配置管理', path: '/documentation/config'},
+						{title: '环境变量', path: '/documentation/env'},
+						{title: '用例管理', path: '/documentation/case'},
+						{title: '定时任务', path: '/documentation/task'},
+						{title: '测试报告', path: '/documentation/report'},
+						{title: '性能测试', path: '/documentation/performance'},
+					],
 				}
 			]
 		},
