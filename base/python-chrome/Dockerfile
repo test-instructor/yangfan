@@ -19,7 +19,7 @@ RUN rm google-chrome-stable_current_x86_64.rpm
 RUN wget -N --no-check-certificate https://raw.githubusercontent.com/notetoday/LocaleCN/master/LocaleCN.sh && bash LocaleCN.sh
 
 # 安装中文字体和语言包
-RUN dnf install -y fonts-noto-cjk langpacks-zh_CN
+RUN dnf install -y wqy-zenhei-fonts langpacks-zh_CN
 
 # 设置区域设置为中文
 RUN localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
