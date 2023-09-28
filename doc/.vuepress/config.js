@@ -44,7 +44,7 @@ module.exports = {
 			'/documentation/':[
 				{
 					title: '快速入门',
-					collapsable: false,
+					collapsable: true,
 					children: [
 						{title: '测试平台简介', path: '/documentation/'},
 						{title: '快速开始', path: '/documentation/start'},
