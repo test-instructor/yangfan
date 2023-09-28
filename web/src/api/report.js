@@ -1,6 +1,8 @@
 import service from "@/utils/request";
 
-const project = JSON.parse(window.localStorage.getItem("project")).ID;
+// const project = JSON.parse(window.localStorage.getItem("project")).ID;
+const projectData = JSON.parse(window.localStorage.getItem("project"));
+const project = projectData?.ID;
 const baseURL = "/case/report/" + project;
 
 export const deleteReport = (data) => {
