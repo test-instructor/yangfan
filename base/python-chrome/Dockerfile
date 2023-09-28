@@ -11,19 +11,18 @@ RUN python3 -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/si
 
 RUN python3 -m venv ~/.hrp/venv
 
-RUN dnf install -y wget
-RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
-RUN dnf localinstall -y google-chrome-stable_current_x86_64.rpm
-RUN rm google-chrome-stable_current_x86_64.rpm
+# 安装必要的依赖
+RUN dnf install -y epel-release && \
+    dnf install -y wget unzip which && \
+    dnf clean all
 
-RUN wget -N --no-check-certificate https://raw.githubusercontent.com/notetoday/LocaleCN/master/LocaleCN.sh && bash LocaleCN.sh
+# 安装Chrome浏览器的依赖
+RUN dnf install -y fontconfig libX11 libXcomposite libXcursor libXdamage libXext libXi libXtst libXrandr libXScrnSaver libXss libXxf86vm libdrm libgbm mesa-libOSMesa
 
-# 安装中文字体和语言包
-RUN dnf install -y wqy-zenhei-fonts langpacks-zh_CN
-
-# 设置区域设置为中文
-RUN localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
-ENV LANG=zh_CN.UTF-8
+# 下载并安装Chrome浏览器
+RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm && \
+    dnf localinstall -y google-chrome-stable_current_x86_64.rpm && \
+    rm google-chrome-stable_current_x86_64.rpm
 
 # 重新配置Chrome启动器以使用中文区域设置
 RUN sed -i 's|exec -a "$0" "$HERE/chrome" "$@"|exec -a "$0" "$HERE/chrome" "$@" --lang=zh-CN|g' /opt/google/chrome/google-chrome
