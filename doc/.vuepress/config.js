@@ -31,6 +31,7 @@ module.exports = {
 		nav: [
 			{text: '首页', link: '/'},
 			{text: '使用文档', link: '/documentation/'},
+			{text: 'hrp二次开发', link: '/hrp/'},
 			{text: '提问', link: 'https://gitee.com/test-instructor/yangfan/issues'},
 			{
 				text: '源码下载', items: [
@@ -61,6 +62,26 @@ module.exports = {
 						{title: '定时任务', path: '/documentation/task'},
 						{title: '测试报告', path: '/documentation/report'},
 						{title: '性能测试', path: '/documentation/performance'},
+					],
+				}
+			],
+			"/hrp/":[
+				{
+					title: '概述',
+					path: '/hrp/',
+				},
+				{
+					title: '源码解析',
+					collapsable: true,
+					children: [
+						{title: '目录结构', path: '/hrp/code/directory'},
+						{title: '流程解析', path: '/hrp/code/flow_path'},
+						{title: '配置管理', path: '/hrp/code/config'},
+						{title: '用例类型', path: '/hrp/code/case_type'},
+						{title: '用例读取', path: '/hrp/code/case_read'},
+						{title: '用例执行流程', path: '/hrp/code/case_run_flow'},
+						{title: '用例执行对象', path: '/hrp/code/case_obj'},
+						{title: '用例运行', path: '/hrp/code/case_run'},
 					],
 				}
 			]
