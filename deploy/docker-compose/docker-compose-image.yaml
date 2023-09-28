@@ -104,5 +104,20 @@ services:
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml
 
-
+  yangfan-mysql-init:
+    image: mysql:latest
+    command: --default-authentication-plugin=mysql_native_password
+    container_name: yangfan-mysql
+    restart: always
+    ports:
+      - '33016:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: yangfan
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/yangfan.sql:/docker-entrypoint-initdb.d/yangfan.sql
+    networks:
+      network:
+        ipv4_address: 177.7.0.99
 
