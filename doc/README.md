@@ -13,8 +13,11 @@
 - **Gitee 代码仓库:** [点击进入](https://gitee.com/test-instructor/yangfan)
 
 ## 联系我们
-1. 扬帆测试平台官方公众号：yangfan-test
-2. QQ群：873175584
-3. 微信交流群：
+* 扬帆测试平台官方公众号：yangfan-test
 
-<img src="http://doc.yangfan.gd.cn/about/author.jpeg" alt="微信二维码" width="267" height="368">
+<img src="./img/mp.png" alt="微信二维码" width="513" height="187">
+
+* QQ群：873175584
+* 微信交流群：
+
+<img src="./img/author.jpeg" alt="微信二维码" width="273" height="367">
