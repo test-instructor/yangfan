@@ -51,8 +51,8 @@
 4. 软件包路径选择对应的服务
 5. 名称默认为软件包路径，为了更加简洁可以直接改成对应服务的名称
 
-![image-20230928162540358](http://qiniu.yangfan.gd.cn//markdown/image-20230928162540358.png)
+![image-20230928162540358](https://qiniu.yangfan.gd.cn//markdown/image-20230928162540358.png)
 
-![image-20230928162759825](http://qiniu.yangfan.gd.cn//markdown/image-20230928162759825.png)
+![image-20230928162759825](https://qiniu.yangfan.gd.cn//markdown/image-20230928162759825.png)
 
-![image-20230928162928134](http://qiniu.yangfan.gd.cn//markdown/image-20230928162928134.png)
+![image-20230928162928134](https://qiniu.yangfan.gd.cn//markdown/image-20230928162928134.png)

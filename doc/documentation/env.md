@@ -24,6 +24,6 @@
 7. 在编写测试用例时，可以在请求参数或者断言中使用${env_变量名}来引用环境变量的值
 8. 在执行测试用例时，可以在执行配置中选择要使用的环境
 9. 在查看测试报告时，可以看到实际使用的环境变量和值
-   ![img.png](http://qiniu.yangfan.gd.cn/image/documents/engmanage.png)
-   ![img.png](http://qiniu.yangfan.gd.cn/image/documents/addvariable.png)
-   ![img.png](http://qiniu.yangfan.gd.cn/image/documents/envlist.png)
+   ![img.png](https://qiniu.yangfan.gd.cn/image/documents/engmanage.png)
+   ![img.png](https://qiniu.yangfan.gd.cn/image/documents/addvariable.png)
+   ![img.png](https://qiniu.yangfan.gd.cn/image/documents/envlist.png)

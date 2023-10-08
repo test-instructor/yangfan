@@ -23,7 +23,7 @@
 1. Header: 请求头，复选框为将当前请求头字段导出为全局header，场景：token保持在后续的接口中，无需每个接口再添加token字段
 2. Extract：提取变量，复选框为将当前请求头字段导出为全局变量，场景：用于步骤、用例的解耦，假设步骤执行顺序为步骤A、步骤B，那么可以在步骤B中引用步骤A导出的变量，`引用其他步骤的变量时需要确保执行顺序`
 3. `Params`、`Form`、`Jsons`、`Validate`、`Variables`参考`httprunner`中的应用
-   ![img.png](http://qiniu.yangfan.gd.cn/image/documents/apiadd.png)
+   ![img.png](https://qiniu.yangfan.gd.cn/image/documents/apiadd.png)
 
 ## 测试步骤
 
@@ -34,8 +34,8 @@
 1. 新建步骤
 2. 进入步骤详情，在详情中添加api，对已添加的api进行拖动排序
 3. 在步骤详情对测试接口进行定制化修改、删除、拖动排序
-   ![img.png](http://qiniu.yangfan.gd.cn/image/documents/stepDetail.png)
-   ![img.png](http://qiniu.yangfan.gd.cn/image/documents/stepDetailAdd.png)
+   ![img.png](https://qiniu.yangfan.gd.cn/image/documents/stepDetail.png)
+   ![img.png](https://qiniu.yangfan.gd.cn/image/documents/stepDetailAdd.png)
 
 
 ## 测试用例
@@ -46,5 +46,5 @@
 2. 进入用例详情，在详情中添加步骤，一个用例可以同时添加多个步骤（一个步骤可以被多次添加）
 3. 在用例详情中调整步骤执行顺序
 
-![img.png](http://qiniu.yangfan.gd.cn/image/documents/caseDetail.png)
-![img.png](http://qiniu.yangfan.gd.cn/image/documents/caseDetailAdd.png)
+![img.png](https://qiniu.yangfan.gd.cn/image/documents/caseDetail.png)
+![img.png](https://qiniu.yangfan.gd.cn/image/documents/caseDetailAdd.png)

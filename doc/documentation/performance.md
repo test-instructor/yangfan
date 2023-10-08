@@ -19,8 +19,8 @@
 
 ## k8s 部署下单节点rps达到13k
 
-![image-20230724083322579](http://qiniu.yangfan.gd.cn/markdown/image-20230724083322579.png)
+![image-20230724083322579](https://qiniu.yangfan.gd.cn/markdown/image-20230724083322579.png)
 
 ## docker下部署单节点rps达到4k（服务器配置：2C4G，部署完整的测试平台、mysql数据库、防火墙、httpdemo等服务）
 
-![性能测试报告详情](http://qiniu.yangfan.gd.cn/markdown/image-20230711163104716.png)
+![性能测试报告详情](https://qiniu.yangfan.gd.cn/markdown/image-20230711163104716.png)

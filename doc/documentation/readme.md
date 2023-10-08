@@ -10,7 +10,7 @@
 
 总的来说，扬帆测试平台是一款易用且功能丰富的自动化测试平台，适用于各类软件测试工作，为用户提供高效的测试支持，助力测试工作的顺利进行。
 
-![扬帆测试平台架构图](http://qiniu.yangfan.gd.cn/markdown/%E6%89%AC%E5%B8%86%E6%B5%8B%E8%AF%95%E5%B9%B3%E5%8F%B0%E6%9E%B6%E6%9E%84%E5%9B%BE.jpg)
+![扬帆测试平台架构图](https://qiniu.yangfan.gd.cn/markdown/%E6%89%AC%E5%B8%86%E6%B5%8B%E8%AF%95%E5%B9%B3%E5%8F%B0%E6%9E%B6%E6%9E%84%E5%9B%BE.jpg)
 
 ## 部署方式
 
@@ -47,54 +47,54 @@
 
 ### 环境变量管理
 
-![环境变量](http://qiniu.yangfan.gd.cn/markdown/image-20230706103232835.png)
+![环境变量](https://qiniu.yangfan.gd.cn/markdown/image-20230706103232835.png)
 
 ### 配置管理
 
-![配置管理](http://qiniu.yangfan.gd.cn/markdown/image-20230706103301861.png)
+![配置管理](https://qiniu.yangfan.gd.cn/markdown/image-20230706103301861.png)
 
 ### 接口管理
 
-![接口管理](http://qiniu.yangfan.gd.cn/markdown/image-20230706103324932.png)
+![接口管理](https://qiniu.yangfan.gd.cn/markdown/image-20230706103324932.png)
 
 ### 测试步骤
 
-![测试步骤](http://qiniu.yangfan.gd.cn/markdown/image-20230710214256760.png)
+![测试步骤](https://qiniu.yangfan.gd.cn/markdown/image-20230710214256760.png)
 
 ### 测试用例
 
-![测试用例](http://qiniu.yangfan.gd.cn/markdown/image-20230710214315331.png)
+![测试用例](https://qiniu.yangfan.gd.cn/markdown/image-20230710214315331.png)
 
 ### 定时任务
 
-![定时任务](http://qiniu.yangfan.gd.cn/markdown/image-20230710214332669.png)
+![定时任务](https://qiniu.yangfan.gd.cn/markdown/image-20230710214332669.png)
 
 ### 定时任务-标签管理
 
-![定时任务-标签管理](http://qiniu.yangfan.gd.cn/markdown/image-20230710214416134.png)
+![定时任务-标签管理](https://qiniu.yangfan.gd.cn/markdown/image-20230710214416134.png)
 
 ### 测试报告列表
 
-![测试报告](http://qiniu.yangfan.gd.cn/markdown/image-20230710215435068.png)
+![测试报告](https://qiniu.yangfan.gd.cn/markdown/image-20230710215435068.png)
 
 ### 测试报告详情
 
-![测试报告详情](http://qiniu.yangfan.gd.cn/markdown/image-20230710215510007.png)
+![测试报告详情](https://qiniu.yangfan.gd.cn/markdown/image-20230710215510007.png)
 
-![image-20230710215523125](http://qiniu.yangfan.gd.cn/markdown/image-20230710215523125.png)
+![image-20230710215523125](https://qiniu.yangfan.gd.cn/markdown/image-20230710215523125.png)
 
 ### python 第三方库管理
 
-![python包管理](http://qiniu.yangfan.gd.cn/markdown/image-20230711193741088.png)
+![python包管理](https://qiniu.yangfan.gd.cn/markdown/image-20230711193741088.png)
 
 ### 性能任务
 
-![性能任务](http://qiniu.yangfan.gd.cn/markdown/image-20230711163010339.png)
+![性能任务](https://qiniu.yangfan.gd.cn/markdown/image-20230711163010339.png)
 
 ### 性能任务详情
 
-![性能任务详情](http://qiniu.yangfan.gd.cn/markdown/image-20230711163030903.png)
+![性能任务详情](https://qiniu.yangfan.gd.cn/markdown/image-20230711163030903.png)
 
 ### 性能测试报告详情
 
-![性能测试报告详情](http://qiniu.yangfan.gd.cn/markdown/image-20230711163104716.png)
+![性能测试报告详情](https://qiniu.yangfan.gd.cn/markdown/image-20230711163104716.png)

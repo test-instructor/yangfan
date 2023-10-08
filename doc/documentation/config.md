@@ -41,5 +41,5 @@
 > 2. 类型：目前为String、Integer、Float、Boolean、List、Dict
 > 3. 变量值：根据类型设置对应的值，如设置错误则无法使用对应的变量
 
-![img.png](http://qiniu.yangfan.gd.cn/image/documents/addconfig.png)
-![img.png](http://qiniu.yangfan.gd.cn/image/documents/configlist.png)
+![img.png](https://qiniu.yangfan.gd.cn/image/documents/addconfig.png)
+![img.png](https://qiniu.yangfan.gd.cn/image/documents/configlist.png)

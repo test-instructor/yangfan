@@ -33,9 +33,9 @@
 
 
 > 1. 编辑任务
-     >    ![img.png](http://qiniu.yangfan.gd.cn/image/documents/case_add_step.png)
+     >    ![img.png](https://qiniu.yangfan.gd.cn/image/documents/case_add_step.png)
 > 2. 任务详情
-     >    ![img.png](http://qiniu.yangfan.gd.cn/image/documents/task_detail.png)
+     >    ![img.png](https://qiniu.yangfan.gd.cn/image/documents/task_detail.png)
 > 3. 任务添加测试用例
-     >    ![img.png](http://qiniu.yangfan.gd.cn/image/documents/task_add_case.png)
+     >    ![img.png](https://qiniu.yangfan.gd.cn/image/documents/task_add_case.png)
 
