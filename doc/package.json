@@ -11,7 +11,6 @@
   "license": "ISC",
   "devDependencies": {
     "@vuepress/theme-blog": "^2.3.3",
-    "terser-webpack-plugin": "^5.3.9",
     "vuepress": "^1.9.10",
     "vuepress-theme-reco": "^1.6.17"
   }
