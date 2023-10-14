@@ -83,6 +83,13 @@ module.exports = {
 						{title: '用例执行对象', path: '/hrp/code/case_obj'},
 						{title: '用例运行', path: '/hrp/code/case_run'},
 					],
+				},
+				{
+					title: '定制开发',
+					collapsable: true,
+					children: [
+						{title: '目录结构', path: '/hrp/code/compile'},
+					],
 				}
 			]
 		},
