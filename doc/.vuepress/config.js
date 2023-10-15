@@ -88,7 +88,7 @@ module.exports = {
 					title: '定制开发',
 					collapsable: true,
 					children: [
-						{title: '目录结构', path: '/hrp/code/compile'},
+						{title: '编译&交叉编译', path: '/hrp/development/compile'},
 					],
 				}
 			]
