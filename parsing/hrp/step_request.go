@@ -406,14 +406,19 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 		if err != nil {
 			return stepResult, errors.Wrap(err, "run setup hooks failed")
 		}
+		if err != nil {
+			return stepResult, errors.Wrap(err, "run setup hooks failed")
+		}
 		// 处理hook返回的结果
 		reqMap, ok := req.(map[string]interface{})
+		// 每次调用回写request信息
 		if ok && reqMap != nil {
 			rb.requestMap = reqMap
 			stepVariables["request"] = reqMap
 		}
 	}
-	// 将hook处理后的结果回写到请求对象中
+	// 将hook处理后的结果回写到请求对象中，主要更新body和header的内容
+	// 由于每次调用信息已经回写，这里只需要判断是否有setup hooks
 	if len(step.SetupHooks) > 0 {
 		// 更新body的内容
 		requestBody, ok := rb.requestMap["body"].(map[string]interface{})
@@ -512,10 +517,12 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 	// add response object to step variables, could be used in teardown hooks
 	// 将响应对象添加到step变量中，hrp_step_response、response 变量
 	stepVariables["hrp_step_response"] = respObj.respObjMeta
+	// 添加response变量
 	stepVariables["response"] = respObj.respObjMeta
 
 	// deal with teardown hooks
 	// 遍历teardown hook并执行
+	// 于setup hooks不同的实现方式，直接更新respObj.respObjMeta
 	for _, teardownHook := range step.TeardownHooks {
 		// 调用hook
 		res, err := parser.Parse(teardownHook, stepVariables)
@@ -531,6 +538,7 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 	}
 	// 将hook处理后的结果回写到响应对象中
 	sessionData.ReqResps.Request = rb.requestMap
+	// 使用更新后的respObj.respObjMeta
 	sessionData.ReqResps.Response = builtin.FormatResponse(respObj.respObjMeta)
 
 	// extract variables from response
