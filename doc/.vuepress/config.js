@@ -24,8 +24,6 @@ module.exports = {
 
 		codeTheme: 'tomorrow',
 
-
-
 		lastUpdated: '更新时间',
 
 		nav: [
