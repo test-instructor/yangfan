@@ -34,7 +34,7 @@ go mod tidy
 PS: 当使用 IDE 更新依赖库时，也可能会因网络问题而出现超时错误。您可以通过设置代码模块来解决这个问题
 1. 打开「设置 - Go - go 模块」
 2. 在「go 模块」中启用「启用 Go 模块集成」，并在输入框中填入「GOPROXY=https://goproxy.cn,direct」
-    ![gosetting](img/gosetting.png)
+    ![gosetting](./img/gosetting.png)
 3. 重新执行「go mod tidy」（这一步骤可选）
 4. 如果设置后执行仍然有问题，尝试重启 Goland，然后再次执行「go mod tidy」
 
