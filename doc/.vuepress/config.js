@@ -87,6 +87,7 @@ module.exports = {
 					collapsable: true,
 					children: [
 						{title: '编译&交叉编译', path: '/hrp/development/compile'},
+						// {title: 'hooks', path: '/hrp/development/hooks'},
 					],
 				}
 			]

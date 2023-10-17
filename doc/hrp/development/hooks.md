@@ -124,6 +124,8 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 
 为了使我们改动的代码更加稳定，让其他使用者可以更清楚如何使用，通过yaml实现，通过单元测试调用，下面是简单例子
 
+![hooks](./img/hooks.png)
+
 ```yaml
 config:
   name: httpbin
