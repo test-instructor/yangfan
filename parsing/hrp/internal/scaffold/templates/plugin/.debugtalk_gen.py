@@ -21,4 +21,6 @@ if __name__ == "__main__":
     funppy.register("concatenate", concatenate)
     funppy.register("setup_hook_example", setup_hook_example)
     funppy.register("teardown_hook_example", teardown_hook_example)
+    funppy.register("setup_hook", setup_hook)
+    funppy.register("teardown_hook", teardown_hook)
     funppy.serve()

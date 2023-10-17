@@ -60,3 +60,12 @@ def setup_hook_example(name):
 def teardown_hook_example(name):
     logging.warning("teardown_hook_example")
     return f"teardown_hook_example: {name}"
+
+def setup_hook(request):
+    request["headers"]["hook"] = "header setup hook"
+    request["body"]["hook"] = "body setup hook"
+    return request
+
+def teardown_hook(response):
+    response["body"]["json"]["hook"] = "测试 teardown hook"
+    return response

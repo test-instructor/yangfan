@@ -120,6 +120,60 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 
 ```
 
+## 单元测试&&demo
 
+为了使我们改动的代码更加稳定，让其他使用者可以更清楚如何使用，通过yaml实现，通过单元测试调用，下面是简单例子
+
+```yaml
+config:
+  name: httpbin
+  base_url: 'https://httpbin.org/'
+teststeps:
+  - name: post 请求
+    variables:
+      foo1: bar1
+    request:
+      method: POST
+      url: /post
+      headers:
+        Content-Type: "application/x-www-form-urlencoded"
+      body:
+        foo1: foo1
+        foo2: foo3
+    validate:
+    setup_hooks:
+      - '${setup_hook($request)}'
+    teardown_hooks:
+      - '${teardown_hook($response)}'
+```
+```python
+def setup_hook(request):
+    request["headers"]["hook"] = "header setup hook"
+    request["body"]["hook"] = "body setup hook"
+    return request
+
+def teardown_hook(response):
+    response["body"]["json"]["hook"] = "测试 teardown hook"
+    return response
+```
+```go
+package hrp
+
+import (
+	"testing"
+)
+
+var yangfanHooks = tmpl("testcases/yangfan_hooks.yml")
+
+func TestRunHook(t *testing.T) {
+	buildHashicorpPyPlugin()
+	defer removeHashicorpPyPlugin()
+	testCase := TestCasePath(yangfanHooks)
+	err := NewRunner(nil).GenHTMLReport().Run(&testCase) // hrp.Run(testCase)
+	if err != nil {
+		t.Fatal()
+	}
+}
+```
 
 

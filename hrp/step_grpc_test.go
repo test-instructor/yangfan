@@ -5,9 +5,9 @@ import (
 	"testing"
 )
 
-var demoGrpc = tmpl("testcases/demo_grpc.json")
+var demoGrpc = tmpl("testcases/demo_hook.yaml")
 
-func TestRunGRPC(t *testing.T) {
+func TestRunHooks(t *testing.T) {
 	go demo.StartSvc()
 	defer demo.StopSvc()
 	buildHashicorpPyPlugin()
