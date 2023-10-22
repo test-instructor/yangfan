@@ -30,6 +30,7 @@ module.exports = {
 			{text: '首页', link: '/'},
 			{text: '使用文档', link: '/documentation/'},
 			{text: 'hrp二次开发', link: '/hrp/'},
+			// {text: '人生随笔', link: '/career/'},
 			{text: '提问', link: 'https://gitee.com/test-instructor/yangfan/issues'},
 			{
 				text: '源码下载', items: [
