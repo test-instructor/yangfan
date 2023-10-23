@@ -1,0 +1,25 @@
+.idea/
+node_modules
+yarn.lock
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+/server/log/
+/server/gva
+/server/latest_log
+
+
+*.iml
+
+deploy/docker/data/*
+deploy/docker/logs
+./server/yangfan.yaml
+./server/config.yaml
+/config.yaml
+*.temp*
