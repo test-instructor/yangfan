@@ -21,3 +21,4 @@
 * 微信交流群：
 
 <img src="./img/author.jpeg" alt="微信二维码" width="273" height="367">
+<img src="http://qiniu.yangfan.gd.cn/about/group.jpeg" alt="微信二维码" width="273" height="367">
