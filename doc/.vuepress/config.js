@@ -30,7 +30,7 @@ module.exports = {
 			{text: '首页', link: '/'},
 			{text: '使用文档', link: '/documentation/'},
 			{text: 'hrp二次开发', link: '/hrp/'},
-			// {text: '人生随笔', link: '/career/'},
+			{text: '人生随笔', link: '/career/depart.md'},
 			{text: '提问', link: 'https://gitee.com/test-instructor/yangfan/issues'},
 			{
 				text: '源码下载', items: [
@@ -91,6 +91,12 @@ module.exports = {
 						// {title: 'hooks', path: '/hrp/development/hooks'},
 					],
 				}
+			],
+			"/career/":[
+				{
+					title: '克服职场不公',
+					path: '/career/depart.md',
+				},
 			]
 		},
 		sidebarDepth: 1
