@@ -14,6 +14,8 @@ services:
       context: ../../
       dockerfile: ./server/Dockerfile
     container_name: yangfan-server
+    depends_on:
+      - yangfan-mysql
     restart: always
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml
@@ -29,6 +31,8 @@ services:
       context: ../../
       dockerfile: ./web/Dockerfile
     container_name: yangfan-web
+    depends_on:
+      - yangfan-server
     restart: always
     # 飞书登陆环境变量
     environment:
@@ -46,6 +50,8 @@ services:
       context: ../../
       dockerfile: ./master/Dockerfile
     container_name: yangfan-master
+    depends_on:
+      - yangfan-mysql
     restart: always
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml
@@ -62,6 +68,8 @@ services:
       context: ../../
       dockerfile: ./work/Dockerfile
     container_name: yangfan-work
+    depends_on:
+      - yangfan-mysql
     restart: always
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml
@@ -74,6 +82,8 @@ services:
       context: ../../
       dockerfile: ./timer/Dockerfile
     container_name: yangfan-timer
+    depends_on:
+      - yangfan-mysql
     restart: always
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml
@@ -86,6 +96,8 @@ services:
       context: ../../
       dockerfile: ./run/Dockerfile
     container_name: yangfan-run
+    depends_on:
+      - yangfan-mysql
     restart: always
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml

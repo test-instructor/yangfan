@@ -128,6 +128,7 @@ services:
     image: registry.cn-hangzhou.aliyuncs.com/yangfanz/work:${ENV_TAG}
     depends_on:
       - yangfan-mysql
+      - yangfan-master
     container_name: yangfan-work
     restart: always
     volumes:

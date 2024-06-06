@@ -12,6 +12,8 @@ services:
   server:
     image: registry.cn-hangzhou.aliyuncs.com/yangfanz/server:latest
     container_name: yangfan-server
+    depends_on:
+      - yangfan-mysql
     restart: always
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml
@@ -22,6 +24,8 @@ services:
   web:
     image: registry.cn-hangzhou.aliyuncs.com/yangfanz/web:latest
     container_name: yangfan-web
+    depends_on:
+      - yangfan-server
     restart: always
     # 飞书登陆环境变量
     environment:
@@ -75,6 +79,8 @@ services:
   master:
     image: registry.cn-hangzhou.aliyuncs.com/yangfanz/master:latest
     container_name: yangfan-master
+    depends_on:
+      - yangfan-server
     restart: always
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml
@@ -86,6 +92,8 @@ services:
   work:
     image: registry.cn-hangzhou.aliyuncs.com/yangfanz/work:latest
     container_name: yangfan-work
+    depends_on:
+      - yangfan-server
     restart: always
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml
@@ -93,6 +101,8 @@ services:
   run:
     image: registry.cn-hangzhou.aliyuncs.com/yangfanz/run:latest
     container_name: yangfan-run
+    depends_on:
+      - yangfan-server
     restart: always
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml
@@ -100,6 +110,8 @@ services:
   timer:
     image: registry.cn-hangzhou.aliyuncs.com/yangfanz/timer:latest
     container_name: yangfan-timer
+    depends_on:
+      - yangfan-server
     restart: always
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml
