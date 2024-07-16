@@ -1,29 +1,45 @@
 version: "3"
 
-# 声明一个名为network的networks,subnet为network的子网地址,默认网关是177.7.0.1
 networks:
-  network:
+  yangfan_network:
     ipam:
       driver: default
       config:
         - subnet: '177.8.0.0/16'
 
 services:
-  server:
+  yangfan-mysql:
+    image: mysql:latest
+    command: --default-authentication-plugin=mysql_native_password
+    container_name: yangfan-mysql
+    restart: always
+    networks:
+      - yangfan_network
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: yangfan
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/yangfan.sql:/docker-entrypoint-initdb.d/yangfan.sql
+
+  yangfan-server:
     image: registry.cn-hangzhou.aliyuncs.com/yangfanz/server:latest
     container_name: yangfan-server
+    networks:
+      - yangfan_network
     depends_on:
       - yangfan-mysql
     restart: always
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml
-    ports:
-      - '8888:8888'
-      - '7967:7967'
 
   web:
     image: registry.cn-hangzhou.aliyuncs.com/yangfanz/web:latest
-    container_name: yangfan-web
+    container_name: web
+    networks:
+      - yangfan_network
     depends_on:
       - yangfan-server
     restart: always
@@ -38,8 +54,10 @@ services:
 
   prometheus:
     image: prom/prometheus
-    container_name: yangfan-prometheus
-    hostname: yangfan-prometheus
+    container_name: prometheus
+    networks:
+      - yangfan_network
+    hostname: prometheus
     restart: always
     environment:
       - TZ=Asia/Shanghai
@@ -49,8 +67,10 @@ services:
       - "9090:9090"
 
   pushgateway:
-    container_name: yangfan-pushgateway
-    hostname: yangfan-pushgateway
+    container_name: pushgateway
+    hostname: pushgateway
+    networks:
+      - yangfan_network
     image: prom/pushgateway
     restart: always
     environment:
@@ -59,12 +79,14 @@ services:
       - '9091:9091'
 
   grafana:
-    container_name: yangfan-grafana
+    container_name: grafana
     image: "grafana/grafana:9.5.1"
     user: root
     ports:
       - '3000:3000'
     restart: always
+    networks:
+      - yangfan_network
     volumes:
       - ./data/grafana/data:/var/lib/grafana
       - ./data/grafana/log:/var/log/grafana
@@ -76,9 +98,11 @@ services:
       - GF_PATHS_CONFIG=/etc/grafana/provisioning/grafana.ini
       - TZ=Asia/Shanghai
 
-  master:
+  yangfan-master:
     image: registry.cn-hangzhou.aliyuncs.com/yangfanz/master:latest
     container_name: yangfan-master
+    networks:
+      - yangfan_network
     depends_on:
       - yangfan-server
     restart: always
@@ -91,16 +115,20 @@ services:
 
   work:
     image: registry.cn-hangzhou.aliyuncs.com/yangfanz/work:latest
-    container_name: yangfan-work
+    container_name: work
+    networks:
+      - yangfan_network
     depends_on:
       - yangfan-server
     restart: always
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml
 
-  run:
+  yangfan-run:
     image: registry.cn-hangzhou.aliyuncs.com/yangfanz/run:latest
     container_name: yangfan-run
+    networks:
+      - yangfan_network
     depends_on:
       - yangfan-server
     restart: always
@@ -109,27 +137,13 @@ services:
 
   timer:
     image: registry.cn-hangzhou.aliyuncs.com/yangfanz/timer:latest
-    container_name: yangfan-timer
+    container_name: timer
+    networks:
+      - yangfan_network
     depends_on:
       - yangfan-server
     restart: always
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml
 
-  yangfan-mysql-init:
-    image: mysql:latest
-    command: --default-authentication-plugin=mysql_native_password
-    container_name: yangfan-mysql
-    restart: always
-    ports:
-      - '33016:3306'
-    environment:
-      MYSQL_ROOT_PASSWORD: 123456
-      MYSQL_DATABASE: yangfan
-    volumes:
-      - ./mysql/data:/var/lib/mysql
-      - ./mysql/yangfan.sql:/docker-entrypoint-initdb.d/yangfan.sql
-    networks:
-      network:
-        ipv4_address: 177.7.0.99
 
