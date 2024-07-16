@@ -13,6 +13,7 @@ import (
 	"go.uber.org/zap"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
@@ -24,8 +25,8 @@ type PyPkgVersionList struct {
 
 func (p *PyPkgService) PythonEnv() (PyEnvPath string, PipEnvPath string) {
 	hostname, _ := os.UserHomeDir()
-	PyEnvPath = hostname + "/.hrp/venv/bin/python3"
-	PipEnvPath = hostname + "/.hrp/venv/bin/pip3"
+	PyEnvPath = filepath.Join(hostname, ".hrp", "venv", "bin", "python3")
+	PipEnvPath = filepath.Join(hostname, ".hrp", "venv", "bin", "pip3")
 	return
 }
 
