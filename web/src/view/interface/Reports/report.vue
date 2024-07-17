@@ -74,13 +74,13 @@
         row-key="ID"
         @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="55" />
-        <el-table-column align="left" label="执行时间" width="170">
+        <el-table-column fixed type="selection" width="55" />
+        <el-table-column fixed align="left" label="执行时间" width="170">
           <template #default="scope">{{
             formatDate(scope.row.CreatedAt)
           }}</template>
         </el-table-column>
-        <el-table-column align="left" label="用例类型" width="100">
+        <el-table-column fixed align="left" label="用例类型" width="100">
           <template #default="scope">
             <el-tag
               :style="{
@@ -93,7 +93,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column align="left" label="执行类型" width="100">
+        <el-table-column fixed align="left" label="执行类型" width="100">
           <template #default="scope">
             <el-tag
               :style="{
@@ -111,6 +111,7 @@
           label="报告名称"
           prop="name"
           width="220"
+          fixed
         />
         <el-table-column
           align="left"
@@ -158,7 +159,7 @@
             }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column align="left" label="按钮组">
+        <el-table-column align="left" label="按钮组" width="120">
           <template #default="scope">
             <el-button
               type="text"
