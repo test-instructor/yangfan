@@ -48,26 +48,36 @@ func (a TypeArgs) Value() (value driver.Value, err error) {
 
 func (a *TypeArgs) Scan(value interface{}) error {
 	str, ok := value.([]byte)
-	strs := string(str)
 	if !ok {
 		return errors.New("数据格式无法解析")
 	}
+
+	strs := string(str)
 	tempStr := ""
-	for k, v := range strs {
-		if k < len(strs)-1 {
-			if string(v) == "," && string(strs[k+1]) == "$" {
+	depth := 0 // 用于记录括号嵌套的深度
+
+	for _, v := range strs {
+		switch v {
+		case ',':
+			if depth == 0 {
 				*a = append(*a, tempStr)
 				tempStr = ""
-				fmt.Println(string(v))
-
 			} else {
 				tempStr += string(v)
 			}
-		} else {
+		case '(', '{', '[':
+			depth++
 			tempStr += string(v)
-			*a = append(*a, tempStr)
-			break
+		case ')', '}', ']':
+			depth--
+			tempStr += string(v)
+		default:
+			tempStr += string(v)
 		}
+	}
+
+	if tempStr != "" {
+		*a = append(*a, tempStr)
 	}
 
 	return nil
