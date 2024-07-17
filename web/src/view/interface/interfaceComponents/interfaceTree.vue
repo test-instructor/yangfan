@@ -1,46 +1,46 @@
 <template>
   <div id="left">
     <el-input
-      v-model="filterText"
-      placeholder="输入关键字进行过滤"
-      style="margin-bottom: 10px"
+        v-model="filterText"
+        placeholder="输入关键字进行过滤"
+        style="margin-bottom: 10px"
     />
     <el-button
-      type="primary"
-      round
-      style="margin-bottom: 10px"
-      @click="add_new_question"
-      v-if="eventType === '1'"
-      >添加一级节点
+        type="primary"
+        round
+        style="margin-bottom: 10px"
+        @click="add_new_question"
+        v-if="eventType === '1'"
+    >添加一级节点
     </el-button>
 
     <div style="overflow-y: auto; height: 680px">
       <el-tree
-        :data="trees"
-        :render-after-expand="true"
-        node-key="id"
-        :default-expand-all="true"
-        :expand-on-click-node="false"
-        :filter-node-method="filterNode"
-        ref="tree"
-        @node-drag-start="handleDragStart"
-        @node-drag-enter="handleDragEnter"
-        @node-drag-leave="handleDragLeave"
-        @node-drag-over="handleDragOver"
-        @node-drag-end="handleDragEnd"
-        @node-drop="handleDrop"
-        @node-click="handleClick"
-        check-on-click-node
-        :props="defaultProps"
-        :current-node-key="current_node_key"
-        :default-checked-keys="[current_node_key]"
-        highlight-current
+          :data="trees"
+          :render-after-expand="true"
+          node-key="id"
+          :default-expand-all="true"
+          :expand-on-click-node="false"
+          :filter-node-method="filterNode"
+          ref="tree"
+          @node-drag-start="handleDragStart"
+          @node-drag-enter="handleDragEnter"
+          @node-drag-leave="handleDragLeave"
+          @node-drag-over="handleDragOver"
+          @node-drag-end="handleDragEnd"
+          @node-drop="handleDrop"
+          @node-click="handleClick"
+          check-on-click-node
+          :props="defaultProps"
+          :current-node-key="current_node_key"
+          :default-checked-keys="[current_node_key]"
+          highlight-current
       >
         <template #default="{ node, data }" v-if="eventType === '1'">
           <span class="custom-tree-node">
             <span>{{ node.label }}</span>
             <span>
-              <a @click.stop="openappend(data)">
+              <a v-if="getNodeLevel(node) < 5" @click.stop="openappend(data)">
                 <i class="iconfont icon-add"></i>
               </a>
               <a @click.stop="openedit(node, data)">
@@ -64,7 +64,6 @@ let treeID = 0;
 const project_id = JSON.parse(window.localStorage.getItem("project")).ID;
 export default {
   props: ["menutype", "eventType"],
-  // name: interfaceTree,
   data() {
     return {
       params: { menutype: this.menutype },
@@ -97,21 +96,20 @@ export default {
         inputPattern: /./,
         inputErrorMessage: "节点名称不能为空",
       })
-        .then(({ value }) => {
-          const newChild = { name: value, project: project_id, parent: "0" };
-          this.addTrees(newChild);
-          // this.trees.push()
-          this.$message({
-            type: "success",
-            message: "新增节点: " + value,
+          .then(({ value }) => {
+            const newChild = { name: value, project: project_id, parent: "0" };
+            this.addTrees(newChild);
+            this.$message({
+              type: "success",
+              message: "新增节点: " + value,
+            });
+          })
+          .catch(() => {
+            this.$message({
+              type: "info",
+              message: "取消输入",
+            });
           });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "取消输入",
-          });
-        });
     },
     openappend(data) {
       this.$prompt("请输入节点名称", "新增子节点", {
@@ -120,44 +118,44 @@ export default {
         inputPattern: /./,
         inputErrorMessage: "节点名称不能为空",
       })
-        .then(({ value }) => {
-          this.append(data, value);
-          this.$message({
-            type: "success",
-            message: "新增节点: " + value,
+          .then(({ value }) => {
+            this.append(data, value);
+            this.$message({
+              type: "success",
+              message: "新增节点: " + value,
+            });
+          })
+          .catch(() => {
+            this.$message({
+              type: "info",
+              message: "取消输入",
+            });
           });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "取消输入",
-          });
-        });
     },
     open(node, data) {
       this.$emit("getTreeID", 0);
       this.$confirm(
-        `节点${data.label}及子节点和对应的数据将被删除, 是否继续?`,
-        "删除节点",
-        {
-          confirmButtonText: "删除",
-          cancelButtonText: "取消",
-          type: "error",
-        }
+          `节点${data.label}及子节点和对应的数据将被删除, 是否继续?`,
+          "删除节点",
+          {
+            confirmButtonText: "删除",
+            cancelButtonText: "取消",
+            type: "error",
+          }
       )
-        .then(() => {
-          this.remove(node, data);
-          this.$message({
-            type: "success",
-            message: "删除成功!",
+          .then(() => {
+            this.remove(node, data);
+            this.$message({
+              type: "success",
+              message: "删除成功!",
+            });
+          })
+          .catch(() => {
+            this.$message({
+              type: "info",
+              message: "已取消删除",
+            });
           });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除",
-          });
-        });
     },
     openedit(node, data) {
       this.$prompt("请输入节点名称", "修改节点名称", {
@@ -167,23 +165,21 @@ export default {
         inputPattern: /./,
         inputErrorMessage: "节点名称不能为空",
       })
-        .then(({ value }) => {
-          this.editTree(data, value);
-          this.$message({
-            type: "success",
-            // message: '你的邮箱是: ' + value
-            message: "修改节点: " + value,
+          .then(({ value }) => {
+            this.editTree(data, value);
+            this.$message({
+              type: "success",
+              message: "修改节点: " + value,
+            });
+          })
+          .catch(() => {
+            this.$message({
+              type: "info",
+              message: "取消输入",
+            });
           });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "取消输入",
-          });
-        });
     },
     getTrees() {
-      // 获取树结构数据
       getTree(this.params).then((response) => {
         if (response.code === 0) {
           this.trees = response.data.list;
@@ -219,7 +215,6 @@ export default {
       }
       return data;
     },
-
     filterNode(value, data) {
       if (!value) return true;
       return data.label.indexOf(value) !== -1;
@@ -240,7 +235,6 @@ export default {
       return null;
     },
     editTrees(editChild) {
-      // 添加树节点
       var trees = {
         id: editChild.id,
         name: editChild.label,
@@ -254,9 +248,7 @@ export default {
         this.setNodeStatus();
       });
     },
-
     delTrees(delChild) {
-      // 添加树节点
       var trees = delChild;
       delTree(trees, this.params).then((response) => {
         if (response.code === 0) {
@@ -265,9 +257,7 @@ export default {
         }
       });
     },
-
     addTrees(newChild) {
-      // 添加树节点
       var trees = newChild;
       addTree(trees, this.params).then((response) => {
         if (response.code === 0) {
@@ -276,7 +266,6 @@ export default {
         }
       });
     },
-
     append(data, value) {
       const newChild = { parent: data.id, name: value };
       if (!data.children) {
@@ -284,7 +273,6 @@ export default {
       }
       this.addTrees(newChild);
     },
-
     editTree(data, value) {
       data.label = value;
       this.editTrees(data);
@@ -306,30 +294,38 @@ export default {
     },
     renderContent(h, { node, data, store }) {
       return h(
-        "span",
-        {
-          class: "custom-tree-node",
-        },
-        h("span", null, node.label),
-        h(
           "span",
-          null,
+          {
+            class: "custom-tree-node",
+          },
+          h("span", null, node.label),
           h(
-            "a",
-            {
-              onClick: () => this.append(data),
-            },
-            "Append "
-          ),
-          h(
-            "a",
-            {
-              onClick: () => this.remove(node, data),
-            },
-            "Delete"
+              "span",
+              null,
+              h(
+                  "a",
+                  {
+                    onClick: () => this.append(data),
+                  },
+                  "Append "
+              ),
+              h(
+                  "a",
+                  {
+                    onClick: () => this.remove(node, data),
+                  },
+                  "Delete"
+              )
           )
-        )
       );
+    },
+    getNodeLevel(node) {
+      let level = 0;
+      while (node.parent) {
+        node = node.parent;
+        level++;
+      }
+      return level;
     },
     handleDragStart(node, ev) {},
     handleDragEnter(draggingNode, dropNode, ev) {},
@@ -362,8 +358,6 @@ export default {
   },
 };
 </script>
-
-<script setup></script>
 
 <style>
 .mask::-webkit-scrollbar {
