@@ -367,8 +367,10 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 		}
 	}
 	if len(step.SetupHooks) > 0 {
+		global.GVA_LOG.Debug("len(step.SetupHooks) > 0", zap.Any("rb.requestMap", rb.requestMap))
 		requestBody, ok := rb.requestMap["body"].(map[string]interface{})
 		if ok {
+			global.GVA_LOG.Debug("len(step.SetupHooks) > 0", zap.Any("requestBody", requestBody))
 			body, err := json.Marshal(requestBody)
 			if err == nil {
 				rb.req.Body = io.NopCloser(bytes.NewReader(body))
@@ -377,6 +379,7 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 		}
 		requestParams, ok := rb.requestMap["params"].(map[string]interface{})
 		if ok {
+			global.GVA_LOG.Debug("len(step.SetupHooks) > 0", zap.Any("requestParams", requestParams))
 			rb.stepRequest.Params = requestParams
 			err = rb.prepareUrlParams(stepVariables)
 			if err != nil {
@@ -385,6 +388,7 @@ func runStepRequest(r *SessionRunner, step *TStep) (stepResult *StepResult, err 
 		}
 		requestHeaders, ok := rb.requestMap["headers"].(map[string]interface{})
 		if ok {
+			global.GVA_LOG.Debug("len(step.SetupHooks) > 0", zap.Any("requestHeaders", requestHeaders))
 			rb.req.Header = http.Header{}
 			for k, v := range requestHeaders {
 				rb.req.Header.Set(k, v.(string))
