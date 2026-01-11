@@ -42,3 +42,26 @@ export const editFileName = (data) => {
     data
   })
 }
+
+/**
+ * 导入URL
+ * @param data
+ * @returns {*}
+ */
+export const importURL = (data) => {
+  return service({
+    url: '/fileUploadAndDownload/importURL',
+    method: 'post',
+    data
+  })
+}
+
+
+// 上传文件 暂时用于头像上传
+export const uploadFile = (data) => {
+  return service({
+    url: "/fileUploadAndDownload/upload",
+    method: "post",
+    data,
+  });
+};

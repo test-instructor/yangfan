@@ -1,0 +1,46 @@
+name: Run unittests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+env:
+  DISABLE_GA: "true"
+
+jobs:
+  test-hrp:
+    strategy:
+      fail-fast: false
+      matrix:
+        go-version:
+          - 1.23.x
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - name: Install Python plugin dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install funppy httprunner
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run coverage
+        run: go test -coverprofile="cover.out" -covermode=atomic -race ./...
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          name: hrp (HttpRunner+) # User defined upload name. Visible in Codecov UI
+          token: ${{ secrets.CODECOV_TOKEN }} # Repository upload token
+          file: ./cover.out # Path to coverage file to upload
+          flags: unittests # Flag upload to group coverage metrics
+          fail_ci_if_error: true # Specify whether or not CI build should fail if Codecov runs into an error during upload
+          verbose: true

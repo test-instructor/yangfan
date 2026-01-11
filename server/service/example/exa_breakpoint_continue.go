@@ -3,12 +3,14 @@ package example
 import (
 	"errors"
 
-	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/model/example"
+	"github.com/test-instructor/yangfan/server/v2/global"
+	"github.com/test-instructor/yangfan/server/v2/model/example"
 	"gorm.io/gorm"
 )
 
 type FileUploadAndDownloadService struct{}
+
+var FileUploadAndDownloadServiceApp = new(FileUploadAndDownloadService)
 
 //@author: [piexlmax](https://github.com/piexlmax)
 //@function: FindOrCreateFile
@@ -56,7 +58,11 @@ func (e *FileUploadAndDownloadService) CreateFileChunk(id uint, fileChunkPath st
 func (e *FileUploadAndDownloadService) DeleteFileChunk(fileMd5 string, filePath string) error {
 	var chunks []example.ExaFileChunk
 	var file example.ExaFile
-	err := global.GVA_DB.Where("file_md5 = ? ", fileMd5).First(&file).Update("IsFinish", true).Update("file_path", filePath).Error
+	err := global.GVA_DB.Where("file_md5 = ?", fileMd5).First(&file).
+		Updates(map[string]interface{}{
+			"IsFinish":  true,
+			"file_path": filePath,
+		}).Error
 	if err != nil {
 		return err
 	}

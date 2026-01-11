@@ -7,13 +7,13 @@ import (
 	"path/filepath"
 
 	"github.com/gookit/color"
-	"github.com/test-instructor/yangfan/server/config"
+	"github.com/test-instructor/yangfan/server/v2/config"
 
-	"github.com/test-instructor/yangfan/server/utils"
+	"github.com/test-instructor/yangfan/server/v2/utils"
 
-	uuid "github.com/satori/go.uuid"
-	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/model/system/request"
+	"github.com/google/uuid"
+	"github.com/test-instructor/yangfan/server/v2/global"
+	"github.com/test-instructor/yangfan/server/v2/model/system/request"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -32,11 +32,12 @@ func (h PgsqlInitHandler) WriteConfig(ctx context.Context) error {
 	}
 	global.GVA_CONFIG.System.DbType = "pgsql"
 	global.GVA_CONFIG.Pgsql = c
-	global.GVA_CONFIG.JWT.SigningKey = uuid.NewV4().String()
+	global.GVA_CONFIG.JWT.SigningKey = uuid.New().String()
 	cs := utils.StructToMap(global.GVA_CONFIG)
 	for k, v := range cs {
 		global.GVA_VP.Set(k, v)
 	}
+	global.GVA_ACTIVE_DBNAME = &c.Dbname
 	return global.GVA_VP.WriteConfig()
 }
 
@@ -53,7 +54,12 @@ func (h PgsqlInitHandler) EnsureDB(ctx context.Context, conf *request.InitDB) (n
 	} // 如果没有数据库名, 则跳出初始化数据
 
 	dsn := conf.PgsqlEmptyDsn()
-	createSql := fmt.Sprintf("CREATE DATABASE %s;", c.Dbname)
+	var createSql string
+	if conf.Template != "" {
+		createSql = fmt.Sprintf("CREATE DATABASE %s WITH TEMPLATE %s;", c.Dbname, conf.Template)
+	} else {
+		createSql = fmt.Sprintf("CREATE DATABASE %s;", c.Dbname)
+	}
 	if err = createDatabase(dsn, "pgx", createSql); err != nil {
 		return nil, err
 	} // 创建数据库

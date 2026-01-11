@@ -2,18 +2,21 @@ package system
 
 import (
 	"github.com/gin-gonic/gin"
-
-	v1 "github.com/test-instructor/yangfan/server/api/v1"
-	"github.com/test-instructor/yangfan/server/middleware"
+	"github.com/test-instructor/yangfan/server/v2/middleware"
 )
 
 type ApiRouter struct{}
 
-func (s *ApiRouter) InitApiRouter(Router *gin.RouterGroup) {
+func (s *ApiRouter) InitApiRouter(Router *gin.RouterGroup, RouterPub *gin.RouterGroup) {
 	apiRouter := Router.Group("api").Use(middleware.OperationRecord())
 	apiRouterWithoutRecord := Router.Group("api")
-	apiRouterApi := v1.ApiGroupApp.SystemApiGroup.SystemApiApi
+
+	apiPublicRouterWithoutRecord := RouterPub.Group("api")
 	{
+		apiRouter.GET("getApiGroups", apiRouterApi.GetApiGroups)          // 获取路由组
+		apiRouter.GET("syncApi", apiRouterApi.SyncApi)                    // 同步Api
+		apiRouter.POST("ignoreApi", apiRouterApi.IgnoreApi)               // 忽略Api
+		apiRouter.POST("enterSyncApi", apiRouterApi.EnterSyncApi)         // 确认同步Api
 		apiRouter.POST("createApi", apiRouterApi.CreateApi)               // 创建Api
 		apiRouter.POST("deleteApi", apiRouterApi.DeleteApi)               // 删除Api
 		apiRouter.POST("getApiById", apiRouterApi.GetApiById)             // 获取单条Api消息
@@ -23,5 +26,8 @@ func (s *ApiRouter) InitApiRouter(Router *gin.RouterGroup) {
 	{
 		apiRouterWithoutRecord.POST("getAllApis", apiRouterApi.GetAllApis) // 获取所有api
 		apiRouterWithoutRecord.POST("getApiList", apiRouterApi.GetApiList) // 获取Api列表
+	}
+	{
+		apiPublicRouterWithoutRecord.GET("freshCasbin", apiRouterApi.FreshCasbin) // 刷新casbin权限
 	}
 }

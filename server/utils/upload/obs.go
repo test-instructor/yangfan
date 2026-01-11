@@ -1,34 +1,38 @@
 package upload
 
 import (
+	"mime/multipart"
+
 	"github.com/huaweicloud/huaweicloud-sdk-go-obs/obs"
 	"github.com/pkg/errors"
-	"github.com/test-instructor/yangfan/server/global"
-	"mime/multipart"
+	"github.com/test-instructor/yangfan/server/v2/global"
 )
 
-var HuaWeiObs = new(_obs)
+var HuaWeiObs = new(Obs)
 
-type _obs struct{}
+type Obs struct{}
 
 func NewHuaWeiObsClient() (client *obs.ObsClient, err error) {
 	return obs.New(global.GVA_CONFIG.HuaWeiObs.AccessKey, global.GVA_CONFIG.HuaWeiObs.SecretKey, global.GVA_CONFIG.HuaWeiObs.Endpoint)
 }
 
-func (o *_obs) UploadFile(file *multipart.FileHeader) (filename string, filepath string, err error) {
-	var open multipart.File
-	open, err = file.Open()
+func (o *Obs) UploadFile(file *multipart.FileHeader) (string, string, error) {
+	// var open multipart.File
+	open, err := file.Open()
 	if err != nil {
-		return filename, filepath, err
+		return "", "", err
 	}
-	filename = file.Filename
+	defer open.Close()
+	filename := file.Filename
 	input := &obs.PutObjectInput{
 		PutObjectBasicInput: obs.PutObjectBasicInput{
 			ObjectOperationInput: obs.ObjectOperationInput{
 				Bucket: global.GVA_CONFIG.HuaWeiObs.Bucket,
 				Key:    filename,
 			},
-			ContentType: file.Header.Get("content-type"),
+			HttpHeader: obs.HttpHeader{
+				ContentType: file.Header.Get("content-type"),
+			},
 		},
 		Body: open,
 	}
@@ -36,18 +40,18 @@ func (o *_obs) UploadFile(file *multipart.FileHeader) (filename string, filepath
 	var client *obs.ObsClient
 	client, err = NewHuaWeiObsClient()
 	if err != nil {
-		return filepath, filename, errors.Wrap(err, "获取华为对象存储对象失败!")
+		return "", "", errors.Wrap(err, "获取华为对象存储对象失败!")
 	}
 
 	_, err = client.PutObject(input)
 	if err != nil {
-		return filepath, filename, errors.Wrap(err, "文件上传失败!")
+		return "", "", errors.Wrap(err, "文件上传失败!")
 	}
-	filepath = global.GVA_CONFIG.HuaWeiObs.Path + "/" + filename
+	filepath := global.GVA_CONFIG.HuaWeiObs.Path + "/" + filename
 	return filepath, filename, err
 }
 
-func (o *_obs) DeleteFile(key string) error {
+func (o *Obs) DeleteFile(key string) error {
 	client, err := NewHuaWeiObsClient()
 	if err != nil {
 		return errors.Wrap(err, "获取华为对象存储对象失败!")

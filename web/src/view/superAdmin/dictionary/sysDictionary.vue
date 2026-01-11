@@ -1,157 +1,73 @@
 <template>
   <div>
-<!--    <warning-bar-->
-<!--      title="获取字典且缓存方法已在前端utils/dictionary 已经封装完成 不必自己书写 使用方法查看文件内注释"-->
-<!--    />-->
-    <div class="gva-search-box">
-      <el-form :inline="true" :model="searchInfo">
-        <el-form-item label="字典名（中）">
-          <el-input v-model="searchInfo.name" placeholder="搜索条件" />
-        </el-form-item>
-        <el-form-item label="字典名（英）">
-          <el-input v-model="searchInfo.type" placeholder="搜索条件" />
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-select v-model="searchInfo.status" clear placeholder="请选择">
-            <el-option key="true" label="是" value="true" />
-            <el-option key="false" label="否" value="false" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="描述">
-          <el-input v-model="searchInfo.desc" placeholder="搜索条件" />
-        </el-form-item>
-        <el-form-item>
-          <el-button
-            size="small"
-            type="primary"
-            icon="search"
-            @click="onSubmit"
-          >查询</el-button>
-          <el-button
-            size="small"
-            icon="refresh"
-            @click="onReset"
-          >重置</el-button>
-        </el-form-item>
-      </el-form>
-    </div>
-    <div class="gva-table-box">
-      <div class="gva-btn-list">
-        <el-button
-          size="small"
-          type="primary"
-          icon="plus"
-          @click="openDialog"
-        >新增</el-button>
-      </div>
-      <el-table
-        ref="multipleTable"
-        :data="tableData"
-        style="width: 100%"
-        tooltip-effect="dark"
-        row-key="ID"
+    <warning-bar
+      title="获取字典且缓存方法已在前端utils/dictionary 已经封装完成 不必自己书写 使用方法查看文件内注释"
+    />
+    <div class="flex gap-4 p-2">
+      <div
+        class="flex-none w-52 bg-white text-slate-700 dark:text-slate-400 dark:bg-slate-900 rounded p-4"
       >
-        <el-table-column type="selection" width="55" />
-        <el-table-column align="left" label="日期" width="180">
-          <template #default="scope">{{
-            formatDate(scope.row.CreatedAt)
-          }}</template>
-        </el-table-column>
-
-        <el-table-column
-          align="left"
-          label="字典名（中）"
-          prop="name"
-          width="160"
-        />
-
-        <el-table-column
-          align="left"
-          label="字典名（英）"
-          prop="type"
-          width="120"
-        />
-
-        <el-table-column align="left" label="状态" prop="status" width="120">
-          <template #default="scope">{{
-            formatBoolean(scope.row.status)
-          }}</template>
-        </el-table-column>
-
-        <el-table-column align="left" label="描述" prop="desc" width="280" />
-
-        <el-table-column align="left" label="按钮组">
-          <template #default="scope">
-            <el-button
-              size="small"
-              icon="document"
-              type="primary"
-              link
-              @click="toDetail(scope.row)"
-            >详情</el-button>
-            <el-button
-              size="small"
-              icon="edit"
-              type="primary"
-              link
-              @click="updateSysDictionaryFunc(scope.row)"
-            >变更</el-button>
-            <el-popover
-              v-model="scope.row.visible"
-              placement="top"
-              width="160"
-            >
-              <p>确定要删除吗？</p>
-              <div style="text-align: right; margin-top: 8px">
-                <el-button
-                  size="small"
-                  type="primary"
-                  link
-                  @click="scope.row.visible = false"
-                >取消</el-button>
-                <el-button
-                  type="primary"
-                  size="small"
-                  @click="deleteSysDictionaryFunc(scope.row)"
-                >确定</el-button>
-              </div>
-              <template #reference>
-                <el-button
-                  type="primary"
-                  link
-                  icon="delete"
-                  size="small"
-                  style="margin-left: 10px"
-                  @click="scope.row.visible = true"
-                >删除</el-button>
-              </template>
-            </el-popover>
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <div class="gva-pagination">
-        <el-pagination
-          :current-page="page"
-          :page-size="pageSize"
-          :page-sizes="[10, 30, 50, 100]"
-          :total="total"
-          layout="total, sizes, prev, pager, next, jumper"
-          @current-change="handleCurrentChange"
-          @size-change="handleSizeChange"
-        />
+        <div class="flex justify-between items-center">
+          <span class="text font-bold">字典列表</span>
+          <el-button type="primary" @click="openDrawer"> 新增 </el-button>
+        </div>
+        <el-scrollbar class="mt-4" style="height: calc(100vh - 300px)">
+          <div
+            v-for="dictionary in dictionaryData"
+            :key="dictionary.ID"
+            class="rounded flex justify-between items-center px-2 py-4 cursor-pointer mt-2 hover:bg-blue-50 dark:hover:bg-blue-900 bg-gray-50 dark:bg-gray-800 gap-4"
+            :class="
+              selectID === dictionary.ID
+                ? 'text-active'
+                : 'text-slate-700 dark:text-slate-50'
+            "
+            @click="toDetail(dictionary)"
+          >
+            <span class="max-w-[160px] truncate">{{ dictionary.name }}</span>
+            <div class="min-w-[40px]">
+              <el-icon
+                class="text-blue-500"
+                @click.stop="updateSysDictionaryFunc(dictionary)"
+              >
+                <Edit />
+              </el-icon>
+              <el-icon
+                class="ml-2 text-red-500"
+                @click="deleteSysDictionaryFunc(dictionary)"
+              >
+                <Delete />
+              </el-icon>
+            </div>
+          </div>
+        </el-scrollbar>
+      </div>
+      <div
+        class="flex-1 bg-white text-slate-700 dark:text-slate-400 dark:bg-slate-900"
+      >
+        <sysDictionaryDetail :sys-dictionary-i-d="selectID" />
       </div>
     </div>
-    <el-dialog
-      v-model="dialogFormVisible"
-      :before-close="closeDialog"
-      title="弹窗操作"
+    <el-drawer
+      v-model="drawerFormVisible"
+      :size="appStore.drawerSize"
+      :show-close="false"
+      :before-close="closeDrawer"
     >
+      <template #header>
+        <div class="flex justify-between items-center">
+          <span class="text-lg">{{
+            type === 'create' ? '添加字典' : '修改字典'
+          }}</span>
+          <div>
+            <el-button @click="closeDrawer"> 取 消 </el-button>
+            <el-button type="primary" @click="enterDrawer"> 确 定 </el-button>
+          </div>
+        </div>
+      </template>
       <el-form
-        ref="dialogForm"
+        ref="drawerForm"
         :model="formData"
         :rules="rules"
-        size="medium"
         label-width="110px"
       >
         <el-form-item label="字典名（中）" prop="name">
@@ -186,190 +102,154 @@
           />
         </el-form-item>
       </el-form>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button size="small" @click="closeDialog">取 消</el-button>
-          <el-button
-            size="small"
-            type="primary"
-            @click="enterDialog"
-          >确 定</el-button>
-        </div>
-      </template>
-    </el-dialog>
+    </el-drawer>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'SysDictionary',
-}
-</script>
-
 <script setup>
-import {
-  createSysDictionary,
-  deleteSysDictionary,
-  updateSysDictionary,
-  findSysDictionary,
-  getSysDictionaryList,
-} from '@/api/sysDictionary' // 此处请自行替换地址
-import WarningBar from '@/components/warningBar/warningBar.vue'
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { formatBoolean, formatDate } from '@/utils/format'
+  import {
+    createSysDictionary,
+    deleteSysDictionary,
+    updateSysDictionary,
+    findSysDictionary,
+    getSysDictionaryList
+  } from '@/api/sysDictionary' // 此处请自行替换地址
+  import WarningBar from '@/components/warningBar/warningBar.vue'
+  import { ref } from 'vue'
+  import { ElMessage, ElMessageBox } from 'element-plus'
 
-const router = useRouter()
+  import sysDictionaryDetail from './sysDictionaryDetail.vue'
+  import { Edit } from '@element-plus/icons-vue'
+  import { useAppStore } from "@/pinia";
 
-const formData = ref({
-  name: null,
-  type: null,
-  status: true,
-  desc: null,
-})
-const rules = ref({
-  name: [
-    {
-      required: true,
-      message: '请输入字典名（中）',
-      trigger: 'blur',
-    },
-  ],
-  type: [
-    {
-      required: true,
-      message: '请输入字典名（英）',
-      trigger: 'blur',
-    },
-  ],
-  desc: [
-    {
-      required: true,
-      message: '请输入描述',
-      trigger: 'blur',
-    },
-  ],
-})
-
-const page = ref(1)
-const total = ref(0)
-const pageSize = ref(10)
-const tableData = ref([])
-const searchInfo = ref({})
-
-const onReset = () => {
-  searchInfo.value = {}
-}
-
-// 条件搜索前端看此方法
-const onSubmit = () => {
-  page.value = 1
-  pageSize.value = 10
-  if (searchInfo.value.status === '') {
-    searchInfo.value.status = null
-  }
-  getTableData()
-}
-
-// 分页
-const handleSizeChange = (val) => {
-  pageSize.value = val
-  getTableData()
-}
-
-const handleCurrentChange = (val) => {
-  page.value = val
-  getTableData()
-}
-
-// 查询
-const getTableData = async() => {
-  const table = await getSysDictionaryList({
-    page: page.value,
-    pageSize: pageSize.value,
-    ...searchInfo.value,
+  defineOptions({
+    name: 'SysDictionary'
   })
-  if (table.code === 0) {
-    tableData.value = table.data.list
-    total.value = table.data.total
-    page.value = table.data.page
-    pageSize.value = table.data.pageSize
-  }
-}
 
-getTableData()
+  const appStore = useAppStore()
 
-const toDetail = (row) => {
-  router.push({
-    name: 'dictionaryDetail',
-    params: {
-      id: row.ID,
-    },
-  })
-}
+  const selectID = ref(0)
 
-const dialogFormVisible = ref(false)
-const type = ref('')
-const updateSysDictionaryFunc = async(row) => {
-  const res = await findSysDictionary({ ID: row.ID, status: row.status })
-  type.value = 'update'
-  if (res.code === 0) {
-    formData.value = res.data.resysDictionary
-    dialogFormVisible.value = true
-  }
-}
-const closeDialog = () => {
-  dialogFormVisible.value = false
-  formData.value = {
+  const formData = ref({
     name: null,
     type: null,
     status: true,
-    desc: null,
-  }
-}
-const deleteSysDictionaryFunc = async(row) => {
-  row.visible = false
-  const res = await deleteSysDictionary({ ID: row.ID })
-  if (res.code === 0) {
-    ElMessage({
-      type: 'success',
-      message: '删除成功',
-    })
-    if (tableData.value.length === 1 && page.value > 1) {
-      page.value--
-    }
-    getTableData()
-  }
-}
-
-const dialogForm = ref(null)
-const enterDialog = async() => {
-  dialogForm.value.validate(async(valid) => {
-    if (!valid) return
-    let res
-    switch (type.value) {
-      case 'create':
-        res = await createSysDictionary(formData.value)
-        break
-      case 'update':
-        res = await updateSysDictionary(formData.value)
-        break
-      default:
-        res = await createSysDictionary(formData.value)
-        break
-    }
-    if (res.code === 0) {
-      ElMessage.success('操作成功')
-      closeDialog()
-      getTableData()
-    }
+    desc: null
   })
-}
-const openDialog = () => {
-  type.value = 'create'
-  dialogFormVisible.value = true
-}
+  const rules = ref({
+    name: [
+      {
+        required: true,
+        message: '请输入字典名（中）',
+        trigger: 'blur'
+      }
+    ],
+    type: [
+      {
+        required: true,
+        message: '请输入字典名（英）',
+        trigger: 'blur'
+      }
+    ],
+    desc: [
+      {
+        required: true,
+        message: '请输入描述',
+        trigger: 'blur'
+      }
+    ]
+  })
+
+  const dictionaryData = ref([])
+
+  // 查询
+  const getTableData = async () => {
+    const res = await getSysDictionaryList()
+    if (res.code === 0) {
+      dictionaryData.value = res.data
+      selectID.value = res.data[0].ID
+    }
+  }
+
+  getTableData()
+
+  const toDetail = (row) => {
+    selectID.value = row.ID
+  }
+
+  const drawerFormVisible = ref(false)
+  const type = ref('')
+  const updateSysDictionaryFunc = async (row) => {
+    const res = await findSysDictionary({ ID: row.ID, status: row.status })
+    type.value = 'update'
+    if (res.code === 0) {
+      formData.value = res.data.resysDictionary
+      drawerFormVisible.value = true
+    }
+  }
+  const closeDrawer = () => {
+    drawerFormVisible.value = false
+    formData.value = {
+      name: null,
+      type: null,
+      status: true,
+      desc: null
+    }
+  }
+  const deleteSysDictionaryFunc = async (row) => {
+    ElMessageBox.confirm('确定要删除吗?', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(async () => {
+      const res = await deleteSysDictionary({ ID: row.ID })
+      if (res.code === 0) {
+        ElMessage({
+          type: 'success',
+          message: '删除成功'
+        })
+        getTableData()
+      }
+    })
+  }
+
+  const drawerForm = ref(null)
+  const enterDrawer = async () => {
+    drawerForm.value.validate(async (valid) => {
+      if (!valid) return
+      let res
+      switch (type.value) {
+        case 'create':
+          res = await createSysDictionary(formData.value)
+          break
+        case 'update':
+          res = await updateSysDictionary(formData.value)
+          break
+        default:
+          res = await createSysDictionary(formData.value)
+          break
+      }
+      if (res.code === 0) {
+        ElMessage.success('操作成功')
+        closeDrawer()
+        getTableData()
+      }
+    })
+  }
+  const openDrawer = () => {
+    type.value = 'create'
+    drawerForm.value && drawerForm.value.clearValidate()
+    drawerFormVisible.value = true
+  }
 </script>
 
-<style></style>
+<style>
+  .dict-box {
+    height: calc(100vh - 240px);
+  }
+
+  .active {
+    background-color: var(--el-color-primary) !important;
+    color: #fff;
+  }
+</style>

@@ -1,6 +1,6 @@
 package response
 
-import "github.com/test-instructor/yangfan/server/model/system"
+import "github.com/test-instructor/yangfan/server/v2/model/system"
 
 type SysAuthorityResponse struct {
 	Authority system.SysAuthority `json:"authority"`

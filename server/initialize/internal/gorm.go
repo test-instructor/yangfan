@@ -1,18 +1,13 @@
 package internal
 
 import (
-	"log"
-	"os"
 	"time"
 
-	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/v2/config"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
 )
-
-type DBBASE interface {
-	GetLogMode() string
-}
 
 var Gorm = new(_gorm)
 
@@ -20,36 +15,17 @@ type _gorm struct{}
 
 // Config gorm 自定义配置
 // Author [SliverHorn](https://github.com/SliverHorn)
-func (g *_gorm) Config() *gorm.Config {
-	config := &gorm.Config{DisableForeignKeyConstraintWhenMigrating: true}
-	_default := logger.New(NewWriter(log.New(os.Stdout, "\r\n", log.LstdFlags)), logger.Config{
-		SlowThreshold: 200 * time.Millisecond,
-		LogLevel:      logger.Warn,
-		Colorful:      true,
-	})
-	var logMode DBBASE
-	switch global.GVA_CONFIG.System.DbType {
-	case "mysql":
-		logMode = &global.GVA_CONFIG.Mysql
-		break
-	case "pgsql":
-		logMode = &global.GVA_CONFIG.Pgsql
-		break
-	default:
-		logMode = &global.GVA_CONFIG.Mysql
+func (g *_gorm) Config(general config.GeneralDB) *gorm.Config {
+	return &gorm.Config{
+		Logger: logger.New(NewWriter(general), logger.Config{
+			SlowThreshold: 200 * time.Millisecond,
+			LogLevel:      general.LogLevel(),
+			Colorful:      true,
+		}),
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix:   general.Prefix,
+			SingularTable: general.Singular,
+		},
+		DisableForeignKeyConstraintWhenMigrating: true,
 	}
-
-	switch logMode.GetLogMode() {
-	case "silent", "Silent":
-		config.Logger = _default.LogMode(logger.Silent)
-	case "error", "Error":
-		config.Logger = _default.LogMode(logger.Error)
-	case "warn", "Warn":
-		config.Logger = _default.LogMode(logger.Warn)
-	case "info", "Info":
-		config.Logger = _default.LogMode(logger.Info)
-	default:
-		config.Logger = _default.LogMode(logger.Info)
-	}
-	return config
 }

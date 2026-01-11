@@ -2,14 +2,16 @@ package system
 
 import (
 	"errors"
-	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/model/system"
-	"github.com/test-instructor/yangfan/server/model/system/request"
-	"github.com/test-instructor/yangfan/server/model/system/response"
+	"github.com/test-instructor/yangfan/server/v2/global"
+	"github.com/test-instructor/yangfan/server/v2/model/system"
+	"github.com/test-instructor/yangfan/server/v2/model/system/request"
+	"github.com/test-instructor/yangfan/server/v2/model/system/response"
 	"gorm.io/gorm"
 )
 
 type AuthorityBtnService struct{}
+
+var AuthorityBtnServiceApp = new(AuthorityBtnService)
 
 func (a *AuthorityBtnService) GetAuthorityBtn(req request.SysAuthorityBtnReq) (res response.SysAuthorityBtnRes, err error) {
 	var authorityBtn []system.SysAuthorityBtn

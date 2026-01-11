@@ -2,7 +2,7 @@
 package system
 
 import (
-	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/v2/global"
 )
 
 // 如果含有time.Time 请自行import time包

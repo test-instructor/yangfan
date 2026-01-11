@@ -1,0 +1,44 @@
+name: run smoke tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+env:
+  DISABLE_GA: "true"
+
+jobs:
+  smoke-test-hrp:
+    name: smoketest - hrp - ${{ matrix.go-version }} on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        go-version:
+          - 1.23.x
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install funppy httprunner
+      - name: Build hrp binary
+        run: make build
+      - name: Run smoketest - run with parameters
+        run: ./output/hrp run examples/hrp/parameters_test.json
+      - name: Run hrp convert --pytest
+        run: ./output/hrp convert examples/postman_echo/request_methods/
+      - name: Run hrp pytest
+        run: ./output/hrp pytest examples/postman_echo/request_methods/

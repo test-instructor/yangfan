@@ -2,159 +2,123 @@ package initialize
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
-
-	_ "github.com/test-instructor/yangfan/server/docs"
-	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/middleware"
-	"github.com/test-instructor/yangfan/server/router"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/test-instructor/yangfan/server/v2/docs"
+	"github.com/test-instructor/yangfan/server/v2/global"
+	"github.com/test-instructor/yangfan/server/v2/middleware"
+	"github.com/test-instructor/yangfan/server/v2/router"
 )
+
+type justFilesFilesystem struct {
+	fs http.FileSystem
+}
+
+func (fs justFilesFilesystem) Open(name string) (http.File, error) {
+	f, err := fs.fs.Open(name)
+	if err != nil {
+		return nil, err
+	}
+
+	stat, err := f.Stat()
+	if stat.IsDir() {
+		return nil, os.ErrPermission
+	}
+
+	return f, nil
+}
 
 // 初始化总路由
 
 func Routers() *gin.Engine {
-	Router := gin.Default()
+	Router := gin.New()
+	Router.Use(gin.Recovery())
+	if gin.Mode() == gin.DebugMode {
+		Router.Use(gin.Logger())
+	}
+
+	sseServer := McpRun()
+
+	// 注册mcp服务
+	Router.GET(global.GVA_CONFIG.MCP.SSEPath, func(c *gin.Context) {
+		sseServer.SSEHandler().ServeHTTP(c.Writer, c.Request)
+	})
+
+	Router.POST(global.GVA_CONFIG.MCP.MessagePath, func(c *gin.Context) {
+		sseServer.MessageHandler().ServeHTTP(c.Writer, c.Request)
+	})
+
 	systemRouter := router.RouterGroupApp.System
 	exampleRouter := router.RouterGroupApp.Example
-	ciRouter := router.RouterGroupApp.CI
-	ciRespRouter := router.RouterGroupApp.CIResp
 	// 如果想要不使用nginx代理前端网页，可以修改 web/.env.production 下的
 	// VUE_APP_BASE_API = /
 	// VUE_APP_BASE_PATH = http://localhost
-	// 然后执行打包命令 npm run build。在打开下面4行注释
-	// Router.LoadHTMLGlob("./dist/*.html") // npm打包成dist的路径
-	// Router.Static("/favicon.ico", "./dist/favicon.ico")
-	// Router.Static("/static", "./dist/assets")   // dist里面的静态资源
+	// 然后执行打包命令 npm run build。在打开下面3行注释
+	// Router.StaticFile("/favicon.ico", "./dist/favicon.ico")
+	// Router.Static("/assets", "./dist/assets")   // dist里面的静态资源
 	// Router.StaticFile("/", "./dist/index.html") // 前端网页入口页面
 
-	Router.StaticFS(global.GVA_CONFIG.Local.Path, http.Dir(global.GVA_CONFIG.Local.StorePath)) // 为用户头像和文件提供静态地址
-	// Router.Use(middleware.LoadTls())  // 如果需要使用https 请打开此中间件 然后前往 core/server.go 将启动模式 更变为 Router.RunTLS("端口","你的cre/pem文件","你的key文件")
+	Router.StaticFS(global.GVA_CONFIG.Local.StorePath, justFilesFilesystem{http.Dir(global.GVA_CONFIG.Local.StorePath)}) // Router.Use(middleware.LoadTls())  // 如果需要使用https 请打开此中间件 然后前往 core/server.go 将启动模式 更变为 Router.RunTLS("端口","你的cre/pem文件","你的key文件")
 	// 跨域，如需跨域可以打开下面的注释
 	// Router.Use(middleware.Cors()) // 直接放行全部跨域请求
-	//Router.Use(middleware.CorsByRules()) // 按照配置的规则放行跨域请求
-	//global.GVA_LOG.Info("use middleware cors")
-	Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	// Router.Use(middleware.CorsByRules()) // 按照配置的规则放行跨域请求
+	// global.GVA_LOG.Info("use middleware cors")
+	docs.SwaggerInfo.BasePath = global.GVA_CONFIG.System.RouterPrefix
+	Router.GET(global.GVA_CONFIG.System.RouterPrefix+"/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	global.GVA_LOG.Info("register swagger handler")
 	// 方便统一添加路由组前缀 多服务器上线使用
 
-	PublicGroup := Router.Group("")
+	PublicGroup := Router.Group(global.GVA_CONFIG.System.RouterPrefix)
+	PrivateGroup := Router.Group(global.GVA_CONFIG.System.RouterPrefix)
+
+	PrivateGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler())
+	ProjectGroup := Router.Group(global.GVA_CONFIG.System.RouterPrefix)
+	ProjectGroup.Use(middleware.ProjectAuth())
+
 	{
 		// 健康监测
 		PublicGroup.GET("/health", func(c *gin.Context) {
-			c.JSON(200, "ok")
+			c.JSON(http.StatusOK, "ok")
 		})
 	}
 	{
-		systemRouter.InitBaseRouter(PublicGroup)  // 注册基础功能路由 不做鉴权
-		ciRouter.InitApiCIRouter(PublicGroup)     // 注册CI功能路由 不做鉴权
-		ciRespRouter.InitApiCIRouter(PublicGroup) // 注册CI测试报告 不做鉴权
+		systemRouter.InitBaseRouter(PublicGroup) // 注册基础功能路由 不做鉴权
+		systemRouter.InitInitRouter(PublicGroup) // 自动初始化相关
 	}
-	PrivateGroup := Router.Group("")
-	PrivateGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler())
+
 	{
-		systemRouter.InitApiRouter(PrivateGroup)                 // 注册功能api路由
-		systemRouter.InitJwtRouter(PrivateGroup)                 // jwt相关路由
-		systemRouter.InitUserRouter(PrivateGroup)                // 注册用户路由
-		systemRouter.InitMenuRouter(PrivateGroup)                // 注册menu路由
-		systemRouter.InitSystemRouter(PrivateGroup)              // system相关路由
-		systemRouter.InitCasbinRouter(PrivateGroup)              // 权限相关路由
-		systemRouter.InitAutoCodeRouter(PrivateGroup)            // 创建自动化代码
-		systemRouter.InitAuthorityRouter(PrivateGroup)           // 注册角色路由
-		systemRouter.InitSysDictionaryRouter(PrivateGroup)       // 字典管理
-		systemRouter.InitAutoCodeHistoryRouter(PrivateGroup)     // 自动化代码历史
-		systemRouter.InitSysOperationRecordRouter(PrivateGroup)  // 操作记录
-		systemRouter.InitSysDictionaryDetailRouter(PrivateGroup) // 字典详情管理
-		systemRouter.InitAuthorityBtnRouterRouter(PrivateGroup)  // 字典详情管理
-		systemRouter.InitProjectRouter(PrivateGroup)
+		systemRouter.InitApiRouter(PrivateGroup, PublicGroup)               // 注册功能api路由
+		systemRouter.InitJwtRouter(PrivateGroup)                            // jwt相关路由
+		systemRouter.InitUserRouter(PrivateGroup)                           // 注册用户路由
+		systemRouter.InitMenuRouter(PrivateGroup)                           // 注册menu路由
+		systemRouter.InitSystemRouter(PrivateGroup)                         // system相关路由
+		systemRouter.InitSysVersionRouter(PrivateGroup)                     // 发版相关路由
+		systemRouter.InitCasbinRouter(PrivateGroup)                         // 权限相关路由
+		systemRouter.InitAutoCodeRouter(PrivateGroup, PublicGroup)          // 创建自动化代码
+		systemRouter.InitAuthorityRouter(PrivateGroup)                      // 注册角色路由
+		systemRouter.InitSysDictionaryRouter(PrivateGroup)                  // 字典管理
+		systemRouter.InitAutoCodeHistoryRouter(PrivateGroup)                // 自动化代码历史
+		systemRouter.InitSysOperationRecordRouter(PrivateGroup)             // 操作记录
+		systemRouter.InitSysDictionaryDetailRouter(PrivateGroup)            // 字典详情管理
+		systemRouter.InitAuthorityBtnRouterRouter(PrivateGroup)             // 按钮权限管理
+		systemRouter.InitSysExportTemplateRouter(PrivateGroup, PublicGroup) // 导出模板
+		systemRouter.InitSysParamsRouter(PrivateGroup, PublicGroup)         // 参数管理
+		exampleRouter.InitCustomerRouter(PrivateGroup)                      // 客户路由
+		exampleRouter.InitFileUploadAndDownloadRouter(PrivateGroup)         // 文件上传下载功能路由
+		exampleRouter.InitAttachmentCategoryRouterRouter(PrivateGroup)      // 文件上传下载分类
 
-		exampleRouter.InitExcelRouter(PrivateGroup)                 // 表格导入导出
-		exampleRouter.InitCustomerRouter(PrivateGroup)              // 客户路由
-		exampleRouter.InitFileUploadAndDownloadRouter(PrivateGroup) // 文件上传下载功能路由
-
-		// Code generated by server Begin; DO NOT EDIT.
-
-		// Code generated by server End; DO NOT EDIT.
 	}
 
-	//获取路由组实例
-	interfacecaseRouter := router.RouterGroupApp.Interfacecase
-	InterfaceGroup := Router.Group("case/:project")
-	InterfaceGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler()).Use(middleware.ProjectAuth())
-	{
-		interfacecaseRouter.InitApiMenuRouter(InterfaceGroup)
-		interfacecaseRouter.InitInterfaceTemplateRouter(InterfaceGroup)
-		interfacecaseRouter.InitTestCaseRouter(InterfaceGroup)
-		interfacecaseRouter.InitPyPkgRouter(InterfaceGroup) // python包管理
-	}
+	//插件路由安装
+	InstallPlugin(PrivateGroup, PublicGroup, Router)
 
-	runCaseRouter := router.RouterGroupApp.RunCase
-	runCaseGroup := Router.Group("case/run/:project")
-	runCaseGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler()).Use(middleware.ProjectAuth())
-	{
-		runCaseRouter.InitRunCaseRouter(runCaseGroup)
-	}
+	// 注册业务路由
+	initBizRouter(PrivateGroup, PublicGroup, ProjectGroup)
 
-	reportRouter := router.RouterGroupApp.Report
-	reportGroup := Router.Group("case/report/:project")
-	reportGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler()).Use(middleware.ProjectAuth())
-	{
-		reportRouter.InitReportRouter(reportGroup)
-	}
-
-	apiConfigRouter := router.RouterGroupApp.ApiConfig
-	apiConfigGroup := Router.Group("ac/:project")
-	apiConfigGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler()).Use(middleware.ProjectAuth())
-	{
-		apiConfigRouter.InitApiConfigRouter(apiConfigGroup)
-	}
-
-	apiCaseRouter := router.RouterGroupApp.ApiCase
-	apiCaseGroup := Router.Group("testcase/:project")
-	apiCaseGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler()).Use(middleware.ProjectAuth())
-	{
-		apiCaseRouter.InitApiCaseRouter(apiCaseGroup)
-	}
-
-	timerTaskRouter := router.RouterGroupApp.TimerTask
-	timerTaskGroup := Router.Group("task/:project")
-	timerTaskGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler()).Use(middleware.ProjectAuth())
-	{
-		timerTaskRouter.InitTimerTaskRouter(timerTaskGroup)
-	}
-
-	performanceRouter := router.RouterGroupApp.Performance
-	performanceGroup := Router.Group("performance/:project")
-	performanceGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler()).Use(middleware.ProjectAuth())
-	{
-		performanceRouter.InitPerformanceRouter(performanceGroup)
-	}
-
-	environmentRouter := router.RouterGroupApp.Environment
-	environmentGroup := Router.Group("env/:project")
-	environmentGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler()).Use(middleware.ProjectAuth())
-	{
-		environmentRouter.InitEnvironmentRouter(environmentGroup)
-	}
-	messageRouter := router.RouterGroupApp.Message
-	messageGroup := Router.Group("message/:project")
-	messageGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler()).Use(middleware.ProjectHandler()).Use(middleware.ProjectAuth())
-	{
-		messageRouter.InitMessageRouter(messageGroup)
-	}
-	InstallPlugin(
-		Router,
-		InterfaceGroup,
-		apiConfigGroup,
-		runCaseGroup,
-		reportGroup,
-		apiCaseGroup,
-		timerTaskGroup,
-		performanceGroup,
-		environmentGroup,
-	) // 安装插件
+	global.GVA_ROUTERS = Router.Routes()
 
 	global.GVA_LOG.Info("router register success")
 	return Router

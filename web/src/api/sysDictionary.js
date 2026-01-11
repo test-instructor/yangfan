@@ -59,8 +59,7 @@ export const findSysDictionary = (params) => {
   return service({
     url: '/sysDictionary/findSysDictionary',
     method: 'get',
-    params,
-    donNotShowLoading: true
+    params
   })
 }
 

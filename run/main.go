@@ -1,47 +1,93 @@
 package main
 
 import (
-	"fmt"
-	"github.com/test-instructor/yangfan/server/source/yangfan"
-	"math/rand"
 	"os"
-	"time"
+	"os/signal"
+	"syscall"
 
-	"github.com/test-instructor/yangfan/run/server"
-	"github.com/test-instructor/yangfan/server/core"
-	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/grpc/client"
-	"github.com/test-instructor/yangfan/server/grpc/pkg"
-	"github.com/test-instructor/yangfan/server/initialize"
+	"github.com/test-instructor/yangfan/httprunner/hrp"
+	"github.com/test-instructor/yangfan/run/internal/mq"
+	"github.com/test-instructor/yangfan/run/internal/service"
+	"github.com/test-instructor/yangfan/server/v2/core"
+	"github.com/test-instructor/yangfan/server/v2/global"
+	"github.com/test-instructor/yangfan/server/v2/initialize"
+	server_mq "github.com/test-instructor/yangfan/server/v2/utils/mq"
 	"go.uber.org/zap"
 )
 
-//go:generate go env -w GO111MODULE=on
-//go:generate go env -w GOPROXY=https://goproxy.cn,direct
-//go:generate go mod tidy
-//go:generate go mod download
+func main() {
+	// 1. Initialize System
+	initializeSystem()
 
-func RunPkgInstallClient() {
-	host := fmt.Sprintf("%s:%s", global.GVA_CONFIG.YangFan.Background, global.GVA_CONFIG.YangFan.BackgroundGrpcPort)
-	c, err := client.NewClient(host)
-	if err != nil {
-		global.GVA_LOG.Error("[RunClient]创建客户端失败", zap.Error(err))
+	// 2. Initialize MQ Client
+	mqConfig := global.GVA_CONFIG.MQ
+	mqLoader := server_mq.NewMQConfigLoader()
+	if err := mqLoader.LoadAndValidate(mqConfig); err != nil {
+		global.GVA_LOG.Fatal("MQ Config validation failed", zap.Error(err))
 	}
-	p := pkg.NewRunInstallPkg(c)
-	p.RunInstallPkg()
+
+	mqClient, err := server_mq.NewMQClient(mqConfig, global.GVA_LOG)
+	if err != nil {
+		global.GVA_LOG.Fatal("MQ Initialization failed", zap.Error(err))
+	}
+	defer mqClient.Close()
+
+	// 3. Prepare Runner Config (only NodeName is used for MQ queue naming)
+	runnerConfig := global.GVA_CONFIG.Runner
+	// Support Env Override
+	if envNode := os.Getenv("NODE_NAME"); envNode != "" {
+		runnerConfig.NodeName = envNode
+	}
+
+	if runnerConfig.NodeName == "" {
+		hostname, err := os.Hostname()
+		if err != nil {
+			hostname = "unknown"
+		}
+		runnerConfig.NodeName = "lc_runner_" + hostname
+		global.GVA_LOG.Info("Runner NodeName not specified, using generated name", zap.String("name", runnerConfig.NodeName))
+	}
+
+	runnerSvc := service.NewRunnerService(runnerConfig.NodeName, runnerConfig.Port)
+	if err := runnerSvc.Register(); err != nil {
+		global.GVA_LOG.Fatal("Runner registration failed", zap.Error(err))
+	}
+	runnerSvc.StartHeartbeat()
+	defer runnerSvc.Stop()
+
+	// 4. Initialize MQ Consumer
+	consumer := mq.NewRunnerTaskConsumer(mqClient, runnerConfig.NodeName)
+	if err := consumer.StartListen(); err != nil {
+		global.GVA_LOG.Fatal("Failed to start consumer", zap.Error(err))
+	}
+	defer consumer.Stop()
+
+	// 5. Wait for Signal
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	global.GVA_LOG.Info("Shutting down runner...")
 }
 
-func main() {
-	rand.Seed(time.Now().UnixNano())
-	global.GVA_VP = core.Viper()
-	global.GVA_LOG = core.Zap()
-	global.GVA_DB = initialize.Gorm()
+// initializeSystem 初始化系统所有组件
+// 提取为单独函数以便于系统重载时调用
+func initializeSystem() {
+	global.GVA_VP = core.Viper() // 初始化Viper
+	initialize.OtherInit()
+	global.GVA_LOG = core.Zap() // 初始化zap日志库
 	zap.ReplaceGlobals(global.GVA_LOG)
-	if global.GVA_DB.Error != nil {
-		global.GVA_LOG.Error("register db", zap.Error(global.GVA_DB.Error))
-		os.Exit(0)
+	hrp.InitLogger("INFO", true, false)
+	global.GVA_DB = initialize.Gorm() // gorm连接数据库
+	if global.GVA_CONFIG.System.UseRedis {
+		// 初始化redis服务
+		initialize.Redis()
+		if global.GVA_CONFIG.System.UseMultipoint {
+			initialize.RedisList()
+		}
 	}
-	go yangfan.InitPythonPackage(true)
-	go RunPkgInstallClient()
-	server.StartRunServer()
+	os.Setenv("DISABLE_GA", "true") // 禁用GA
+	// initialize.Timer() // Runner might not need server timers
+	// initialize.DBList()
+	// initialize.SetupHandlers() // 注册全局函数
 }

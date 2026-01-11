@@ -1,14 +1,16 @@
 package example
 
 import (
-	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/model/common/request"
-	"github.com/test-instructor/yangfan/server/model/example"
-	"github.com/test-instructor/yangfan/server/model/system"
-	systemService "github.com/test-instructor/yangfan/server/service/system"
+	"github.com/test-instructor/yangfan/server/v2/global"
+	"github.com/test-instructor/yangfan/server/v2/model/common/request"
+	"github.com/test-instructor/yangfan/server/v2/model/example"
+	"github.com/test-instructor/yangfan/server/v2/model/system"
+	systemService "github.com/test-instructor/yangfan/server/v2/service/system"
 )
 
 type CustomerService struct{}
+
+var CustomerServiceApp = new(CustomerService)
 
 //@author: [piexlmax](https://github.com/piexlmax)
 //@function: CreateExaCustomer

@@ -5,10 +5,10 @@ import (
 	"mime/multipart"
 	"strings"
 
-	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/model/common/request"
-	"github.com/test-instructor/yangfan/server/model/example"
-	"github.com/test-instructor/yangfan/server/utils/upload"
+	"github.com/test-instructor/yangfan/server/v2/global"
+	"github.com/test-instructor/yangfan/server/v2/model/example"
+	"github.com/test-instructor/yangfan/server/v2/model/example/request"
+	"github.com/test-instructor/yangfan/server/v2/utils/upload"
 )
 
 //@author: [piexlmax](https://github.com/piexlmax)
@@ -62,24 +62,28 @@ func (e *FileUploadAndDownloadService) EditFileName(file example.ExaFileUploadAn
 //@author: [piexlmax](https://github.com/piexlmax)
 //@function: GetFileRecordInfoList
 //@description: 分页获取数据
-//@param: info request.PageInfo
+//@param: info request.ExaAttachmentCategorySearch
 //@return: list interface{}, total int64, err error
 
-func (e *FileUploadAndDownloadService) GetFileRecordInfoList(info request.PageInfo) (list interface{}, total int64, err error) {
+func (e *FileUploadAndDownloadService) GetFileRecordInfoList(info request.ExaAttachmentCategorySearch) (list []example.ExaFileUploadAndDownload, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
-	keyword := info.Keyword
 	db := global.GVA_DB.Model(&example.ExaFileUploadAndDownload{})
-	var fileLists []example.ExaFileUploadAndDownload
-	if len(keyword) > 0 {
-		db = db.Where("name LIKE ?", "%"+keyword+"%")
+
+	if len(info.Keyword) > 0 {
+		db = db.Where("name LIKE ?", "%"+info.Keyword+"%")
 	}
+
+	if info.ClassId > 0 {
+		db = db.Where("class_id = ?", info.ClassId)
+	}
+
 	err = db.Count(&total).Error
 	if err != nil {
 		return
 	}
-	err = db.Limit(limit).Offset(offset).Order("updated_at desc").Find(&fileLists).Error
-	return fileLists, total, err
+	err = db.Limit(limit).Offset(offset).Order("id desc").Find(&list).Error
+	return list, total, err
 }
 
 //@author: [piexlmax](https://github.com/piexlmax)
@@ -88,21 +92,32 @@ func (e *FileUploadAndDownloadService) GetFileRecordInfoList(info request.PageIn
 //@param: header *multipart.FileHeader, noSave string
 //@return: file model.ExaFileUploadAndDownload, err error
 
-func (e *FileUploadAndDownloadService) UploadFile(header *multipart.FileHeader, noSave string) (file example.ExaFileUploadAndDownload, err error) {
+func (e *FileUploadAndDownloadService) UploadFile(header *multipart.FileHeader, noSave string, classId int) (file example.ExaFileUploadAndDownload, err error) {
 	oss := upload.NewOss()
 	filePath, key, uploadErr := oss.UploadFile(header)
 	if uploadErr != nil {
-		panic(err)
+		return file, uploadErr
+	}
+	s := strings.Split(header.Filename, ".")
+	f := example.ExaFileUploadAndDownload{
+		Url:     filePath,
+		Name:    header.Filename,
+		ClassId: classId,
+		Tag:     s[len(s)-1],
+		Key:     key,
 	}
 	if noSave == "0" {
-		s := strings.Split(header.Filename, ".")
-		f := example.ExaFileUploadAndDownload{
-			Url:  filePath,
-			Name: header.Filename,
-			Tag:  s[len(s)-1],
-			Key:  key,
-		}
 		return f, e.Upload(f)
 	}
-	return
+	return f, nil
+}
+
+//@author: [piexlmax](https://github.com/piexlmax)
+//@function: ImportURL
+//@description: 导入URL
+//@param: file model.ExaFileUploadAndDownload
+//@return: error
+
+func (e *FileUploadAndDownloadService) ImportURL(file *[]example.ExaFileUploadAndDownload) error {
+	return global.GVA_DB.Create(&file).Error
 }

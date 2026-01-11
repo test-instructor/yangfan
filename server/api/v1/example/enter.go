@@ -1,15 +1,15 @@
 package example
 
-import "github.com/test-instructor/yangfan/server/service"
+import "github.com/test-instructor/yangfan/server/v2/service"
 
 type ApiGroup struct {
-	ExcelApi
 	CustomerApi
+	AttachmentCategoryApi
 	FileUploadAndDownloadApi
 }
 
 var (
-	excelService                 = service.ServiceGroupApp.ExampleServiceGroup.ExcelService
 	customerService              = service.ServiceGroupApp.ExampleServiceGroup.CustomerService
+	attachmentCategoryService    = service.ServiceGroupApp.ExampleServiceGroup.AttachmentCategoryService
 	fileUploadAndDownloadService = service.ServiceGroupApp.ExampleServiceGroup.FileUploadAndDownloadService
 )

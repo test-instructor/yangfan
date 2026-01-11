@@ -2,11 +2,11 @@ package system
 
 import (
 	"context"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	uuid "github.com/satori/go.uuid"
-	sysModel "github.com/test-instructor/yangfan/server/model/system"
-	"github.com/test-instructor/yangfan/server/service/system"
-	"github.com/test-instructor/yangfan/server/utils"
+	sysModel "github.com/test-instructor/yangfan/server/v2/model/system"
+	"github.com/test-instructor/yangfan/server/v2/service/system"
+	"github.com/test-instructor/yangfan/server/v2/utils"
 	"gorm.io/gorm"
 )
 
@@ -35,7 +35,7 @@ func (i *initUser) TableCreated(ctx context.Context) bool {
 	return db.Migrator().HasTable(&sysModel.SysUser{})
 }
 
-func (i initUser) InitializerName() string {
+func (i *initUser) InitializerName() string {
 	return sysModel.SysUser{}.TableName()
 }
 
@@ -44,26 +44,33 @@ func (i *initUser) InitializeData(ctx context.Context) (next context.Context, er
 	if !ok {
 		return ctx, system.ErrMissingDBContext
 	}
-	password := utils.BcryptHash("6447985")
-	adminPassword := utils.BcryptHash("123456")
+
+	ap := ctx.Value("adminPassword")
+	apStr, ok := ap.(string)
+	if !ok {
+		apStr = "123456"
+	}
+
+	password := utils.BcryptHash(apStr)
+	adminPassword := utils.BcryptHash(apStr)
 
 	entities := []sysModel.SysUser{
 		{
-			UUID:        uuid.NewV4(),
+			UUID:        uuid.New(),
 			Username:    "admin",
 			Password:    adminPassword,
-			NickName:    "超级管理员",
+			NickName:    "Mr.奇淼",
 			HeaderImg:   "https://qmplusimg.henrongyi.top/gva_header.jpg",
 			AuthorityId: 888,
 			Phone:       "17611111111",
 			Email:       "333333333@qq.com",
 		},
 		{
-			UUID:        uuid.NewV4(),
+			UUID:        uuid.New(),
 			Username:    "a303176530",
 			Password:    password,
-			NickName:    "QMPlusUser",
-			HeaderImg:   "https:///qmplusimg.henrongyi.top/1572075907logo.png",
+			NickName:    "用户1",
+			HeaderImg:   "https://qmplusimg.henrongyi.top/1572075907logo.png",
 			AuthorityId: 9528,
 			Phone:       "17611111111",
 			Email:       "333333333@qq.com"},
@@ -72,7 +79,7 @@ func (i *initUser) InitializeData(ctx context.Context) (next context.Context, er
 		return ctx, errors.Wrap(err, sysModel.SysUser{}.TableName()+"表数据初始化失败!")
 	}
 	next = context.WithValue(ctx, i.InitializerName(), entities)
-	authorityEntities, ok := ctx.Value(initAuthority{}.InitializerName()).([]sysModel.SysAuthority)
+	authorityEntities, ok := ctx.Value(new(initAuthority).InitializerName()).([]sysModel.SysAuthority)
 	if !ok {
 		return next, errors.Wrap(system.ErrMissingDependentContext, "创建 [用户-权限] 关联失败, 未找到权限表初始化数据")
 	}

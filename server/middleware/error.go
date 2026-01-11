@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/v2/global"
 	"go.uber.org/zap"
 )
 

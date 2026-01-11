@@ -8,14 +8,6 @@ export const getAuthorityList = (data) => {
   })
 }
 
-export const getProjectList = (params) => {
-  return service({
-    url: '/project/getProjectList',
-    method: 'get',
-    params
-  })
-}
-
 // @Summary 删除角色
 // @Security ApiKeyAuth
 // @accept application/json

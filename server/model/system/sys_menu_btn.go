@@ -1,6 +1,6 @@
 package system
 
-import "github.com/test-instructor/yangfan/server/global"
+import "github.com/test-instructor/yangfan/server/v2/global"
 
 type SysBaseMenuBtn struct {
 	global.GVA_MODEL

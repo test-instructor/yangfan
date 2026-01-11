@@ -10,12 +10,10 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'Example'
-}
-</script>
 <script setup>
-import { useRouterStore } from '@/pinia/modules/router'
-const routerStore = useRouterStore()
+  import { useRouterStore } from '@/pinia/modules/router'
+  const routerStore = useRouterStore()
+  defineOptions({
+    name: 'Example'
+  })
 </script>

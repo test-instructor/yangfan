@@ -1,11 +1,11 @@
 package request
 
 import (
-	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/model/system"
+	"github.com/test-instructor/yangfan/server/v2/global"
+	"github.com/test-instructor/yangfan/server/v2/model/system"
 )
 
-// Add menu authority info structure
+// AddMenuAuthorityInfo Add menu authority info structure
 type AddMenuAuthorityInfo struct {
 	Menus       []system.SysBaseMenu `json:"menus"`
 	AuthorityId uint                 `json:"authorityId"` // 角色ID
@@ -14,7 +14,7 @@ type AddMenuAuthorityInfo struct {
 func DefaultMenu() []system.SysBaseMenu {
 	return []system.SysBaseMenu{{
 		GVA_MODEL: global.GVA_MODEL{ID: 1},
-		ParentId:  "0",
+		ParentId:  0,
 		Path:      "dashboard",
 		Name:      "dashboard",
 		Component: "view/dashboard/index.vue",

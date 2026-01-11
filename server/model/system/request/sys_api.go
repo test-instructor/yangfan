@@ -1,8 +1,8 @@
 package request
 
 import (
-	"github.com/test-instructor/yangfan/server/model/common/request"
-	"github.com/test-instructor/yangfan/server/model/system"
+	"github.com/test-instructor/yangfan/server/v2/model/common/request"
+	"github.com/test-instructor/yangfan/server/v2/model/system"
 )
 
 // api分页条件查询及排序结构体

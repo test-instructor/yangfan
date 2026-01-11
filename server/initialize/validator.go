@@ -1,6 +1,6 @@
 package initialize
 
-import "github.com/test-instructor/yangfan/server/utils"
+import "github.com/test-instructor/yangfan/server/v2/utils"
 
 func init() {
 	_ = utils.RegisterRule("PageVerify",

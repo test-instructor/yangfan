@@ -4,8 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/mojocn/base64Captcha"
-	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/v2/global"
 	"go.uber.org/zap"
 )
 
@@ -13,6 +12,7 @@ func NewDefaultRedisStore() *RedisStore {
 	return &RedisStore{
 		Expiration: time.Second * 180,
 		PreKey:     "CAPTCHA_",
+		Context:    context.TODO(),
 	}
 }
 
@@ -22,16 +22,20 @@ type RedisStore struct {
 	Context    context.Context
 }
 
-func (rs *RedisStore) UseWithCtx(ctx context.Context) base64Captcha.Store {
-	rs.Context = ctx
+func (rs *RedisStore) UseWithCtx(ctx context.Context) *RedisStore {
+	if ctx == nil {
+		rs.Context = ctx
+	}
 	return rs
 }
 
-func (rs *RedisStore) Set(id string, value string) {
+func (rs *RedisStore) Set(id string, value string) error {
 	err := global.GVA_REDIS.Set(rs.Context, rs.PreKey+id, value, rs.Expiration).Err()
 	if err != nil {
 		global.GVA_LOG.Error("RedisStoreSetError!", zap.Error(err))
+		return err
 	}
+	return nil
 }
 
 func (rs *RedisStore) Get(key string, clear bool) string {

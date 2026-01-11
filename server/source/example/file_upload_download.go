@@ -3,8 +3,8 @@ package example
 import (
 	"context"
 	"github.com/pkg/errors"
-	"github.com/test-instructor/yangfan/server/model/example"
-	"github.com/test-instructor/yangfan/server/service/system"
+	"github.com/test-instructor/yangfan/server/v2/model/example"
+	"github.com/test-instructor/yangfan/server/v2/service/system"
 	"gorm.io/gorm"
 )
 
@@ -33,7 +33,7 @@ func (i *initExaFileMysql) TableCreated(ctx context.Context) bool {
 	return db.Migrator().HasTable(&example.ExaFileUploadAndDownload{})
 }
 
-func (i initExaFileMysql) InitializerName() string {
+func (i *initExaFileMysql) InitializerName() string {
 	return example.ExaFileUploadAndDownload{}.TableName()
 }
 

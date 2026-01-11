@@ -1,133 +1,98 @@
 <template>
-  <div class="search-component">
-    <!--    <PreferentialServer/>-->
-    <div v-if="btnShow" class="user-box">
-      <a href="https://gitee.com/test-instructor/yangfan" target="_blank"
-        ><img
-          style="width: 20px; height: 20px; margin-right: 15px"
-          src="@/assets/gitee.png"
-          alt
-      /></a>
-      <a href="https://github.com/test-instructor/yangfan" target="_blank"
-        ><img style="width: 20px; height: 20px" src="@/assets/github.png" alt
-      /></a>
-    </div>
-    <transition name="el-fade-in-linear">
-      <div v-show="show" class="transition-box" style="display: inline-block">
-        <el-select
-          ref="searchInput"
-          v-model="value"
-          filterable
-          placeholder="请选择"
-          @blur="hiddenSearch"
-          @change="changeRouter"
-        >
-          <el-option
-            v-for="item in routerStore.routerList"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          />
-        </el-select>
-      </div>
-    </transition>
-    <div v-if="btnShow" class="user-box">
-      <div
-        class="gvaIcon gvaIcon-refresh"
-        :class="[reload ? 'reloading' : '']"
-        @click="handleReload"
-      ></div>
-    </div>
-    <div v-if="btnShow" class="user-box">
-      <div class="gvaIcon gvaIcon-search" @click="showSearch"></div>
-    </div>
-    <div v-if="btnShow" class="user-box">
-      <Screenfull class="search-icon" :style="{ cursor: 'pointer' }" />
-    </div>
-
-    <div v-if="btnShow" class="user-box">
-      <SelectProject />
-    </div>
+  <div class="search-component items-center">
+    <div
+      class="gvaIcon gvaIcon-refresh"
+      :class="[reload ? 'reloading' : '']"
+      @click="handleReload"
+    />
+    <Screenfull class="search-icon" />
+    <div class="gvaIcon gvaIcon-customer-service" @click="toService" />
+    <el-switch
+      v-model="isDark"
+      :active-action-icon="Moon"
+      :inactive-action-icon="Sunny"
+      @change="handleDarkSwitch"
+    />
   </div>
 </template>
 
-<script>
-export default {
-  name: "BtnBox",
-};
-</script>
-
 <script setup>
-import Screenfull from "@/view/layout/screenfull/index.vue";
-import PreferentialServer from "@/view/layout/preferentialserver/index.vue";
-import SelectProject from "@/view/layout/ProjectSelect/index.vue";
-import { emitter } from "@/utils/bus.js";
-import { ref, nextTick } from "vue";
-import { useRouter } from "vue-router";
-import { useRouterStore } from "@/pinia/modules/router";
+  import Screenfull from '@/view/layout/screenfull/index.vue'
+  import { emitter } from '@/utils/bus.js'
+  import { Sunny, Moon } from '@element-plus/icons-vue'
+  import { ref, watchEffect } from 'vue'
 
-const router = useRouter();
+  defineOptions({
+    name: 'BtnBox'
+  })
+  const isDark = ref(localStorage.getItem('isDark') === 'true' || true)
 
-const routerStore = useRouterStore();
+  watchEffect(() => {
+    if (isDark.value) {
+      document.documentElement.classList.add('dark')
+      localStorage.setItem('isDark', true)
+    } else {
+      document.documentElement.classList.remove('dark')
+      localStorage.setItem('isDark', false)
+    }
+  })
+  const reload = ref(false)
+  const handleReload = () => {
+    reload.value = true
+    emitter.emit('reload')
+    setTimeout(() => {
+      reload.value = false
+    }, 500)
+  }
+  const toService = () => {
+    window.open('https://support.qq.com/product/371961')
+  }
 
-const value = ref("");
-const changeRouter = () => {
-  router.push({ name: value.value });
-  value.value = "";
-};
-
-const show = ref(false);
-const btnShow = ref(true);
-const hiddenSearch = () => {
-  show.value = false;
-  setTimeout(() => {
-    btnShow.value = true;
-  }, 500);
-};
-
-const searchInput = ref(null);
-const showSearch = async () => {
-  btnShow.value = false;
-  show.value = true;
-  await nextTick();
-  searchInput.value.focus();
-};
-
-const reload = ref(false);
-const handleReload = () => {
-  reload.value = true;
-  emitter.emit("reload");
-  setTimeout(() => {
-    reload.value = false;
-  }, 500);
-};
-const toService = () => {
-  window.open("https://support.qq.com/product/371961");
-};
+  const handleDarkSwitch = (e) => {
+    isDark.value = e
+  }
 </script>
 <style scoped lang="scss">
-.reload {
-  font-size: 18px;
-}
+  .search-component {
+    @apply inline-flex overflow-hidden text-center gap-5 mr-5 text-black dark:text-gray-100;
+    div {
+      @apply cursor-pointer;
+    }
+    .el-input__inner {
+      @apply border-b border-solid border-gray-300;
+    }
+    .el-dropdown-link {
+      @apply cursor-pointer;
+    }
+  }
 
-.reloading {
-  animation: turn 0.5s linear infinite;
-}
-@keyframes turn {
-  0% {
-    -webkit-transform: rotate(0deg);
+  .reload {
+    font-size: 18px;
   }
-  25% {
-    -webkit-transform: rotate(90deg);
+
+  .reloading {
+    animation: turn 0.5s linear infinite;
   }
-  50% {
-    -webkit-transform: rotate(180deg);
+
+  @keyframes turn {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    25% {
+      transform: rotate(90deg);
+    }
+
+    50% {
+      transform: rotate(180deg);
+    }
+
+    75% {
+      transform: rotate(270deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
   }
-  75% {
-    -webkit-transform: rotate(270deg);
-  }
-  100% {
-    -webkit-transform: rotate(360deg);
-  }
-}
 </style>

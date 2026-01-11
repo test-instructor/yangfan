@@ -1,4 +1,5 @@
 import service from '@/utils/request'
+
 // @Tags api
 // @Summary 分页获取角色列表
 // @Security ApiKeyAuth
@@ -104,7 +105,7 @@ export const getAllApis = (data) => {
 // @accept application/json
 // @Produce application/json
 // @Param data body dbModel.Api true "删除api"
-// @Success 200 {string} json "{"success":true,"data":{},"msg":"获取成功"}"
+// @Success 200 {string} json "{"success":true,"data":{},"msg":"删除成功"}"
 // @Router /api/deleteApi [post]
 export const deleteApi = (data) => {
   return service({
@@ -126,6 +127,50 @@ export const deleteApisByIds = (data) => {
   return service({
     url: '/api/deleteApisByIds',
     method: 'delete',
+    data
+  })
+}
+
+// FreshCasbin
+// @Tags      SysApi
+// @Summary   刷新casbin缓存
+// @accept    application/json
+// @Produce   application/json
+// @Success   200   {object}  response.Response{msg=string}  "刷新成功"
+// @Router    /api/freshCasbin [get]
+export const freshCasbin = () => {
+  return service({
+    url: '/api/freshCasbin',
+    method: 'get'
+  })
+}
+
+export const syncApi = () => {
+  return service({
+    url: '/api/syncApi',
+    method: 'get'
+  })
+}
+
+export const getApiGroups = () => {
+  return service({
+    url: '/api/getApiGroups',
+    method: 'get'
+  })
+}
+
+export const ignoreApi = (data) => {
+  return service({
+    url: '/api/ignoreApi',
+    method: 'post',
+    data
+  })
+}
+
+export const enterSyncApi = (data) => {
+  return service({
+    url: '/api/enterSyncApi',
+    method: 'post',
     data
   })
 }

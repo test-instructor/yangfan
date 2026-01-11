@@ -2,21 +2,18 @@ package middleware
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"strconv"
 	"time"
 
-	"github.com/test-instructor/yangfan/server/plugin/email/utils"
-	utils2 "github.com/test-instructor/yangfan/server/utils"
+	"github.com/test-instructor/yangfan/server/v2/plugin/email/utils"
+	utils2 "github.com/test-instructor/yangfan/server/v2/utils"
 
 	"github.com/gin-gonic/gin"
-	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/model/system"
-	"github.com/test-instructor/yangfan/server/service"
+	"github.com/test-instructor/yangfan/server/v2/global"
+	"github.com/test-instructor/yangfan/server/v2/model/system"
 	"go.uber.org/zap"
 )
-
-var userService = service.ServiceGroupApp.SystemServiceGroup.UserService
 
 func ErrorToEmail() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -26,15 +23,16 @@ func ErrorToEmail() gin.HandlerFunc {
 			username = claims.Username
 		} else {
 			id, _ := strconv.Atoi(c.Request.Header.Get("x-user-id"))
-			user, err := userService.FindUserById(id)
+			var u system.SysUser
+			err := global.GVA_DB.Where("id = ?", id).First(&u).Error
 			if err != nil {
 				username = "Unknown"
 			}
-			username = user.Username
+			username = u.Username
 		}
-		body, _ := ioutil.ReadAll(c.Request.Body)
+		body, _ := io.ReadAll(c.Request.Body)
 		// 再重新写回请求体body中，ioutil.ReadAll会清空c.Request.Body中的数据
-		c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(body))
 		record := system.SysOperationRecord{
 			Ip:     c.ClientIP(),
 			Method: c.Request.Method,

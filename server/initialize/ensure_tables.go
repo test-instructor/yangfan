@@ -2,13 +2,12 @@ package initialize
 
 import (
 	"context"
-
 	adapter "github.com/casbin/gorm-adapter/v3"
+	"github.com/test-instructor/yangfan/server/v2/model/example"
+	sysModel "github.com/test-instructor/yangfan/server/v2/model/system"
+	"github.com/test-instructor/yangfan/server/v2/plugin/announcement/model"
+	"github.com/test-instructor/yangfan/server/v2/service/system"
 	"gorm.io/gorm"
-
-	"github.com/test-instructor/yangfan/server/model/example"
-	sysModel "github.com/test-instructor/yangfan/server/model/system"
-	"github.com/test-instructor/yangfan/server/service/system"
 )
 
 const initOrderEnsureTables = system.InitOrderExternal - 1
@@ -20,7 +19,7 @@ func init() {
 	system.RegisterInit(initOrderEnsureTables, &ensureTables{})
 }
 
-func (ensureTables) InitializerName() string {
+func (e *ensureTables) InitializerName() string {
 	return "ensure_tables_created"
 }
 func (e *ensureTables) InitializeData(ctx context.Context) (next context.Context, err error) {
@@ -49,14 +48,21 @@ func (e *ensureTables) MigrateTable(ctx context.Context) (context.Context, error
 		sysModel.SysBaseMenuParameter{},
 		sysModel.SysBaseMenuBtn{},
 		sysModel.SysAuthorityBtn{},
-		sysModel.SysAutoCode{},
-
+		sysModel.SysAutoCodePackage{},
+		sysModel.SysExportTemplate{},
+		sysModel.Condition{},
+		sysModel.JoinTemplate{},
+		sysModel.SysParams{},
+		sysModel.SysVersion{},
 		adapter.CasbinRule{},
 
 		example.ExaFile{},
 		example.ExaCustomer{},
 		example.ExaFileChunk{},
 		example.ExaFileUploadAndDownload{},
+		example.ExaAttachmentCategory{},
+
+		model.Info{},
 	}
 	for _, t := range tables {
 		_ = db.AutoMigrate(&t)
@@ -84,7 +90,10 @@ func (e *ensureTables) TableCreated(ctx context.Context) bool {
 		sysModel.SysBaseMenuParameter{},
 		sysModel.SysBaseMenuBtn{},
 		sysModel.SysAuthorityBtn{},
-		sysModel.SysAutoCode{},
+		sysModel.SysAutoCodePackage{},
+		sysModel.SysExportTemplate{},
+		sysModel.Condition{},
+		sysModel.JoinTemplate{},
 
 		adapter.CasbinRule{},
 
@@ -92,6 +101,9 @@ func (e *ensureTables) TableCreated(ctx context.Context) bool {
 		example.ExaCustomer{},
 		example.ExaFileChunk{},
 		example.ExaFileUploadAndDownload{},
+		example.ExaAttachmentCategory{},
+
+		model.Info{},
 	}
 	yes := true
 	for _, t := range tables {

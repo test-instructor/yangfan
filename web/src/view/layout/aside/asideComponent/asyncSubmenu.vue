@@ -1,8 +1,17 @@
 <template>
-  <el-sub-menu ref="subMenu" :index="routerInfo.name">
-
+  <el-sub-menu
+    ref="subMenu"
+    :index="routerInfo.name"
+    class="gva-sub-menu dark:text-slate-300 relative"
+  >
     <template #title>
-      <div v-if="!isCollapse" class="gva-subMenu">
+      <div
+        v-if="!isCollapse"
+        class="flex items-center"
+        :style="{
+          height: sideHeight
+        }"
+      >
         <el-icon v-if="routerInfo.meta.icon">
           <component :is="routerInfo.meta.icon" />
         </el-icon>
@@ -19,74 +28,39 @@
   </el-sub-menu>
 </template>
 
-<script>
-export default {
-  name: 'AsyncSubmenu',
-}
-</script>
-
 <script setup>
-import { ref, watch } from 'vue'
-const props = defineProps({
-  routerInfo: {
-    default: function() {
-      return null
-    },
-    type: Object
-  },
-  isCollapse: {
-    default: function() {
-      return false
-    },
-    type: Boolean
-  },
-  theme: {
-    default: function() {
-      return {}
-    },
-    type: Object
-  }
-})
+  import { inject, computed } from 'vue'
+  import { useAppStore } from '@/pinia'
+  import { storeToRefs } from 'pinia'
+  const appStore = useAppStore()
+  const { config } = storeToRefs(appStore)
 
-const activeBackground = ref(props.theme.activeBackground)
-const activeText = ref(props.theme.activeText)
-const normalText = ref(props.theme.normalText)
-// const hoverBackground = ref(props.theme.hoverBackground)
-// const hoverText = ref(props.theme.hoverText)
+  defineOptions({
+    name: 'AsyncSubmenu'
+  })
 
-watch(() => props.theme, () => {
-  activeBackground.value = props.theme.activeBackground
-  activeText.value = props.theme.activeText
-  normalText.value = props.theme.normalText
-  // hoverBackground.value = props.theme.hoverBackground
-  // hoverText.value = props.theme.hoverText
-})
+  defineProps({
+    routerInfo: {
+      default: function () {
+        return null
+      },
+      type: Object
+    }
+  })
 
+  const isCollapse = inject('isCollapse', {
+    default: false
+  })
+
+  const sideHeight = computed(() => {
+    return config.value.layout_side_item_height + 'px'
+  })
 </script>
 
-<style lang="scss" scoped>
-.el-sub-menu{
-  ::v-deep(.el-sub-menu__title){
-      padding: 6px;
-      color: v-bind(normalText);
-  }
-}
-
-  .is-active:not(.is-opened){
-  ::v-deep(.el-sub-menu__title) .gva-subMenu{
-      flex:1;
-      height: 100%;
-      line-height: 44px;
-      background: v-bind(activeBackground) !important;
-      border-radius: 4px;
-      box-shadow: 0 0 2px 1px v-bind(activeBackground) !important;
-      i{
-        color: v-bind(activeText);
-      }
-      span{
-        color: v-bind(activeText);
-      }
+<style lang="scss">
+  .gva-sub-menu {
+    .el-sub-menu__title {
+      height: v-bind('sideHeight') !important;
     }
   }
-
 </style>

@@ -1,7 +1,7 @@
 package system
 
 import (
-	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/v2/global"
 )
 
 type SysApi struct {
@@ -14,4 +14,15 @@ type SysApi struct {
 
 func (SysApi) TableName() string {
 	return "sys_apis"
+}
+
+type SysIgnoreApi struct {
+	global.GVA_MODEL
+	Path   string `json:"path" gorm:"comment:api路径"`             // api路径
+	Method string `json:"method" gorm:"default:POST;comment:方法"` // 方法:创建POST(默认)|查看GET|更新PUT|删除DELETE
+	Flag   bool   `json:"flag" gorm:"-"`                         // 是否忽略
+}
+
+func (SysIgnoreApi) TableName() string {
+	return "sys_ignore_apis"
 }

@@ -1,10 +1,9 @@
 package initialize
 
 import (
+	"github.com/test-instructor/yangfan/server/v2/config"
+	"github.com/test-instructor/yangfan/server/v2/global"
 	"gorm.io/gorm"
-
-	"github.com/test-instructor/yangfan/server/config"
-	"github.com/test-instructor/yangfan/server/global"
 )
 
 const sys = "system"
@@ -18,8 +17,12 @@ func DBList() {
 		switch info.Type {
 		case "mysql":
 			dbMap[info.AliasName] = GormMysqlByConfig(config.Mysql{GeneralDB: info.GeneralDB})
+		case "mssql":
+			dbMap[info.AliasName] = GormMssqlByConfig(config.Mssql{GeneralDB: info.GeneralDB})
 		case "pgsql":
 			dbMap[info.AliasName] = GormPgSqlByConfig(config.Pgsql{GeneralDB: info.GeneralDB})
+		case "oracle":
+			dbMap[info.AliasName] = GormOracleByConfig(config.Oracle{GeneralDB: info.GeneralDB})
 		default:
 			continue
 		}

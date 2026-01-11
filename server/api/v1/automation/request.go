@@ -1,0 +1,191 @@
+package automation
+
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/test-instructor/yangfan/server/v2/global"
+	"github.com/test-instructor/yangfan/server/v2/model/automation"
+	automationReq "github.com/test-instructor/yangfan/server/v2/model/automation/request"
+	"github.com/test-instructor/yangfan/server/v2/model/common/response"
+	"github.com/test-instructor/yangfan/server/v2/utils"
+	"go.uber.org/zap"
+)
+
+type RequestApi struct{}
+
+// CreateRequest 创建请求
+// @Tags Request
+// @Summary 创建请求
+// @Security ApiKeyAuth
+// @Accept application/json
+// @Produce application/json
+// @Param data body automation.Request true "创建请求"
+// @Success 200 {object} response.Response{msg=string} "创建成功"
+// @Router /req/createRequest [post]
+func (reqApi *RequestApi) CreateRequest(c *gin.Context) {
+	// 创建业务用Context
+	ctx := c.Request.Context()
+
+	var req automation.Request
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = reqService.CreateRequest(ctx, &req)
+	if err != nil {
+		global.GVA_LOG.Error("创建失败!", zap.Error(err))
+		response.FailWithMessage("创建失败:"+err.Error(), c)
+		return
+	}
+	response.OkWithMessage("创建成功", c)
+}
+
+// DeleteRequest 删除请求
+// @Tags Request
+// @Summary 删除请求
+// @Security ApiKeyAuth
+// @Accept application/json
+// @Produce application/json
+// @Param data body automation.Request true "删除请求"
+// @Success 200 {object} response.Response{msg=string} "删除成功"
+// @Router /req/deleteRequest [delete]
+func (reqApi *RequestApi) DeleteRequest(c *gin.Context) {
+	// 创建业务用Context
+	ctx := c.Request.Context()
+
+	ID := c.Query("ID")
+	projectId := utils.GetProjectIDInt64(c)
+	err := reqService.DeleteRequest(ctx, ID, projectId)
+	if err != nil {
+		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		response.FailWithMessage("删除失败:"+err.Error(), c)
+		return
+	}
+	response.OkWithMessage("删除成功", c)
+}
+
+// DeleteRequestByIds 批量删除请求
+// @Tags Request
+// @Summary 批量删除请求
+// @Security ApiKeyAuth
+// @Accept application/json
+// @Produce application/json
+// @Success 200 {object} response.Response{msg=string} "批量删除成功"
+// @Router /req/deleteRequestByIds [delete]
+func (reqApi *RequestApi) DeleteRequestByIds(c *gin.Context) {
+	// 创建业务用Context
+	ctx := c.Request.Context()
+
+	IDs := c.QueryArray("IDs[]")
+	err := reqService.DeleteRequestByIds(ctx, IDs)
+	if err != nil {
+		global.GVA_LOG.Error("批量删除失败!", zap.Error(err))
+		response.FailWithMessage("批量删除失败:"+err.Error(), c)
+		return
+	}
+	response.OkWithMessage("批量删除成功", c)
+}
+
+// UpdateRequest 更新请求
+// @Tags Request
+// @Summary 更新请求
+// @Security ApiKeyAuth
+// @Accept application/json
+// @Produce application/json
+// @Param data body automation.Request true "更新请求"
+// @Success 200 {object} response.Response{msg=string} "更新成功"
+// @Router /req/updateRequest [put]
+func (reqApi *RequestApi) UpdateRequest(c *gin.Context) {
+	// 从ctx获取标准context进行业务行为
+	ctx := c.Request.Context()
+
+	var req automation.Request
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	projectId := utils.GetProjectIDInt64(c)
+	err = reqService.UpdateRequest(ctx, req, projectId)
+	if err != nil {
+		global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		response.FailWithMessage("更新失败:"+err.Error(), c)
+		return
+	}
+	response.OkWithMessage("更新成功", c)
+}
+
+// FindRequest 用id查询请求
+// @Tags Request
+// @Summary 用id查询请求
+// @Security ApiKeyAuth
+// @Accept application/json
+// @Produce application/json
+// @Param ID query uint true "用id查询请求"
+// @Success 200 {object} response.Response{data=automation.Request,msg=string} "查询成功"
+// @Router /req/findRequest [get]
+func (reqApi *RequestApi) FindRequest(c *gin.Context) {
+	// 创建业务用Context
+	ctx := c.Request.Context()
+
+	ID := c.Query("ID")
+	rereq, err := reqService.GetRequest(ctx, ID)
+	if err != nil {
+		global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		response.FailWithMessage("查询失败:"+err.Error(), c)
+		return
+	}
+	response.OkWithData(rereq, c)
+}
+
+// GetRequestList 分页获取请求列表
+// @Tags Request
+// @Summary 分页获取请求列表
+// @Security ApiKeyAuth
+// @Accept application/json
+// @Produce application/json
+// @Param data query automationReq.RequestSearch true "分页获取请求列表"
+// @Success 200 {object} response.Response{data=response.PageResult,msg=string} "获取成功"
+// @Router /req/getRequestList [get]
+func (reqApi *RequestApi) GetRequestList(c *gin.Context) {
+	// 创建业务用Context
+	ctx := c.Request.Context()
+
+	var pageInfo automationReq.RequestSearch
+	err := c.ShouldBindQuery(&pageInfo)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	list, total, err := reqService.GetRequestInfoList(ctx, pageInfo)
+	if err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败:"+err.Error(), c)
+		return
+	}
+	response.OkWithDetailed(response.PageResult{
+		List:     list,
+		Total:    total,
+		Page:     pageInfo.Page,
+		PageSize: pageInfo.PageSize,
+	}, "获取成功", c)
+}
+
+// GetRequestPublic 不需要鉴权的请求接口
+// @Tags Request
+// @Summary 不需要鉴权的请求接口
+// @Accept application/json
+// @Produce application/json
+// @Success 200 {object} response.Response{data=object,msg=string} "获取成功"
+// @Router /req/getRequestPublic [get]
+func (reqApi *RequestApi) GetRequestPublic(c *gin.Context) {
+	// 创建业务用Context
+	ctx := c.Request.Context()
+
+	// 此接口不需要鉴权
+	// 示例为返回了一个固定的消息接口，一般本接口用于C端服务，需要自己实现业务逻辑
+	reqService.GetRequestPublic(ctx)
+	response.OkWithDetailed(gin.H{
+		"info": "不需要鉴权的请求接口信息",
+	}, "获取成功", c)
+}

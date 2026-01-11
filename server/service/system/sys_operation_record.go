@@ -1,10 +1,10 @@
 package system
 
 import (
-	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/model/common/request"
-	"github.com/test-instructor/yangfan/server/model/system"
-	systemReq "github.com/test-instructor/yangfan/server/model/system/request"
+	"github.com/test-instructor/yangfan/server/v2/global"
+	"github.com/test-instructor/yangfan/server/v2/model/common/request"
+	"github.com/test-instructor/yangfan/server/v2/model/system"
+	systemReq "github.com/test-instructor/yangfan/server/v2/model/system/request"
 )
 
 //@author: [granty1](https://github.com/granty1)
@@ -15,10 +15,7 @@ import (
 
 type OperationRecordService struct{}
 
-func (operationRecordService *OperationRecordService) CreateSysOperationRecord(sysOperationRecord system.SysOperationRecord) (err error) {
-	err = global.GVA_DB.Create(&sysOperationRecord).Error
-	return err
-}
+var OperationRecordServiceApp = new(OperationRecordService)
 
 //@author: [granty1](https://github.com/granty1)
 //@author: [piexlmax](https://github.com/piexlmax)
@@ -44,7 +41,7 @@ func (operationRecordService *OperationRecordService) DeleteSysOperationRecord(s
 }
 
 //@author: [granty1](https://github.com/granty1)
-//@function: DeleteSysOperationRecord
+//@function: GetSysOperationRecord
 //@description: 根据id获取单条操作记录
 //@param: id uint
 //@return: sysOperationRecord system.SysOperationRecord, err error

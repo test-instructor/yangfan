@@ -1,0 +1,38 @@
+name: Release hrp cli binaries
+
+on:
+  release:
+    types: [created]
+
+env:
+  DISABLE_GA: "true"
+
+jobs:
+  releases-matrix:
+    name: Release hrp cli binaries
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # build and publish in parallel: linux/amd64/windows
+        goos: [linux, windows, darwin]
+        goarch: [amd64, arm64]
+        exclude:
+          - goarch: arm64
+            goos: windows
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Release hrp cli binaries
+        uses: wangyoucao577/go-release-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.goarch }}
+          project_path: "cmd/cli/" # go build cmd/cli/main.go
+          binary_name: "hrp"
+          ldflags: "-s -w"
+          extra_files: LICENSE README.md docs/CHANGELOG.md
+          post_command: |
+            echo "ASSET_PATH=$INPUT_PROJECT_PATH/$BUILD_ARTIFACTS_FOLDER/$RELEASE_ASSET_FILE" >> $GITHUB_ENV
+      - name: Test install.sh
+        run: bash -c "$(curl -ksSL https://httprunner.com/script/install.sh)"

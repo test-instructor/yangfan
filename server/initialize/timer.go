@@ -2,53 +2,36 @@ package initialize
 
 import (
 	"fmt"
-	ifc "github.com/test-instructor/yangfan/server/service/interfacecase"
-	"strconv"
+	"github.com/test-instructor/yangfan/server/v2/task"
 
 	"github.com/robfig/cron/v3"
 
-	"github.com/test-instructor/yangfan/server/config"
-	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/model/interfacecase"
-	"github.com/test-instructor/yangfan/server/utils"
+	"github.com/test-instructor/yangfan/server/v2/global"
 )
 
 func Timer() {
-	if global.GVA_CONFIG.Timer.Start {
-		for i := range global.GVA_CONFIG.Timer.Detail {
-			go func(detail config.Detail) {
-				var option []cron.Option
-				if global.GVA_CONFIG.Timer.WithSeconds {
-					option = append(option, cron.WithSeconds())
-				}
-				_, err := global.GVA_Timer.AddTaskByFunc("ClearDB", global.GVA_CONFIG.Timer.Spec, func() {
-					err := utils.ClearTable(global.GVA_DB, detail.TableName, detail.CompareField, detail.Interval)
-					if err != nil {
-						fmt.Println("timer error:", err)
-					}
-				}, option...)
-				if err != nil {
-					fmt.Println("add timer error:", err)
-				}
-			}(global.GVA_CONFIG.Timer.Detail[i])
+	go func() {
+		var option []cron.Option
+		option = append(option, cron.WithSeconds())
+		// 清理DB定时任务
+		_, err := global.GVA_Timer.AddTaskByFunc("ClearDB", "@daily", func() {
+			err := task.ClearTable(global.GVA_DB) // 定时任务方法定在task文件包中
+			if err != nil {
+				fmt.Println("timer error:", err)
+			}
+		}, "定时清理数据库【日志，黑名单】内容", option...)
+		if err != nil {
+			fmt.Println("add timer error:", err)
 		}
-	}
-}
 
-func TimerTaskCase() {
-	var timerTaskCase []interfacecase.ApiTimerTask
-	global.GVA_DB.Model(interfacecase.ApiTimerTask{}).
-		Where("Status = ?", true).
-		Find(&timerTaskCase)
-	for _, task := range timerTaskCase {
-		id, err := global.GVA_Timer.AddTaskByFunc(strconv.Itoa(int(task.ID)), task.RunTime, ifc.RunTimerTaskBack(task.ID), cron.WithSeconds())
-		if err != nil {
-			return
-		}
-		task.EntryID = int(id)
-		err = global.GVA_DB.Save(&task).Error
-		if err != nil {
-			return
-		}
-	}
+		// 其他定时任务定在这里 参考上方使用方法
+
+		//_, err := global.GVA_Timer.AddTaskByFunc("定时任务标识", "corn表达式", func() {
+		//	具体执行内容...
+		//  ......
+		//}, option...)
+		//if err != nil {
+		//	fmt.Println("add timer error:", err)
+		//}
+	}()
 }

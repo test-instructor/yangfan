@@ -12,8 +12,7 @@ export const createTemp = (data) => {
   return service({
     url: '/autoCode/createTemp',
     method: 'post',
-    data,
-    responseType: 'blob'
+    data
   })
 }
 
@@ -24,10 +23,11 @@ export const createTemp = (data) => {
 // @Produce application/json
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"创建成功"}"
 // @Router /autoCode/getDatabase [get]
-export const getDB = () => {
+export const getDB = (params) => {
   return service({
     url: '/autoCode/getDB',
-    method: 'get'
+    method: 'get',
+    params
   })
 }
 
@@ -116,17 +116,119 @@ export const deletePackageApi = (data) => {
   })
 }
 
-export const createPlugApi = (data) => {
+export const getTemplatesApi = () => {
   return service({
-    url: '/autoCode/createPlug',
-    method: 'post',
-    data
+    url: '/autoCode/getTemplates',
+    method: 'get'
   })
 }
 
 export const installPlug = (data) => {
   return service({
     url: '/autoCode/installPlug',
+    method: 'post',
+    data
+  })
+}
+
+export const pubPlug = (params) => {
+  return service({
+    url: '/autoCode/pubPlug',
+    method: 'post',
+    params
+  })
+}
+
+export const llmAuto = (data) => {
+  return service({
+    url: '/autoCode/llmAuto',
+    method: 'post',
+    data: { ...data, mode: 'ai' },
+    timeout: 1000 * 60 * 10,
+    loadingOption: {
+      lock: true,
+      fullscreen: true,
+      text: `小淼正在思考，请稍候...`
+    }
+  })
+}
+
+export const butler = (data) => {
+  return service({
+    url: '/autoCode/llmAuto',
+    method: 'post',
+    data: { ...data, mode: 'butler' },
+    timeout: 1000 * 60 * 10
+  })
+}
+
+
+export const eye = (data) => {
+  return service({
+    url: '/autoCode/llmAuto',
+    method: 'post',
+    data: { ...data, mode: 'eye' },
+    timeout: 1000 * 60 * 10
+  })
+}
+
+
+export const createWeb = (data) => {
+  return service({
+    url: '/autoCode/llmAuto',
+    method: 'post',
+    data: { ...data, mode: 'painter' },
+    timeout: 1000 * 60 * 10
+  })
+}
+
+
+
+export const addFunc = (data) => {
+  return service({
+    url: '/autoCode/addFunc',
+    method: 'post',
+    data
+  })
+}
+
+export const initMenu = (data) => {
+  return service({
+    url: '/autoCode/initMenu',
+    method: 'post',
+    data
+  })
+}
+
+export const initAPI = (data) => {
+  return service({
+    url: '/autoCode/initAPI',
+    method: 'post',
+    data
+  })
+}
+
+export const mcp = (data) => {
+  return service({
+    url: '/autoCode/mcp',
+    method: 'post',
+    data
+  })
+}
+
+
+export const mcpList = (data) => {
+  return service({
+    url: '/autoCode/mcpList',
+    method: 'post',
+    data
+  })
+}
+
+
+export const mcpTest = (data) => {
+  return service({
+    url: '/autoCode/mcpTest',
     method: 'post',
     data
   })

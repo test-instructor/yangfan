@@ -1,10 +1,10 @@
 package system
 
 import (
-	"github.com/test-instructor/yangfan/server/config"
-	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/model/system"
-	"github.com/test-instructor/yangfan/server/utils"
+	"github.com/test-instructor/yangfan/server/v2/config"
+	"github.com/test-instructor/yangfan/server/v2/global"
+	"github.com/test-instructor/yangfan/server/v2/model/system"
+	"github.com/test-instructor/yangfan/server/v2/utils"
 	"go.uber.org/zap"
 )
 
@@ -15,11 +15,13 @@ import (
 
 type SystemConfigService struct{}
 
+var SystemConfigServiceApp = new(SystemConfigService)
+
 func (systemConfigService *SystemConfigService) GetSystemConfig() (conf config.Server, err error) {
 	return global.GVA_CONFIG, nil
 }
 
-//	@description	set system config,
+// @description   set system config,
 //@author: [piexlmax](https://github.com/piexlmax)
 //@function: SetSystemConfig
 //@description: 设置配置文件

@@ -3,8 +3,8 @@ package system
 import (
 	"context"
 	"github.com/pkg/errors"
-	sysModel "github.com/test-instructor/yangfan/server/model/system"
-	"github.com/test-instructor/yangfan/server/service/system"
+	sysModel "github.com/test-instructor/yangfan/server/v2/model/system"
+	"github.com/test-instructor/yangfan/server/v2/service/system"
 	"gorm.io/gorm"
 )
 
@@ -33,7 +33,7 @@ func (i *initDict) TableCreated(ctx context.Context) bool {
 	return db.Migrator().HasTable(&sysModel.SysDictionary{})
 }
 
-func (i initDict) InitializerName() string {
+func (i *initDict) InitializerName() string {
 	return sysModel.SysDictionary{}.TableName()
 }
 

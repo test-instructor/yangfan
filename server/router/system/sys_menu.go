@@ -2,9 +2,7 @@ package system
 
 import (
 	"github.com/gin-gonic/gin"
-
-	v1 "github.com/test-instructor/yangfan/server/api/v1"
-	"github.com/test-instructor/yangfan/server/middleware"
+	"github.com/test-instructor/yangfan/server/v2/middleware"
 )
 
 type MenuRouter struct{}
@@ -12,7 +10,6 @@ type MenuRouter struct{}
 func (s *MenuRouter) InitMenuRouter(Router *gin.RouterGroup) (R gin.IRoutes) {
 	menuRouter := Router.Group("menu").Use(middleware.OperationRecord())
 	menuRouterWithoutRecord := Router.Group("menu")
-	authorityMenuApi := v1.ApiGroupApp.SystemApiGroup.AuthorityMenuApi
 	{
 		menuRouter.POST("addBaseMenu", authorityMenuApi.AddBaseMenu)           // 新增菜单
 		menuRouter.POST("addMenuAuthority", authorityMenuApi.AddMenuAuthority) //	增加menu和角色关联关系

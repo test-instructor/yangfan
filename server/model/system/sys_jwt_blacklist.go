@@ -1,7 +1,7 @@
 package system
 
 import (
-	"github.com/test-instructor/yangfan/server/global"
+	"github.com/test-instructor/yangfan/server/v2/global"
 )
 
 type JwtBlacklist struct {

@@ -1,0 +1,159 @@
+{
+    "config": {
+        "name": "点播_抖音_滑动场景_随机间隔_android",
+        "variables": {
+            "device": "${ENV(SerialNumber)}"
+        },
+        "android": [
+            {
+                "serial": "$device",
+                "log_on": false,
+                "adb_server_host": "localhost",
+                "adb_server_port": 5037,
+                "uia2_ip": "localhost",
+                "uia2_port": 6790,
+                "uia2_server_package_name": "io.appium.uiautomator2.server",
+                "uia2_server_test_package_name": "io.appium.uiautomator2.server.test"
+            }
+        ]
+    },
+    "teststeps": [
+        {
+            "name": "启动抖音",
+            "android": {
+                "os_type": "android",
+                "actions": [
+                    {
+                        "method": "app_terminate",
+                        "params": "com.ss.android.ugc.aweme"
+                    },
+                    {
+                        "method": "app_launch",
+                        "params": "com.ss.android.ugc.aweme"
+                    },
+                    {
+                        "method": "sleep",
+                        "params": 10
+                    }
+                ]
+            },
+            "validate": [
+                {
+                    "check": "ui_foreground_app",
+                    "assert": "equal",
+                    "expect": "com.ss.android.ugc.aweme",
+                    "msg": "app [com.ss.android.ugc.aweme] should be in foreground"
+                }
+            ]
+        },
+        {
+            "name": "处理青少年弹窗",
+            "android": {
+                "os_type": "android",
+                "actions": [
+                    {
+                        "method": "tap_ocr",
+                        "params": "我知道了",
+                        "options": {
+                            "max_retry_times": 1,
+                            "ignore_NotFoundError": true
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "滑动 Feed 3 次，随机间隔 0-5s",
+            "loops": 3,
+            "android": {
+                "os_type": "android",
+                "actions": [
+                    {
+                        "method": "swipe",
+                        "params": "up",
+                        "options": {
+                            "max_retry_times": 1
+                        }
+                    },
+                    {
+                        "method": "sleep_random",
+                        "params": [
+                            0,
+                            5
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "滑动 Feed 1 次，随机间隔 5-10s",
+            "loops": 1,
+            "android": {
+                "os_type": "android",
+                "actions": [
+                    {
+                        "method": "swipe",
+                        "params": "up",
+                        "options": {
+                            "max_retry_times": 1
+                        }
+                    },
+                    {
+                        "method": "sleep_random",
+                        "params": [
+                            5,
+                            10
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "滑动 Feed 10 次，70% 随机间隔 0-5s，30% 随机间隔 5-10s",
+            "loops": 10,
+            "android": {
+                "os_type": "android",
+                "actions": [
+                    {
+                        "method": "swipe",
+                        "params": "up",
+                        "options": {
+                            "max_retry_times": 1
+                        }
+                    },
+                    {
+                        "method": "sleep_random",
+                        "params": [
+                            0,
+                            5,
+                            0.7,
+                            5,
+                            10,
+                            0.3
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "exit",
+            "android": {
+                "os_type": "android",
+                "actions": [
+                    {
+                        "method": "app_terminate",
+                        "params": "com.ss.android.ugc.aweme"
+                    }
+                ]
+            },
+            "validate": [
+                {
+                    "check": "ui_foreground_app",
+                    "assert": "not_equal",
+                    "expect": "com.ss.android.ugc.aweme",
+                    "msg": "app [com.ss.android.ugc.aweme] should not be in foreground"
+                }
+            ]
+        }
+    ]
+}

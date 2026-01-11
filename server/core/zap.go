@@ -2,14 +2,12 @@ package core
 
 import (
 	"fmt"
-	"os"
-
+	"github.com/test-instructor/yangfan/server/v2/core/internal"
+	"github.com/test-instructor/yangfan/server/v2/global"
+	"github.com/test-instructor/yangfan/server/v2/utils"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-
-	"github.com/test-instructor/yangfan/server/core/internal"
-	"github.com/test-instructor/yangfan/server/global"
-	"github.com/test-instructor/yangfan/server/utils"
+	"os"
 )
 
 // Zap 获取 zap.Logger
@@ -19,14 +17,14 @@ func Zap() (logger *zap.Logger) {
 		fmt.Printf("create %v directory\n", global.GVA_CONFIG.Zap.Director)
 		_ = os.Mkdir(global.GVA_CONFIG.Zap.Director, os.ModePerm)
 	}
-	hostname, err := os.Hostname()
-	if err == nil {
-		global.GVA_CONFIG.Zap.Prefix = fmt.Sprintf("[%s]", hostname)
+	levels := global.GVA_CONFIG.Zap.Levels()
+	length := len(levels)
+	cores := make([]zapcore.Core, 0, length)
+	for i := 0; i < length; i++ {
+		core := internal.NewZapCore(levels[i])
+		cores = append(cores, core)
 	}
-
-	cores := internal.Zap.GetZapCores()
 	logger = zap.New(zapcore.NewTee(cores...))
-
 	if global.GVA_CONFIG.Zap.ShowLine {
 		logger = logger.WithOptions(zap.AddCaller())
 	}
