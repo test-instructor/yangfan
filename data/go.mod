@@ -1,19 +1,22 @@
-module github.com/test-instructor/yangfan/run
+module github.com/test-instructor/yangfan/data
 
-go 1.23.9
+go 1.23.0
+
+toolchain go1.23.9
 
 require (
-	github.com/google/uuid v1.6.0
-	github.com/mitchellh/mapstructure v1.5.0
-	github.com/pkg/errors v0.9.1
-	github.com/rabbitmq/amqp091-go v1.10.0
-	github.com/rs/zerolog v1.33.0
-	github.com/stretchr/testify v1.10.0
-	github.com/test-instructor/yangfan/httprunner v0.0.0-20251121115157-32766ff2ceab
-	github.com/test-instructor/yangfan/server/v2 v2.0.0-20251121115157-32766ff2ceab
+	github.com/gin-gonic/gin v1.10.0
+	github.com/lingcetech/funplugin v0.5.8
+	github.com/test-instructor/yangfan/httprunner v0.0.0-20251204144104-d139a4573d55
+	github.com/test-instructor/yangfan/server/v2 v2.0.0-20251204144104-d139a4573d55
 	go.uber.org/zap v1.27.1
 	gorm.io/datatypes v1.2.5
 	gorm.io/gorm v1.25.12
+)
+
+replace (
+	github.com/test-instructor/yangfan/httprunner => ../httprunner
+	github.com/test-instructor/yangfan/server/v2 => ../server
 )
 
 require (
@@ -76,7 +79,6 @@ require (
 	github.com/getkin/kin-openapi v0.118.0 // indirect
 	github.com/getsentry/sentry-go v0.13.0 // indirect
 	github.com/gin-contrib/sse v1.0.0 // indirect
-	github.com/gin-gonic/gin v1.10.0 // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/glebarez/sqlite v1.11.0 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
@@ -102,6 +104,7 @@ require (
 	github.com/google/btree v1.1.2 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/pprof v0.0.0-20240409012703-83162a5b38cd // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/gookit/color v1.5.4 // indirect
 	github.com/goph/emperror v0.17.2 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
@@ -132,7 +135,6 @@ require (
 	github.com/klauspost/cpuid/v2 v2.2.11 // indirect
 	github.com/klauspost/pgzip v1.2.6 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/lingcetech/funplugin v0.5.8 // indirect
 	github.com/lingcetech/lingce/server v0.0.0-20251229142412-6d96ccb81d3e // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20240909124753-873cd0166683 // indirect
@@ -152,6 +154,7 @@ require (
 	github.com/minio/minio-go/v7 v7.0.84 // indirect
 	github.com/minio/minlz v1.0.0 // indirect
 	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
+	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
@@ -173,12 +176,14 @@ require (
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/pierrec/lz4 v2.6.1+incompatible // indirect
 	github.com/pierrec/lz4/v4 v4.1.22 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/qiniu/go-sdk/v7 v7.25.2 // indirect
 	github.com/qiniu/qmgo v1.1.9 // indirect
 	github.com/quic-go/qtls-go1-20 v0.4.1 // indirect
 	github.com/quic-go/quic-go v0.40.1-0.20231203135336-87ef8ec48d55 // indirect
+	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
 	github.com/redis/go-redis/v9 v9.7.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/richardlehane/mscfb v1.0.4 // indirect
@@ -186,6 +191,7 @@ require (
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rs/xid v1.6.0 // indirect
+	github.com/rs/zerolog v1.33.0 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
@@ -202,6 +208,7 @@ require (
 	github.com/spf13/cast v1.9.2 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.19.0 // indirect
+	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/swaggo/files v1.0.1 // indirect
 	github.com/swaggo/gin-swagger v1.6.0 // indirect
@@ -267,9 +274,4 @@ require (
 	modernc.org/memory v1.8.2 // indirect
 	modernc.org/sqlite v1.34.5 // indirect
 	software.sslmate.com/src/go-pkcs12 v0.2.0 // indirect
-)
-
-replace (
-	github.com/test-instructor/yangfan/httprunner => ../httprunner
-	github.com/test-instructor/yangfan/server/v2 => ../server
 )
