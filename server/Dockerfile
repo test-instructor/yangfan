@@ -1,26 +1,23 @@
-FROM golang:1.23-alpine AS builder
+FROM golang:alpine AS builder
 
-WORKDIR /app
-COPY go.work go.work.sum ./
-COPY httprunner/ httprunner/
-COPY parsing/ parsing/
-COPY server/ server/
-COPY run/ run/
-COPY data/ data/
+WORKDIR /go/src/yangfan
 
-WORKDIR /app/server
-RUN CGO_ENABLED=0 go build -o server .
+COPY . .
+ENV GO111MODULE=on
+ENV GOPROXY=https://goproxy.cn
+
+RUN  go build -o ./server ./server
+
 
 FROM yangfanz/python:3.10.0
-LABEL MAINTAINER="lingce"
 ENV TZ=Asia/Shanghai
-RUN apk update && apk add --no-cache tzdata ca-certificates \
-    && ln -sf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-WORKDIR /app
-COPY --from=builder /app/server/server ./
-COPY --from=builder /app/server/resource ./resource/
-COPY --from=builder /app/server/config.docker.yaml ./
+WORKDIR /yangfan
+COPY --from=builder /go/src/yangfan/server .
+COPY --from=builder /go/src/yangfan/get-pip.py .
+COPY --from=builder /go/src/yangfan/httprunner/pkg/boomer/data/x509 /root/.lc/x509
+COPY --from=builder /go/src/yangfan/deploy/docker-compose/config/docker.config.yaml .
 
 EXPOSE 8888
-ENTRYPOINT ["./server", "-c", "config.docker.yaml"]
+ENTRYPOINT ./server -c docker.config.yaml
+
+CMD ["tail", "-f", "/dev/null"]
