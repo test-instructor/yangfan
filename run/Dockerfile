@@ -11,8 +11,8 @@ COPY data/ data/
 WORKDIR /app/run
 RUN CGO_ENABLED=0 go build -o run .
 
-FROM alpine:latest
-LABEL MAINTAINER="test-instructor"
+FROM yangfanz/python:3.10.0
+LABEL MAINTAINER="lingce"
 ENV TZ=Asia/Shanghai
 RUN apk update && apk add --no-cache tzdata ca-certificates \
     && ln -sf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone

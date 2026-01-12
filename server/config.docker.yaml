@@ -1,4 +1,4 @@
-# github.com/test-instructor/yangfan/server/v2 Global Configuration
+# github.com/lingcetech/lingce/server Global Configuration
 
 # jwt configuration
 jwt:
@@ -10,7 +10,7 @@ jwt:
 zap:
     level: info
     format: console
-    prefix: "[github.com/test-instructor/yangfan/server/v2]"
+    prefix: "[github.com/lingcetech/lingce/server]"
     director: log
     show-line: true
     encode-level: LowercaseColorLevelEncoder
@@ -181,7 +181,7 @@ autocode:
     web: web/src
     root: "" # root 自动适配项目根目录, 请不要手动配置,他会在项目加载的时候识别出根路径
     server: server
-    module: 'github.com/test-instructor/yangfan/server/v2'
+    module: 'github.com/lingcetech/lingce/server'
     ai-path: ""  # AI服务路径
 
 # qiniu configuration (请自行七牛申请对应的 公钥 私钥 bucket 和 域名地址)
@@ -220,7 +220,7 @@ tencent-cos:
     secret-id: your-secret-id
     secret-key: your-secret-key
     base-url: https://gin.vue.admin
-    path-prefix: github.com/test-instructor/yangfan/server/v2
+    path-prefix: github.com/lingcetech/lingce/server
 
 # aws s3 configuration (minio compatible)
 aws-s3:
@@ -232,7 +232,7 @@ aws-s3:
     secret-id: your-secret-id
     secret-key: your-secret-key
     base-url: https://gin.vue.admin
-    path-prefix: github.com/test-instructor/yangfan/server/v2
+    path-prefix: github.com/lingcetech/lingce/server
 
 # cloudflare r2 configuration
 cloudflare-r2:

@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - dev
+      - v2
     tags:
       - '*'
 
@@ -15,7 +16,7 @@ env:
   IMAGE_NAME_WEB: web
   IMAGE_NAME_RUN: run
   IMAGE_NAME_DATA: data
-  IMAGE_TAG: v1.${{ github.run_number }}
+  IMAGE_TAG: v2.${{ github.run_number }}
 
 jobs:
   server:
