@@ -14,15 +14,15 @@ func Init() error {
 	if global.GVA_DB == nil {
 		return nil
 	}
-	return ensureSysBaseMenus(global.GVA_DB, seeds())
+	return ensureSysBaseMenus(global.GVA_DB, Seeds())
 }
 
-func ensureSysBaseMenus(db *gorm.DB, seeds []menuSeed) error {
+func ensureSysBaseMenus(db *gorm.DB, seeds []MenuSeed) error {
 	if db == nil || len(seeds) == 0 {
 		return nil
 	}
 
-	seedByPath := make(map[string]menuSeed, len(seeds))
+	seedByPath := make(map[string]MenuSeed, len(seeds))
 	paths := make([]string, 0, len(seeds))
 	for _, s := range seeds {
 		if s.Path == "" {
@@ -42,11 +42,11 @@ func ensureSysBaseMenus(db *gorm.DB, seeds []menuSeed) error {
 		return err
 	}
 	for i := range existing {
-		m := existing[i]
+		m := &existing[i]
 		if m.Path == "" {
 			continue
 		}
-		existingByPath[m.Path] = &m
+		existingByPath[m.Path] = m
 	}
 
 	// Compute menu level based on seed tree (not DB values).

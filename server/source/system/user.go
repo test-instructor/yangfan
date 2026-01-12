@@ -2,6 +2,7 @@ package system
 
 import (
 	"context"
+
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	sysModel "github.com/test-instructor/yangfan/server/v2/model/system"
@@ -59,7 +60,7 @@ func (i *initUser) InitializeData(ctx context.Context) (next context.Context, er
 			UUID:        uuid.New(),
 			Username:    "admin",
 			Password:    adminPassword,
-			NickName:    "Mr.奇淼",
+			NickName:    "灵测",
 			HeaderImg:   "https://qmplusimg.henrongyi.top/gva_header.jpg",
 			AuthorityId: 888,
 			Phone:       "17611111111",

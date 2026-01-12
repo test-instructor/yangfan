@@ -4,7 +4,7 @@ import (
 	sysModel "github.com/test-instructor/yangfan/server/v2/model/system"
 )
 
-type menuSeed struct {
+type MenuSeed struct {
 	Path       string
 	ParentPath string
 	Name       string
@@ -14,8 +14,8 @@ type menuSeed struct {
 	Meta       sysModel.Meta
 }
 
-func seeds() []menuSeed {
-	return []menuSeed{
+func Seeds() []MenuSeed {
+	return []MenuSeed{
 		// Root menus
 		{Path: "platform", ParentPath: "", Name: "platform", Hidden: false, Component: "view/routerHolder.vue", Sort: 200, Meta: sysModel.Meta{Title: "配置管理", Icon: "setting"}},
 		{Path: "APIAutomation", ParentPath: "", Name: "APIAutomation", Hidden: false, Component: "view/routerHolder.vue", Sort: 400, Meta: sysModel.Meta{Title: "接口自动化", Icon: "connection"}},

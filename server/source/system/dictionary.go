@@ -50,6 +50,10 @@ func (i *initDict) InitializeData(ctx context.Context) (next context.Context, er
 		{Name: "数据库浮点型", Type: "float64", Status: &True, Desc: "数据库浮点型"},
 		{Name: "数据库字符串", Type: "string", Status: &True, Desc: "数据库字符串"},
 		{Name: "数据库bool类型", Type: "bool", Status: &True, Desc: "数据库bool类型"},
+		{Name: "请求头", Type: "header", Status: &True, Desc: "请求头key"},
+		{Name: "Host", Type: "Host", Status: &True, Desc: "Host"},
+		{Name: "字段类型", Type: "fieldType", Status: &True, Desc: "字段类型"},
+		{Name: "断言", Type: "assert", Status: &True, Desc: "自动化测试中的断言"},
 	}
 
 	if err = db.Create(&entities).Error; err != nil {

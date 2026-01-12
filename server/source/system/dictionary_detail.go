@@ -98,6 +98,42 @@ func (i *initDictDetail) InitializeData(ctx context.Context) (context.Context, e
 		{Label: "tinyint", Value: "1", Extend: "mysql", Status: &True},
 		{Label: "bool", Value: "2", Extend: "pgsql", Status: &True},
 	}
+
+	dicts[6].SysDictionaryDetails = []sysModel.SysDictionaryDetail{
+		{Label: "Host", Value: "Host", Status: &True, Sort: 1},
+		{Label: "Token", Value: "Token", Status: &True, Sort: 2},
+	}
+
+	dicts[8].SysDictionaryDetails = []sysModel.SysDictionaryDetail{
+		{Label: "String", Value: "String", Status: &True, Sort: 1},
+		{Label: "Integer", Value: "Integer", Status: &True, Sort: 2},
+		{Label: "Float", Value: "Float", Status: &True, Sort: 3},
+		{Label: "Boolean", Value: "Boolean", Status: &True, Sort: 4},
+		{Label: "List", Value: "List", Status: &True, Sort: 5},
+		{Label: "Dict", Value: "Dict", Status: &True, Sort: 6},
+	}
+
+	dicts[9].SysDictionaryDetails = []sysModel.SysDictionaryDetail{
+		{Label: "等于", Value: "equals", Status: &True, Sort: 1},
+		{Label: "大于", Value: "greater_than", Status: &True, Sort: 2},
+		{Label: "小于", Value: "less_than", Status: &True, Sort: 3},
+		{Label: "大于等于", Value: "greater_or_equals", Status: &True, Sort: 4},
+		{Label: "小于等于", Value: "less_or_equals", Status: &True, Sort: 5},
+		{Label: "不等于", Value: "not_equal", Status: &True, Sort: 6},
+		{Label: "包含", Value: "contains", Status: &True, Sort: 7},
+		{Label: "类型匹配", Value: "type_match", Status: &True, Sort: 8},
+		{Label: "正则匹配", Value: "regex_match", Status: &True, Sort: 9},
+		{Label: "长度等于", Value: "length_equals", Status: &True, Sort: 10},
+		{Label: "被包含", Value: "contained_by", Status: &True, Sort: 11},
+		{Label: "长度小于", Value: "length_less_than", Status: &True, Sort: 12},
+		{Label: "字符串相等", Value: "string_equals", Status: &True, Sort: 13},
+		{Label: "忽略大小写相等", Value: "equal_fold", Status: &True, Sort: 14},
+		{Label: "长度小于等于", Value: "length_less_or_equals", Status: &True, Sort: 15},
+		{Label: "长度大于", Value: "length_greater_than", Status: &True, Sort: 16},
+		{Label: "长度大于等于", Value: "length_greater_or_equals", Status: &True, Sort: 17},
+		{Label: "开头字符串", Value: "startswith", Status: &True, Sort: 18},
+		{Label: "结尾字符串", Value: "endswith", Status: &True, Sort: 19},
+	}
 	for _, dict := range dicts {
 		if err := db.Model(&dict).Association("SysDictionaryDetails").
 			Replace(dict.SysDictionaryDetails); err != nil {

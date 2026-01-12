@@ -6,6 +6,16 @@ import (
 	"gorm.io/gorm"
 )
 
+func GetApis() []sysModel.SysApi {
+	apis := make([]sysModel.SysApi, 0, 128)
+	apis = append(apis, projectmgrApis()...)
+	apis = append(apis, platformApis()...)
+	apis = append(apis, automationApis()...)
+	apis = append(apis, datawarehouseApis()...)
+	apis = append(apis, uiApis()...)
+	return apis
+}
+
 // Init ensures curated sys_apis routes exist.
 // It only runs when global.GVA_DB is initialized.
 func Init() error {
@@ -13,12 +23,7 @@ func Init() error {
 		return nil
 	}
 
-	apis := make([]sysModel.SysApi, 0, 128)
-	apis = append(apis, projectmgrApis()...)
-	apis = append(apis, platformApis()...)
-	apis = append(apis, automationApis()...)
-	apis = append(apis, datawarehouseApis()...)
-	apis = append(apis, uiApis()...)
+	apis := GetApis()
 
 	return ensureSysApis(global.GVA_DB, apis)
 }

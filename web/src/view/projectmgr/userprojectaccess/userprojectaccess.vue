@@ -460,7 +460,7 @@
     formData.value = {
       userId: undefined,
       projectId: undefined,
-      accessPermission: false,
+      accessPermission: true,
       editPermission: false,
       deletePermission: false,
     }
