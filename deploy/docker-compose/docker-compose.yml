@@ -1,0 +1,64 @@
+services:
+  server:
+    image: "${REGISTRY:-yangfanz/}server${IMAGE_SUFFIX:-}:${IMAGE_TAG:-latest}"
+    container_name: yangfan-server
+    restart: always
+    depends_on:
+      - mysql
+      - redis
+      - rabbitmq
+    volumes:
+      - ./config/docker.config.yaml:/yangfan/docker.config.yaml:ro
+    ports:
+      - "8888:8888"
+      - "7967:7967"
+    networks:
+      - yangfan-network
+
+  run:
+    image: "${REGISTRY:-yangfanz/}run${IMAGE_SUFFIX:-}:${IMAGE_TAG:-latest}"
+    container_name: yangfan-run
+    restart: always
+    depends_on:
+      - server
+      - mysql
+      - redis
+      - rabbitmq
+    volumes:
+      - ./config/docker.config.yaml:/yangfan/docker.config.yaml:ro
+    networks:
+      - yangfan-network
+
+  data:
+    image: "${REGISTRY:-yangfanz/}data${IMAGE_SUFFIX:-}:${IMAGE_TAG:-latest}"
+    container_name: yangfan-data
+    restart: always
+    depends_on:
+      - mysql
+      - redis
+      - rabbitmq
+    volumes:
+      - ./config/docker.config.yaml:/yangfan/docker.config.yaml:ro
+    ports:
+      - "18080:18080"
+
+  web:
+    image: "${REGISTRY:-yangfanz/}web${IMAGE_SUFFIX:-}:${IMAGE_TAG:-latest}"
+    container_name: yangfan-web
+    restart: always
+    depends_on:
+      - server
+    ports:
+      - "8080:8080"
+    environment:
+      ENV_VITE_FS_APP_ID: ${ENV_VITE_FS_APP_ID:-}
+      ENV_VITE_FS_LOGIN: ${ENV_VITE_FS_LOGIN:-http://localhost:8080/api/fsLogin/login}
+    volumes:
+      - ./config/my.conf:/etc/nginx/conf.d/my.conf:ro
+    networks:
+      - yangfan-network
+
+networks:
+  yangfan-network:
+    name: yangfan-network
+    driver: bridge

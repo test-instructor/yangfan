@@ -529,7 +529,7 @@ defineExpose({
 .python-editor-container {
   display: flex;
   gap: 15px;
-  background-color: #f5f7fa;
+  background-color: var(--el-bg-color-page);
   border-radius: 8px;
   overflow: hidden;
   width: 100%;
@@ -538,7 +538,7 @@ defineExpose({
 .editor-section {
   flex: 1;
   min-width: 0;
-  background: #fff;
+  background: var(--el-bg-color);
   border-radius: 8px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
   display: flex;
@@ -553,8 +553,8 @@ defineExpose({
 
 .editor-header, .function-header {
   padding: 12px 16px;
-  border-bottom: 1px solid #ebeef5;
-  background-color: #fafafa;
+  border-bottom: 1px solid var(--el-border-color-light);
+  background-color: var(--el-fill-color-light);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -563,7 +563,7 @@ defineExpose({
   .header-title {
     font-size: 14px;
     font-weight: 600;
-    color: #303133;
+    color: var(--el-text-color-primary);
     display: flex;
     align-items: center;
 
@@ -572,7 +572,7 @@ defineExpose({
       display: block;
       width: 4px;
       height: 14px;
-      background-color: #409eff;
+      background-color: var(--el-color-primary);
       margin-right: 8px;
       border-radius: 2px;
     }
@@ -611,7 +611,7 @@ defineExpose({
 .function-list-section {
   width: v-bind(functionListWidth);
   flex-shrink: 0;
-  background: #fff;
+  background: var(--el-bg-color);
   border-radius: 8px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
   display: flex;
@@ -624,7 +624,7 @@ defineExpose({
   flex: 1;
   overflow: hidden;
   padding: 10px;
-  background-color: #fff;
+  background-color: var(--el-bg-color);
 }
 
 .function-list {
@@ -636,7 +636,7 @@ defineExpose({
     width: 6px;
   }
   &::-webkit-scrollbar-thumb {
-    background-color: #dcdfe6;
+    background-color: var(--el-border-color);
     border-radius: 3px;
   }
 }
@@ -647,16 +647,16 @@ defineExpose({
   align-items: center;
   padding: 10px 12px;
   margin-bottom: 8px;
-  background: #fff;
-  border: 1px solid #ebeef5;
+  background: var(--el-bg-color);
+  border: 1px solid var(--el-border-color-light);
   border-radius: 6px;
   transition: all 0.3s ease;
   box-shadow: 0 1px 4px rgba(0,0,0,0.02);
   cursor: pointer;
 
   &:hover {
-    background: #ecf5ff;
-    border-color: #c6e2ff;
+    background: var(--el-color-primary-light-9);
+    border-color: var(--el-color-primary-light-7);
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   }
@@ -670,14 +670,14 @@ defineExpose({
   .function-name {
     font-size: 13px;
     font-weight: 600;
-    color: #303133;
+    color: var(--el-text-color-primary);
     margin-bottom: 2px;
   }
 
   .function-signature {
     font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
     font-size: 11px;
-    color: #909399;
+    color: var(--el-text-color-secondary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

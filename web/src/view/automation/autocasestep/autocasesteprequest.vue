@@ -618,7 +618,7 @@
     -ms-flex: 1;
     flex: 1;
     font-family: Open Sans, sans-serif;
-    color: #3b4151;
+    color: var(--el-text-color-regular);
   }
 
   .block_method_color {
@@ -649,7 +649,7 @@
     -ms-flex: 1;
     flex: 1;
     font-family: Open Sans, sans-serif;
-    color: #3b4151;
+    color: var(--el-text-color-regular);
   }
 
   .gva-pagination {
@@ -666,7 +666,7 @@
     display: flex;
     width: 100%;
     height: 750px;
-    background-color: #f0f2f5;
+    background-color: var(--el-bg-color-page);
     padding: 16px;
     box-sizing: border-box;
     gap: 16px;
@@ -675,7 +675,7 @@
   .left-panel, .right-panel {
     display: flex;
     flex-direction: column;
-    background-color: #fff;
+    background-color: var(--el-bg-color);
     border-radius: 8px;
     box-shadow: 0 1px 2px -2px rgba(0, 0, 0, 0.16), 0 3px 6px 0 rgba(0, 0, 0, 0.12), 0 5px 12px 4px rgba(0, 0, 0, 0.09);
     overflow: hidden;
@@ -696,8 +696,8 @@
 
   .panel-header {
     padding: 16px 24px;
-    border-bottom: 1px solid #f0f0f0;
-    background-color: #fff;
+    border-bottom: 1px solid var(--el-border-color-light);
+    background-color: var(--el-bg-color);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -706,13 +706,13 @@
   .title {
     font-size: 16px;
     font-weight: 600;
-    color: #303133;
+    color: var(--el-text-color-primary);
     line-height: 1.5;
   }
 
   .subtitle {
     font-size: 12px;
-    color: #909399;
+    color: var(--el-text-color-secondary);
     margin-left: 4px;
   }
 
@@ -725,8 +725,8 @@
 
   .menu-container {
     width: 240px;
-    border-right: 1px solid #f0f0f0;
-    background-color: #fafafa;
+    border-right: 1px solid var(--el-border-color-light);
+    background-color: var(--el-fill-color-light);
     overflow-y: auto;
   }
 
@@ -737,7 +737,7 @@
   }
 
   .menu-container::-webkit-scrollbar-thumb {
-    background: #dcdfe6;
+    background: var(--el-border-color);
     border-radius: 3px;
   }
 
@@ -751,7 +751,7 @@
     flex-direction: column;
     overflow: hidden;
     padding: 12px;
-    background-color: #fff;
+    background-color: var(--el-bg-color);
   }
 
   .search-box {
@@ -786,7 +786,7 @@
 
   .action-text {
     font-size: 12px;
-    color: #909399;
+    color: var(--el-text-color-secondary);
     writing-mode: vertical-rl;
     letter-spacing: 4px;
     font-weight: 500;

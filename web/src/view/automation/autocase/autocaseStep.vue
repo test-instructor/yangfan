@@ -376,7 +376,7 @@
     display: flex;
     width: 100%;
     height: 750px; /* Fixed height or calc(100vh - ...) depending on need */
-    background-color: #f5f7fa;
+    background-color: var(--el-bg-color-page);
     padding: 10px;
     box-sizing: border-box;
     gap: 10px;
@@ -386,7 +386,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    background-color: #fff;
+    background-color: var(--el-bg-color);
     border-radius: 4px;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
     overflow: hidden;
@@ -394,8 +394,8 @@
 
   .panel-header {
     padding: 15px 20px;
-    border-bottom: 1px solid #ebeef5;
-    background-color: #fafafa;
+    border-bottom: 1px solid var(--el-border-color-light);
+    background-color: var(--el-fill-color-light);
     display: flex;
     align-items: center;
   }
@@ -403,12 +403,12 @@
   .title {
     font-size: 16px;
     font-weight: bold;
-    color: #303133;
+    color: var(--el-text-color-primary);
   }
 
   .subtitle {
     font-size: 12px;
-    color: #909399;
+    color: var(--el-text-color-secondary);
     margin-left: 8px;
   }
 
@@ -421,7 +421,7 @@
 
   .menu-container {
     width: 220px;
-    border-right: 1px solid #ebeef5;
+    border-right: 1px solid var(--el-border-color-light);
     margin-right: 10px;
     overflow-y: auto;
   }
@@ -466,7 +466,7 @@
 
   .action-text {
     font-size: 12px;
-    color: #909399;
+    color: var(--el-text-color-secondary);
     writing-mode: vertical-rl;
     letter-spacing: 2px;
   }

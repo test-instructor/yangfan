@@ -728,7 +728,8 @@ onMounted(async () => {
   line-height: 1.5;
 }
 .code-preview {
-  background-color: #f5f7fa;
+  background-color: var(--el-fill-color-light);
+  color: var(--el-text-color-primary);
   padding: 15px;
   border-radius: 4px;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
@@ -738,11 +739,12 @@ onMounted(async () => {
   word-wrap: break-word;
   max-height: 400px;
   overflow-y: auto;
+  border: 1px solid var(--el-border-color-lighter);
 }
 </style>
 <style scoped>
 .env-counts { display: flex; flex-wrap: wrap; gap: 8px 12px; }
-.env-count-chip { background: #f5f7fa; border-radius: 4px; padding: 2px 8px; }
-.env-name { color: #606266; margin-right: 4px; }
-.env-val { font-weight: 600; }
+.env-count-chip { background: var(--el-fill-color-light); border-radius: 4px; padding: 2px 8px; border: 1px solid var(--el-border-color-lighter); }
+.env-name { color: var(--el-text-color-secondary); margin-right: 4px; }
+.env-val { font-weight: 600; color: var(--el-text-color-primary); }
 </style>

@@ -1,21 +1,21 @@
 <template>
 
-  <div style="background-color: white;margin:8px">
+  <div class="menu-wrapper">
     <el-input
       v-model="filterText"
       placeholder="输入关键字进行过滤"
-      style="margin-bottom: 10px;margin-top: 20px;"
+      class="filter-input"
     />
     <el-button
       v-if="!props.detail"
       type="primary"
       @click="addNewQuestion"
-      style="margin: 2px 10px;"
+      class="add-btn"
     >
       添加一级节点
     </el-button>
 
-    <div style="overflow-y: auto; height: 560px;margin: 2px 10px;">
+    <div class="tree-container">
       <el-tree
         ref="treeRef"
         :data="trees"
@@ -38,16 +38,16 @@
         @node-drop="handleDrop"
       >
         <template #default="{ node, data }">
-          <span class="custom-tree-node"  v-if="!props.detail">
+          <span class="custom-tree-node">
             <span>{{ node.label }}</span>
-            <span>
-              <a v-if="getNodeLevel(node) < 4" @click.stop="openAppend(data)" style="margin: 0px 10px;">
+            <span v-if="!props.detail" class="node-actions">
+              <a v-if="getNodeLevel(node) < 4" @click.stop="openAppend(data)" class="node-action">
                 <el-icon><add /></el-icon>
               </a>
-              <a @click.stop="openEdit(node, data)" style="margin: 0px 10px;">
+              <a @click.stop="openEdit(node, data)" class="node-action">
                 <el-icon><edit /></el-icon>
               </a>
-              <a @click.stop="openDelete(node, data)" style="margin: 0px 10px;">
+              <a @click.stop="openDelete(node, data)" class="node-action">
                 <el-icon><delete /></el-icon>
               </a>
             </span>
@@ -409,6 +409,28 @@
 </script>
 
 <style scoped>
+  .menu-wrapper {
+    background-color: var(--el-bg-color);
+    margin: 8px;
+    border-radius: 8px;
+    padding: 12px 10px;
+    border: 1px solid var(--el-border-color-light);
+  }
+
+  .filter-input {
+    margin: 8px 0 10px;
+  }
+
+  .add-btn {
+    margin: 2px 10px;
+  }
+
+  .tree-container {
+    overflow-y: auto;
+    height: 560px;
+    margin: 2px 10px;
+  }
+
   .mask::-webkit-scrollbar {
     width: 0;
   }
@@ -426,17 +448,17 @@
 
   /* 高亮当前选中的树节点 */
   :deep(.el-tree-node.is-current > .el-tree-node__content) {
-    background-color: #66b1ff87;
+    background-color: var(--el-color-primary-light-9);
   }
 
   /* 树节点点击时的样式设置 */
   :deep(.el-tree-node:focus > .el-tree-node__content) {
-    background-color: #66b1ff87;
+    background-color: var(--el-color-primary-light-9);
   }
 
   /* 树节点hover时的样式设置 */
   :deep(.el-tree-node__content:hover) {
-    background-color: #26b1ff87;
+    background-color: var(--el-color-primary-light-8);
   }
 
   .custom-tree-node {
@@ -445,5 +467,19 @@
     align-items: center;
     justify-content: space-between;
     font-size: 16px;
+  }
+
+  .node-actions {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .node-action {
+    margin: 0 10px;
+    color: var(--el-text-color-regular);
+  }
+
+  .node-action:hover {
+    color: var(--el-color-primary);
   }
 </style>

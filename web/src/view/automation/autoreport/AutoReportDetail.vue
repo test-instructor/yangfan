@@ -4,13 +4,13 @@
     <div class="flex justify-between items-start mb-6">
       <div>
         <h1 class="text-2xl font-bold text-blue-600 mb-2">{{ detail.name || '报告名称' }}</h1>
-        <div class="text-gray-500 text-sm">
+        <div class="text-gray-500 dark:text-gray-400 text-sm">
           任务 ID: {{ detail.ID }} | 生成时间: {{ formatDate(detail.CreatedAt) }}
         </div>
       </div>
       <div class="flex gap-2">
-        <div class="text-sm text-gray-600 flex items-center">执行模式: <el-tag class="ml-1">{{ detail.run_mode }}</el-tag></div>
-        <div class="text-sm text-gray-600 flex items-center">环境: <el-tag type="info" class="ml-1">{{ detail.env_name || '测试环境' }}</el-tag></div>
+        <div class="text-sm text-gray-600 dark:text-gray-300 flex items-center">执行模式: <el-tag class="ml-1">{{ detail.run_mode }}</el-tag></div>
+        <div class="text-sm text-gray-600 dark:text-gray-300 flex items-center">环境: <el-tag type="info" class="ml-1">{{ detail.env_name || '测试环境' }}</el-tag></div>
       </div>
     </div>
 
@@ -18,10 +18,10 @@
     <div class="grid grid-cols-4 gap-4 mb-6">
       <!-- Card 1: Use Cases -->
       <el-card shadow="hover" class="summary-card rounded-lg">
-        <div class="flex justify-between items-start">
-          <div>
-            <div class="text-gray-500 text-sm mb-1">用例执行概要</div>
-            <div class="text-3xl font-bold mb-2">{{ detail.stat?.testcases?.total || 0 }} <span class="text-sm font-normal text-gray-500">个用例</span></div>
+          <div class="flex justify-between items-start">
+            <div>
+            <div class="text-gray-500 dark:text-gray-400 text-sm mb-1">用例执行概要</div>
+            <div class="text-3xl font-bold mb-2">{{ detail.stat?.testcases?.total || 0 }} <span class="text-sm font-normal text-gray-500 dark:text-gray-400">个用例</span></div>
             <div class="flex items-center text-sm">
               <span class="w-3 h-3 rounded-full bg-green-500 mr-1"></span>
               <span class="mr-3">{{ detail.stat?.testcases?.success || 0 }} 成功</span>
@@ -29,7 +29,7 @@
               <span>{{ detail.stat?.testcases?.fail || 0 }} 失败</span>
             </div>
           </div>
-          <div class="p-3 bg-blue-50 rounded-lg text-blue-500">
+          <div class="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-blue-500 dark:text-blue-300">
             <el-icon :size="24"><Document /></el-icon>
           </div>
         </div>
@@ -39,8 +39,8 @@
       <el-card shadow="hover" class="summary-card rounded-lg">
         <div class="flex justify-between items-start">
           <div>
-             <div class="text-gray-500 text-sm mb-1">接口执行概要</div>
-             <div class="text-3xl font-bold mb-2">{{ apiStats.total }} <span class="text-sm font-normal text-gray-500">个接口</span></div>
+             <div class="text-gray-500 dark:text-gray-400 text-sm mb-1">接口执行概要</div>
+             <div class="text-3xl font-bold mb-2">{{ apiStats.total }} <span class="text-sm font-normal text-gray-500 dark:text-gray-400">个接口</span></div>
              <div class="flex items-center text-sm">
                <span class="w-3 h-3 rounded-full bg-green-500 mr-1"></span>
                <span class="mr-3">{{ apiStats.success }} 成功</span>
@@ -48,7 +48,7 @@
                <span>{{ apiStats.fail }} 失败</span>
              </div>
           </div>
-          <div class="p-3 bg-green-50 rounded-lg text-green-500">
+          <div class="p-3 bg-green-50 dark:bg-green-900/30 rounded-lg text-green-500 dark:text-green-300">
              <el-icon :size="24"><Sort /></el-icon>
           </div>
         </div>
@@ -58,13 +58,13 @@
       <el-card shadow="hover" class="summary-card rounded-lg">
          <div class="flex justify-between items-start">
            <div>
-             <div class="text-gray-500 text-sm mb-1">执行时间</div>
-             <div class="text-3xl font-bold mb-2">{{ detail.time?.duration ? detail.time.duration.toFixed(2) : 0 }} <span class="text-sm font-normal text-gray-500">秒</span></div>
-             <div class="text-sm text-gray-500">
+             <div class="text-gray-500 dark:text-gray-400 text-sm mb-1">执行时间</div>
+             <div class="text-3xl font-bold mb-2">{{ detail.time?.duration ? detail.time.duration.toFixed(2) : 0 }} <span class="text-sm font-normal text-gray-500 dark:text-gray-400">秒</span></div>
+             <div class="text-sm text-gray-500 dark:text-gray-400">
                开始时间: {{ formatDate(detail.time?.start_at) }}
              </div>
            </div>
-           <div class="p-3 bg-orange-50 rounded-lg text-orange-500">
+           <div class="p-3 bg-orange-50 dark:bg-orange-900/30 rounded-lg text-orange-500 dark:text-orange-300">
               <el-icon :size="24"><Timer /></el-icon>
            </div>
          </div>
@@ -74,18 +74,18 @@
       <el-card shadow="hover" class="summary-card rounded-lg">
          <div class="flex justify-between items-start">
             <div>
-              <div class="text-gray-500 text-sm mb-1">执行状态</div>
+              <div class="text-gray-500 dark:text-gray-400 text-sm mb-1">执行状态</div>
               <div class="mb-2">
                 <el-tag :type="statusType" effect="light" size="large" class="!text-base px-4 py-1 rounded-full flex items-center w-fit">
                    <el-icon class="mr-1"><CircleCheckFilled v-if="detail.success" /><CircleCloseFilled v-else /></el-icon>
                    {{ statusText }}
                 </el-tag>
               </div>
-              <div class="text-sm text-gray-500 truncate w-40" :title="detail.hostname">
+              <div class="text-sm text-gray-500 dark:text-gray-400 truncate w-40" :title="detail.hostname">
                 主机名: {{ detail.hostname }}
               </div>
               <div v-if="showProgress" class="mt-3 w-full">
-                 <div class="flex justify-between text-xs text-gray-500 mb-1">
+                 <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
                     <span>执行进度</span>
                     <span>{{ progressText }}</span>
                  </div>
@@ -95,7 +95,7 @@
                  <el-button type="primary" link icon="Refresh" @click="refreshData" :loading="loading">刷新</el-button>
               </div>
             </div>
-            <div class="p-3 bg-green-50 rounded-lg text-green-500">
+            <div class="p-3 bg-green-50 dark:bg-green-900/30 rounded-lg text-green-500 dark:text-green-300">
                <el-icon :size="24"><CircleCheck /></el-icon>
             </div>
          </div>
@@ -137,7 +137,7 @@
       <template #header>
         <div class="font-bold">平台信息</div>
       </template>
-      <div class="flex flex-wrap gap-8 text-sm text-gray-700">
+      <div class="flex flex-wrap gap-8 text-sm text-gray-700 dark:text-gray-300">
         <div class="flex items-center">
           <span class="w-2 h-2 rounded-full bg-blue-500 mr-2"></span>
           Go 版本: {{ platformInfo.go_version || '-' }}
@@ -160,13 +160,13 @@
       <div v-for="(item, index) in filteredDetails" :key="item.ID" class="mb-4">
         <!-- Case Header -->
         <el-card shadow="hover" :body-style="{ padding: '0px' }" class="overflow-hidden rounded-lg">
-           <div class="p-4 flex items-center justify-between bg-white cursor-pointer hover:bg-gray-50 transition-colors" @click="toggleExpand(item.ID)">
+           <div class="p-4 flex items-center justify-between bg-white dark:bg-slate-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors" @click="toggleExpand(item.ID)">
               <div class="flex items-center gap-3">
                  <span class="font-bold text-lg">用例{{ index + 1 }}</span>
                  <el-tag :type="item.success ? 'success' : 'danger'" effect="light">{{ item.success ? '成功' : '失败' }}</el-tag>
-                 <span class="font-medium ml-2 text-gray-700">{{ item.name }}</span>
+                 <span class="font-medium ml-2 text-gray-700 dark:text-gray-200">{{ item.name }}</span>
               </div>
-              <div class="flex items-center gap-6 text-gray-500 text-sm">
+              <div class="flex items-center gap-6 text-gray-500 dark:text-gray-400 text-sm">
                  <div class="flex items-center"><el-icon class="mr-1"><Timer /></el-icon> {{ item.time?.duration?.toFixed(2) }}s</div>
                  <div class="flex items-center"><el-icon class="mr-1"><List /></el-icon> {{ apiCount(item) }}个接口</div>
                  <el-icon :class="{'transform rotate-180': isExpanded(item.ID)}" class="transition-transform duration-300"><ArrowDown /></el-icon>
@@ -174,14 +174,14 @@
            </div>
 
            <!-- Expanded Content -->
-           <div v-show="isExpanded(item.ID)" class="border-t border-gray-100 bg-gray-50 p-4">
+           <div v-show="isExpanded(item.ID)" class="border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-slate-900/40 p-4">
               <!-- Config Vars -->
-              <div class="bg-blue-50 rounded p-3 mb-4 text-sm" v-if="hasCaseVars(item)">
-                 <div class="font-bold text-blue-700 mb-2">配置变量</div>
+              <div class="bg-blue-50 dark:bg-blue-900/30 rounded p-3 mb-4 text-sm" v-if="hasCaseVars(item)">
+                 <div class="font-bold text-blue-700 dark:text-blue-300 mb-2">配置变量</div>
                  <div class="grid grid-cols-2 gap-x-4 gap-y-1">
                     <div v-for="(val, key) in getCaseVars(item)" :key="key" class="flex">
-                       <span class="text-gray-600 w-40 shrink-0 text-right mr-2">{{ key }}:</span>
-                       <span class="font-medium truncate text-gray-800" :title="val">{{ val }}</span>
+                       <span class="text-gray-600 dark:text-gray-300 w-40 shrink-0 text-right mr-2">{{ key }}:</span>
+                       <span class="font-medium truncate text-gray-800 dark:text-gray-100" :title="val">{{ val }}</span>
                     </div>
                  </div>
               </div>
@@ -196,19 +196,19 @@
                     >
                        <template #title>
                           <div class="flex items-center gap-2 w-full">
-                             <span class="font-bold text-gray-700">{{ group.stepName }}</span>
+                             <span class="font-bold text-gray-700 dark:text-gray-200">{{ group.stepName }}</span>
                              <el-tag size="small" effect="plain">{{ group.records.length }}个接口</el-tag>
                           </div>
                        </template>
 
                        <!-- Interface List -->
-                       <div class="bg-white rounded border border-gray-200 divide-y divide-gray-100">
-                          <div v-for="record in group.records" :key="record.index" class="p-3 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                       <div class="bg-white dark:bg-slate-800 rounded border border-gray-200 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700">
+                          <div v-for="record in group.records" :key="record.index" class="p-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
                              <div class="flex items-center gap-3 overflow-hidden flex-1 mr-4">
                                 <el-tag :type="getMethodColor(getRequestMethod(record))" class="w-16 text-center font-bold" effect="light">{{ getRequestMethod(record) }}</el-tag>
                                 <div class="flex flex-col overflow-hidden">
-                                   <div class="font-medium truncate text-gray-800" :title="getRequestDesc(record)">{{ getRequestDesc(record) }}</div>
-                                   <div class="text-xs text-gray-400 flex items-center gap-1 truncate" :title="getRequestUrl(record)">
+                                   <div class="font-medium truncate text-gray-800 dark:text-gray-100" :title="getRequestDesc(record)">{{ getRequestDesc(record) }}</div>
+                                   <div class="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1 truncate" :title="getRequestUrl(record)">
                                       <el-icon><Link /></el-icon> {{ getRequestUrl(record) }}
                                    </div>
                                 </div>
@@ -216,7 +216,7 @@
                              
                              <div class="flex items-center gap-6 shrink-0">
                                 <el-tag :type="record.success ? 'success' : 'danger'" size="small" effect="light">{{ record.success ? '成功' : '失败' }}</el-tag>
-                                <div class="text-sm text-gray-500 w-24 text-right flex justify-end items-center"><el-icon class="mr-1"><Timer /></el-icon>{{ record.elapsed_ms }} ms</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400 w-24 text-right flex justify-end items-center"><el-icon class="mr-1"><Timer /></el-icon>{{ record.elapsed_ms }} ms</div>
                                 <el-button
                                   v-if="['request', 'api'].includes(record.step_type) || getRequestMethod(record)"
                                   link 

@@ -400,6 +400,24 @@
             </el-form-item>
           </template>
         </el-tab-pane>
+        <el-tab-pane label="平台配置" name="16" class="mt-3.5">
+          <el-form-item label="">
+            <h3>数据仓库</h3>
+          </el-form-item>
+          <el-form-item label="Host">
+            <el-input
+              v-model.trim="config['data-warehouse'].host"
+              placeholder="请输入数据仓库服务器地址"
+            />
+          </el-form-item>
+          <el-form-item label="Port">
+            <el-input-number
+              v-model="config['data-warehouse'].port"
+              :min="1"
+              :max="65535"
+            />
+          </el-form-item>
+        </el-tab-pane>
         <el-tab-pane label="验证码配置" name="7" class="mt-3.5">
           <el-form-item label="字符长度">
             <el-input-number
@@ -1102,6 +1120,10 @@
       'prefetch-count': 10,
       durable: true,
       'auto-delete': false
+    },
+    'data-warehouse': {
+      host: '',
+      port: 0
     },
     captcha: {},
     zap: {},

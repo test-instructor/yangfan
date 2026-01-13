@@ -41,6 +41,8 @@
 <script setup>
 import { ref, computed, onMounted, watch, nextTick, onBeforeUnmount } from 'vue'
 import * as echarts from 'echarts'
+import { useAppStore } from '@/pinia'
+import { storeToRefs } from 'pinia'
 
 const props = defineProps({
   detail: {
@@ -55,6 +57,9 @@ const stepChartRef = ref(null)
 const apiChartRef = ref(null)
 let charts = []
 
+const appStore = useAppStore()
+const { isDark } = storeToRefs(appStore)
+
 const apiStats = computed(() => {
   const api = props.detail.stat?.teststepapi || {}
   return {
@@ -63,6 +68,11 @@ const apiStats = computed(() => {
     fail: api.fail || 0
   }
 })
+
+const getCssVar = (name, fallback) => {
+  const val = getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+  return val || fallback
+}
 
 const renderChart = (el, name, success, fail) => {
   if (!el) return
@@ -74,11 +84,17 @@ const renderChart = (el, name, success, fail) => {
   
   const total = success + fail
   const successRate = total > 0 ? Math.round((success / total) * 100) + '%' : '0%'
+  const bgColor = getCssVar('--el-bg-color', '#ffffff')
+  const bgOverlay = getCssVar('--el-bg-color-overlay', '#ffffff')
+  const textPrimary = getCssVar('--el-text-color-primary', '#303133')
+  const textRegular = getCssVar('--el-text-color-regular', '#606266')
 
   const option = {
     tooltip: {
       trigger: 'item',
-      formatter: '{a} <br/>{b}: {c} ({d}%)'
+      formatter: '{a} <br/>{b}: {c} ({d}%)',
+      backgroundColor: bgOverlay,
+      textStyle: { color: textPrimary }
     },
     toolbox: {
       show: true,
@@ -88,7 +104,8 @@ const renderChart = (el, name, success, fail) => {
     },
     legend: {
       top: '5%',
-      left: 'center'
+      left: 'center',
+      textStyle: { color: textRegular }
     },
     series: [
       {
@@ -98,7 +115,7 @@ const renderChart = (el, name, success, fail) => {
         avoidLabelOverlap: false,
         itemStyle: {
           borderRadius: 10,
-          borderColor: '#fff',
+          borderColor: bgColor,
           borderWidth: 2
         },
         label: {
@@ -110,7 +127,8 @@ const renderChart = (el, name, success, fail) => {
             show: true,
             fontSize: 20,
             fontWeight: 'bold',
-            formatter: '{b}\n{d}%'
+            formatter: '{b}\n{d}%',
+            color: textPrimary
           },
           scale: true,
           scaleSize: 10
@@ -131,7 +149,7 @@ const renderChart = (el, name, success, fail) => {
       style: {
         text: successRate,
         textAlign: 'center',
-        fill: '#333',
+        fill: textPrimary,
         fontSize: 24,
         fontWeight: 'bold'
       }
@@ -160,6 +178,10 @@ const initCharts = () => {
 watch(() => props.detail, () => {
   initCharts()
 }, { deep: true })
+
+watch(isDark, () => {
+  initCharts()
+})
 
 onMounted(() => {
   initCharts()

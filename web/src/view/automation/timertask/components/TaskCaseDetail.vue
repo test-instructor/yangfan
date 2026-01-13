@@ -42,7 +42,7 @@
               :data="leftTableData"
               row-key="ID"
               :cell-style="{ paddingTop: '8px', paddingBottom: '8px' }"
-              :header-cell-style="{ background: '#f5f7fa', color: '#606266', fontWeight: '600' }"
+              :header-cell-style="{ background: 'var(--el-fill-color-light)', color: 'var(--el-text-color-secondary)', fontWeight: '600' }"
               height="100%"
               stripe
               highlight-current-row
@@ -79,7 +79,7 @@
           :data="rightTableData"
           row-key="ID"
           :cell-style="{ paddingTop: '8px', paddingBottom: '8px' }"
-          :header-cell-style="{ background: '#f5f7fa', color: '#606266', fontWeight: '600' }"
+          :header-cell-style="{ background: 'var(--el-fill-color-light)', color: 'var(--el-text-color-secondary)', fontWeight: '600' }"
           height="100%"
           stripe
           highlight-current-row
@@ -263,7 +263,7 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   min-height: 600px;
-  background-color: #f0f2f5;
+  background-color: var(--el-bg-color-page);
   padding: 16px;
   box-sizing: border-box;
   gap: 16px;
@@ -272,7 +272,7 @@ onMounted(() => {
 .card-panel {
   display: flex;
   flex-direction: column;
-  background-color: #fff;
+  background-color: var(--el-bg-color);
   border-radius: 8px;
   box-shadow: 0 1px 2px -2px rgba(0, 0, 0, 0.16), 0 3px 6px 0 rgba(0, 0, 0, 0.12), 0 5px 12px 4px rgba(0, 0, 0, 0.09);
   overflow: hidden;
@@ -294,8 +294,8 @@ onMounted(() => {
 
 .panel-header {
   padding: 16px 24px;
-  border-bottom: 1px solid #f0f0f0;
-  background-color: #fff;
+  border-bottom: 1px solid var(--el-border-color-light);
+  background-color: var(--el-bg-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -310,13 +310,13 @@ onMounted(() => {
 .title {
   font-size: 16px;
   font-weight: 600;
-  color: #303133;
+  color: var(--el-text-color-primary);
   line-height: 1.5;
 }
 
 .subtitle {
   font-size: 12px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
   margin-left: 4px;
 }
 
@@ -334,8 +334,8 @@ onMounted(() => {
 
 .menu-container {
   width: 240px;
-  border-right: 1px solid #f0f0f0;
-  background-color: #fafafa;
+  border-right: 1px solid var(--el-border-color-light);
+  background-color: var(--el-fill-color-light);
   overflow-y: auto;
 }
 
@@ -345,7 +345,7 @@ onMounted(() => {
   flex-direction: column;
   overflow: hidden;
   padding: 12px;
-  background-color: #fff;
+  background-color: var(--el-bg-color);
 }
 
 .search-box {
@@ -371,23 +371,23 @@ onMounted(() => {
 }
 
 .search-input :deep(.el-input__wrapper) {
-  box-shadow: 0 0 0 1px #dcdfe6 inset;
+  box-shadow: 0 0 0 1px var(--el-border-color) inset;
   border-radius: 4px;
 }
 
 .search-input :deep(.el-input__wrapper:hover) {
-  box-shadow: 0 0 0 1px #c0c4cc inset;
+  box-shadow: 0 0 0 1px var(--el-border-color) inset;
 }
 
 .search-input :deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 1px #409eff inset;
+  box-shadow: 0 0 0 1px var(--el-color-primary) inset;
 }
 
 .table-wrapper {
   flex: 1;
   overflow: hidden;
   border-radius: 4px;
-  border: 1px solid #ebeef5;
+  border: 1px solid var(--el-border-color-light);
 }
 
 .middle-actions {
@@ -417,7 +417,7 @@ onMounted(() => {
 
 .action-text {
   font-size: 12px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
   writing-mode: vertical-rl;
   letter-spacing: 4px;
   font-weight: 500;
@@ -430,7 +430,7 @@ onMounted(() => {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #dcdfe6;
+  background: var(--el-border-color);
   border-radius: 3px;
 }
 
@@ -443,13 +443,13 @@ onMounted(() => {
 }
 
 .delete-btn:hover {
-  color: #f56c6c;
-  background-color: #fef0f0;
+  color: var(--el-color-danger);
+  background-color: var(--el-color-danger-light-9);
   border-radius: 4px;
 }
 
 /* Table Tweaks */
 :deep(.el-table__inner-wrapper::before) {
-  display: none; /* Remove bottom border */
+  display: none;
 }
 </style>

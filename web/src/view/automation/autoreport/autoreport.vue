@@ -539,7 +539,7 @@ const closeDetailShow = () => {
 <style scoped>
 .auto-report-container {
   padding: 20px;
-  background-color: #f5f7fa;
+  background-color: var(--el-bg-color-page);
   min-height: 100vh;
 }
 
@@ -553,8 +553,8 @@ const closeDetailShow = () => {
 }
 
 .table-header {
-  background-color: #f5f7fa !important;
-  color: #606266;
+  background-color: var(--el-fill-color-light) !important;
+  color: var(--el-text-color-secondary);
   font-weight: 600;
 }
 

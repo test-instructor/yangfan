@@ -411,17 +411,17 @@ const removeCondition = (group, index) => {
 }
 
 .group-box {
-    border: 1px solid #e4e7ed;
+    border: 1px solid var(--el-border-color-lighter);
     padding: 12px;
     border-radius: 6px;
-    background: #f8f9fb;
+    background: var(--el-fill-color-light);
     transition: all 0.3s;
     width: 1000px  ;
 }
 
 .group-box:hover {
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
-    border-color: #dcdfe6;
+    border-color: var(--el-border-color);
 }
 
 .group-header {
@@ -430,7 +430,7 @@ const removeCondition = (group, index) => {
     align-items: center;
     margin-bottom: 12px;
     padding-bottom: 8px;
-    border-bottom: 1px solid #ebeef5;
+    border-bottom: 1px solid var(--el-border-color-lighter);
 }
 
 .group-title-area {
@@ -442,7 +442,7 @@ const removeCondition = (group, index) => {
 .group-title {
     font-weight: 600;
     font-size: 14px;
-    color: #303133;
+    color: var(--el-text-color-primary);
     display: flex;
     align-items: center;
 }
@@ -452,7 +452,7 @@ const removeCondition = (group, index) => {
     display: inline-block;
     width: 4px;
     height: 14px;
-    background: #409eff;
+    background: var(--el-color-primary);
     margin-right: 8px;
     border-radius: 2px;
 }
@@ -465,7 +465,7 @@ const removeCondition = (group, index) => {
 
 .group-logic .label {
     font-size: 12px;
-    color: #909399;
+    color: var(--el-text-color-secondary);
 }
 
 .conditions-list {
@@ -478,14 +478,14 @@ const removeCondition = (group, index) => {
     display: flex;
     align-items: center;
     gap: 8px;
-    background: #fff;
+    background: var(--el-bg-color);
     padding: 4px 10px;
     border-radius: 4px;
     border: 1px solid transparent;
 }
 
 .condition-row:hover {
-    border-color: #ebeef5;
+    border-color: var(--el-border-color-lighter);
 }
 
 .field-select {

@@ -36,6 +36,8 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import * as echarts from 'echarts'
+import { useAppStore } from '@/pinia'
+import { storeToRefs } from 'pinia'
 
 const props = defineProps({
   testcases: {
@@ -58,6 +60,14 @@ const apiChartRef = ref(null)
 
 let charts = []
 
+const appStore = useAppStore()
+const { isDark } = storeToRefs(appStore)
+
+const getCssVar = (name, fallback) => {
+  const val = getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+  return val || fallback
+}
+
 const initChart = (el, name, success, fail) => {
     if (!el) return
     let chart = echarts.getInstanceByDom(el)
@@ -65,13 +75,20 @@ const initChart = (el, name, success, fail) => {
         chart = echarts.init(el)
         charts.push(chart)
     }
+    const bgColor = getCssVar('--el-bg-color', '#ffffff')
+    const bgOverlay = getCssVar('--el-bg-color-overlay', '#ffffff')
+    const textPrimary = getCssVar('--el-text-color-primary', '#303133')
+    const textRegular = getCssVar('--el-text-color-regular', '#606266')
     const option = {
         tooltip: {
-            trigger: 'item'
+            trigger: 'item',
+            backgroundColor: bgOverlay,
+            textStyle: { color: textPrimary }
         },
         legend: {
             top: '5%',
-            left: 'center'
+            left: 'center',
+            textStyle: { color: textRegular }
         },
         series: [
             {
@@ -81,7 +98,7 @@ const initChart = (el, name, success, fail) => {
                 avoidLabelOverlap: false,
                 itemStyle: {
                     borderRadius: 10,
-                    borderColor: '#fff',
+                    borderColor: bgColor,
                     borderWidth: 2
                 },
                 label: {
@@ -92,7 +109,8 @@ const initChart = (el, name, success, fail) => {
                     label: {
                         show: true,
                         fontSize: 20,
-                        fontWeight: 'bold'
+                        fontWeight: 'bold',
+                        color: textPrimary
                     }
                 },
                 labelLine: {
@@ -128,6 +146,12 @@ watch(() => props, () => {
         renderAllCharts()
     })
 }, { deep: true })
+
+watch(isDark, () => {
+    nextTick(() => {
+        renderAllCharts()
+    })
+})
 
 const handleResize = () => {
     charts.forEach(c => c.resize())

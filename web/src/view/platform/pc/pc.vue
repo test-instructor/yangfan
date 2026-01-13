@@ -7,6 +7,7 @@
         v-model="pythonCode"
         height="calc(100vh - 120px)"
         title="代码编辑器"
+        :theme="editorTheme"
         :show-function-list="true"
         :show-debug-button="true"
         :line-numbers="'off'"
@@ -95,7 +96,7 @@
 </template>
 
 <script setup>
-  import { ref, onMounted, toRaw } from 'vue'
+  import { ref, onMounted, toRaw, computed } from 'vue'
   import { findPythonCode, updatePythonCode } from '@/api/platform/pc.js'
   import { createPythonCodeDebug } from '@/api/platform/pythoncodedebug.js'
   import { ElMessage, ElMessageBox } from 'element-plus'
@@ -104,6 +105,7 @@
   import PythonCodeEditor from '@/components/platform/pythonEditor/PythonCodeEditor.vue'
   import HistoryDialog from '@/components/platform/history/index.vue'
   import { useUserStore } from '@/pinia/modules/user'
+  import { useAppStore } from '@/pinia/modules/app'
 
   // 响应式引用
   const pythonEditorRef = ref(null)
@@ -113,8 +115,13 @@
   const showHistoryDialog = ref(false)
 
   const userStore = useUserStore()
+  const appStore = useAppStore()
   const projectId = userStore.userInfo?.projectId
   const uniqueKey = ''
+
+  const editorTheme = computed(() => {
+    return appStore.isDark ? 'vs-dark' : 'vs'
+  })
 
   // 函数相关状态
   const functionList = ref([])
@@ -296,21 +303,20 @@
   height: calc(100vh - 100px);
   padding: 10px;
   box-sizing: border-box;
-  background-color: #f5f7fa;
+  background-color: var(--el-bg-color-page);
 }
 
 .main-content {
   height: 100%;
 }
 
-/* Debug Dialog Styles */
 .debug-dialog {
   padding: 0 10px;
 
   .section-title {
     font-size: 14px;
     font-weight: 600;
-    color: #303133;
+    color: var(--el-text-color-primary);
     margin-bottom: 10px;
     margin-top: 15px;
     display: flex;
@@ -321,7 +327,7 @@
       display: inline-block;
       width: 3px;
       height: 14px;
-      background-color: #409eff;
+      background-color: var(--el-color-primary);
       margin-right: 8px;
       border-radius: 2px;
     }
@@ -337,7 +343,7 @@
 
   .parameters-section {
     margin-bottom: 20px;
-    border: 1px solid #dcdfe6;
+    border: 1px solid var(--el-border-color);
     border-radius: 4px;
     overflow: hidden;
   }
@@ -346,15 +352,15 @@
     margin-top: 20px;
 
     .code-content, .result-content {
-      background-color: #f5f7fa;
+      background-color: var(--el-fill-color-light);
       padding: 15px;
       border-radius: 4px;
-      border: 1px solid #ebeef5;
+      border: 1px solid var(--el-border-color-light);
       max-height: 200px;
       overflow: auto;
       font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
       font-size: 12px;
-      color: #606266;
+      color: var(--el-text-color-regular);
 
       pre {
         margin: 0;
@@ -363,8 +369,8 @@
     }
 
     .result-content {
-      background-color: #ecf5ff;
-      color: #333;
+      background-color: var(--el-color-primary-light-9);
+      color: var(--el-text-color-primary);
     }
   }
 }
@@ -375,4 +381,3 @@
   gap: 10px;
 }
 </style>
-
