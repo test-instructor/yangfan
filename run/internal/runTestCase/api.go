@@ -96,11 +96,11 @@ func (r *runAPI) LoadCase() (err error) {
 	steps = append(steps, apiIStep)
 
 	// 包装为虚拟用例
-	lingceTestCase := wrapStepsInVirtualTestCase(steps, tConfig, apiStep.StepName)
-	lingceTestCase.ID = apiStep.ID
+	yangfanTestCase := wrapStepsInVirtualTestCase(steps, tConfig, apiStep.StepName)
+	yangfanTestCase.ID = apiStep.ID
 
 	// 添加到用例列表
-	r.tcm.Case = append(r.tcm.Case, lingceTestCase)
+	r.tcm.Case = append(r.tcm.Case, yangfanTestCase)
 	r.tcm.Config = tConfig
 
 	hostname, _ := os.Hostname()

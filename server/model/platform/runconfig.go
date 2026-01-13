@@ -33,5 +33,5 @@ type RunConfig struct {
 
 // TableName 运行配置 RunConfig自定义表名 run_configs
 func (RunConfig) TableName() string {
-	return "lc_run_configs"
+	return "yf_run_configs"
 }

@@ -15,5 +15,5 @@ type Env struct {
 
 // TableName 环境配置 Env自定义表名 env
 func (Env) TableName() string {
-	return "lc_env"
+	return "yf_env"
 }

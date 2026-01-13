@@ -1,4 +1,4 @@
-# github.com/lingcetech/lingce/server Global Configuration
+# github.com/test-instructor/yangfan/server/v2 Global Configuration
 
 # jwt configuration
 jwt:
@@ -10,7 +10,7 @@ jwt:
 zap:
     level: info
     format: console
-    prefix: "[github.com/lingcetech/lingce/server]"
+    prefix: "[github.com/test-instructor/yangfan/server/v2]"
     director: log
     show-line: true
     encode-level: LowercaseColorLevelEncoder
@@ -181,7 +181,7 @@ autocode:
     web: web/src
     root: "" # root 自动适配项目根目录, 请不要手动配置,他会在项目加载的时候识别出根路径
     server: server
-    module: 'github.com/lingcetech/lingce/server'
+    module: 'github.com/test-instructor/yangfan/server/v2'
     ai-path: ""  # AI服务路径
 
 # qiniu configuration (请自行七牛申请对应的 公钥 私钥 bucket 和 域名地址)
@@ -220,7 +220,7 @@ tencent-cos:
     secret-id: your-secret-id
     secret-key: your-secret-key
     base-url: https://gin.vue.admin
-    path-prefix: github.com/lingcetech/lingce/server
+    path-prefix: github.com/test-instructor/yangfan/server/v2
 
 # aws s3 configuration (minio compatible)
 aws-s3:
@@ -232,7 +232,7 @@ aws-s3:
     secret-id: your-secret-id
     secret-key: your-secret-key
     base-url: https://gin.vue.admin
-    path-prefix: github.com/lingcetech/lingce/server
+    path-prefix: github.com/test-instructor/yangfan/server/v2
 
 # cloudflare r2 configuration
 cloudflare-r2:
@@ -290,8 +290,8 @@ mq:
     username: guest          # 用户名
     password: guest          # 密码
     virtual-host: /          # RabbitMQ虚拟主机
-    exchange: lingce         # 交换机名称
-    queue-prefix: lingce_    # 队列名称前缀
+    exchange: yangfan         # 交换机名称
+    queue-prefix: yangfan_    # 队列名称前缀
     retry-count: 3           # 消息重试次数
     timeout: 30              # 连接超时时间(秒)
     heartbeat: 60            # 心跳间隔(秒)

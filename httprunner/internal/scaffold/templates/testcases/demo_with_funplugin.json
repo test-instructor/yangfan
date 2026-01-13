@@ -20,17 +20,6 @@
         },
         {
             "name": "get with params",
-            "request": {
-                "method": "GET",
-                "url": "/get",
-                "params": {
-                    "foo1": "$varFoo1",
-                    "foo2": "$varFoo2"
-                },
-                "headers": {
-                    "User-Agent": "HttpRunnerPlus"
-                }
-            },
             "variables": {
                 "b": 34.5,
                 "n": 3,
@@ -76,7 +65,18 @@
                     "expect": "34.5",
                     "msg": "check args foo2"
                 }
-            ]
+            ],
+            "request": {
+                "method": "GET",
+                "url": "/get",
+                "params": {
+                    "foo1": "$varFoo1",
+                    "foo2": "$varFoo2"
+                },
+                "headers": {
+                    "User-Agent": "HttpRunnerPlus"
+                }
+            }
         },
         {
             "name": "transaction 1 end",
@@ -87,14 +87,6 @@
         },
         {
             "name": "post json data",
-            "request": {
-                "method": "POST",
-                "url": "/post",
-                "body": {
-                    "foo1": "$varFoo1",
-                    "foo2": "${max($a, $b)}"
-                }
-            },
             "validate": [
                 {
                     "check": "status_code",
@@ -114,22 +106,18 @@
                     "expect": 12.3,
                     "msg": "check args foo2"
                 }
-            ]
-        },
-        {
-            "name": "post form data",
+            ],
             "request": {
                 "method": "POST",
                 "url": "/post",
-                "headers": {
-                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-                },
                 "body": {
                     "foo1": "$varFoo1",
-                    "foo2": "${max($a, $b)}",
-                    "time": "${get_timestamp()}"
+                    "foo2": "${max($a, $b)}"
                 }
-            },
+            }
+        },
+        {
+            "name": "post form data",
             "extract": {
                 "varTime": "body.form.time"
             },
@@ -152,17 +140,22 @@
                     "expect": "12.3",
                     "msg": "check args foo2"
                 }
-            ]
+            ],
+            "request": {
+                "method": "POST",
+                "url": "/post",
+                "headers": {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                },
+                "body": {
+                    "foo1": "$varFoo1",
+                    "foo2": "${max($a, $b)}",
+                    "time": "${get_timestamp()}"
+                }
+            }
         },
         {
             "name": "get with timestamp",
-            "request": {
-                "method": "GET",
-                "url": "/get",
-                "params": {
-                    "time": "$varTime"
-                }
-            },
             "validate": [
                 {
                     "check": "body.args.time",
@@ -170,7 +163,14 @@
                     "expect": 13,
                     "msg": "check extracted var timestamp"
                 }
-            ]
+            ],
+            "request": {
+                "method": "GET",
+                "url": "/get",
+                "params": {
+                    "time": "$varTime"
+                }
+            }
         }
     ]
 }

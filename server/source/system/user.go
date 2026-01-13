@@ -60,7 +60,7 @@ func (i *initUser) InitializeData(ctx context.Context) (next context.Context, er
 			UUID:        uuid.New(),
 			Username:    "admin",
 			Password:    adminPassword,
-			NickName:    "灵测",
+			NickName:    "扬帆",
 			HeaderImg:   "https://qmplusimg.henrongyi.top/gva_header.jpg",
 			AuthorityId: 888,
 			Phone:       "17611111111",

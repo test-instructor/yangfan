@@ -371,7 +371,7 @@
             <el-form-item label="Queue 前缀">
               <el-input
                 v-model.trim="config.mq['queue-prefix']"
-                placeholder="例如 lingce_"
+                placeholder="例如 yangfan_"
               />
             </el-form-item>
             <el-form-item label="重试次数">
@@ -1112,8 +1112,8 @@
       username: '',
       password: '',
       'virtual-host': '/',
-      exchange: 'lingce',
-      'queue-prefix': 'lingce_',
+      exchange: 'yangfan',
+      'queue-prefix': 'yangfan_',
       'retry-count': 3,
       timeout: 30,
       heartbeat: 60,

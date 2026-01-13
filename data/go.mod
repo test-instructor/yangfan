@@ -6,7 +6,7 @@ toolchain go1.23.9
 
 require (
 	github.com/gin-gonic/gin v1.10.0
-	github.com/lingcetech/funplugin v0.5.8
+	github.com/lingcetech/funplugin v0.5.9
 	github.com/test-instructor/yangfan/httprunner v0.0.0-20251204144104-d139a4573d55
 	github.com/test-instructor/yangfan/server/v2 v2.0.0-20251204144104-d139a4573d55
 	go.uber.org/zap v1.27.1

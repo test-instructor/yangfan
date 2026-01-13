@@ -6,7 +6,7 @@ import (
 )
 
 // Replaces interfacecase.ApiCaseRelationship
-// Lingce: AutoCaseStepList
+// Yangfan: AutoCaseStepList
 func caseSort(caseId uint) []automation.AutoCaseStepList {
 	var apiCaseCase []automation.AutoCaseStepList
 	caseDB := global.GVA_DB.Model(automation.AutoCaseStepList{}).
@@ -15,12 +15,12 @@ func caseSort(caseId uint) []automation.AutoCaseStepList {
 		Where("case_id = ?", caseId).
 		Order("sort")
 	caseDB.Find(&apiCaseCase)
-	
+
 	return apiCaseCase
 }
 
 // Replaces interfacecase.ApiTimerTaskRelationship
-// Lingce: TimerTaskCaseList
+// Yangfan: TimerTaskCaseList
 func taskSort(taskId uint) []automation.TimerTaskCaseList {
 	var apiCaseCase []automation.TimerTaskCaseList
 	caseDB := global.GVA_DB.Model(automation.TimerTaskCaseList{}).

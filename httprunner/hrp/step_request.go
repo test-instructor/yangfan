@@ -20,12 +20,12 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
-	"github.com/lingcetech/lingce/server/global"
 	"github.com/test-instructor/yangfan/httprunner/code"
 	"github.com/test-instructor/yangfan/httprunner/internal/builtin"
 	"github.com/test-instructor/yangfan/httprunner/internal/httpstat"
 	"github.com/test-instructor/yangfan/httprunner/internal/json"
 	"github.com/test-instructor/yangfan/httprunner/uixt/option"
+	"github.com/test-instructor/yangfan/server/v2/global"
 )
 
 type HTTPMethod string

@@ -19,5 +19,5 @@ type Project struct {
 
 // TableName 项目配置 Project自定义表名 project
 func (Project) TableName() string {
-	return "lc_project"
+	return "yf_project"
 }

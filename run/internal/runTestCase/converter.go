@@ -499,7 +499,7 @@ func convertAutoCaseStepToIStep(autoCaseStep *automation.AutoCaseStep, config *h
 
 // wrapStepsInVirtualTestCase 将步骤列表包装为虚拟用例
 // 用于仅获取 "步骤" 而无外层用例结构的场景
-func wrapStepsInVirtualTestCase(steps []hrp.IStep, config *hrp.TConfig, name string) *LingceTestCase {
+func wrapStepsInVirtualTestCase(steps []hrp.IStep, config *hrp.TConfig, name string) *YangfanTestCase {
 	if config == nil {
 		config = hrp.NewConfig(name)
 	}
@@ -507,7 +507,7 @@ func wrapStepsInVirtualTestCase(steps []hrp.IStep, config *hrp.TConfig, name str
 		config.Name = name
 	}
 
-	return &LingceTestCase{
+	return &YangfanTestCase{
 		Name:      name,
 		Config:    config,
 		TestSteps: steps,

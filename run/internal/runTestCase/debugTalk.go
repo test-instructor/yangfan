@@ -13,7 +13,7 @@ import (
 
 // Adapted from yangfan/run/runTestCase/debugTalk.go
 
-// Mocking global locks if not present in lingce global
+// Mocking global locks if not present in yangfan global
 var (
 	DebugTalkFileLock sync.RWMutex
 	DebugTalkLock     = make(map[string]*sync.Mutex)

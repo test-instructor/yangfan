@@ -111,11 +111,11 @@ func (r *runStep) LoadCase() (err error) {
 	steps = append(steps, mainStep)
 
 	// 包装为虚拟用例
-	lingceTestCase := wrapStepsInVirtualTestCase(steps, tConfig, autoCaseStep.StepName)
-	lingceTestCase.ID = autoCaseStep.ID
+	yangfanTestCase := wrapStepsInVirtualTestCase(steps, tConfig, autoCaseStep.StepName)
+	yangfanTestCase.ID = autoCaseStep.ID
 
 	// 添加到用例列表
-	r.tcm.Case = append(r.tcm.Case, lingceTestCase)
+	r.tcm.Case = append(r.tcm.Case, yangfanTestCase)
 	r.tcm.Config = tConfig
 
 	// Report

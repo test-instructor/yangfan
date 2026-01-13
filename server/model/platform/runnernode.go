@@ -24,5 +24,5 @@ type RunnerNode struct {
 
 // TableName 节点 RunnerNode自定义表名 runner_node
 func (RunnerNode) TableName() string {
-	return "lc_runner_node"
+	return "yf_runner_node"
 }

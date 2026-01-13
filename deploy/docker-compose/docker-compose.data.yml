@@ -10,7 +10,7 @@ services:
       - yangfan-network
     environment:
       MYSQL_ROOT_PASSWORD: 123456
-      MYSQL_DATABASE: lc
+      MYSQL_DATABASE: yf
     volumes:
       - ./mysql/data:/var/lib/mysql
     healthcheck:

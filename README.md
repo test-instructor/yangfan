@@ -6,9 +6,20 @@
 
 - [使用文档](https://yangfan.gd.cn/)
 - 前后端采用[gin-vue-admin v2.5.3](https://www.gin-vue-admin.com/), Gin + Vue全栈开发基础平台
-- 测试引擎采用[HttpRunner V4](https://httprunner.com/),支持 HTTP(S)/HTTP2/WebSocket/RPC 等网络协议，涵盖接口测试、性能测试、数字体验监测等测试类型。简单易用，功能强大，具有丰富的插件化机制和高度的可扩展能力。
-- [测试平台接入HttpRunner V4](https://www.yuque.com/docs/share/bb392180-8ea9-46a0-a27b-bb4fbec3450e?#)
-# 支持功能
+- 测试引擎采用[HttpRunner V5](https://httprunner.com/),支持 HTTP(S)/HTTP2/WebSocket/RPC 等网络协议，涵盖接口测试、性能测试、数字体验监测等测试类型。简单易用，功能强大，具有丰富的插件化机制和高度的可扩展能力。
+
+#  V2支持功能
+- [x] 用户管理
+- [x] 项目管理，用户在项目的权限、CI密钥设置
+- [x] 环境管理
+- [x] 接口管理
+- [x] 函数插件
+- [x] 函数调试
+
+
+
+
+## V1支持功能
 - [x] 用户管理
 - [x] 项目管理，用户在项目的权限、CI密钥设置
 - [x] 环境管理
@@ -28,12 +39,7 @@
 - [x] 多种部署方式，docker构建和远程镜像库、一键部署脚本、k8s部署
 - [x] 测试报告通知，目前支持飞书、钉钉和企业微信的消息通知
 - [x] CI执行
-- [ ] 支持sql操作
-- [ ] 可视化数据报表
-- [ ] 数据驱动`parameterize`,页面操作
-- [ ] go 函数驱动
-- [ ] 支持更多协议，`WebSocket`、`TCP`、`RPC`等
-- [ ] web UI 自动化测试
+
 
 # 在线demo
 

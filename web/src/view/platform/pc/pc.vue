@@ -5,7 +5,7 @@
       <PythonCodeEditor
         ref="pythonEditorRef"
         v-model="pythonCode"
-        height="calc(100vh - 120px)"
+        :height="editorHeight"
         title="代码编辑器"
         :theme="editorTheme"
         :show-function-list="true"
@@ -111,6 +111,7 @@
   const pythonEditorRef = ref(null)
   const pythonCode = ref('')
   const pythonCodeType = ref(1)
+  const editorHeight = ref('calc(100vh - 120px)')
   const saving = ref(false)
   const showHistoryDialog = ref(false)
 
@@ -230,6 +231,9 @@
       const res = await findPythonCode({ type: pythonCodeType.value })
       if (res.code === 0) {
         pythonCode.value = res.data.code
+      } else if (res.code === 7) {
+        pythonCode.value = ''
+        editorHeight.value = '100%'
       }
     } catch (error) {
       console.error('获取Python代码失败:', error)

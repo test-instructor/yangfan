@@ -44,9 +44,9 @@ type HrpCase struct {
 	TestSteps []interface{}      `json:"teststeps,omitempty" yaml:"teststeps,omitempty"`
 }
 
-// LingceTestCase 实现 hrp.ITestCase 接口
+// YangfanTestCase 实现 hrp.ITestCase 接口
 // 用于将业务数据直接转换为 httprunner 可执行格式
-type LingceTestCase struct {
+type YangfanTestCase struct {
 	ID        uint
 	Name      string
 	Config    *hrp.TConfig
@@ -54,7 +54,7 @@ type LingceTestCase struct {
 }
 
 // GetTestCase 实现 hrp.ITestCase 接口
-func (ltc *LingceTestCase) GetTestCase() (*hrp.TestCase, error) {
+func (ltc *YangfanTestCase) GetTestCase() (*hrp.TestCase, error) {
 	if ltc.Name != "" && ltc.Config != nil {
 		ltc.Config.Name = ltc.Name
 		if ltc.Config.Variables == nil {

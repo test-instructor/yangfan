@@ -13,8 +13,10 @@ func InitPython() {
 	if err != nil {
 		global.GVA_LOG.Error("get user home dir fail", zap.Error(err))
 	}
-	venv := filepath.Join(home, ".lc", "venv")
-	global.PythonVENV = filepath.Join(venv, "bin", "python3")
+	venv := filepath.Join(home, ".yf", "venv")
+	global.PythonVenvDir = venv
+	global.Python3Executable = filepath.Join(venv, "bin", "python3")
+	global.PythonVENV = venv
 	//var pk []platform.PythonPackage
 	//var pks []string
 	//pks = append(pks, "funppy==0.5.0")

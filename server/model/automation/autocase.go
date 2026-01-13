@@ -22,7 +22,7 @@ type AutoCase struct {
 
 // TableName 测试用例 AutoCase自定义表名 auto_case
 func (AutoCase) TableName() string {
-	return "lc_auto_case"
+	return "yf_auto_case"
 }
 
 type AutoCaseStepList struct {
@@ -38,5 +38,5 @@ type AutoCaseStepList struct {
 }
 
 func (AutoCaseStepList) TableName() string {
-	return "lc_auto_case_step_list"
+	return "yf_auto_case_step_list"
 }

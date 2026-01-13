@@ -48,7 +48,7 @@ type AutoReport struct {
 
 // TableName 自动报告 AutoReport自定义表名 auto_reports
 func (AutoReport) TableName() string {
-	return "lc_auto_reports"
+	return "yf_auto_reports"
 }
 
 // Redis key prefix for progress data
@@ -124,7 +124,7 @@ type AutoReportStat struct {
 }
 
 func (AutoReportStat) TableName() string {
-	return "lc_auto_report_stats"
+	return "yf_auto_report_stats"
 }
 
 type AutoReportStatTestcases struct {
@@ -135,7 +135,7 @@ type AutoReportStatTestcases struct {
 }
 
 func (AutoReportStatTestcases) TableName() string {
-	return "lc_auto_report_stat_testcases"
+	return "yf_auto_report_stat_testcases"
 }
 
 type AutoReportStatTeststeps struct {
@@ -147,7 +147,7 @@ type AutoReportStatTeststeps struct {
 }
 
 func (AutoReportStatTeststeps) TableName() string {
-	return "lc_auto_report_stat_teststeps"
+	return "yf_auto_report_stat_teststeps"
 }
 
 type AutoReportStatTeststepapi struct {
@@ -158,7 +158,7 @@ type AutoReportStatTeststepapi struct {
 }
 
 func (AutoReportStatTeststepapi) TableName() string {
-	return "lc_auto_report_stat_teststepapi"
+	return "yf_auto_report_stat_teststepapi"
 }
 
 // 时间信息
@@ -169,7 +169,7 @@ type AutoReportTime struct {
 }
 
 func (AutoReportTime) TableName() string {
-	return "lc_auto_report_times"
+	return "yf_auto_report_times"
 }
 
 // 详情
@@ -185,7 +185,7 @@ type AutoReportDetail struct {
 }
 
 func (AutoReportDetail) TableName() string {
-	return "lc_auto_report_details"
+	return "yf_auto_report_details"
 }
 
 // 记录
@@ -204,5 +204,5 @@ type AutoReportRecord struct {
 }
 
 func (AutoReportRecord) TableName() string {
-	return "lc_auto_report_records"
+	return "yf_auto_report_records"
 }

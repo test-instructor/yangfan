@@ -18,5 +18,5 @@ type AutoReportProgress struct {
 
 // TableName 测试报告进度 自定义表名
 func (AutoReportProgress) TableName() string {
-	return "lc_auto_report_progress"
+	return "yf_auto_report_progress"
 }

@@ -1148,6 +1148,8 @@ github.com/labstack/gommon v0.3.0/go.mod h1:MULnywXg0yavhxWKc+lOruYdAhDwPK9wf0OL
 github.com/labstack/gommon v0.4.0 h1:y7cvthEAEbU0yHOf4axH8ZG2NH8knB9iNSoTO8dyIk8=
 github.com/labstack/gommon v0.4.0/go.mod h1:uW6kP17uPlLJsD3ijUYn3/M5bAxtlZhMI6m3MFxTMTM=
 github.com/leodido/go-urn v1.2.0 h1:hpXL4XnriNwQ/ABnpepYM/1vCLWNDfUNts8dX3xTG6Y=
+github.com/lingcetech/funplugin v0.5.9 h1:ukCXQTgQx6Bo3QRTSJ5K9dk2u3RgcKxyeFQP4uydYKI=
+github.com/lingcetech/funplugin v0.5.9/go.mod h1:RGn3kd0+YCJLzMskWZdCrVC78Tr34eWXZ9niX3weGc0=
 github.com/lingcetech/lingce/httprunner v0.0.0-20251121115157-32766ff2ceab h1:2cf8gbk3L5+NwdeKC3yRHZr6JH08BJsNLOOViQzlBhk=
 github.com/lingcetech/lingce/httprunner v0.0.0-20251121115157-32766ff2ceab/go.mod h1:/b9wdYtAtaKA87uXyEaTOD8hVY2ViKQfLG8xa4Sg+B4=
 github.com/lyft/protoc-gen-star v0.6.1 h1:erE0rdztuaDq3bpGifD95wfoPrSZc95nGA6tbiNYh6M=
@@ -1660,7 +1662,6 @@ gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 h1:uRGJdciOHaEIrze2W8Q3AKkep
 gopkg.in/yaml.v1 v1.0.0-20140924161607-9f9df34309c0 h1:POO/ycCATvegFmVuPpQzZFJ+pGZeX22Ufu6fibxDVjU=
 gorm.io/driver/mysql v1.2.3/go.mod h1:qsiz+XcAyMrS6QY+X3M9R6b/lKM1imKmcuK9kac5LTo=
 gorm.io/driver/postgres v1.2.3/go.mod h1:pJV6RgYQPG47aM1f0QeOzFH9HxQc8JcmAgjRCgS0wjs=
-gorm.io/driver/sqlite v1.4.3/go.mod h1:0Aq3iPO+v9ZKbcdiz8gLWRw5VOPcBOPUQJFLq5e2ecI=
 gorm.io/gorm v1.22.3/go.mod h1:F+OptMscr0P2F2qU97WT1WimdH9GaQPoDW7AYd5i2Y0=
 gorm.io/gorm v1.22.4/go.mod h1:1aeVC+pe9ZmvKZban/gW4QPra7PRoTEssyc922qCAkk=
 gorm.io/gorm v1.22.5/go.mod h1:l2lP/RyAtc1ynaTjFksBde/O8v9oOGIApu2/xRitmZk=

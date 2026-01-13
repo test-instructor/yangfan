@@ -118,8 +118,8 @@ func (r *runCase) LoadCase() (err error) {
 		}
 	}
 
-	// 构建 LingceTestCase
-	lingceTestCase := &LingceTestCase{
+	// 构建 YangfanTestCase
+	yangfanTestCase := &YangfanTestCase{
 		ID:        autoCase.ID,
 		Name:      autoCase.CaseName,
 		Config:    tConfig,
@@ -127,7 +127,7 @@ func (r *runCase) LoadCase() (err error) {
 	}
 
 	// 添加到用例列表
-	r.tcm.Case = append(r.tcm.Case, lingceTestCase)
+	r.tcm.Case = append(r.tcm.Case, yangfanTestCase)
 	r.tcm.Config = tConfig
 
 	hostname, _ := os.Hostname()

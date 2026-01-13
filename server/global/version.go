@@ -6,7 +6,7 @@ const (
 	// Version 当前版本号
 	Version = "v1.0.1"
 	// AppName 应用名称
-	AppName = "Lingce"
+	AppName = "Yangfan"
 	// Description 应用描述
 	Description = "使用gin+vue进行极速开发的全栈开发基础平台"
 )

@@ -20,5 +20,5 @@ type PythonCodeDebug struct {
 
 // TableName 调试信息 PythonCodeDebug自定义表名 python_code_debug
 func (PythonCodeDebug) TableName() string {
-	return "lc_python_code_debug"
+	return "yf_python_code_debug"
 }

@@ -18,5 +18,5 @@ type PythonCodeFunc struct {
 
 // TableName python函数详情 PythonCodeFunc自定义表名 python_code_func
 func (PythonCodeFunc) TableName() string {
-	return "lc_python_code_func"
+	return "yf_python_code_func"
 }

@@ -170,7 +170,7 @@
     port: '3306',
     userName: 'root',
     password: '',
-    dbName: 'lc',
+    dbName: 'yf',
     dbPath: ''
   })
 
@@ -185,7 +185,7 @@
           port: '3306',
           userName: 'root',
           password: '',
-          dbName: 'lc',
+          dbName: 'yf',
           dbPath: ''
         })
         break
@@ -197,7 +197,7 @@
           port: '5432',
           userName: 'postgres',
           password: '',
-          dbName: 'lc',
+          dbName: 'yf',
           dbPath: '',
           template: 'template0'
         })
@@ -210,7 +210,7 @@
           port: '1521',
           userName: 'oracle',
           password: '',
-          dbName: 'lc',
+          dbName: 'yf',
           dbPath: ''
         })
         break
@@ -222,7 +222,7 @@
           port: '1433',
           userName: 'mssql',
           password: '',
-          dbName: 'lc',
+          dbName: 'yf',
           dbPath: ''
         })
         break
@@ -234,7 +234,7 @@
           port: '',
           userName: '',
           password: '',
-          dbName: 'lc',
+          dbName: 'yf',
           dbPath: ''
         })
         break
@@ -246,7 +246,7 @@
           port: '3306',
           userName: 'root',
           password: '',
-          dbName: 'lc',
+          dbName: 'yf',
           dbPath: ''
         })
     }

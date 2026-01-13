@@ -132,7 +132,7 @@ require (
 	github.com/klauspost/cpuid/v2 v2.2.11 // indirect
 	github.com/klauspost/pgzip v1.2.6 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/lingcetech/funplugin v0.5.8 // indirect
+	github.com/lingcetech/funplugin v0.5.9 // indirect
 	github.com/lingcetech/lingce/server v0.0.0-20251229142412-6d96ccb81d3e // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20240909124753-873cd0166683 // indirect

@@ -50,7 +50,7 @@ func (r *runTask) LoadCase() (err error) {
 	}
 
 	// 获取任务关联的用例列表
-	// lc_timer_task_case_list.task_id -> TimerTask.ID
+	// yf_timer_task_case_list.task_id -> TimerTask.ID
 	taskCaseList := taskSort(uint(r.CaseID))
 
 	// 计算运行使用的环境 ID：
@@ -148,8 +148,8 @@ func (r *runTask) LoadCase() (err error) {
 			}
 		}
 
-		// 构建 LingceTestCase
-		lingceTestCase := &LingceTestCase{
+		// 构建 YangfanTestCase
+		yangfanTestCase := &YangfanTestCase{
 			ID:        taskCase.AutoCase.ID,
 			Name:      taskCase.AutoCase.CaseName,
 			Config:    tConfig,
@@ -157,7 +157,7 @@ func (r *runTask) LoadCase() (err error) {
 		}
 
 		// 添加到用例列表
-		r.tcm.Case = append(r.tcm.Case, lingceTestCase)
+		r.tcm.Case = append(r.tcm.Case, yangfanTestCase)
 		r.tcm.Config = tConfig
 
 		// 汇总统计：使用精确的进度计算，考虑 Parameters 循环

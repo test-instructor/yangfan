@@ -7,22 +7,22 @@ import (
 	"gorm.io/gorm"
 )
 
-// migrateDCMCountColumns 将 lc_data_category_management 的 count/available_count 列变更为 JSON 类型（幂等）
+// migrateDCMCountColumns 将 yf_data_category_management 的 count/available_count 列变更为 JSON 类型（幂等）
 func migrateDCMCountColumns(db *gorm.DB) error {
 	dial := db.Dialector.Name()
 	switch dial {
 	case "mysql":
 		// MySQL: 将列修改为 JSON 类型（已是 JSON 时不会改变）；忽略错误以保证幂等
-		if err := db.Exec("ALTER TABLE `lc_data_category_management` MODIFY COLUMN `count` JSON NULL").Error; err != nil {
+		if err := db.Exec("ALTER TABLE `yf_data_category_management` MODIFY COLUMN `count` JSON NULL").Error; err != nil {
 			global.GVA_LOG.Debug("migrate dcm count column (mysql) skipped", zap.Any("err", err))
 		}
-		if err := db.Exec("ALTER TABLE `lc_data_category_management` MODIFY COLUMN `available_count` JSON NULL").Error; err != nil {
+		if err := db.Exec("ALTER TABLE `yf_data_category_management` MODIFY COLUMN `available_count` JSON NULL").Error; err != nil {
 			global.GVA_LOG.Debug("migrate dcm available_count column (mysql) skipped", zap.Any("err", err))
 		}
 	case "postgres":
 		// Postgres: 使用 jsonb，并尝试把旧值转换为对象或空对象
 		if err := db.Exec(`
-			ALTER TABLE lc_data_category_management
+			ALTER TABLE yf_data_category_management
 			ALTER COLUMN count TYPE jsonb USING 
 				CASE 
 					WHEN jsonb_typeof(count::jsonb) IS NOT NULL THEN count::jsonb

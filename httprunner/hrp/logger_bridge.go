@@ -1,7 +1,7 @@
 package hrp
 
 import (
-	"github.com/lingcetech/lingce/server/global"
+	"github.com/test-instructor/yangfan/server/v2/global"
 	"go.uber.org/zap"
 )
 

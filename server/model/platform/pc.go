@@ -17,5 +17,5 @@ type PythonCode struct {
 
 // TableName python 函数 PythonCode自定义表名 python_code
 func (PythonCode) TableName() string {
-	return "lc_python_code"
+	return "yf_python_code"
 }

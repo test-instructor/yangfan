@@ -44,7 +44,7 @@ func main() {
 		if err != nil {
 			hostname = "unknown"
 		}
-		runnerConfig.NodeName = "lc_runner_" + hostname
+		runnerConfig.NodeName = "yf_runner_" + hostname
 		global.GVA_LOG.Info("Runner NodeName not specified, using generated name", zap.String("name", runnerConfig.NodeName))
 	}
 

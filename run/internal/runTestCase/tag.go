@@ -152,8 +152,8 @@ func (r *runTag) LoadCase() (err error) {
 				}
 			}
 
-			// 构建 LingceTestCase
-			lingceTestCase := &LingceTestCase{
+			// 构建 YangfanTestCase
+			yangfanTestCase := &YangfanTestCase{
 				ID:        taskCase.AutoCase.ID,
 				Name:      taskCase.AutoCase.CaseName,
 				Config:    tConfig,
@@ -161,7 +161,7 @@ func (r *runTag) LoadCase() (err error) {
 			}
 
 			// 添加到用例列表
-			r.tcm.Case = append(r.tcm.Case, lingceTestCase)
+			r.tcm.Case = append(r.tcm.Case, yangfanTestCase)
 			r.tcm.Config = tConfig
 
 			// 汇总标签下的用例/步骤/接口数量：使用精确的进度计算

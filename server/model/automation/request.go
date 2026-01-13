@@ -37,5 +37,5 @@ type Request struct {
 
 // TableName 请求 Request自定义表名 request
 func (Request) TableName() string {
-	return "lc_request"
+	return "yf_request"
 }

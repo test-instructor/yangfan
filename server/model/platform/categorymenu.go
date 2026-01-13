@@ -18,5 +18,5 @@ type CategoryMenu struct {
 
 // TableName 自动化菜单 CategoryMenu自定义表名 category_menu
 func (CategoryMenu) TableName() string {
-	return "lc_category_menu"
+	return "yf_category_menu"
 }

@@ -21,7 +21,7 @@ func (ppService *PythonPackageService) CreatePythonPackage(ctx context.Context, 
 	if err == nil {
 		go func() {
 			global.GVA_LOG.Info("开始安装")
-			err := myexec.InstallPythonPackage(global.PythonVENV, fmt.Sprintf("%s==%s", *pp.Name, pp.Version))
+			err := myexec.InstallPythonPackage(global.Python3Executable, fmt.Sprintf("%s==%s", *pp.Name, pp.Version))
 			if err != nil {
 				global.GVA_LOG.Error("安装失败", zap.Error(err))
 			} else {
@@ -61,7 +61,7 @@ func (ppService *PythonPackageService) UpdatePythonPackage(ctx context.Context, 
 	if err == nil {
 		go func() {
 			global.GVA_LOG.Info("开始安装")
-			err := myexec.InstallPythonPackage(global.PythonVENV, fmt.Sprintf("%s==%s", *pp.Name, pp.Version))
+			err := myexec.InstallPythonPackage(global.Python3Executable, fmt.Sprintf("%s==%s", *pp.Name, pp.Version))
 			if err != nil {
 				global.GVA_LOG.Error("安装失败", zap.Error(err))
 			} else {

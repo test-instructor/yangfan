@@ -32,6 +32,23 @@ var (
 	pluginMutex sync.RWMutex
 )
 
+func normalizeVenvDir(venv string) string {
+	if venv == "" {
+		return ""
+	}
+	venv = filepath.Clean(venv)
+
+	base := filepath.Base(venv)
+	if base == "python" || base == "python3" || base == "python.exe" || strings.HasPrefix(base, "python3.") {
+		parent := filepath.Base(filepath.Dir(venv))
+		if parent == "bin" || parent == "Scripts" {
+			return filepath.Dir(filepath.Dir(venv))
+		}
+	}
+
+	return venv
+}
+
 func initPlugin(path, venv string, logOn bool) (plugin funplugin.IPlugin, err error) {
 	log.Info().Str("path", path).Str("venv", venv).
 		Bool("logOn", logOn).Msg("init plugin")
@@ -66,12 +83,15 @@ func initPlugin(path, venv string, logOn bool) (plugin funplugin.IPlugin, err er
 		pluginPath = genPyPluginPath
 
 		packages := []string{"funppy"}
-		python3, err := myexec.EnsurePython3Venv(venv, packages...)
+		python3, err := myexec.EnsurePython3Venv(normalizeVenvDir(venv), packages...)
 		if err != nil {
 			log.Error().Err(err).
 				Interface("packages", packages).
 				Msg("python3 venv is not ready")
 			return nil, errors.Wrap(code.InvalidPython3Venv, err.Error())
+		}
+		if stat, statErr := os.Stat(python3); statErr == nil && stat.Mode()&0111 == 0 {
+			_ = os.Chmod(python3, stat.Mode()|0111)
 		}
 		pluginOptions = append(pluginOptions, funplugin.WithPython3(python3))
 	}

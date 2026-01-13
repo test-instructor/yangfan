@@ -44,7 +44,9 @@ var (
 	BlackCache              local_cache.Cache
 	lock                    sync.RWMutex
 
-	PythonVENV string
+	PythonVENV        string
+	PythonVenvDir     string
+	Python3Executable string
 
 	// 数据仓库配置
 	GVA_DW_HOST string

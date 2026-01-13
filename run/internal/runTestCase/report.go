@@ -18,7 +18,7 @@ type ReportOperation struct {
 }
 
 // UpdateFromSummary 根据 hrp.Summary 计算并更新报告的用例 / 步骤 / 接口运行概要
-// 参考 yangfan/run/runTestCase/report.go 的 resetReport 思路，按 lingce 的 AutoReport 结构落库。
+// 参考 yangfan/run/runTestCase/report.go 的 resetReport 思路，按 yangfan 的 AutoReport 结构落库。
 func (r *ReportOperation) UpdateFromSummary(s *hrp.Summary) {
 	if s == nil {
 		return
@@ -291,7 +291,7 @@ func (r *ReportOperation) UpdateReport(report *automation.AutoReport) {
 	r.report.ProgressID = progressID
 
 	// 使用 Save + FullSaveAssociations：
-	// 1）根据主键 ID 更新 lc_auto_reports 本身；
+	// 1）根据主键 ID 更新 yf_auto_reports 本身；
 	// 2）自动创建 / 更新 Stat、Time、Details、Records 等所有关联表记录。
 	err := global.GVA_DB.
 		Session(&gorm.Session{FullSaveAssociations: true}).

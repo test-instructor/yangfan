@@ -18,5 +18,5 @@ type PythonPackage struct {
 
 // TableName py 第三方库 PythonPackage自定义表名 python_package
 func (PythonPackage) TableName() string {
-	return "lc_python_package"
+	return "yf_python_package"
 }

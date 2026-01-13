@@ -29,7 +29,7 @@ type TimerTask struct {
 
 // TableName 定时任务 TimerTask自定义表名 timer_task
 func (TimerTask) TableName() string {
-	return "lc_timer_task"
+	return "yf_timer_task"
 }
 
 type TimerTaskTag struct {
@@ -40,7 +40,7 @@ type TimerTaskTag struct {
 }
 
 func (TimerTaskTag) TableName() string {
-	return "lc_timer_task_tag"
+	return "yf_timer_task_tag"
 }
 
 type TimerTaskCaseList struct {
@@ -52,5 +52,5 @@ type TimerTaskCaseList struct {
 }
 
 func (TimerTaskCaseList) TableName() string {
-	return "lc_timer_task_case_list"
+	return "yf_timer_task_case_list"
 }

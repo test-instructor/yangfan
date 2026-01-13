@@ -10,7 +10,7 @@ import (
 )
 
 // PythonCodeInfo 用于前端交互的 Python 代码信息
-// 包含代码内容和最后一次更新时间（来自 lc_python_code.UpdatedAt）
+// 包含代码内容和最后一次更新时间（来自 yf_python_code.UpdatedAt）
 type PythonCodeInfo struct {
 	Code     string     `json:"code"`                // 代码内容
 	UpdateAt *time.Time `json:"update_at,omitempty"` // 最后更新时间
@@ -40,7 +40,7 @@ type DataCategoryManagement struct {
 
 // TableName 数据分类 DataCategoryManagement自定义表名 data_category_management
 func (DataCategoryManagement) TableName() string {
-	return "lc_data_category_management"
+	return "yf_data_category_management"
 }
 
 // ==================== 数据池记录表 ====================
@@ -71,5 +71,5 @@ type DataCategoryData struct {
 
 // TableName 数据池记录表
 func (DataCategoryData) TableName() string {
-	return "lc_data_category_data"
+	return "yf_data_category_data"
 }

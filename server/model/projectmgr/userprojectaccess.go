@@ -17,5 +17,5 @@ type UserProjectAccess struct {
 
 // TableName 项目成员与权限 UserProjectAccess自定义表名 user_project_access
 func (UserProjectAccess) TableName() string {
-	return "lc_user_project_access"
+	return "yf_user_project_access"
 }

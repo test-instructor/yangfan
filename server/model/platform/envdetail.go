@@ -17,5 +17,5 @@ type EnvDetail struct {
 
 // TableName 环境详情 EnvDetail自定义表名 env_detail
 func (EnvDetail) TableName() string {
-	return "lc_env_detail"
+	return "yf_env_detail"
 }

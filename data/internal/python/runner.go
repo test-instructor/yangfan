@@ -81,7 +81,7 @@ func (r *Runner) Init() error {
 	}
 
 	// 初始化插件
-	plugin, err := python.InitPlugin(path, global.PythonVENV, true)
+	plugin, err := python.InitPlugin(path, global.PythonVenvDir, true)
 	if err != nil {
 		os.RemoveAll(path)
 		return fmt.Errorf("初始化Python插件失败: %w", err)

@@ -20,7 +20,7 @@ require (
 	github.com/gookit/color v1.5.4
 	github.com/huaweicloud/huaweicloud-sdk-go-obs v3.24.9+incompatible
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
-	github.com/lingcetech/funplugin v0.5.8
+	github.com/lingcetech/funplugin v0.5.9
 	github.com/mark3labs/mcp-go v0.32.0
 	github.com/mholt/archives v0.1.1
 	github.com/minio/minio-go/v7 v7.0.84

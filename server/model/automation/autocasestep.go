@@ -25,7 +25,7 @@ type AutoCaseStep struct {
 
 // TableName 测试步骤 AutoCaseStep自定义表名 AutoCaseStep
 func (AutoCaseStep) TableName() string {
-	return "lc_auto_case_step"
+	return "yf_auto_case_step"
 }
 
 type AutoCaseStepRelation struct {
@@ -39,7 +39,7 @@ type AutoCaseStepRelation struct {
 }
 
 func (AutoCaseStepRelation) TableName() string {
-	return "lc_auto_case_step_relation"
+	return "yf_auto_case_step_relation"
 }
 
 type CaseStepConfig struct {

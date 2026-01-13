@@ -30,7 +30,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0
 	github.com/joho/godotenv v1.5.1
 	github.com/json-iterator/go v1.1.12
-	github.com/lingcetech/funplugin v0.5.8
+	github.com/lingcetech/funplugin v0.5.9
 	github.com/lingcetech/lingce/server v0.0.0-20251229142412-6d96ccb81d3e
 	github.com/maja42/goval v1.2.1
 	github.com/mark3labs/mcp-go v0.32.0

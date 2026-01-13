@@ -22,7 +22,7 @@ type AutoStep struct {
 
 // TableName 自动化步骤 AutoStep自定义表名 AutoStep
 func (AutoStep) TableName() string {
-	return "lc_auto_step"
+	return "yf_auto_step"
 }
 
 type StepConfig struct {

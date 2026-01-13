@@ -290,8 +290,8 @@ mq:
   username: guest          # 用户名
   password: guest          # 密码
   virtual-host: /          # RabbitMQ虚拟主机
-  exchange: lingce         # 交换机名称
-  queue-prefix: lingce_    # 队列名称前缀
+  exchange: yangfan         # 交换机名称
+  queue-prefix: yangfan_    # 队列名称前缀
   retry-count: 3           # 消息重试次数
   timeout: 30              # 连接超时时间(秒)
   heartbeat: 60            # 心跳间隔(秒)

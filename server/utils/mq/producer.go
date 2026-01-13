@@ -113,8 +113,8 @@ type runnerNode struct {
 func (p *RunnerTaskProducer) selectRandomNode() (string, error) {
 	var nodes []runnerNode
 	// Status 1 = Online
-	// Table name: lc_runner_node
-	err := p.db.Table("lc_runner_node").Where("status = ?", 1).Find(&nodes).Error
+	// Table name: yf_runner_node
+	err := p.db.Table("yf_runner_node").Where("status = ?", 1).Find(&nodes).Error
 	if err != nil {
 		return "", err
 	}
