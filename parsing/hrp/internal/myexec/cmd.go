@@ -96,7 +96,7 @@ func InstallPythonPackage(python3 string, pkg string) (err error) {
 	}
 
 	// check if pip available
-	err = RunCommand(python3, "-m", "pip", "--version")
+	err = RunCommand(python3, "python", "-m", "pip", "--version")
 	if err != nil {
 		log.Warn().Msg("pip is not available")
 		return errors.Wrap(err, "pip is not available")

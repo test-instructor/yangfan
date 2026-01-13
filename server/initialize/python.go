@@ -43,6 +43,6 @@ func InitPython() {
 		global.GVA_LOG.Error("install or upgrade pip fail", zap.Error(err))
 	}
 	for _, pkg := range pks {
-		myexec.InstallPythonPackage(global.PythonVENV, pkg)
+		myexec.InstallPythonPackage(global.Python3Executable, pkg)
 	}
 }

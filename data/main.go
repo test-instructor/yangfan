@@ -67,11 +67,7 @@ func initializeSystem() {
 			initialize.RedisList()
 		}
 	}
-	go func() {
-		// 测试平台相关初始化
-		//time.Sleep(10 * time.Second)
-		initialize.InitPython()
-	}()
+	initialize.InitPython()
 	os.Setenv("DISABLE_GA", "true") // 禁用GA
 }
 

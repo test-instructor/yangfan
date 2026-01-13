@@ -225,6 +225,10 @@ func (e *Executor) createWithPython() (int, error) {
 	if err := global.GVA_DB.First(&category, e.ctx.CategoryID).Error; err != nil {
 		return 0, fmt.Errorf("获取数据分类失败: %w", err)
 	}
+
+	if category.MaxCreatePerRun != nil && *category.MaxCreatePerRun > 0 && needCreate > int(*category.MaxCreatePerRun) {
+		needCreate = int(*category.MaxCreatePerRun)
+	}
 	envIDStr := strconv.FormatUint(uint64(e.ctx.EnvID), 10)
 
 	// 获取当前环境的 LastData

@@ -19,6 +19,7 @@ type DataCategoryManagementSave struct {
 	Name              *string                                 `json:"name"`
 	Type              *string                                 `json:"type"`  // 数据类型
 	Count             map[int]int64                           `json:"count"` // 各环境总数量 {env_id: 数量}
+	MaxCreatePerRun   *int64                                  `json:"maxCreatePerRun"`
 	CreateCallType    *int64                                  `json:"createCallType"`
 	CreateTestStepId  *uint                                   `json:"createTestStepId"`
 	CleanCallType     *int64                                  `json:"cleanCallType"`

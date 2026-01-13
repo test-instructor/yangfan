@@ -55,6 +55,11 @@
             </div>
           </template>
         </el-table-column>
+        <el-table-column label="每次运行最大数量" width="150">
+          <template #default="scope">
+            {{ scope.row.maxCreatePerRun && scope.row.maxCreatePerRun > 0 ? scope.row.maxCreatePerRun : '不限' }}
+          </template>
+        </el-table-column>
         <el-table-column label="创建数据方式" width="120">
           <template #default="scope">
             {{ scope.row.createCallType === 1 ? '测试步骤' : 'Python脚本' }}
@@ -127,6 +132,11 @@
               </el-radio-group>
             </el-form-item>
           </el-col>
+          <el-col :span="12">
+            <el-form-item label="每次运行最大数量" prop="maxCreatePerRun">
+              <el-input-number v-model="formData.maxCreatePerRun" :min="0" :step="1" :controls="false" style="width: 100%" />
+            </el-form-item>
+          </el-col>
           <el-col :span="12" v-if="formData.createCallType === 1">
             <el-form-item label="运行配置" prop="createRunConfigId">
               <RunConfig v-model="formData.createRunConfigId" width="100%" />
@@ -183,6 +193,7 @@
       <el-descriptions :column="1" border>
         <el-descriptions-item label="数据分类名称">{{ detailForm.name }}</el-descriptions-item>
         <el-descriptions-item label="数据类型">{{ detailForm.type }}</el-descriptions-item>
+        <el-descriptions-item label="每次运行最大数量">{{ detailForm.maxCreatePerRun && detailForm.maxCreatePerRun > 0 ? detailForm.maxCreatePerRun : '不限' }}</el-descriptions-item>
         <el-descriptions-item label="创建数据方式">
           {{ detailForm.createCallType === 1 ? '测试步骤' : 'Python脚本' }}
         </el-descriptions-item>
@@ -326,6 +337,7 @@ const formData = reactive({
   ID: 0,
   name: '',
   type: '',
+  maxCreatePerRun: 0,
   // 各环境数量
   count: {},
   createCallType: 1,
@@ -414,6 +426,7 @@ const resetForm = () => {
   formData.ID = 0
   formData.name = ''
   formData.type = ''
+  formData.maxCreatePerRun = 0
   formData.createCallType = 1
   formData.createTestStepId = null
   formData.cleanCallType = 1
@@ -456,6 +469,7 @@ const updateFunc = async (row) => {
       formData.ID = data.ID
       formData.name = data.name || ''
       formData.type = data.type || ''
+      formData.maxCreatePerRun = Number(data.maxCreatePerRun || 0)
       formData.createCallType = data.createCallType || 1
       formData.createTestStepId = data.createTestStepId || null
       formData.cleanCallType = data.cleanCallType || 1
@@ -549,6 +563,7 @@ const enterDialog = async () => {
       ID: formData.ID,
       name: formData.name,
       type: formData.type,
+      maxCreatePerRun: Number(formData.maxCreatePerRun || 0),
       // 各环境数量
       count: {},
       createCallType: formData.createCallType,

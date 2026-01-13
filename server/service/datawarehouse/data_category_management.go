@@ -30,6 +30,7 @@ func (dcmService *DataCategoryManagementService) CreateDataCategoryManagement(ct
 			Name:              req.Name,
 			Type:              req.Type,
 			Count:             map[string]interface{}{},
+			MaxCreatePerRun:   req.MaxCreatePerRun,
 			CreateCallType:    req.CreateCallType,
 			CreateTestStepId:  req.CreateTestStepId,
 			CleanCallType:     req.CleanCallType,
@@ -119,6 +120,7 @@ func (dcmService *DataCategoryManagementService) UpdateDataCategoryManagement(ct
 		updates := datawarehouse.DataCategoryManagement{
 			Name:              req.Name,
 			Type:              req.Type,
+			MaxCreatePerRun:   req.MaxCreatePerRun,
 			CreateCallType:    req.CreateCallType,
 			CreateTestStepId:  req.CreateTestStepId,
 			CleanCallType:     req.CleanCallType,

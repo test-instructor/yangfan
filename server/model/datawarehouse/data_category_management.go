@@ -23,6 +23,7 @@ type DataCategoryManagement struct {
 	Type              *string           `json:"type" form:"type" gorm:"comment:数据类型;column:type;size:255;"`                                                                         // 数据类型
 	Count             datatypes.JSONMap `json:"count" form:"count" gorm:"type:JSON;comment:各环境数据总数量，key为env_id字符串;column:count;" swaggertype:"object"`                              // 各环境总数量 {env_id: 数量}
 	AvailableCount    datatypes.JSONMap `json:"availableCount" form:"availableCount" gorm:"type:JSON;comment:各环境可用数据数量，key为env_id字符串;column:available_count;" swaggertype:"object"` // 各环境可用数量 {env_id: 数量}
+	MaxCreatePerRun   *int64            `json:"maxCreatePerRun" form:"maxCreatePerRun" gorm:"comment:每次运行最大生成数量(0或空表示不限制);column:max_create_per_run;"`                              // 每次运行最大生成数量
 	CreateCallType    *int64            `json:"createCallType" form:"createCallType" gorm:"comment:创建数据的调用类型(1测试步骤,2Python);column:create_call_type;"`                              // 创建数据的调用类型
 	CreateTestStepId  *uint             `json:"createTestStepId" form:"createTestStepId" gorm:"comment:创建数据的测试步骤ID;column:create_test_step_id;"`                                    // 创建数据的测试步骤ID
 	CleanCallType     *int64            `json:"cleanCallType" form:"cleanCallType" gorm:"comment:清洗数据的调用类型(1测试步骤,2Python,3直接删除);column:clean_call_type;"`                           // 清洗数据的调用类型
