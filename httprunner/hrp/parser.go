@@ -63,6 +63,9 @@ func buildURL(baseURL, stepURL string, queryParams url.Values) (fullUrl *url.URL
 	}
 
 	// step url is relative, based on base url
+	if baseURL != "" && !strings.Contains(baseURL, "://") {
+		baseURL = "http://" + baseURL
+	}
 	uConfig, err := url.Parse(baseURL)
 	if err != nil {
 		log.Error().Str("baseURL", baseURL).Err(err).Msg("[buildURL] parse url failed")

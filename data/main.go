@@ -72,10 +72,10 @@ func initializeSystem() {
 }
 
 // initializeTimer 初始化定时任务
-// 环境变量 DEBUG_MODE=true 启用调试模式（每分钟执行）
+// 环境变量 DEBUG_MODE=true 启用调试模式（每 10 分钟执行）
 func initializeTimer() {
 	if os.Getenv("DEBUG_MODE") == "true" {
-		global.GVA_LOG.Info("启用调试模式，定时任务每分钟执行一次")
+		global.GVA_LOG.Info("启用调试模式，定时任务每 10 分钟执行一次")
 		scheduler = timer.NewDebugScheduler()
 	} else {
 		scheduler = timer.NewScheduler()

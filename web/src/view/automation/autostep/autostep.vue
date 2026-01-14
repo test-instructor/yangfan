@@ -1,12 +1,7 @@
 <template>
   <div class="autostep-container">
     <div class="main-panel card-panel">
-      <div class="panel-header">
-        <div class="header-title-group">
-          <span class="title">接口管理</span>
-          <span class="subtitle">管理测试步骤接口</span>
-        </div>
-      </div>
+
       <div class="panel-content">
         <div class="menu-container custom-scrollbar">
           <ApiMenu
@@ -48,8 +43,6 @@
               <el-form-item class="action-item">
                 <el-button type="primary" icon="search" @click="onSubmit" circle plain></el-button>
                 <el-button icon="refresh" @click="onReset" circle plain></el-button>
-                <el-button link type="primary" icon="arrow-down" @click="showAllQuery=true" v-if="!showAllQuery">展开</el-button>
-                <el-button link type="primary" icon="arrow-up" @click="showAllQuery=false" v-else>收起</el-button>
               </el-form-item>
             </el-form>
           </div>

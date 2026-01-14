@@ -44,6 +44,9 @@ func buildURL(baseURL, stepURL string) string {
 
 	// step url is relative, based on base url
 	// 解析base url格式
+	if baseURL != "" && !strings.Contains(baseURL, "://") {
+		baseURL = "http://" + baseURL
+	}
 	uConfig, err := url.Parse(baseURL)
 	if err != nil {
 		log.Error().Str("baseURL", baseURL).Err(err).Msg("[buildURL] parse url failed")

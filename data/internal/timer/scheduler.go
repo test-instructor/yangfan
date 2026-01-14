@@ -13,10 +13,10 @@ const (
 	CronName = "DataWarehouse"
 	// TaskName 任务名称
 	TaskName = "DataCategoryProcess"
-	// CronSpec 定时任务表达式 - 每小时执行一次
-	CronSpec = "@every 1h"
-	// CronSpecDebug 调试用定时任务表达式 - 每分钟执行一次
-	CronSpecDebug = "@every 1m"
+	// CronSpec 定时任务表达式 - 每 10 分钟执行一次
+	CronSpec = "@every 10m"
+	// CronSpecDebug 调试用定时任务表达式 - 每 10 分钟执行一次
+	CronSpecDebug = "@every 10m"
 )
 
 // Scheduler 定时任务调度器
@@ -33,7 +33,7 @@ func NewScheduler() *Scheduler {
 	}
 }
 
-// NewDebugScheduler 创建调试模式调度器（每分钟执行）
+// NewDebugScheduler 创建调试模式调度器（每 10 分钟执行）
 func NewDebugScheduler() *Scheduler {
 	return &Scheduler{
 		service:   datacategory.NewService(),

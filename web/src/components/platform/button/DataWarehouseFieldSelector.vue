@@ -8,6 +8,27 @@
       width="800px"
       destroy-on-close
     >
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+        <div style="width: 64px; color: #606266;">数据类型</div>
+        <el-select
+          v-if="!typeFromParent"
+          v-model="selectedType"
+          placeholder="请选择数据类型"
+          filterable
+          clearable
+          style="flex: 1;"
+        >
+          <el-option
+            v-for="item in typeOptions"
+            :key="item.type"
+            :label="item.type"
+            :value="item.type"
+          />
+        </el-select>
+        <el-select v-else :model-value="typeFromParent" disabled style="flex: 1;">
+          <el-option :label="typeFromParent" :value="typeFromParent" />
+        </el-select>
+      </div>
       <el-table
         :data="fieldList"
         border
@@ -35,18 +56,12 @@
           </template>
         </el-table-column>
       </el-table>
-      <div v-if="!currentType" class="text-center text-gray-500 py-4" style="text-align: center; color: #909399; padding-top: 20px; padding-bottom: 20px;">
-        请先在数据仓库配置中选择数据类型
-      </div>
-      <div v-else-if="fieldList.length === 0" class="text-center text-gray-500 py-4" style="text-align: center; color: #909399; padding-top: 20px; padding-bottom: 20px;">
-        该类型暂无字段数据
-      </div>
     </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getDataCategoryTypeList } from '@/api/datawarehouse/dataCategoryManagement'
 
@@ -59,14 +74,24 @@ const props = defineProps({
 
 const showDialog = ref(false)
 const typeOptions = ref([])
+const selectedType = ref('')
+
+const typeFromParent = computed(() => (props.currentType || '').trim())
+const effectiveType = computed(() => typeFromParent.value || selectedType.value)
 
 const openDialog = () => {
   showDialog.value = true
+  if (!typeFromParent.value) {
+    selectedType.value = ''
+  }
+  if (typeOptions.value.length === 0) {
+    getDataCategory()
+  }
 }
 
 const fieldList = computed(() => {
-  if (!props.currentType) return []
-  const found = typeOptions.value.find(item => item.type === props.currentType)
+  if (!effectiveType.value) return []
+  const found = typeOptions.value.find(item => item.type === effectiveType.value)
   if (!found || !found.value) return []
   
   return Object.keys(found.value).map(key => ({
@@ -93,4 +118,13 @@ const copyField = (field) => {
 onMounted(() => {
   getDataCategory()
 })
+
+watch(
+  () => props.currentType,
+  () => {
+    if (typeFromParent.value) {
+      selectedType.value = ''
+    }
+  }
+)
 </script>

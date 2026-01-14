@@ -36,3 +36,4 @@ deploy/docker/logs
 /config.yaml
 *.temp*
 /deploy/docker-compose/mysql/data/
+/debugcode/

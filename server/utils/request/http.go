@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 func HttpRequest(
@@ -13,6 +14,10 @@ func HttpRequest(
 	headers map[string]string,
 	params map[string]string,
 	data any) (*http.Response, error) {
+	// 确保 URL 包含协议
+	if urlStr != "" && !strings.Contains(urlStr, "://") {
+		urlStr = "http://" + urlStr
+	}
 	// 创建URL
 	u, err := url.Parse(urlStr)
 	if err != nil {

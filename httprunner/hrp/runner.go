@@ -161,6 +161,9 @@ func (r *HRPRunner) SetPython3Venv(venv string) *HRPRunner {
 // SetProxyUrl configures the proxy URL, which is usually used to capture HTTP packets for debugging.
 func (r *HRPRunner) SetProxyUrl(proxyUrl string) *HRPRunner {
 	log.Info().Str("proxyUrl", proxyUrl).Msg("[init] SetProxyUrl")
+	if proxyUrl != "" && !strings.Contains(proxyUrl, "://") {
+		proxyUrl = "http://" + proxyUrl
+	}
 	p, err := url.Parse(proxyUrl)
 	if err != nil {
 		log.Error().Err(err).Str("proxyUrl", proxyUrl).Msg("[init] invalid proxyUrl")
