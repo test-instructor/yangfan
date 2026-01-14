@@ -10,3 +10,7 @@ type ProjectSearch struct {
 	Name           *string     `json:"name" form:"name"`
 	request.PageInfo
 }
+
+type ResetProjectAuthReq struct {
+	ID uint `json:"ID" binding:"required"`
+}

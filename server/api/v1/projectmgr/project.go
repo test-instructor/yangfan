@@ -112,6 +112,37 @@ func (pjApi *ProjectApi) UpdateProject(c *gin.Context) {
 	response.OkWithMessage("更新成功", c)
 }
 
+// ResetProjectAuth 重设项目CI鉴权信息
+// @Tags Project
+// @Summary 重设项目CI鉴权信息
+// @Security ApiKeyAuth
+// @Accept application/json
+// @Produce application/json
+// @Param data body projectmgrReq.ResetProjectAuthReq true "重设项目CI鉴权信息"
+// @Success 200 {object} response.Response{data=object,msg=string} "重设成功"
+// @Router /pj/resetProjectAuth [put]
+func (pjApi *ProjectApi) ResetProjectAuth(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	var req projectmgrReq.ResetProjectAuthReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+
+	pj, err := pjService.ResetProjectAuth(ctx, req.ID)
+	if err != nil {
+		global.GVA_LOG.Error("重设失败!", zap.Error(err))
+		response.FailWithMessage("重设失败:"+err.Error(), c)
+		return
+	}
+
+	response.OkWithData(gin.H{
+		"uuid":   pj.UUID,
+		"secret": pj.Secret,
+	}, c)
+}
+
 // FindProject 用id查询项目配置
 // @Tags Project
 // @Summary 用id查询项目配置

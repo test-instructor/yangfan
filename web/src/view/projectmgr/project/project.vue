@@ -136,6 +136,15 @@
      file-type="image"
     />
 </el-form-item>
+            <el-form-item label="CI鉴权标识:" prop="uuid">
+              <el-input v-model="formData.uuid" :disabled="true" placeholder="创建后自动生成" />
+            </el-form-item>
+            <el-form-item label="CI鉴权密钥:" prop="secret">
+              <div class="flex items-center gap-2 w-full">
+                <el-input v-model="formData.secret" :disabled="true" placeholder="创建后自动生成" />
+                <el-button type="primary" :disabled="type==='create' || !formData.ID" @click="resetAuthFromEdit">重新设定</el-button>
+              </div>
+            </el-form-item>
           </el-form>
     </el-drawer>
 
@@ -153,12 +162,24 @@
                     <el-descriptions-item label="描述">
     {{ detailForm.describe }}
 </el-descriptions-item>
-                    <el-descriptions-item label="唯一标识">
-    {{ detailForm.uuid }}
+                    <el-descriptions-item label="项目ID">
+    {{ detailForm.ID }}
 </el-descriptions-item>
-                    <el-descriptions-item label="密钥">
-    {{ detailForm.secret }}
-</el-descriptions-item>
+                    <el-descriptions-item label="CI鉴权标识">
+                      <div class="flex items-center gap-2">
+                        <span>{{ detailForm.uuid }}</span>
+                        <el-button link type="primary" :disabled="!detailForm.uuid" @click="copyText(detailForm.uuid)">复制</el-button>
+                      </div>
+                    </el-descriptions-item>
+                    <el-descriptions-item label="CI鉴权密钥">
+                      <div class="flex items-center gap-2">
+                        <span>{{ detailForm.secret }}</span>
+                        <el-button link type="primary" :disabled="!detailForm.secret" @click="copyText(detailForm.secret)">复制</el-button>
+                      </div>
+                    </el-descriptions-item>
+                    <el-descriptions-item label="CI鉴权重设">
+                      <el-button type="primary" :disabled="!detailForm.ID" @click="resetAuthFromDetail">重新设定</el-button>
+                    </el-descriptions-item>
                     <el-descriptions-item label="logo">
     <el-image style="width: 25px; height: 25px" :preview-src-list="returnArrImg(detailForm.logo)" :src="getUrl(detailForm.logo)" fit="cover" />
 </el-descriptions-item>
@@ -175,7 +196,8 @@ import {
   deleteProjectByIds,
   updateProject,
   findProject,
-  getProjectList
+  getProjectList,
+  resetProjectAuth
 } from '@/api/projectmgr/project'
 import { getUrl } from '@/utils/image'
 
@@ -212,6 +234,8 @@ const formData = ref({
             admin: undefined,
             describe: '',
             logo: "",
+            uuid: '',
+            secret: '',
         })
 
 
@@ -415,6 +439,8 @@ const closeDialog = () => {
         admin: undefined,
         describe: '',
         logo: "",
+        uuid: '',
+        secret: '',
         }
 }
 // 弹窗确定
@@ -473,6 +499,46 @@ const getDetails = async (row) => {
 const closeDetailShow = () => {
   detailShow.value = false
   detailForm.value = {}
+}
+
+const resetAuthFromEdit = async () => {
+  ElMessageBox.confirm('确定要重新设定CI鉴权信息吗? 旧密钥将立即失效。', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async () => {
+    const res = await resetProjectAuth({ ID: formData.value.ID })
+    if (res.code === 0) {
+      formData.value.uuid = res.data.uuid
+      formData.value.secret = res.data.secret
+      ElMessage({ type: 'success', message: '重设成功' })
+    }
+  })
+}
+
+const resetAuthFromDetail = async () => {
+  ElMessageBox.confirm('确定要重新设定CI鉴权信息吗? 旧密钥将立即失效。', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async () => {
+    const res = await resetProjectAuth({ ID: detailForm.value.ID })
+    if (res.code === 0) {
+      detailForm.value.uuid = res.data.uuid
+      detailForm.value.secret = res.data.secret
+      ElMessage({ type: 'success', message: '重设成功' })
+    }
+  })
+}
+
+const copyText = async (text) => {
+  if (!text) return
+  try {
+    await navigator.clipboard.writeText(text)
+    ElMessage({ type: 'success', message: '已复制到剪贴板' })
+  } catch (e) {
+    ElMessage({ type: 'error', message: '复制失败，请手动复制' })
+  }
 }
 
 

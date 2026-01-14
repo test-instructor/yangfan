@@ -63,6 +63,14 @@ export const updateProject = (data) => {
   })
 }
 
+export const resetProjectAuth = (data) => {
+  return service({
+    url: '/pj/resetProjectAuth',
+    method: 'put',
+    data
+  })
+}
+
 // @Tags Project
 // @Summary 用id查询项目配置
 // @Security ApiKeyAuth

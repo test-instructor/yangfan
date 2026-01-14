@@ -12,12 +12,21 @@
         <el-form-item label="描述:" prop="describe">
     <el-input v-model="formData.describe" :clearable="false" placeholder="请输入描述" />
 </el-form-item>
-        <el-form-item label="logo:" prop="logo">
+<el-form-item label="logo:" prop="logo">
     <SelectImage
      v-model="formData.logo"
      file-type="image"
     />
 </el-form-item>
+        <el-form-item label="CI鉴权标识:" prop="uuid">
+          <el-input v-model="formData.uuid" :disabled="true" placeholder="创建后自动生成" />
+        </el-form-item>
+        <el-form-item label="CI鉴权密钥:" prop="secret">
+          <div class="flex items-center gap-2 w-full">
+            <el-input v-model="formData.secret" :disabled="true" placeholder="创建后自动生成" />
+            <el-button type="primary" :disabled="type==='create' || !formData.ID" @click="resetAuth">重新设定</el-button>
+          </div>
+        </el-form-item>
         <el-form-item>
           <el-button :loading="btnLoading" type="primary" @click="save">保存</el-button>
           <el-button type="primary" @click="back">返回</el-button>
@@ -31,7 +40,8 @@
 import {
   createProject,
   updateProject,
-  findProject
+  findProject,
+  resetProjectAuth
 } from '@/api/projectmgr/project'
 
 defineOptions({
@@ -42,6 +52,7 @@ defineOptions({
 import { getDictFunc } from '@/utils/format'
 import { useRoute, useRouter } from "vue-router"
 import { ElMessage } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 import { ref, reactive } from 'vue'
 // 图片选择组件
 import SelectImage from '@/components/selectImage/selectImage.vue'
@@ -59,6 +70,8 @@ const formData = ref({
             admin: undefined,
             describe: '',
             logo: "",
+            uuid: '',
+            secret: '',
         })
 // 验证规则
 const rule = reactive({
@@ -121,6 +134,21 @@ const save = async() => {
 // 返回按钮
 const back = () => {
     router.go(-1)
+}
+
+const resetAuth = async () => {
+  ElMessageBox.confirm('确定要重新设定CI鉴权信息吗? 旧密钥将立即失效。', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async () => {
+    const res = await resetProjectAuth({ ID: formData.value.ID })
+    if (res.code === 0) {
+      formData.value.uuid = res.data.uuid
+      formData.value.secret = res.data.secret
+      ElMessage({ type: 'success', message: '重设成功' })
+    }
+  })
 }
 
 </script>

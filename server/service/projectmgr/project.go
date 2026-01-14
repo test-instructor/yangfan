@@ -2,6 +2,7 @@ package projectmgr
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/test-instructor/yangfan/server/v2/global"
@@ -16,6 +17,20 @@ type ProjectService struct{}
 // Author [yourname](https://github.com/yourname)
 func (pjService *ProjectService) CreateProject(c *gin.Context, ctx context.Context, pj *projectmgr.Project) (err error) {
 	pj.Creator = utils.GetUserID(c)
+	uuid, err := utils.SnowflakeIDString()
+	if err != nil {
+		return err
+	}
+	secretSnowflake, err := utils.SnowflakeIDString()
+	if err != nil {
+		return err
+	}
+	secretRand, err := utils.SecureRandomString(24)
+	if err != nil {
+		return err
+	}
+	pj.UUID = uuid
+	pj.Secret = secretSnowflake + "." + secretRand
 	err = global.GVA_DB.Create(pj).Error
 	return err
 }
@@ -37,8 +52,38 @@ func (pjService *ProjectService) DeleteProjectByIds(ctx context.Context, IDs []s
 // UpdateProject 更新项目配置记录
 // Author [yourname](https://github.com/yourname)
 func (pjService *ProjectService) UpdateProject(ctx context.Context, pj projectmgr.Project) (err error) {
-	err = global.GVA_DB.Model(&projectmgr.Project{}).Where("id = ?", pj.ID).Updates(&pj).Error
+	updates := map[string]interface{}{
+		"name":     pj.Name,
+		"admin":    pj.Admin,
+		"describe": pj.Describe,
+		"logo":     pj.Logo,
+	}
+	err = global.GVA_DB.Model(&projectmgr.Project{}).Where("id = ?", pj.ID).Updates(updates).Error
 	return err
+}
+
+func (pjService *ProjectService) ResetProjectAuth(ctx context.Context, id uint) (pj projectmgr.Project, err error) {
+	uuid, err := utils.SnowflakeIDString()
+	if err != nil {
+		return pj, err
+	}
+	secretSnowflake, err := utils.SnowflakeIDString()
+	if err != nil {
+		return pj, err
+	}
+	secretRand, err := utils.SecureRandomString(24)
+	if err != nil {
+		return pj, err
+	}
+	updates := map[string]interface{}{
+		"uuid":   uuid,
+		"secret": secretSnowflake + "." + secretRand,
+	}
+	if err := global.GVA_DB.Model(&projectmgr.Project{}).Where("id = ?", id).Updates(updates).Error; err != nil {
+		return pj, err
+	}
+	pj, err = pjService.GetProject(ctx, strconv.FormatUint(uint64(id), 10))
+	return pj, err
 }
 
 // GetProject 根据ID获取项目配置记录

@@ -17,6 +17,7 @@ func projectmgrApis() []sysModel.SysApi {
 		{Path: "/pj/deleteProject", Description: "删除项目配置", ApiGroup: "项目配置", Method: "DELETE"},
 		{Path: "/pj/deleteProjectByIds", Description: "批量删除项目配置", ApiGroup: "项目配置", Method: "DELETE"},
 		{Path: "/pj/updateProject", Description: "更新项目配置", ApiGroup: "项目配置", Method: "PUT"},
+		{Path: "/pj/resetProjectAuth", Description: "重设项目CI鉴权信息", ApiGroup: "项目配置", Method: "PUT"},
 		{Path: "/pj/findProject", Description: "根据ID获取项目配置", ApiGroup: "项目配置", Method: "GET"},
 		{Path: "/pj/getProjectList", Description: "获取项目配置列表", ApiGroup: "项目配置", Method: "GET"},
 	}

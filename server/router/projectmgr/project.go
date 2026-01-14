@@ -17,6 +17,7 @@ func (s *ProjectRouter) InitProjectRouter(Router *gin.RouterGroup, PublicRouter 
 		pjRouter.DELETE("deleteProject", pjApi.DeleteProject)           // 删除项目配置
 		pjRouter.DELETE("deleteProjectByIds", pjApi.DeleteProjectByIds) // 批量删除项目配置
 		pjRouter.PUT("updateProject", pjApi.UpdateProject)              // 更新项目配置
+		pjRouter.PUT("resetProjectAuth", pjApi.ResetProjectAuth)        // 重设项目CI鉴权信息
 	}
 	{
 		pjRouterWithoutRecord.GET("findProject", pjApi.FindProject)       // 根据ID获取项目配置
