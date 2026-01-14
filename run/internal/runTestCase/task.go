@@ -3,6 +3,7 @@ package runTestCase
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"testing"
 
@@ -52,6 +53,16 @@ func (r *runTask) LoadCase() (err error) {
 	// 获取任务关联的用例列表
 	// yf_timer_task_case_list.task_id -> TimerTask.ID
 	taskCaseList := taskSort(uint(r.CaseID))
+	if len(taskCaseList) == 0 {
+		return fmt.Errorf("定时任务未关联任何用例（task_id=%d）", r.runCaseReq.CaseID)
+	}
+
+	debugTalkStarted := false
+	defer func() {
+		if err != nil && debugTalkStarted {
+			r.d.StopDebugTalkFile()
+		}
+	}()
 
 	// 计算运行使用的环境 ID：
 	// 优先级：
@@ -86,19 +97,51 @@ func (r *runTask) LoadCase() (err error) {
 	r.d.ProjectID = uint(task.ProjectId)
 	r.d.ID = uint(r.runCaseReq.CaseID)
 	r.d.RunDebugTalkFile()
+	debugTalkStarted = true
 
 	// 遍历每个用例，转换为 ITestCase
 	for _, taskCase := range taskCaseList {
-		// 获取用例配置: 优先使用 mq 消息中的 ConfigID，否则使用用例自身的配置
-		configID := uint(r.runCaseReq.ConfigID)
+		requestConfigID := uint(r.runCaseReq.ConfigID)
+		caseConfigID := uint(taskCase.AutoCase.ConfigID)
+		configID := requestConfigID
 		if configID == 0 {
-			configID = uint(taskCase.AutoCase.ConfigID)
+			configID = caseConfigID
 		}
-		apiConfig, err := getRunConfig(configID)
-		if err != nil {
-			global.GVA_LOG.Warn("Failed to get config for case",
+
+		apiConfig, configErr := getRunConfig(configID)
+		if configErr != nil && requestConfigID != 0 && caseConfigID != 0 && caseConfigID != requestConfigID {
+			global.GVA_LOG.Warn("RunTask config_id invalid, fallback to case config",
+				zap.Uint("task_id", uint(r.runCaseReq.CaseID)),
 				zap.Uint("case_id", taskCase.AutoCaseID),
-				zap.Error(err))
+				zap.Uint("request_config_id", requestConfigID),
+				zap.Uint("case_config_id", caseConfigID),
+				zap.Error(configErr))
+			configID = caseConfigID
+			apiConfig, configErr = getRunConfig(configID)
+		}
+		if configErr == nil && requestConfigID != 0 && apiConfig != nil {
+			caseProjectID := taskCase.AutoCase.ProjectId
+			if apiConfig.ProjectId != 0 && apiConfig.ProjectId != caseProjectID {
+				global.GVA_LOG.Warn("RunTask config project mismatch, fallback to case config",
+					zap.Uint("task_id", uint(r.runCaseReq.CaseID)),
+					zap.Uint("case_id", taskCase.AutoCaseID),
+					zap.Int64("config_project_id", apiConfig.ProjectId),
+					zap.Int64("case_project_id", caseProjectID),
+					zap.Uint("request_config_id", requestConfigID),
+					zap.Uint("case_config_id", caseConfigID))
+				if caseConfigID != 0 && caseConfigID != requestConfigID {
+					apiConfig, configErr = getRunConfig(caseConfigID)
+				} else {
+					configErr = errors.New("配置与用例项目不匹配")
+				}
+			}
+		}
+		if configErr != nil {
+			global.GVA_LOG.Warn("Failed to get config for case",
+				zap.Uint("task_id", uint(r.runCaseReq.CaseID)),
+				zap.Uint("case_id", taskCase.AutoCaseID),
+				zap.Uint("config_id", configID),
+				zap.Error(configErr))
 			continue
 		}
 
@@ -165,6 +208,9 @@ func (r *runTask) LoadCase() (err error) {
 		r.totalCases += caseTotals.TotalCases
 		r.totalSteps += caseTotals.TotalSteps
 		r.totalApis += caseTotals.TotalApis
+	}
+	if len(r.tcm.Case) == 0 {
+		return fmt.Errorf("定时任务未生成任何可运行用例（task_id=%d, 关联用例数=%d），请检查用例配置或消息中的 config_id", r.runCaseReq.CaseID, len(taskCaseList))
 	}
 
 	// 加载已存在的报告并更新状态为运行中

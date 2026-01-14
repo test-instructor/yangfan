@@ -137,7 +137,7 @@
         :menu="menuId"
         :formData="formData"
         :type="type"
-        @close="closeDialog"
+        @close="handleSavedClose"
       />
     </el-drawer>
     <el-drawer
@@ -428,6 +428,13 @@
       data_warehouse: null,
       data_warehouse_temp: {}
     }
+  }
+  const handleSavedClose = () => {
+    closeDialog()
+    if (type.value === 'create') {
+      page.value = 1
+    }
+    getTableData()
   }
   // 弹窗确定
   const autoCaseStepForm = ref(null)

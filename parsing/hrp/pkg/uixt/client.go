@@ -61,6 +61,9 @@ func (wd *Driver) httpRequest(method string, rawURL string, rawBody []byte) (raw
 	}
 	req.Header.Set("Content-Type", "application/json;charset=UTF-8")
 	req.Header.Set("Accept", "application/json")
+	if req.Header.Get("User-Agent") == "" {
+		req.Header.Set("User-Agent", "YangFan-Client/V2")
+	}
 
 	start := time.Now()
 	var resp *http.Response

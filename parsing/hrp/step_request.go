@@ -149,6 +149,10 @@ func (r *requestBuilder) prepareHeaders(stepVariables map[string]interface{}) er
 		})
 	}
 
+	if r.req.Header.Get("User-Agent") == "" {
+		r.req.Header.Set("User-Agent", "YangFan-Client/V2")
+	}
+
 	// update header
 	// 将header设置到requestMap中，requestMap主要用于测试报告中的展示
 	headers := make(map[string]string)

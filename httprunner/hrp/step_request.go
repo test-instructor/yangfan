@@ -134,6 +134,10 @@ func (r *requestBuilder) prepareHeaders(stepVariables map[string]interface{}) er
 		})
 	}
 
+	if r.req.Header.Get("User-Agent") == "" {
+		r.req.Header.Set("User-Agent", "YangFan-Client/V2")
+	}
+
 	// update header
 	headers := make(map[string]string)
 	for key, value := range r.req.Header {
@@ -1284,6 +1288,7 @@ func queryDataWarehouse(dataWarehouse map[string]interface{}, stepVariables map[
 	}
 
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("User-Agent", "YangFan-Client/V2")
 
 	// Execute request
 	client := &http.Client{

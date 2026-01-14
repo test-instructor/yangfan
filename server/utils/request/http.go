@@ -56,6 +56,10 @@ func HttpRequest(
 		req.Header.Set("Content-Type", "application/json")
 	}
 
+	if req.Header.Get("User-Agent") == "" {
+		req.Header.Set("User-Agent", "YangFan-Client/V2")
+	}
+
 	// 发送请求
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {

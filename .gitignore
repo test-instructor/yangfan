@@ -37,3 +37,4 @@ deploy/docker/logs
 *.temp*
 /deploy/docker-compose/mysql/data/
 /debugcode/
+/log/

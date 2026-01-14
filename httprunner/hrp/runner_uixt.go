@@ -245,6 +245,7 @@ func (configs *UIXTConfig) getWDALocalPort(udid string) (string, error) {
 		return "", errors.Wrap(err, "create request failed")
 	}
 	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("User-Agent", "YangFan-Client/V2")
 
 	res, err := client.Do(req)
 	if err != nil {

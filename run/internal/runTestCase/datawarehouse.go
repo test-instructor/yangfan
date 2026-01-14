@@ -58,6 +58,7 @@ func queryDataWarehouse(dataWarehouse datatypes.JSONMap, projectID int64, envID 
 	}
 
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("User-Agent", "YangFan-Client/V2")
 
 	// Execute request
 	client := &http.Client{

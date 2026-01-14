@@ -297,6 +297,9 @@ func (s *DriverSession) Request(method string, urlStr string, rawBody []byte, op
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("X-HTTP-Request-ID", logid)
 	req.Header.Set("logid", logid)
+	if req.Header.Get("User-Agent") == "" {
+		req.Header.Set("User-Agent", "YangFan-Client/V2")
+	}
 
 	driverResult.RequestTime = time.Now()
 	var resp *http.Response

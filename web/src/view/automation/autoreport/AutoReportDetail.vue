@@ -77,11 +77,10 @@
               <div class="text-gray-500 dark:text-gray-400 text-sm mb-1">执行状态</div>
               <div class="mb-2">
                 <el-tag :type="statusType" effect="light" size="large" class="!text-base px-4 py-1 rounded-full flex items-center w-fit">
-                   <el-icon class="mr-1"><CircleCheckFilled v-if="detail.success" /><CircleCloseFilled v-else /></el-icon>
-                   {{ statusText }}
+                   <el-icon class="mr-1"><CircleCheckFilled v-if="detail.success" /><CircleCloseFilled v-else />{{ statusText }}</el-icon>
                 </el-tag>
               </div>
-              <div class="text-sm text-gray-500 dark:text-gray-400 truncate w-40" :title="detail.hostname">
+              <div class="text-sm text-gray-500 dark:text-gray-400 truncate w-100" :title="detail.hostname">
                 主机名: {{ detail.hostname }}
               </div>
               <div v-if="showProgress" class="mt-3 w-full">
