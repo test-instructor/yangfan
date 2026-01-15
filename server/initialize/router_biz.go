@@ -13,11 +13,20 @@ func holder(routers ...*gin.RouterGroup) {
 func initBizRouter(routers ...*gin.RouterGroup) {
 	privateGroup := routers[0]
 	publicGroup := routers[1]
-	holder(publicGroup, privateGroup)
+	var projectGroup *gin.RouterGroup
+	if len(routers) > 2 {
+		projectGroup = routers[2]
+	}
+	var openGroup *gin.RouterGroup
+	if len(routers) > 3 {
+		openGroup = routers[3]
+	}
+	holder(publicGroup, privateGroup, projectGroup, openGroup)
 	{
 		projectmgrRouter := router.RouterGroupApp.Projectmgr
 		projectmgrRouter.InitProjectRouter(privateGroup, publicGroup)
 		projectmgrRouter.InitUserProjectAccessRouter(privateGroup, publicGroup)
+		projectmgrRouter.InitReportNotifyRouter(privateGroup, publicGroup)
 	}
 	privateGroup.Use(middleware.ProjectAuth())
 	{
@@ -32,6 +41,7 @@ func initBizRouter(routers ...*gin.RouterGroup) {
 		platformRouter.InitCategoryMenuRouter(privateGroup, publicGroup)
 		platformRouter.InitRunnerNodeRouter(privateGroup, publicGroup)
 		platformRouter.InitRunnerRouter(privateGroup, publicGroup)
+		platformRouter.InitOpenRunnerRouter(openGroup)
 	}
 	{
 		automationRouter := router.RouterGroupApp.Automation

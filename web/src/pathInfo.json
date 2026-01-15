@@ -88,6 +88,7 @@
   "/src/view/platform/runnernode/runnernodeForm.vue": "RunnerNodeForm",
   "/src/view/projectmgr/project/project.vue": "Project",
   "/src/view/projectmgr/project/projectForm.vue": "ProjectForm",
+  "/src/view/projectmgr/reportNotify/reportNotify.vue": "reportNotify",
   "/src/view/projectmgr/userprojectaccess/userprojectaccess.vue": "UserProjectAccess",
   "/src/view/projectmgr/userprojectaccess/userprojectaccessForm.vue": "UserProjectAccessForm",
   "/src/view/routerHolder.vue": "RouterHolder",

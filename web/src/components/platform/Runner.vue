@@ -4,7 +4,7 @@
     <el-dialog
       v-model="visible"
       title="运行任务"
-      width="400px"
+      width="520px"
       append-to-body
       destroy-on-close
     >
@@ -28,6 +28,37 @@
           <el-form-item label="运行环境:">
             <EnvSelector v-model="form.env_id" width="100%" />
           </el-form-item>
+
+          <template v-if="runResult.report_id">
+            <el-divider content-position="left">消息通知</el-divider>
+            <el-form-item label="报告:">
+              <div class="flex items-center justify-between w-full">
+                <div class="text-sm">
+                  <span class="mr-2">report_id: {{ runResult.report_id }}</span>
+                  <span v-if="runResult.task_id" class="text-gray-500">task_id: {{ runResult.task_id }}</span>
+                </div>
+                <el-button type="primary" link @click="openReport">打开报告</el-button>
+              </div>
+            </el-form-item>
+            <el-form-item label="发送状态:">
+              <el-select
+                v-model="selectedChannelIds"
+                multiple
+                collapse-tags
+                collapse-tags-tooltip
+                style="width: 100%"
+                :loading="notifyLoading"
+                placeholder="等待通知结果"
+              >
+                <el-option
+                  v-for="item in notifyItems"
+                  :key="item.channelId"
+                  :label="item.display"
+                  :value="item.channelId"
+                />
+              </el-select>
+            </el-form-item>
+          </template>
         </el-form>
       </div>
       <template #footer>
@@ -41,11 +72,13 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onUnmounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import EnvSelector from '@/components/platform/env.vue'
 import RunConfigSelector from '@/components/platform/runConfig.vue'
 import { runTask } from '@/api/run.js'
+import { getAutoReportNotifyStatus } from '@/api/projectmgr/reportNotify'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   case_type: {
@@ -60,6 +93,15 @@ const props = defineProps({
 
 const visible = ref(false)
 const loading = ref(false)
+const notifyLoading = ref(false)
+const notifyItems = ref([])
+const selectedChannelIds = ref([])
+const runResult = reactive({
+  task_id: '',
+  report_id: 0,
+})
+const router = useRouter()
+let notifyTimer = null
 
 const form = reactive({
   run_mode: '调试模式', // 默认调试
@@ -77,6 +119,47 @@ const runModes = [
 const handleOpen = () => {
   // 每次打开可以重置或保持状态，这里保持状态
   visible.value = true
+}
+
+const resetRunState = () => {
+  runResult.task_id = ''
+  runResult.report_id = 0
+  notifyItems.value = []
+  selectedChannelIds.value = []
+  notifyLoading.value = false
+  if (notifyTimer) {
+    clearInterval(notifyTimer)
+    notifyTimer = null
+  }
+}
+
+const openReport = () => {
+  if (!runResult.report_id) return
+  router.push({ name: 'auto-report-detail', params: { id: runResult.report_id } })
+}
+
+const fetchNotifyStatus = async () => {
+  if (!runResult.report_id) return
+  notifyLoading.value = true
+  try {
+    const res = await getAutoReportNotifyStatus({ reportId: runResult.report_id })
+    if (res.code === 0) {
+      const items = res.data?.items || []
+      notifyItems.value = items
+      if (!selectedChannelIds.value.length) {
+        selectedChannelIds.value = items.map((i) => i.channelId)
+      }
+      const reportStatus = res.data?.reportStatus
+      const isFinished = reportStatus === 2 || reportStatus === 3
+      const hasPending = items.some((i) => i.state === '待发送')
+      if (isFinished && !hasPending && notifyTimer) {
+        clearInterval(notifyTimer)
+        notifyTimer = null
+      }
+    }
+  } finally {
+    notifyLoading.value = false
+  }
 }
 
 const handleRun = async () => {
@@ -105,7 +188,13 @@ const handleRun = async () => {
     const res = await runTask(payload)
     if (res.code === 0) {
       ElMessage.success('运行任务已提交')
-      visible.value = false
+      runResult.task_id = res.data?.task_id || ''
+      runResult.report_id = res.data?.report_id || 0
+      notifyItems.value = []
+      selectedChannelIds.value = []
+      await fetchNotifyStatus()
+      if (notifyTimer) clearInterval(notifyTimer)
+      notifyTimer = setInterval(fetchNotifyStatus, 3000)
     } else {
       ElMessage.error(res.msg || '运行失败')
     }
@@ -116,6 +205,17 @@ const handleRun = async () => {
     loading.value = false
   }
 }
+
+watch(
+  () => visible.value,
+  (val) => {
+    if (!val) resetRunState()
+  }
+)
+
+onUnmounted(() => {
+  resetRunState()
+})
 </script>
 
 <style scoped>

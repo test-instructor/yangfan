@@ -26,6 +26,7 @@ func Seeds() []MenuSeed {
 		// pm children
 		{Path: "pj", ParentPath: "pm", Name: "pj", Hidden: false, Component: "view/projectmgr/project/project.vue", Sort: 100, Meta: sysModel.Meta{Title: "项目配置", Icon: "project"}},
 		{Path: "upa", ParentPath: "pm", Name: "upa", Hidden: false, Component: "view/projectmgr/userprojectaccess/userprojectaccess.vue", Sort: 200, Meta: sysModel.Meta{Title: "项目成员与权限", Icon: "auth"}},
+		{Path: "reportNotify", ParentPath: "pm", Name: "reportNotify", Hidden: false, Component: "view/projectmgr/reportNotify/reportNotify.vue", Sort: 300, Meta: sysModel.Meta{Title: "报告通知", Icon: "warn"}},
 
 		// platform children
 		{Path: "envDetail", ParentPath: "platform", Name: "envDetail", Hidden: false, Component: "view/platform/envdetail/envdetail.vue", Sort: 200, Meta: sysModel.Meta{Title: "环境变量管理", Icon: "env"}},

@@ -20,5 +20,13 @@ func projectmgrApis() []sysModel.SysApi {
 		{Path: "/pj/resetProjectAuth", Description: "重设项目CI鉴权信息", ApiGroup: "项目配置", Method: "PUT"},
 		{Path: "/pj/findProject", Description: "根据ID获取项目配置", ApiGroup: "项目配置", Method: "GET"},
 		{Path: "/pj/getProjectList", Description: "获取项目配置列表", ApiGroup: "项目配置", Method: "GET"},
+
+		{Path: "/nt/createReportNotifyChannel", Description: "新增报告通知通道", ApiGroup: "报告通知", Method: "POST"},
+		{Path: "/nt/deleteReportNotifyChannel", Description: "删除报告通知通道", ApiGroup: "报告通知", Method: "DELETE"},
+		{Path: "/nt/deleteReportNotifyChannelByIds", Description: "批量删除报告通知通道", ApiGroup: "报告通知", Method: "DELETE"},
+		{Path: "/nt/updateReportNotifyChannel", Description: "更新报告通知通道", ApiGroup: "报告通知", Method: "PUT"},
+		{Path: "/nt/findReportNotifyChannel", Description: "根据ID获取报告通知通道", ApiGroup: "报告通知", Method: "GET"},
+		{Path: "/nt/getReportNotifyChannelList", Description: "获取报告通知通道列表", ApiGroup: "报告通知", Method: "GET"},
+		{Path: "/nt/getAutoReportNotifyStatus", Description: "获取测试报告通知发送状态", ApiGroup: "报告通知", Method: "GET"},
 	}
 }

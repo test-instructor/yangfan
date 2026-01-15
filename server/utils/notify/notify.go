@@ -172,3 +172,11 @@ func dingTalkSign(timestamp, secret string) string {
 	mac.Write([]byte(toSign))
 	return url.QueryEscape(base64.StdEncoding.EncodeToString(mac.Sum(nil)))
 }
+
+func PostJSON(ctx context.Context, targetURL string, body any) error {
+	return postJSON(ctx, targetURL, body)
+}
+
+func NormalizeURL(raw string) (string, error) {
+	return normalizeURL(raw)
+}

@@ -3,9 +3,12 @@ package automation
 import (
 	"context"
 	"errors"
+	"time"
+
 	"github.com/test-instructor/yangfan/server/v2/global"
 	"github.com/test-instructor/yangfan/server/v2/model/automation"
 	automationReq "github.com/test-instructor/yangfan/server/v2/model/automation/request"
+	projectmgrService "github.com/test-instructor/yangfan/server/v2/service/projectmgr"
 )
 
 type AutoReportService struct{}
@@ -52,6 +55,23 @@ func (arService *AutoReportService) UpdateAutoReport(ctx context.Context, ar aut
 	}
 
 	err = global.GVA_DB.Model(&automation.AutoReport{}).Where("id = ?", ar.ID).Updates(&ar).Error
+	if err == nil {
+		oldStatus := int64(-1)
+		if oldAutoReport.Status != nil {
+			oldStatus = *oldAutoReport.Status
+		}
+		newStatus := oldStatus
+		if ar.Status != nil {
+			newStatus = *ar.Status
+		}
+		if newStatus != oldStatus && (newStatus == int64(automation.ReportStatusSuccess) || newStatus == int64(automation.ReportStatusFailed)) {
+			go func(reportId uint) {
+				nctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+				defer cancel()
+				_ = (&projectmgrService.ReportNotifyService{}).NotifyAutoReport(nctx, reportId)
+			}(ar.ID)
+		}
+	}
 	return err
 }
 
