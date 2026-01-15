@@ -60,7 +60,7 @@ const statusType = computed(() => {
 })
 
 const formatDuration = (seconds) => {
-  if (!seconds) return '-'
-  return seconds.toFixed(2) + 's'
+  if (seconds === null || seconds === undefined || Number.isNaN(Number(seconds))) return '-'
+  return Number(seconds).toFixed(2) + 's'
 }
 </script>

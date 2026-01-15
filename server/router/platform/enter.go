@@ -13,6 +13,7 @@ type RouterGroup struct {
 	CategoryMenuRouter
 	RunnerNodeRouter
 	RunnerRouter
+	OpenRunnerRouter
 }
 
 var (

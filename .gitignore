@@ -38,3 +38,4 @@ deploy/docker/logs
 /deploy/docker-compose/mysql/data/
 /debugcode/
 /log/
+/.trae/

@@ -25,6 +25,7 @@ func NewSummary() *Summary {
 		GoVersion:         runtime.Version(),
 		Platform:          fmt.Sprintf("%v-%v", runtime.GOOS, runtime.GOARCH),
 	}
+	startAt := time.Now()
 	return &Summary{
 		Success: true,
 		Stat: &Stat{
@@ -33,7 +34,7 @@ func NewSummary() *Summary {
 			},
 		},
 		Time: &TestCaseTime{
-			StartAt: config.GetConfig().StartTime,
+			StartAt: startAt,
 		},
 		Platform: platForm,
 	}

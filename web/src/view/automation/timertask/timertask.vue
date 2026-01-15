@@ -57,6 +57,7 @@
         </el-button>
 
         <el-button type="primary" style="margin-left: 10px;" @click="openTagDialog">标签管理</el-button>
+        <el-button type="primary" style="margin-left: 10px;" @click="openCIDialog">CI调用</el-button>
 
       </div>
       <el-table
@@ -216,6 +217,80 @@
 
     <TagManager v-model="tagDialogVisible" @changed="onTagChanged" />
 
+    <el-dialog
+      v-model="ciDialogVisible"
+      title="CI调用"
+      width="760px"
+      append-to-body
+      destroy-on-close
+    >
+      <el-form label-position="right" label-width="110px">
+        <el-form-item label="任务标签">
+          <el-select v-model="ciForm.tagId" filterable placeholder="选择标签" style="width: 100%">
+            <el-option
+              v-for="opt in tagOptions"
+              :key="opt.ID || opt.id"
+              :label="opt.name"
+              :value="opt.ID || opt.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="运行环境">
+          <Env v-model="ciForm.envId" @change="handleCIEnvChange" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="返回方式">
+          <el-radio-group v-model="ciForm.responseMode">
+            <el-radio-button label="sync">同步返回</el-radio-button>
+            <el-radio-button label="callback">回调</el-radio-button>
+            <el-radio-button label="webhook">Webhook</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item v-if="ciForm.responseMode === 'callback'" label="回调URL">
+          <el-input v-model="ciForm.callbackUrl" placeholder="https://your-ci/callback" />
+        </el-form-item>
+        <el-form-item v-if="ciForm.responseMode === 'webhook'" label="Webhook类型">
+          <el-radio-group v-model="ciForm.webhookType">
+            <el-radio-button label="feishu">飞书</el-radio-button>
+            <el-radio-button label="wecom">企业微信</el-radio-button>
+            <el-radio-button label="dingtalk">钉钉</el-radio-button>
+            <el-radio-button label="custom">自定义</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item v-if="ciForm.responseMode === 'webhook'" label="Webhook URL">
+          <el-input v-model="ciForm.webhookUrl" placeholder="https://your-webhook" />
+        </el-form-item>
+        <el-form-item v-if="ciForm.responseMode === 'webhook'" label="Webhook密钥">
+          <el-input v-model="ciForm.webhookSecret" placeholder="" />
+        </el-form-item>
+        <el-form-item label="CI鉴权标识">
+          <el-input v-model="ciForm.ciUUID" placeholder="" />
+        </el-form-item>
+        <el-form-item label="CI鉴权密钥">
+          <el-input v-model="ciForm.ciSecret" placeholder="" />
+        </el-form-item>
+      </el-form>
+
+      <el-tabs v-model="ciPreviewTab">
+        <el-tab-pane label="GET" name="get">
+          <el-input :model-value="ciGetURL" type="textarea" :rows="4" readonly />
+          <div style="margin-top: 10px; text-align: right;">
+            <el-button type="primary" @click="copyToClipboard(ciGetURL)">复制</el-button>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="POST(JSON)" name="post">
+          <el-input :model-value="ciPostCurl" type="textarea" :rows="8" readonly />
+          <div style="margin-top: 10px; text-align: right;">
+            <el-button type="primary" @click="copyToClipboard(ciPostCurl)">复制</el-button>
+          </div>
+        </el-tab-pane>
+      </el-tabs>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="ciDialogVisible = false">关闭</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
     <el-drawer destroy-on-close size="1200px" v-model="caseDetailVisible" :show-close="true" :before-close="closeCaseDetail" title="任务-用例详情">
       <TaskCaseDetail :taskID="currentTask.ID" :taskName="currentTask.name || ''" />
     </el-drawer>
@@ -252,8 +327,9 @@
     onDownloadFile
   } from '@/utils/format'
   import { ElMessage, ElMessageBox } from 'element-plus'
-  import { ref, reactive } from 'vue'
+  import { ref, reactive, computed } from 'vue'
   import { useAppStore } from '@/pinia'
+  import { useUserStore } from '@/pinia/modules/user'
 
 
   defineOptions({
@@ -263,6 +339,7 @@
   // 提交按钮loading
   const btnLoading = ref(false)
   const appStore = useAppStore()
+  const userStore = useUserStore()
 
   // 控制更多查询条件显示/隐藏状态
   const showAllQuery = ref(false)
@@ -384,6 +461,83 @@
 
   // 获取需要的字典 可能为空 按需保留
   setOptions()
+
+  const ciDialogVisible = ref(false)
+  const ciPreviewTab = ref('get')
+  const ciForm = reactive({
+    tagId: null,
+    envId: null,
+    responseMode: 'sync',
+    callbackUrl: '',
+    ciUUID: '',
+    ciSecret: '',
+    webhookType: 'feishu',
+    webhookUrl: '',
+    webhookSecret: ''
+  })
+
+  const ciEndpoint = computed(() => {
+    const basePath = import.meta.env.VITE_BASE_PATH || window.location.origin
+    const baseApi = import.meta.env.VITE_BASE_API || ''
+    return `${basePath}${baseApi}/open/runner/run`
+  })
+
+  const ciProjectId = computed(() => userStore.userInfo?.projectId || 0)
+
+  const ciGetURL = computed(() => {
+    const params = new URLSearchParams()
+    params.set('projectId', String(ciProjectId.value))
+    params.set('uuid', ciForm.ciUUID || '')
+    params.set('secret', ciForm.ciSecret || '')
+    params.set('case_type', 'tag')
+    params.set('case_id', ciForm.tagId ? String(ciForm.tagId) : '')
+    params.set('env_id', ciForm.envId ? String(ciForm.envId) : '')
+    params.set('response_mode', ciForm.responseMode)
+    if (ciForm.responseMode === 'callback') {
+      params.set('callback_url', ciForm.callbackUrl || '')
+    }
+    if (ciForm.responseMode === 'webhook') {
+      params.set('webhook_type', ciForm.webhookType || '')
+      params.set('webhook_url', ciForm.webhookUrl || '')
+      params.set('webhook_secret', ciForm.webhookSecret || '')
+    }
+    return `${ciEndpoint.value}?${params.toString()}`
+  })
+
+  const ciPostCurl = computed(() => {
+    const payload = {
+      projectId: ciProjectId.value,
+      uuid: ciForm.ciUUID || '',
+      secret: ciForm.ciSecret || '',
+      case_type: 'tag',
+      case_id: ciForm.tagId || 0,
+      env_id: ciForm.envId || 0,
+      response_mode: ciForm.responseMode,
+      callback_url: ciForm.responseMode === 'callback' ? (ciForm.callbackUrl || '') : '',
+      webhook_type: ciForm.responseMode === 'webhook' ? (ciForm.webhookType || '') : '',
+      webhook_url: ciForm.responseMode === 'webhook' ? (ciForm.webhookUrl || '') : '',
+      webhook_secret: ciForm.responseMode === 'webhook' ? (ciForm.webhookSecret || '') : ''
+    }
+    return `curl -X POST '${ciEndpoint.value}' \\\n  -H 'Content-Type: application/json' \\\n  -d '${JSON.stringify(payload)}'`
+  })
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text)
+      .then(() => ElMessage({ type: 'success', message: '已复制' }))
+      .catch(() => ElMessage({ type: 'error', message: '复制失败' }))
+  }
+
+  const openCIDialog = async () => {
+    await loadTagOptions()
+    ciDialogVisible.value = true
+    ciPreviewTab.value = 'get'
+  }
+
+  const handleCIEnvChange = (env) => {
+    if (env && typeof env === 'object') {
+      ciForm.envId = env.ID || env.id || ciForm.envId
+    }
+  }
 
 
   // 多选数据

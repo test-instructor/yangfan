@@ -17,37 +17,29 @@ type ReportOperation struct {
 	report *automation.AutoReport
 }
 
-// UpdateFromSummary 根据 hrp.Summary 计算并更新报告的用例 / 步骤 / 接口运行概要
-// 参考 yangfan/run/runTestCase/report.go 的 resetReport 思路，按 yangfan 的 AutoReport 结构落库。
-func (r *ReportOperation) UpdateFromSummary(s *hrp.Summary) {
+func buildReportFromSummary(s *hrp.Summary) *automation.AutoReport {
 	if s == nil {
-		return
+		return nil
 	}
 
-	// 顶层成功状态
 	success := s.Success
 	summaryReport := &automation.AutoReport{
 		Success: &success,
 	}
 
-	// 1. 用例 / 步骤统计 (Summary.Stat)
 	if s.Stat != nil {
-		// 用例统计
 		caseStat := &automation.AutoReportStatTestcases{
 			Total:   s.Stat.TestCases.Total,
 			Success: s.Stat.TestCases.Success,
 			Fail:    s.Stat.TestCases.Fail,
 		}
 
-		// 步骤统计 + 接口统计
 		stepStat := &automation.AutoReportStatTeststeps{
 			Actions: datatypes.JSONMap{},
 		}
 
-		// 接口统计
 		apiStat := &automation.AutoReportStatTeststepapi{}
 
-		// 统计步骤和接口
 		stepTotal := 0
 		stepSuccess := 0
 		stepFail := 0
@@ -62,7 +54,6 @@ func (r *ReportOperation) UpdateFromSummary(s *hrp.Summary) {
 				if step == nil {
 					continue
 				}
-				// 重新统计步骤
 				stepTotal++
 				if step.Success {
 					stepSuccess++
@@ -70,7 +61,6 @@ func (r *ReportOperation) UpdateFromSummary(s *hrp.Summary) {
 					stepFail++
 				}
 
-				// 统计接口 (包含 "request" 或 "api" 类型的步骤)
 				stepTypeStr := string(step.StepType)
 				if strings.Contains(stepTypeStr, "request") || strings.Contains(stepTypeStr, "api") {
 					apiTotal++
@@ -98,16 +88,17 @@ func (r *ReportOperation) UpdateFromSummary(s *hrp.Summary) {
 		}
 	}
 
-	// 2. 整体时间信息：从 StartAt 到当前时间重新计算 Duration
 	if s.Time != nil {
-		duration := time.Since(s.Time.StartAt).Seconds()
+		duration := s.Time.Duration
+		if duration <= 0 {
+			duration = time.Since(s.Time.StartAt).Seconds()
+		}
 		summaryReport.Time = &automation.AutoReportTime{
 			StartAt:  s.Time.StartAt,
 			Duration: duration,
 		}
 	}
 
-	// 3. 平台信息
 	if s.Platform != nil {
 		platform := datatypes.JSONMap{
 			"httprunner_version": s.Platform.HttprunnerVersion,
@@ -117,13 +108,11 @@ func (r *ReportOperation) UpdateFromSummary(s *hrp.Summary) {
 		summaryReport.Platform = platform
 	}
 
-	// 4. 详情 & 步骤记录
 	for _, cs := range s.Details {
 		if cs == nil {
 			continue
 		}
 
-		// 用例维度时间 &统计
 		caseStat := datatypes.JSONMap{}
 		if cs.Stat != nil {
 			caseStat["total"] = cs.Stat.Total
@@ -143,7 +132,6 @@ func (r *ReportOperation) UpdateFromSummary(s *hrp.Summary) {
 			inOut["export_vars"] = cs.InOut.ExportVars
 		}
 
-		// 构建 AutoReportDetail
 		name := cs.Name
 		if cs.InOut != nil && cs.InOut.ConfigVars != nil {
 			if v, ok := cs.InOut.ConfigVars["__case_name__"]; ok {
@@ -161,7 +149,6 @@ func (r *ReportOperation) UpdateFromSummary(s *hrp.Summary) {
 			InOut:   inOut,
 		}
 
-		// 步骤记录
 		for _, step := range cs.Records {
 			if step == nil {
 				continue
@@ -172,14 +159,11 @@ func (r *ReportOperation) UpdateFromSummary(s *hrp.Summary) {
 				httpStat[k] = v
 			}
 
-			// Data 统一转成 map[string]interface{} 存到 JSONMap
 			var dataMap datatypes.JSONMap
 			if step.Data != nil {
-				// 先尝试直接断言
 				if m, ok := step.Data.(map[string]interface{}); ok {
 					dataMap = datatypes.JSONMap(m)
 				} else {
-					// 回退到 JSON 编解码
 					b, err := json.Marshal(step.Data)
 					if err == nil {
 						var tmp map[string]interface{}
@@ -215,7 +199,16 @@ func (r *ReportOperation) UpdateFromSummary(s *hrp.Summary) {
 		summaryReport.Details = append(summaryReport.Details, detail)
 	}
 
-	// 复用已有的 UpdateReport 逻辑，将 summaryReport 合并到 r.report 并持久化
+	return summaryReport
+}
+
+// UpdateFromSummary 根据 hrp.Summary 计算并更新报告的用例 / 步骤 / 接口运行概要
+// 参考 yangfan/run/runTestCase/report.go 的 resetReport 思路，按 yangfan 的 AutoReport 结构落库。
+func (r *ReportOperation) UpdateFromSummary(s *hrp.Summary) {
+	summaryReport := buildReportFromSummary(s)
+	if summaryReport == nil {
+		return
+	}
 	r.UpdateReport(summaryReport)
 }
 

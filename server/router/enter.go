@@ -14,12 +14,13 @@ import (
 var RouterGroupApp = new(RouterGroup)
 
 type RouterGroup struct {
-	System        system.RouterGroup
-	Example       example.RouterGroup
-	Automation    automation.RouterGroup
-	Performance   performance.RouterGroup
-	Ui            ui.RouterGroup
-	Platform      platform.RouterGroup
-	Projectmgr    projectmgr.RouterGroup
-	Datawarehouse datawarehouse.RouterGroup
+	System           system.RouterGroup
+	Example          example.RouterGroup
+	Automation       automation.RouterGroup
+	Performance      performance.RouterGroup
+	Ui               ui.RouterGroup
+	Platform         platform.RouterGroup
+	Projectmgr       projectmgr.RouterGroup
+	Datawarehouse    datawarehouse.RouterGroup
+	OpenRunnerRouter platform.OpenRunnerRouter
 }

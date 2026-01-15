@@ -77,7 +77,12 @@ func Routers() *gin.Engine {
 	PrivateGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler())
 	ProjectGroup := Router.Group(global.GVA_CONFIG.System.RouterPrefix)
 	ProjectGroup.Use(middleware.ProjectAuth())
-
+	{
+		OpenGroup := Router.Group(global.GVA_CONFIG.System.RouterPrefix).Group("open")
+		OpenGroup.Use(middleware.OpenProjectAuth())
+		openRunnerRouter := router.RouterGroupApp.OpenRunnerRouter
+		openRunnerRouter.InitOpenRunnerRouter(OpenGroup)
+	}
 	{
 		// 健康监测
 		PublicGroup.GET("/health", func(c *gin.Context) {
@@ -117,7 +122,6 @@ func Routers() *gin.Engine {
 
 	// 注册业务路由
 	initBizRouter(PrivateGroup, PublicGroup, ProjectGroup)
-
 	global.GVA_ROUTERS = Router.Routes()
 
 	global.GVA_LOG.Info("router register success")
