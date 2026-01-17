@@ -1,11 +1,10 @@
 import service from '@/utils/request'
 import { useUserStore } from '@/pinia/modules/user'
 
-const userStore = useUserStore()
-const projectId = userStore.userInfo.projectId
+const getProjectId = () => useUserStore().userInfo?.projectId || 0
 
 export const createTag = (data) => {
-  data.projectId = projectId
+  data.projectId = getProjectId()
   return service({
     url: '/tk/tag/createTag',
     method: 'post',
@@ -14,7 +13,7 @@ export const createTag = (data) => {
 }
 
 export const updateTag = (data) => {
-  data.projectId = projectId
+  data.projectId = getProjectId()
   return service({
     url: '/tk/tag/updateTag',
     method: 'put',
@@ -23,7 +22,7 @@ export const updateTag = (data) => {
 }
 
 export const deleteTag = (params) => {
-  params.projectId = projectId
+  params.projectId = getProjectId()
   return service({
     url: '/tk/tag/deleteTag',
     method: 'delete',
@@ -32,7 +31,7 @@ export const deleteTag = (params) => {
 }
 
 export const getTagList = (params) => {
-  params.projectId = projectId
+  params.projectId = getProjectId()
   return service({
     url: '/tk/tag/getTagList',
     method: 'get',

@@ -1,6 +1,7 @@
 package platform
 
 import (
+	"encoding/json"
 	"errors"
 	"time"
 
@@ -72,6 +73,9 @@ func (s *RunnerService) RunTask(req request.RunnerRequest) (*request.RunnerRespo
 		req.EnvID,
 		req.ConfigID,
 		req.ProjectId,
+		req.NotifyEnabled,
+		req.NotifyRule,
+		req.NotifyChannelIDs,
 	)
 
 	if err != nil {
@@ -119,13 +123,26 @@ func (s *RunnerService) createPendingReport(req request.RunnerRequest) (*automat
 
 	case "任务", "task":
 		var task automation.TimerTask
-		if err := global.GVA_DB.Model(&automation.TimerTask{}).Select("name, project_id").First(&task, "id = ?", req.CaseID).Error; err != nil {
+		if err := global.GVA_DB.Model(&automation.TimerTask{}).
+			Select("name, project_id, message_id, notify_enabled, notify_rule").
+			First(&task, "id = ?", req.CaseID).Error; err != nil {
 			return nil, errors.New("获取任务信息失败")
 		}
 		if task.Name != nil {
 			name = *task.Name
 		}
 		projectId = task.ProjectId
+		if req.NotifyEnabled == nil && req.NotifyRule == "" && len(req.NotifyChannelIDs) == 0 {
+			if task.NotifyEnabled != nil {
+				req.NotifyEnabled = task.NotifyEnabled
+			}
+			if task.NotifyRule != nil {
+				req.NotifyRule = *task.NotifyRule
+			}
+			if task.MessageID != nil {
+				req.NotifyChannelIDs = []uint{*task.MessageID}
+			}
+		}
 
 	case "标签", "tag":
 		var tag automation.TimerTaskTag
@@ -146,15 +163,30 @@ func (s *RunnerService) createPendingReport(req request.RunnerRequest) (*automat
 
 	// 创建报告，状态为待运行
 	pendingStatus := int64(automation.ReportStatusPending)
+
+	notifyEnabled := req.NotifyEnabled
+	if notifyEnabled == nil && len(req.NotifyChannelIDs) > 0 {
+		v := true
+		notifyEnabled = &v
+	}
+	notifyChannelBytes := []byte("[]")
+	if len(req.NotifyChannelIDs) > 0 {
+		if b, err := json.Marshal(req.NotifyChannelIDs); err == nil {
+			notifyChannelBytes = b
+		}
+	}
 	report := &automation.AutoReport{
-		Name:      &name,
-		Status:    &pendingStatus,
-		ProjectId: projectId,
-		CaseType:  req.CaseType,
-		RunMode:   req.RunMode,
-		ConfigID:  req.ConfigID,
-		EnvID:     req.EnvID,
-		CaseID:    req.CaseID,
+		Name:             &name,
+		Status:           &pendingStatus,
+		ProjectId:        projectId,
+		CaseType:         req.CaseType,
+		RunMode:          req.RunMode,
+		ConfigID:         req.ConfigID,
+		EnvID:            req.EnvID,
+		CaseID:           req.CaseID,
+		NotifyEnabled:    notifyEnabled,
+		NotifyRule:       req.NotifyRule,
+		NotifyChannelIDs: notifyChannelBytes,
 	}
 
 	if err := global.GVA_DB.Create(report).Error; err != nil {

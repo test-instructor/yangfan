@@ -17,6 +17,9 @@ type TimerTaskService struct{}
 // Author [yourname](https://github.com/yourname)
 func (tkService *TimerTaskService) CreateTimerTask(ctx context.Context, tk *automation.TimerTask) (err error) {
 	err = global.GVA_DB.Create(tk).Error
+	if err == nil {
+		RefreshTimerTaskSchedules(ctx)
+	}
 	return err
 }
 
@@ -32,6 +35,9 @@ func (tkService *TimerTaskService) DeleteTimerTask(ctx context.Context, ID strin
 		return errors.New("没有该项目的操作权限")
 	}
 	err = global.GVA_DB.Delete(&automation.TimerTask{}, "id = ?", ID).Error
+	if err == nil {
+		RefreshTimerTaskSchedules(ctx)
+	}
 	return err
 }
 
@@ -39,6 +45,9 @@ func (tkService *TimerTaskService) DeleteTimerTask(ctx context.Context, ID strin
 // Author [yourname](https://github.com/yourname)
 func (tkService *TimerTaskService) DeleteTimerTaskByIds(ctx context.Context, IDs []string) (err error) {
 	err = global.GVA_DB.Delete(&[]automation.TimerTask{}, "id in ?", IDs).Error
+	if err == nil {
+		RefreshTimerTaskSchedules(ctx)
+	}
 	return err
 }
 
@@ -55,6 +64,9 @@ func (tkService *TimerTaskService) UpdateTimerTask(ctx context.Context, tk autom
 	}
 
 	err = global.GVA_DB.Model(&automation.TimerTask{}).Where("id = ?", tk.ID).Updates(&tk).Error
+	if err == nil {
+		RefreshTimerTaskSchedules(ctx)
+	}
 	return err
 }
 

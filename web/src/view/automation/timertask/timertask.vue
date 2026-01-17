@@ -95,7 +95,13 @@
         </el-table-column>
         <el-table-column align="left" label="环境名称" prop="envName" width="120" />
 
-        <el-table-column align="left" label="消息名称" prop="messageName" width="120" />
+        <el-table-column align="left" label="通知通道" prop="messageName" width="140" />
+
+        <el-table-column align="left" label="发送消息" prop="notifyEnabled" width="120">
+          <template #default="scope">{{ formatBoolean(scope.row.notifyEnabled) }}</template>
+        </el-table-column>
+
+        <el-table-column align="left" label="发送规则" prop="notifyRule" width="120" />
 
         <el-table-column align="left" label="备注" prop="describe" width="120" />
 
@@ -171,8 +177,28 @@
         <el-form-item label="环境名称:" prop="envName">
           <Env v-model="formData.envID" @change="handleEnvChange" />
         </el-form-item>
-        <el-form-item label="消息名称:" prop="messageName">
-          <el-input v-model="formData.messageName" :clearable="false" placeholder="请输入消息名称" />
+        <el-form-item label="发送消息:" prop="notifyEnabled">
+          <el-switch v-model="formData.notifyEnabled" active-color="#13ce66" inactive-color="#ff4949" active-text="是"
+                     inactive-text="否" clearable></el-switch>
+        </el-form-item>
+        <el-form-item label="发送规则:" prop="notifyRule">
+          <el-select v-model="formData.notifyRule" placeholder="请选择发送规则" style="width: 100%"
+                     :disabled="!formData.notifyEnabled">
+            <el-option label="总是发送" value="always" />
+            <el-option label="仅成功发送" value="success" />
+            <el-option label="仅失败发送" value="fail" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="通知通道:" prop="messageID">
+          <el-select v-model="formData.messageID" filterable clearable placeholder="选择通道" style="width: 100%"
+                     :disabled="!formData.notifyEnabled" @change="handleNotifyChannelChange">
+            <el-option
+              v-for="opt in notifyChannelOptions"
+              :key="opt.ID"
+              :label="`${providerLabel(opt.provider)}-${opt.name}`"
+              :value="opt.ID"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="备注:" prop="describe">
           <el-input v-model="formData.describe" :clearable="false" placeholder="请输入备注" />
@@ -189,10 +215,10 @@
           {{ detailForm.runTime }}
         </el-descriptions-item>
         <el-descriptions-item label="下次运行时间">
-          {{ detailForm.nextRunTime }}
+          {{ formatDate(detailForm.nextRunTime) }}
         </el-descriptions-item>
         <el-descriptions-item label="运行状态">
-          {{ detailForm.status }}
+          {{ formatBoolean(detailForm.status) }}
         </el-descriptions-item>
         <el-descriptions-item label="运行次数">
           {{ detailForm.runNumber }}
@@ -206,8 +232,14 @@
         <el-descriptions-item label="环境名称">
           {{ detailForm.envName }}
         </el-descriptions-item>
-        <el-descriptions-item label="消息名称">
+        <el-descriptions-item label="通知通道">
           {{ detailForm.messageName }}
+        </el-descriptions-item>
+        <el-descriptions-item label="发送消息">
+          {{ formatBoolean(detailForm.notifyEnabled) }}
+        </el-descriptions-item>
+        <el-descriptions-item label="发送规则">
+          {{ detailForm.notifyRule }}
         </el-descriptions-item>
         <el-descriptions-item label="备注">
           {{ detailForm.describe }}
@@ -238,6 +270,29 @@
         <el-form-item label="运行环境">
           <Env v-model="ciForm.envId" @change="handleCIEnvChange" style="width: 100%" />
         </el-form-item>
+        <el-form-item label="发送消息">
+          <el-switch v-model="ciForm.notifyEnabled" active-color="#13ce66" inactive-color="#ff4949" active-text="是"
+                     inactive-text="否" clearable></el-switch>
+        </el-form-item>
+        <el-form-item label="发送规则">
+          <el-select v-model="ciForm.notifyRule" placeholder="请选择发送规则" style="width: 100%"
+                     :disabled="!ciForm.notifyEnabled">
+            <el-option label="总是发送" value="always" />
+            <el-option label="仅成功发送" value="success" />
+            <el-option label="仅失败发送" value="fail" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="通知通道">
+          <el-select v-model="ciForm.notifyChannelIds" multiple filterable clearable placeholder="选择通道" style="width: 100%"
+                     :disabled="!ciForm.notifyEnabled">
+            <el-option
+              v-for="opt in notifyChannelOptions"
+              :key="opt.ID"
+              :label="`${providerLabel(opt.provider)}-${opt.name}`"
+              :value="opt.ID"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="返回方式">
           <el-radio-group v-model="ciForm.responseMode">
             <el-radio-button label="sync">同步返回</el-radio-button>
@@ -248,19 +303,24 @@
         <el-form-item v-if="ciForm.responseMode === 'callback'" label="回调URL">
           <el-input v-model="ciForm.callbackUrl" placeholder="https://your-ci/callback" />
         </el-form-item>
-        <el-form-item v-if="ciForm.responseMode === 'webhook'" label="Webhook类型">
-          <el-radio-group v-model="ciForm.webhookType">
-            <el-radio-button label="feishu">飞书</el-radio-button>
-            <el-radio-button label="wecom">企业微信</el-radio-button>
-            <el-radio-button label="dingtalk">钉钉</el-radio-button>
-            <el-radio-button label="custom">自定义</el-radio-button>
-          </el-radio-group>
+        <el-form-item v-if="ciForm.responseMode === 'webhook'" label="消息类型">
+          <el-input :model-value="selectedWebhookProviderLabel" readonly />
         </el-form-item>
-        <el-form-item v-if="ciForm.responseMode === 'webhook'" label="Webhook URL">
-          <el-input v-model="ciForm.webhookUrl" placeholder="https://your-webhook" />
-        </el-form-item>
-        <el-form-item v-if="ciForm.responseMode === 'webhook'" label="Webhook密钥">
-          <el-input v-model="ciForm.webhookSecret" placeholder="" />
+        <el-form-item v-if="ciForm.responseMode === 'webhook'" label="通道名称(发送规则)">
+          <el-select
+            v-model="ciForm.webhookChannelId"
+            filterable
+            clearable
+            placeholder="选择通道"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="opt in webhookChannelOptions"
+              :key="opt.ID"
+              :label="`${opt.name}(${sendRuleLabel(opt.send_rule)})`"
+              :value="opt.ID"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="CI鉴权标识">
           <el-input v-model="ciForm.ciUUID" placeholder="" />
@@ -308,6 +368,7 @@
     getTimerTaskList
   } from '@/api/automation/timertask'
   import { getTagList } from '@/api/automation/tag'
+  import { getReportNotifyChannelList } from '@/api/projectmgr/reportNotify'
   import TagManager from '@/components/automation/TagManager.vue'
   import TaskCaseDetail from './components/TaskCaseDetail.vue'
   
@@ -352,9 +413,14 @@
     status: false,
     runNumber: 0,
     configName: '',
+    configID: null,
     tag: [],
     envName: '',
+    envID: null,
     messageName: '',
+    messageID: null,
+    notifyEnabled: false,
+    notifyRule: 'always',
     describe: ''
   })
 
@@ -416,6 +482,7 @@
 
   const tagOptions = ref([])
   const tagNameMap = ref({})
+  const notifyChannelOptions = ref([])
 
   const loadTagOptions = async () => {
     const res = await getTagList({ page: 1, pageSize: 1000 })
@@ -425,6 +492,32 @@
       const map = {}
       list.forEach(item => { map[item.ID || item.id] = item.name })
       tagNameMap.value = map
+    }
+  }
+
+  const loadNotifyChannelOptions = async () => {
+    const res = await getReportNotifyChannelList({ page: 1, pageSize: 1000 })
+    if (res.code === 0) {
+      notifyChannelOptions.value = res.data.list || []
+    }
+  }
+
+  const providerLabel = (p) => {
+    if (p === 'feishu') return '飞书'
+    if (p === 'dingtalk') return '钉钉'
+    if (p === 'wecom') return '企业微信'
+    return p || ''
+  }
+
+  const handleNotifyChannelChange = (id) => {
+    if (!id) {
+      formData.value.messageName = ''
+      formData.value.messageID = null
+      return
+    }
+    const opt = notifyChannelOptions.value.find((x) => x.ID === id)
+    if (opt) {
+      formData.value.messageName = opt.name
     }
   }
 
@@ -457,6 +550,7 @@
   // 获取需要的字典 可能为空 按需保留
   const setOptions = async () => {
     await loadTagOptions()
+    await loadNotifyChannelOptions()
   }
 
   // 获取需要的字典 可能为空 按需保留
@@ -467,10 +561,14 @@
   const ciForm = reactive({
     tagId: null,
     envId: null,
+    notifyEnabled: false,
+    notifyRule: 'always',
+    notifyChannelIds: [],
     responseMode: 'sync',
     callbackUrl: '',
     ciUUID: '',
     ciSecret: '',
+    webhookChannelId: null,
     webhookType: 'feishu',
     webhookUrl: '',
     webhookSecret: ''
@@ -492,14 +590,19 @@
     params.set('case_type', 'tag')
     params.set('case_id', ciForm.tagId ? String(ciForm.tagId) : '')
     params.set('env_id', ciForm.envId ? String(ciForm.envId) : '')
+    params.set('notify_enabled', String(!!ciForm.notifyEnabled))
+    params.set('notify_rule', ciForm.notifyRule || '')
+    if (Array.isArray(ciForm.notifyChannelIds)) {
+      ciForm.notifyChannelIds.forEach((id) => {
+        params.append('notify_channel_ids', String(id))
+      })
+    }
     params.set('response_mode', ciForm.responseMode)
     if (ciForm.responseMode === 'callback') {
       params.set('callback_url', ciForm.callbackUrl || '')
     }
     if (ciForm.responseMode === 'webhook') {
-      params.set('webhook_type', ciForm.webhookType || '')
-      params.set('webhook_url', ciForm.webhookUrl || '')
-      params.set('webhook_secret', ciForm.webhookSecret || '')
+      params.set('webhook_channel_id', ciForm.webhookChannelId ? String(ciForm.webhookChannelId) : '')
     }
     return `${ciEndpoint.value}?${params.toString()}`
   })
@@ -512,11 +615,12 @@
       case_type: 'tag',
       case_id: ciForm.tagId || 0,
       env_id: ciForm.envId || 0,
+      notify_enabled: !!ciForm.notifyEnabled,
+      notify_rule: ciForm.notifyRule || '',
+      notify_channel_ids: Array.isArray(ciForm.notifyChannelIds) ? ciForm.notifyChannelIds : [],
       response_mode: ciForm.responseMode,
       callback_url: ciForm.responseMode === 'callback' ? (ciForm.callbackUrl || '') : '',
-      webhook_type: ciForm.responseMode === 'webhook' ? (ciForm.webhookType || '') : '',
-      webhook_url: ciForm.responseMode === 'webhook' ? (ciForm.webhookUrl || '') : '',
-      webhook_secret: ciForm.responseMode === 'webhook' ? (ciForm.webhookSecret || '') : ''
+      webhook_channel_id: ciForm.responseMode === 'webhook' ? (ciForm.webhookChannelId || 0) : 0
     }
     return `curl -X POST '${ciEndpoint.value}' \\\n  -H 'Content-Type: application/json' \\\n  -d '${JSON.stringify(payload)}'`
   })
@@ -529,6 +633,7 @@
 
   const openCIDialog = async () => {
     await loadTagOptions()
+    await loadNotifyChannelOptions()
     ciDialogVisible.value = true
     ciPreviewTab.value = 'get'
   }
@@ -538,6 +643,35 @@
       ciForm.envId = env.ID || env.id || ciForm.envId
     }
   }
+
+  const sendRuleLabel = (rule) => {
+    if (rule === 'always') return '总是发送'
+    if (rule === 'success') return '仅成功发送'
+    if (rule === 'fail') return '仅失败发送'
+    return rule || ''
+  }
+
+  const webhookChannelOptions = computed(() => {
+    const supported = new Set(['feishu', 'wecom', 'dingtalk', 'custom'])
+    return (notifyChannelOptions.value || []).filter((x) => {
+      if (!x) return false
+      if (x.enabled === false) return false
+      const provider = (x.provider || '').toLowerCase()
+      if (!supported.has(provider)) return false
+      if (!x.webhook_url) return false
+      return true
+    })
+  })
+
+  const selectedWebhookChannel = computed(() => {
+    if (!ciForm.webhookChannelId) return null
+    return webhookChannelOptions.value.find((x) => x.ID === ciForm.webhookChannelId) || null
+  })
+
+  const selectedWebhookProviderLabel = computed(() => {
+    const opt = selectedWebhookChannel.value
+    return opt ? providerLabel(opt.provider) : ''
+  })
 
 
   // 多选数据
@@ -601,6 +735,8 @@
     if (res.code === 0) {
       formData.value = res.data
       formData.value.tag = normalizeTagArray(res.data.tag)
+      if (formData.value.notifyEnabled == null) formData.value.notifyEnabled = false
+      if (!formData.value.notifyRule) formData.value.notifyRule = 'always'
       dialogFormVisible.value = true
     }
   }
@@ -656,9 +792,14 @@
       status: false,
       runNumber: 0,
       configName: '',
+      configID: null,
       tag: [],
       envName: '',
+      envID: null,
       messageName: '',
+      messageID: null,
+      notifyEnabled: false,
+      notifyRule: 'always',
       describe: ''
     }
   }

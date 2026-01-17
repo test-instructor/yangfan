@@ -18,6 +18,7 @@ import (
 	"github.com/test-instructor/yangfan/server/v2/model/projectmgr"
 	projectmgrReq "github.com/test-instructor/yangfan/server/v2/model/projectmgr/request"
 	"github.com/test-instructor/yangfan/server/v2/utils/notify"
+	"go.uber.org/zap"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -138,13 +139,19 @@ func (s *ReportNotifyService) GetReportNotifyChannelList(ctx context.Context, in
 
 func (s *ReportNotifyService) GetAutoReportNotifyStatus(ctx context.Context, reportId uint) (AutoReportNotifyStatusResponse, error) {
 	var report automation.AutoReport
-	if err := global.GVA_DB.Select("id", "project_id", "status").Where("id = ?", reportId).First(&report).Error; err != nil {
+	if err := global.GVA_DB.Select("id", "project_id", "status", "notify_enabled", "notify_rule", "notify_channel_ids").Where("id = ?", reportId).First(&report).Error; err != nil {
 		return AutoReportNotifyStatusResponse{}, err
 	}
 	status := int64(0)
 	if report.Status != nil {
 		status = *report.Status
 	}
+
+	notifyEnabled := true
+	if report.NotifyEnabled != nil {
+		notifyEnabled = *report.NotifyEnabled
+	}
+	selectedChannelIDs := parseNotifyChannelIDs(report.NotifyChannelIDs)
 
 	result := ""
 	switch status {
@@ -155,7 +162,20 @@ func (s *ReportNotifyService) GetAutoReportNotifyStatus(ctx context.Context, rep
 	}
 
 	var channels []projectmgr.ProjectReportNotifyChannel
-	if err := global.GVA_DB.Where("project_id = ? AND enabled = ?", report.ProjectId, true).Order("id desc").Find(&channels).Error; err != nil {
+	channelDB := global.GVA_DB.Where("project_id = ? AND enabled = ?", report.ProjectId, true)
+	if len(selectedChannelIDs) > 0 {
+		channelDB = channelDB.Where("id IN ?", selectedChannelIDs)
+	} else if !notifyEnabled {
+		channels = []projectmgr.ProjectReportNotifyChannel{}
+		return AutoReportNotifyStatusResponse{
+			ReportId:     reportId,
+			ProjectId:    report.ProjectId,
+			ReportStatus: status,
+			Result:       result,
+			Items:        []AutoReportNotifyChannelStatus{},
+		}, nil
+	}
+	if err := channelDB.Order("id desc").Find(&channels).Error; err != nil {
 		return AutoReportNotifyStatusResponse{}, err
 	}
 
@@ -172,12 +192,16 @@ func (s *ReportNotifyService) GetAutoReportNotifyStatus(ctx context.Context, rep
 
 	items := make([]AutoReportNotifyChannelStatus, 0, len(channels))
 	for _, ch := range channels {
-		state, okPtr, errMsg := s.channelState(status, ch, result, logByChannel[ch.ID])
+		rule := ch.SendRule
+		if report.NotifyRule != "" {
+			rule = projectmgr.ReportNotifySendRule(report.NotifyRule)
+		}
+		state, okPtr, errMsg := s.channelState(status, notifyEnabled, rule, result, logByChannel[ch.ID])
 		items = append(items, AutoReportNotifyChannelStatus{
 			ChannelId: ch.ID,
 			Provider:  string(ch.Provider),
 			Name:      ch.Name,
-			SendRule:  string(ch.SendRule),
+			SendRule:  string(rule),
 			State:     state,
 			Ok:        okPtr,
 			Error:     errMsg,
@@ -195,13 +219,16 @@ func (s *ReportNotifyService) GetAutoReportNotifyStatus(ctx context.Context, rep
 }
 
 func (s *ReportNotifyService) NotifyAutoReport(ctx context.Context, reportId uint) error {
+	global.GVA_LOG.Debug("NotifyAutoReport called", zap.Uint("reportId", reportId))
 	var report automation.AutoReport
 	if err := global.GVA_DB.
 		Preload("Stat").
 		Preload("Stat.Testcases").
 		Preload("Time").
+		Preload("Details").
 		Where("id = ?", reportId).
 		First(&report).Error; err != nil {
+		global.GVA_LOG.Error("NotifyAutoReport fetch report failed", zap.Uint("reportId", reportId), zap.Error(err))
 		return err
 	}
 	status := int64(0)
@@ -218,22 +245,47 @@ func (s *ReportNotifyService) NotifyAutoReport(ctx context.Context, reportId uin
 		return nil
 	}
 
+	notifyEnabled := true
+	if report.NotifyEnabled != nil {
+		notifyEnabled = *report.NotifyEnabled
+	}
+	global.GVA_LOG.Debug("NotifyAutoReport check enabled", zap.Uint("reportId", reportId), zap.Bool("enabled", notifyEnabled))
+	if !notifyEnabled {
+		return nil
+	}
+
 	var channels []projectmgr.ProjectReportNotifyChannel
-	if err := global.GVA_DB.Where("project_id = ? AND enabled = ?", report.ProjectId, true).Find(&channels).Error; err != nil {
+	channelDB := global.GVA_DB.Where("project_id = ? AND enabled = ?", report.ProjectId, true)
+	selectedChannelIDs := parseNotifyChannelIDs(report.NotifyChannelIDs)
+	if len(selectedChannelIDs) > 0 {
+		channelDB = channelDB.Where("id IN ?", selectedChannelIDs)
+	}
+	if err := channelDB.Find(&channels).Error; err != nil {
+		global.GVA_LOG.Error("NotifyAutoReport fetch channels failed", zap.Uint("reportId", reportId), zap.Error(err))
 		return err
 	}
+	global.GVA_LOG.Debug("NotifyAutoReport channels found", zap.Uint("reportId", reportId), zap.Int("count", len(channels)))
 	for _, ch := range channels {
-		if !matchRule(ch.SendRule, result) {
+		global.GVA_LOG.Debug("NotifyAutoReport processing channel", zap.Uint("reportId", reportId), zap.Uint("channelId", ch.ID), zap.String("name", ch.Name))
+		rule := ch.SendRule
+		if report.NotifyRule != "" {
+			rule = projectmgr.ReportNotifySendRule(report.NotifyRule)
+		}
+		if !matchRule(rule, result) {
+			global.GVA_LOG.Debug("NotifyAutoReport rule mismatch", zap.Uint("reportId", reportId), zap.Uint("channelId", ch.ID), zap.String("rule", string(rule)), zap.String("result", string(result)))
 			continue
 		}
 		if err := s.sendOnce(ctx, report, ch, result); err != nil {
+			global.GVA_LOG.Error("NotifyAutoReport sendOnce failed", zap.Uint("reportId", reportId), zap.Uint("channelId", ch.ID), zap.Error(err))
 			continue
 		}
+		global.GVA_LOG.Debug("NotifyAutoReport sendOnce success", zap.Uint("reportId", reportId), zap.Uint("channelId", ch.ID))
 	}
 	return nil
 }
 
 func (s *ReportNotifyService) sendOnce(ctx context.Context, report automation.AutoReport, ch projectmgr.ProjectReportNotifyChannel, result projectmgr.ReportNotifyReportResult) error {
+	global.GVA_LOG.Debug("sendOnce called", zap.Uint("reportId", report.ID), zap.Uint("channelId", ch.ID))
 	now := time.Now()
 	logRow := projectmgr.ProjectReportNotifyLog{
 		ProjectId:    report.ProjectId,
@@ -272,7 +324,13 @@ func (s *ReportNotifyService) sendOnce(ctx context.Context, report automation.Au
 }
 
 func (s *ReportNotifyService) sendToChannel(ctx context.Context, report automation.AutoReport, ch projectmgr.ProjectReportNotifyChannel, result projectmgr.ReportNotifyReportResult) ([]byte, error) {
+	global.GVA_LOG.Debug("sendToChannel called", zap.Uint("reportId", report.ID), zap.Uint("channelId", ch.ID), zap.String("provider", string(ch.Provider)))
 	vars := buildTemplateVars(report, ch.WebBaseURL)
+	if ch.Provider != projectmgr.ReportNotifyProviderFeishu {
+		if list, ok := vars["content"].([]Content); ok {
+			vars["content"] = generateTableContent(list)
+		}
+	}
 
 	ctx, cancel := context.WithTimeout(ctx, 6*time.Second)
 	defer cancel()
@@ -299,7 +357,12 @@ func (s *ReportNotifyService) sendToChannel(ctx context.Context, report automati
 			body["sign"] = feishuSign(timestamp, ch.WebhookSecret)
 		}
 		b, _ := json.Marshal(body)
-		return b, notify.PostJSON(ctx, ch.WebhookURL, body)
+		global.GVA_LOG.Debug("NotifyAutoReport request", zap.Uint("reportId", report.ID), zap.Uint("channelId", ch.ID), zap.String("body", string(b)))
+		resp, err := notify.PostJSON(ctx, ch.WebhookURL, body)
+		if len(resp) > 0 {
+			global.GVA_LOG.Debug("NotifyAutoReport response", zap.Uint("reportId", report.ID), zap.Uint("channelId", ch.ID), zap.String("body", string(resp)))
+		}
+		return b, err
 	case projectmgr.ReportNotifyProviderDingTalk:
 		text := renderTemplate(selectTemplate(ch, result), vars)
 		body := map[string]any{
@@ -311,7 +374,12 @@ func (s *ReportNotifyService) sendToChannel(ctx context.Context, report automati
 		}
 		b, _ := json.Marshal(body)
 		targetURL := dingTalkSignedURL(ch.WebhookURL, ch.WebhookSecret)
-		return b, notify.PostJSON(ctx, targetURL, body)
+		global.GVA_LOG.Debug("NotifyAutoReport request", zap.Uint("reportId", report.ID), zap.Uint("channelId", ch.ID), zap.String("body", string(b)))
+		resp, err := notify.PostJSON(ctx, targetURL, body)
+		if len(resp) > 0 {
+			global.GVA_LOG.Debug("NotifyAutoReport response", zap.Uint("reportId", report.ID), zap.Uint("channelId", ch.ID), zap.String("body", string(resp)))
+		}
+		return b, err
 	case projectmgr.ReportNotifyProviderWeCom:
 		text := renderTemplate(selectTemplate(ch, result), vars)
 		body := map[string]any{
@@ -321,7 +389,12 @@ func (s *ReportNotifyService) sendToChannel(ctx context.Context, report automati
 			},
 		}
 		b, _ := json.Marshal(body)
-		return b, notify.PostJSON(ctx, ch.WebhookURL, body)
+		global.GVA_LOG.Debug("NotifyAutoReport request", zap.Uint("reportId", report.ID), zap.Uint("channelId", ch.ID), zap.String("body", string(b)))
+		resp, err := notify.PostJSON(ctx, ch.WebhookURL, body)
+		if len(resp) > 0 {
+			global.GVA_LOG.Debug("NotifyAutoReport response", zap.Uint("reportId", report.ID), zap.Uint("channelId", ch.ID), zap.String("body", string(resp)))
+		}
+		return b, err
 	default:
 		body := map[string]any{
 			"msgtype": "text",
@@ -330,13 +403,18 @@ func (s *ReportNotifyService) sendToChannel(ctx context.Context, report automati
 			},
 		}
 		b, _ := json.Marshal(body)
-		return b, notify.PostJSON(ctx, ch.WebhookURL, body)
+		global.GVA_LOG.Debug("NotifyAutoReport request", zap.Uint("reportId", report.ID), zap.Uint("channelId", ch.ID), zap.String("body", string(b)))
+		resp, err := notify.PostJSON(ctx, ch.WebhookURL, body)
+		if len(resp) > 0 {
+			global.GVA_LOG.Debug("NotifyAutoReport response", zap.Uint("reportId", report.ID), zap.Uint("channelId", ch.ID), zap.String("body", string(resp)))
+		}
+		return b, err
 	}
 }
 
 const (
-	feishuSuccessTemplateID = "ctp_AAmjYNU6suN8"
-	feishuFailTemplateID    = "ctp_AAmjrxmb8sYg"
+	feishuSuccessTemplateID = "ctp_AAmjuIxqEQjK"
+	feishuFailTemplateID    = "ctp_AAmIkXEaoPea"
 )
 
 func providerLabel(p projectmgr.ReportNotifyProvider) string {
@@ -365,14 +443,17 @@ func matchRule(rule projectmgr.ReportNotifySendRule, result projectmgr.ReportNot
 	}
 }
 
-func (s *ReportNotifyService) channelState(reportStatus int64, ch projectmgr.ProjectReportNotifyChannel, result string, log projectmgr.ProjectReportNotifyLog) (string, *bool, string) {
+func (s *ReportNotifyService) channelState(reportStatus int64, notifyEnabled bool, rule projectmgr.ReportNotifySendRule, result string, log projectmgr.ProjectReportNotifyLog) (string, *bool, string) {
+	if !notifyEnabled {
+		return "未发送", nil, ""
+	}
 	if reportStatus != int64(automation.ReportStatusSuccess) && reportStatus != int64(automation.ReportStatusFailed) {
 		return "待发送", nil, ""
 	}
 	if result == "" {
 		return "待发送", nil, ""
 	}
-	if !matchRule(ch.SendRule, projectmgr.ReportNotifyReportResult(result)) {
+	if !matchRule(rule, projectmgr.ReportNotifyReportResult(result)) {
 		return "未发送", nil, ""
 	}
 	if log.ID == 0 {
@@ -383,6 +464,17 @@ func (s *ReportNotifyService) channelState(reportStatus int64, ch projectmgr.Pro
 		return "成功发送", &ok, ""
 	}
 	return "发送失败", &ok, log.Error
+}
+
+func parseNotifyChannelIDs(raw datatypes.JSON) []uint {
+	if len(raw) == 0 {
+		return nil
+	}
+	var ids []uint
+	if err := json.Unmarshal(raw, &ids); err != nil {
+		return nil
+	}
+	return ids
 }
 
 func selectTemplate(ch projectmgr.ProjectReportNotifyChannel, result projectmgr.ReportNotifyReportResult) string {
@@ -401,7 +493,17 @@ func defaultTextTemplate() string {
 	return "**{{title}}**\n\n- 状态：{{status}}\n- 环境：{{env}}\n- 成功：{{success}}\n- 失败：{{fail}}\n- 耗时：{{time}}\n- 详情：{{detail}}\n"
 }
 
-func buildTemplateVars(report automation.AutoReport, webBaseURL string) map[string]string {
+type Content struct {
+	Name    string `json:"name"`
+	Success int    `json:"success"`
+	Fail    int    `json:"fail"`
+	Time    int    `json:"time"`
+	Total   int    `json:"total"`
+	Error   int    `json:"error"`
+	Skip    int    `json:"skip"`
+}
+
+func buildTemplateVars(report automation.AutoReport, webBaseURL string) map[string]any {
 	title := ""
 	if report.Name != nil {
 		title = *report.Name
@@ -429,7 +531,58 @@ func buildTemplateVars(report automation.AutoReport, webBaseURL string) map[stri
 		base := strings.TrimRight(webBaseURL, "/")
 		detail = fmt.Sprintf("%s/#/layout/auto-report-detail/%d", base, report.ID)
 	}
-	return map[string]string{
+
+	var contents []Content
+	for _, v := range report.Details {
+		statMap := v.Stat
+		timeMap := v.Time
+
+		// Debug log to inspect map content
+		global.GVA_LOG.Debug("inspecting detail stat",
+			zap.String("name", v.Name),
+			zap.Any("stat", statMap),
+			zap.Any("time", timeMap))
+
+		getFloat := func(m map[string]any, k string) float64 {
+			if m == nil {
+				return 0
+			}
+			if val, ok := m[k]; ok {
+				switch v := val.(type) {
+				case float64:
+					return v
+				case int:
+					return float64(v)
+				case int64:
+					return float64(v)
+				case float32:
+					return float64(v)
+				case string:
+					f, _ := strconv.ParseFloat(v, 64)
+					return f
+				case json.Number:
+					f, _ := v.Float64()
+					return f
+				}
+			}
+			return 0
+		}
+
+		durationValue := getFloat(timeMap, "duration")
+
+		content := Content{
+			Name:    v.Name,
+			Total:   int(getFloat(statMap, "total")),
+			Fail:    int(getFloat(statMap, "failures")),
+			Success: int(getFloat(statMap, "successes")),
+			Error:   int(getFloat(statMap, "error")),
+			Skip:    int(getFloat(statMap, "skip")),
+			Time:    int(durationValue),
+		}
+		contents = append(contents, content)
+	}
+
+	return map[string]any{
 		"title":   title,
 		"name":    title,
 		"status":  status,
@@ -438,17 +591,35 @@ func buildTemplateVars(report automation.AutoReport, webBaseURL string) map[stri
 		"fail":    fmt.Sprintf("%d", failCount),
 		"time":    fmt.Sprintf("%.2f秒", duration),
 		"detail":  detail,
-		"content": "",
+		"content": contents,
 	}
 }
 
-func renderTemplate(tpl string, vars map[string]string) string {
+func renderTemplate(tpl string, vars map[string]any) string {
 	out := tpl
 	for k, v := range vars {
-		out = strings.ReplaceAll(out, "{{"+k+"}}", v)
-		out = strings.ReplaceAll(out, "${"+k+"}", v)
+		s := fmt.Sprintf("%v", v)
+		out = strings.ReplaceAll(out, "{{"+k+"}}", s)
+		out = strings.ReplaceAll(out, "${"+k+"}", s)
 	}
 	return out
+}
+
+func generateTableContent(data []Content) (tableContent string) {
+	for _, row := range data {
+		tableContent += "<tr>"
+		tableContent += fmt.Sprintf("<td>%s</td>", row.Name)
+		tableContent += fmt.Sprintf("<td>%d</td>", row.Success)
+		tableContent += fmt.Sprintf("<td>%d</td>", row.Fail)
+		tableContent += fmt.Sprintf("<td>%d秒</td>", row.Time)
+		tableContent += "</tr>"
+	}
+	tableContent = fmt.Sprintf("<table><tr><th style=\"min-width: 80px; max-width: 240px;\">用例名称</th>"+
+		"<th style=\"min-width: 80px; max-width: 240px;\">成功数</th>"+
+		"<th style=\"min-width: 80px; max-width: 240px;\">失败数</th>"+
+		"<th style=\"min-width: 80px; max-width: 240px;\">耗时</th></tr>%s</table>", tableContent)
+
+	return tableContent
 }
 
 func feishuSign(timestamp, secret string) string {

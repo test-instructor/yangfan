@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"io"
 	"net"
 	"net/http"
 	"net/url"
@@ -31,13 +32,15 @@ type EnqueuedPayload struct {
 }
 
 func SendCallback(ctx context.Context, callbackURL string, payload EnqueuedPayload) error {
-	return postJSON(ctx, callbackURL, payload)
+	_, err := postJSON(ctx, callbackURL, payload)
+	return err
 }
 
 func SendWebhook(ctx context.Context, webhookType, webhookURL, webhookSecret string, payload EnqueuedPayload) error {
 	switch strings.ToLower(webhookType) {
 	case "custom":
-		return postJSON(ctx, webhookURL, payload)
+		_, err := postJSON(ctx, webhookURL, payload)
+		return err
 	case "feishu":
 		return postFeishu(ctx, webhookURL, webhookSecret, payload)
 	case "wecom":
@@ -49,30 +52,31 @@ func SendWebhook(ctx context.Context, webhookType, webhookURL, webhookSecret str
 	}
 }
 
-func postJSON(ctx context.Context, targetURL string, body any) error {
+func postJSON(ctx context.Context, targetURL string, body any) ([]byte, error) {
 	u, err := normalizeURL(targetURL)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	data, err := json.Marshal(body)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u, bytes.NewReader(data))
 	if err != nil {
-		return err
+		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{Timeout: 6 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer resp.Body.Close()
+	respBody, _ := io.ReadAll(resp.Body)
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return errors.New("webhook http status " + strconv.Itoa(resp.StatusCode))
+		return respBody, errors.New("webhook http status " + strconv.Itoa(resp.StatusCode))
 	}
-	return nil
+	return respBody, nil
 }
 
 func normalizeURL(raw string) (string, error) {
@@ -119,7 +123,8 @@ func postFeishu(ctx context.Context, webhookURL, secret string, payload Enqueued
 		body["timestamp"] = timestamp
 		body["sign"] = feishuSign(timestamp, secret)
 	}
-	return postJSON(ctx, webhookURL, body)
+	_, err := postJSON(ctx, webhookURL, body)
+	return err
 }
 
 func feishuSign(timestamp, secret string) string {
@@ -136,7 +141,8 @@ func postWeCom(ctx context.Context, webhookURL string, payload EnqueuedPayload) 
 			"content": formatEnqueuedText(payload),
 		},
 	}
-	return postJSON(ctx, webhookURL, body)
+	_, err := postJSON(ctx, webhookURL, body)
+	return err
 }
 
 func postDingTalk(ctx context.Context, webhookURL, secret string, payload EnqueuedPayload) error {
@@ -163,7 +169,8 @@ func postDingTalk(ctx context.Context, webhookURL, secret string, payload Enqueu
 			"content": formatEnqueuedText(payload),
 		},
 	}
-	return postJSON(ctx, targetURL, body)
+	_, err := postJSON(ctx, targetURL, body)
+	return err
 }
 
 func dingTalkSign(timestamp, secret string) string {
@@ -173,7 +180,7 @@ func dingTalkSign(timestamp, secret string) string {
 	return url.QueryEscape(base64.StdEncoding.EncodeToString(mac.Sum(nil)))
 }
 
-func PostJSON(ctx context.Context, targetURL string, body any) error {
+func PostJSON(ctx context.Context, targetURL string, body any) ([]byte, error) {
 	return postJSON(ctx, targetURL, body)
 }
 

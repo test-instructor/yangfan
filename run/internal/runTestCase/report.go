@@ -1,6 +1,7 @@
 package runTestCase
 
 import (
+	"context"
 	"encoding/json"
 	"strings"
 	"time"
@@ -8,6 +9,7 @@ import (
 	"github.com/test-instructor/yangfan/httprunner/hrp"
 	"github.com/test-instructor/yangfan/server/v2/global"
 	"github.com/test-instructor/yangfan/server/v2/model/automation"
+	projectmgrsvc "github.com/test-instructor/yangfan/server/v2/service/projectmgr"
 	"go.uber.org/zap"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
@@ -291,5 +293,15 @@ func (r *ReportOperation) UpdateReport(report *automation.AutoReport) {
 		Save(r.report).Error
 	if err != nil {
 		global.GVA_LOG.Error("更新报告失败", zap.Error(err))
+		return
 	}
+
+	reportID := r.report.ID
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		if err := (&projectmgrsvc.ReportNotifyService{}).NotifyAutoReport(ctx, reportID); err != nil {
+			global.GVA_LOG.Warn("发送报告通知失败", zap.Uint("report_id", reportID), zap.Error(err))
+		}
+	}()
 }

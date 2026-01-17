@@ -44,6 +44,10 @@ type AutoReport struct {
 	EnvName    string `json:"env_name" form:"env_name" gorm:"column:env_name;"`
 	ConfigName string `json:"config_name" form:"config_name" gorm:"column:config_name;"`
 	CaseID     uint   `json:"case_id" form:"case_id" gorm:"column:case_id;"` // 用例ID
+
+	NotifyEnabled    *bool          `json:"notifyEnabled" form:"notifyEnabled" gorm:"column:notify_enabled;"`                                      // 是否发送消息
+	NotifyRule       string         `json:"notifyRule" form:"notifyRule" gorm:"column:notify_rule;"`                                               // 发送规则(always/success/fail)
+	NotifyChannelIDs datatypes.JSON `json:"notifyChannelIds" form:"notifyChannelIds" gorm:"column:notify_channel_ids;" swaggertype:"array,number"` // 本次运行通知通道ID列表
 }
 
 // TableName 自动报告 AutoReport自定义表名 auto_reports

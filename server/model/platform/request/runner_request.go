@@ -10,6 +10,10 @@ type RunnerRequest struct {
 	EnvID     int    `json:"env_id"`    // 环境ID
 	ConfigID  int    `json:"config_id"` // 配置ID
 	ProjectId uint   `json:"projectId"`
+
+	NotifyEnabled    *bool  `json:"notify_enabled"`
+	NotifyRule       string `json:"notify_rule"`
+	NotifyChannelIDs []uint `json:"notify_channel_ids"`
 }
 
 type RunnerResponse struct {

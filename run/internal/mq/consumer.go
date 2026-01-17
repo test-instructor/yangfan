@@ -5,11 +5,11 @@ import (
 
 	"encoding/json"
 
+	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/test-instructor/yangfan/run/internal/runTestCase"
 	"github.com/test-instructor/yangfan/server/v2/global"
 	"github.com/test-instructor/yangfan/server/v2/model/platform/request"
 	"github.com/test-instructor/yangfan/server/v2/utils/mq"
-	amqp "github.com/rabbitmq/amqp091-go"
 	"go.uber.org/zap"
 )
 
@@ -90,14 +90,17 @@ func (c *RunnerTaskConsumer) handleMessage(msg amqp.Delivery) {
 
 	// 构建 RunnerRequest
 	runnerReq := request.RunnerRequest{
-		CaseType:  taskMsg.CaseType,
-		CaseID:    taskMsg.CaseID,
-		ReportID:  taskMsg.ReportID,
-		RunMode:   taskMsg.RunMode,
-		NodeName:  taskMsg.NodeName,
-		EnvID:     taskMsg.EnvID,
-		ConfigID:  taskMsg.ConfigID,
-		ProjectId: taskMsg.ProjectID,
+		CaseType:         taskMsg.CaseType,
+		CaseID:           taskMsg.CaseID,
+		ReportID:         taskMsg.ReportID,
+		RunMode:          taskMsg.RunMode,
+		NodeName:         taskMsg.NodeName,
+		EnvID:            taskMsg.EnvID,
+		ConfigID:         taskMsg.ConfigID,
+		ProjectId:        taskMsg.ProjectID,
+		NotifyEnabled:    taskMsg.NotifyEnabled,
+		NotifyRule:       taskMsg.NotifyRule,
+		NotifyChannelIDs: taskMsg.NotifyChannelIDs,
 	}
 
 	msgBody := string(msg.Body)

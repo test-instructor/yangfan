@@ -1,7 +1,6 @@
 import service from '@/utils/request'
 import { useUserStore } from '@/pinia/modules/user'
-const userStore = useUserStore()
-const projectId = userStore.userInfo.projectId
+const getProjectId = () => useUserStore().userInfo?.projectId || 0
 // @Tags TimerTask
 // @Summary 创建定时任务
 // @Security ApiKeyAuth
@@ -11,7 +10,7 @@ const projectId = userStore.userInfo.projectId
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"创建成功"}"
 // @Router /tk/createTimerTask [post]
 export const createTimerTask = (data) => {
-  data.projectId = projectId
+  data.projectId = getProjectId()
   return service({
     url: '/tk/createTimerTask',
     method: 'post',
@@ -28,7 +27,7 @@ export const createTimerTask = (data) => {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
 // @Router /tk/deleteTimerTask [delete]
 export const deleteTimerTask = (params) => {
-  params.projectId = projectId
+  params.projectId = getProjectId()
   return service({
     url: '/tk/deleteTimerTask',
     method: 'delete',
@@ -45,7 +44,7 @@ export const deleteTimerTask = (params) => {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
 // @Router /tk/deleteTimerTask [delete]
 export const deleteTimerTaskByIds = (params) => {
-  params.projectId = projectId
+  params.projectId = getProjectId()
   return service({
     url: '/tk/deleteTimerTaskByIds',
     method: 'delete',
@@ -62,7 +61,7 @@ export const deleteTimerTaskByIds = (params) => {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
 // @Router /tk/updateTimerTask [put]
 export const updateTimerTask = (data) => {
-  data.projectId = projectId
+  data.projectId = getProjectId()
   return service({
     url: '/tk/updateTimerTask',
     method: 'put',
@@ -79,7 +78,7 @@ export const updateTimerTask = (data) => {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
 // @Router /tk/findTimerTask [get]
 export const findTimerTask = (params) => {
-  params.projectId = projectId
+  params.projectId = getProjectId()
   return service({
     url: '/tk/findTimerTask',
     method: 'get',
@@ -96,7 +95,7 @@ export const findTimerTask = (params) => {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /tk/getTimerTaskList [get]
 export const getTimerTaskList = (params) => {
-  params.projectId = projectId
+  params.projectId = getProjectId()
   return service({
     url: '/tk/getTimerTaskList',
     method: 'get',
@@ -120,7 +119,7 @@ export const getTimerTaskPublic = () => {
 
 // 任务-用例关联：添加
 export const addTimerTaskCase = (data) => {
-  data.projectId = projectId
+  data.projectId = getProjectId()
   return service({
     url: '/tk/addTimerTaskCase',
     method: 'post',
@@ -130,7 +129,7 @@ export const addTimerTaskCase = (data) => {
 
 // 任务-用例关联：排序
 export const sortTimerTaskCase = (data) => {
-  data.projectId = projectId
+  data.projectId = getProjectId()
   return service({
     url: '/tk/sortTimerTaskCase',
     method: 'post',
@@ -140,7 +139,7 @@ export const sortTimerTaskCase = (data) => {
 
 // 任务-用例关联：删除
 export const delTimerTaskCase = (params) => {
-  params.projectId = projectId
+  params.projectId = getProjectId()
   return service({
     url: '/tk/delTimerTaskCase',
     method: 'delete',
@@ -150,7 +149,7 @@ export const delTimerTaskCase = (params) => {
 
 // 任务-用例关联：获取任务引用的用例列表
 export const getTimerTaskCases = (params) => {
-  params.projectId = projectId
+  params.projectId = getProjectId()
   return service({
     url: '/tk/getTimerTaskCases',
     method: 'get',

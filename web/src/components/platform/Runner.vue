@@ -29,8 +29,33 @@
             <EnvSelector v-model="form.env_id" width="100%" />
           </el-form-item>
 
+          <el-divider content-position="left">消息通知</el-divider>
+          <el-form-item label="发送消息:">
+            <el-switch v-model="form.notify_enabled" active-color="#13ce66" inactive-color="#ff4949" active-text="是"
+                       inactive-text="否" clearable></el-switch>
+          </el-form-item>
+          <el-form-item label="发送规则:">
+            <el-select v-model="form.notify_rule" placeholder="请选择发送规则" style="width: 100%"
+                       :disabled="!form.notify_enabled">
+              <el-option label="总是发送" value="always" />
+              <el-option label="仅成功发送" value="success" />
+              <el-option label="仅失败发送" value="fail" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="通知通道:">
+            <el-select v-model="form.notify_channel_ids" multiple collapse-tags collapse-tags-tooltip filterable clearable
+                       style="width: 100%" placeholder="选择通道" :loading="notifyChannelLoading"
+                       :disabled="!form.notify_enabled">
+              <el-option
+                v-for="item in notifyChannelOptions"
+                :key="item.ID"
+                :label="`${providerLabel(item.provider)}-${item.name}`"
+                :value="item.ID"
+              />
+            </el-select>
+          </el-form-item>
+
           <template v-if="runResult.report_id">
-            <el-divider content-position="left">消息通知</el-divider>
             <el-form-item label="报告:">
               <div class="flex items-center justify-between w-full">
                 <div class="text-sm">
@@ -78,6 +103,7 @@ import EnvSelector from '@/components/platform/env.vue'
 import RunConfigSelector from '@/components/platform/runConfig.vue'
 import { runTask } from '@/api/run.js'
 import { getAutoReportNotifyStatus } from '@/api/projectmgr/reportNotify'
+import { getReportNotifyChannelList } from '@/api/projectmgr/reportNotify'
 import { useRouter } from 'vue-router'
 
 const props = defineProps({
@@ -94,6 +120,8 @@ const props = defineProps({
 const visible = ref(false)
 const loading = ref(false)
 const notifyLoading = ref(false)
+const notifyChannelLoading = ref(false)
+const notifyChannelOptions = ref([])
 const notifyItems = ref([])
 const selectedChannelIds = ref([])
 const runResult = reactive({
@@ -106,7 +134,10 @@ let notifyTimer = null
 const form = reactive({
   run_mode: '调试模式', // 默认调试
   config_id: null,
-  env_id: null
+  env_id: null,
+  notify_enabled: false,
+  notify_rule: 'always',
+  notify_channel_ids: []
 })
 
 // 运行模式选项
@@ -118,6 +149,7 @@ const runModes = [
 
 const handleOpen = () => {
   // 每次打开可以重置或保持状态，这里保持状态
+  loadNotifyChannels()
   visible.value = true
 }
 
@@ -130,6 +162,25 @@ const resetRunState = () => {
   if (notifyTimer) {
     clearInterval(notifyTimer)
     notifyTimer = null
+  }
+}
+
+const providerLabel = (p) => {
+  if (p === 'feishu') return '飞书'
+  if (p === 'dingtalk') return '钉钉'
+  if (p === 'wecom') return '企业微信'
+  return p || ''
+}
+
+const loadNotifyChannels = async () => {
+  notifyChannelLoading.value = true
+  try {
+    const res = await getReportNotifyChannelList({ page: 1, pageSize: 1000 })
+    if (res.code === 0) {
+      notifyChannelOptions.value = res.data?.list || []
+    }
+  } finally {
+    notifyChannelLoading.value = false
   }
 }
 
@@ -182,7 +233,10 @@ const handleRun = async () => {
       case_id: props.case_id,
       config_id: form.config_id || 0,
       env_id: form.env_id || 0,
-      run_mode: form.run_mode
+      run_mode: form.run_mode,
+      notify_enabled: !!form.notify_enabled,
+      notify_rule: form.notify_rule || '',
+      notify_channel_ids: Array.isArray(form.notify_channel_ids) ? form.notify_channel_ids : []
     }
     
     const res = await runTask(payload)
