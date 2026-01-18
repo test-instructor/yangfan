@@ -32,7 +32,7 @@ func Seeds() []MenuSeed {
 		{Path: "envDetail", ParentPath: "platform", Name: "envDetail", Hidden: false, Component: "view/platform/envdetail/envdetail.vue", Sort: 200, Meta: sysModel.Meta{Title: "环境变量管理", Icon: "env"}},
 		{Path: "FunctionPlugin", ParentPath: "platform", Name: "FunctionPlugin", Hidden: false, Component: "view/routerHolder.vue", Sort: 300, Meta: sysModel.Meta{Title: "函数插件", Icon: "Plugin"}},
 		{Path: "rc", ParentPath: "platform", Name: "rc", Hidden: false, Component: "view/platform/runconfig/runconfig.vue", Sort: 100, Meta: sysModel.Meta{Title: "运行配置", Icon: "un-config-o"}},
-		{Path: "rn", ParentPath: "platform", Name: "rn", Hidden: false, Component: "view/platform/runnernode/runnernode.vue", Sort: 499, Meta: sysModel.Meta{Title: "运行节点", Icon: ""}},
+		{Path: "rn", ParentPath: "platform", Name: "rn", Hidden: false, Component: "view/platform/runnernode/runnernode.vue", Sort: 499, Meta: sysModel.Meta{Title: "运行节点", Icon: "node"}},
 
 		// FunctionPlugin children
 		{Path: "pc", ParentPath: "FunctionPlugin", Name: "pc", Hidden: false, Component: "view/platform/pc/pc.vue", Sort: 200, Meta: sysModel.Meta{Title: "python 函数", Icon: "Function"}},
