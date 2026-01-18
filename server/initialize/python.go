@@ -12,6 +12,9 @@ import (
 )
 
 func InitPython() {
+	if global.GVA_DB == nil {
+		return
+	}
 	home, err := os.UserHomeDir()
 	if err != nil {
 		global.GVA_LOG.Error("get user home dir fail", zap.Error(err))
