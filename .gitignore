@@ -39,3 +39,4 @@ deploy/docker/logs
 /debugcode/
 /log/
 /.trae/
+/capture_screenshots_v4.py

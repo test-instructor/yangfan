@@ -69,45 +69,61 @@
 
 # 项目概况
 
-登录页面
+## 登录页面
 
 ![login.png](docs/img/login.png)
-环境变量
 
-![image-20230829174440747](docs/img/image-20230829174440747.png)
+## 项目管理
 
-配置管理
+### 项目配置
+![pj.png](docs/img/pj.png)
 
-![image-20230829174458214](docs/img/image-20230829174458214.png)
+### 项目成员与权限
+![upa.png](docs/img/upa.png)
 
-消息通知
+### 报告通知
+![reportNotify.png](docs/img/reportNotify.png)
 
-![image-20230829174516343](docs/img/image-20230829174516343.png)
+## 平台配置
 
-接口管理
+### 环境变量管理
+![envDetail.png](docs/img/envDetail.png)
 
-![image-20230829174531185](docs/img/image-20230829174531185.png)
+### 运行配置
+![rc.png](docs/img/rc.png)
 
-测试步骤
+### 运行节点
+![rn.png](docs/img/rn.png)
 
-![image-20230829174557399](docs/img/image-20230829174557399.png)
+#### Python 函数
+![pc.png](docs/img/pc.png)
 
-定时任务
+#### 调试信息
+![pcd.png](docs/img/pcd.png)
 
-![image-20230829174610942](docs/img/image-20230829174610942.png)
+#### Py 第三方库
+![pp.png](docs/img/pp.png)
 
-测试报告
+## 接口自动化
 
-![image-20230829174720649](docs/img/image-20230829174720649.png)
+### 接口管理
+![as.png](docs/img/as.png)
 
-测试报告详情
+### 测试步骤
+![acs.png](docs/img/acs.png)
 
-![image-20230830202631438](docs/img/image-20230830202631438.png)
+### 测试用例
+![ac.png](docs/img/ac.png)
 
-测试报告详情
+### 定时任务
+![tk.png](docs/img/tk.png)
 
-![image-20230829174738189](docs/img/image-20230829174738189.png)
+### 自动报告
+![ar.png](docs/img/ar.png)
 
-性能测试报告
+## 数据仓库
 
-![image-20230829174902698](docs/img/image-20230829174902698.png)
+### 数据分类
+![dcm.png](docs/img/dcm.png)
+
+
