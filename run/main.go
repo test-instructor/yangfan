@@ -40,16 +40,22 @@ func main() {
 
 	// 2. Initialize MQ Client
 	mqConfig := global.GVA_CONFIG.MQ
-	mqLoader := server_mq.NewMQConfigLoader()
-	if err := mqLoader.LoadAndValidate(mqConfig); err != nil {
-		global.GVA_LOG.Fatal("MQ Config validation failed", zap.Error(err))
-	}
+	var mqClient *server_mq.MQClient
+	if mqConfig.Type != "" {
+		mqLoader := server_mq.NewMQConfigLoader()
+		if err := mqLoader.LoadAndValidate(mqConfig); err != nil {
+			global.GVA_LOG.Fatal("MQ Config validation failed", zap.Error(err))
+		}
 
-	mqClient, err := server_mq.NewMQClient(mqConfig, global.GVA_LOG)
-	if err != nil {
-		global.GVA_LOG.Fatal("MQ Initialization failed", zap.Error(err))
+		var err error
+		mqClient, err = server_mq.NewMQClient(mqConfig, global.GVA_LOG)
+		if err != nil {
+			global.GVA_LOG.Fatal("MQ Initialization failed", zap.Error(err))
+		}
+		defer mqClient.Close()
+	} else {
+		global.GVA_LOG.Info("MQ configuration is empty, skipping MQ initialization")
 	}
-	defer mqClient.Close()
 
 	// 3. Prepare Runner Config (only NodeName is used for MQ queue naming)
 	runnerConfig := global.GVA_CONFIG.Runner
@@ -82,11 +88,15 @@ func main() {
 
 	var runnerConsumer *mq.RunnerTaskConsumer
 	if enableRunnerConsumer {
-		runnerConsumer = mq.NewRunnerTaskConsumer(mqClient, runnerConfig.NodeName)
-		if err := runnerConsumer.StartListen(); err != nil {
-			global.GVA_LOG.Fatal("Failed to start runner consumer", zap.Error(err))
+		if mqClient != nil {
+			runnerConsumer = mq.NewRunnerTaskConsumer(mqClient, runnerConfig.NodeName)
+			if err := runnerConsumer.StartListen(); err != nil {
+				global.GVA_LOG.Fatal("Failed to start runner consumer", zap.Error(err))
+			}
+			defer runnerConsumer.Stop()
+		} else {
+			global.GVA_LOG.Info("Runner task consumer disabled because MQ is not configured")
 		}
-		defer runnerConsumer.Stop()
 	} else {
 		global.GVA_LOG.Info("Runner task consumer disabled by RUN_SERVICE_MODE", zap.String("mode", mode))
 	}
@@ -96,11 +106,15 @@ func main() {
 		scheduler.Start(context.Background())
 		defer scheduler.Stop()
 
-		timerConsumer := mq.NewTimerTaskControlConsumer(mqClient, runnerConfig.NodeName, scheduler)
-		if err := timerConsumer.StartListen(); err != nil {
-			global.GVA_LOG.Fatal("Failed to start timer control consumer", zap.Error(err))
+		if mqClient != nil {
+			timerConsumer := mq.NewTimerTaskControlConsumer(mqClient, runnerConfig.NodeName, scheduler)
+			if err := timerConsumer.StartListen(); err != nil {
+				global.GVA_LOG.Fatal("Failed to start timer control consumer", zap.Error(err))
+			}
+			defer timerConsumer.Stop()
+		} else {
+			global.GVA_LOG.Info("Timer control consumer disabled because MQ is not configured")
 		}
-		defer timerConsumer.Stop()
 
 		global.GVA_LOG.Info("Timer mode enabled by RUN_SERVICE_MODE", zap.String("mode", mode))
 	}
