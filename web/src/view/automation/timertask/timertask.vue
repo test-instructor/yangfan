@@ -86,6 +86,8 @@
         </el-table-column>
         <el-table-column align="left" label="运行次数" prop="runNumber" width="120" />
 
+        <el-table-column align="left" label="运行节点" prop="runnerNodeName" width="180" />
+
         <el-table-column align="left" label="运行配置" prop="configName" width="120" />
 
         <el-table-column label="标签" prop="tag" width="200">
@@ -158,6 +160,17 @@
           <el-switch v-model="formData.status" active-color="#13ce66" inactive-color="#ff4949" active-text="是"
                      inactive-text="否" clearable></el-switch>
         </el-form-item>
+        <el-form-item label="运行节点:" prop="runnerNodeName">
+          <el-select v-model="formData.runnerNodeName" filterable clearable placeholder="选择节点" style="width: 100%">
+            <el-option label="不指定" value="" />
+            <el-option
+              v-for="opt in runnerNodeOptions"
+              :key="opt.nodeName"
+              :label="opt.alias ? `${opt.alias}(${opt.nodeName})` : opt.nodeName"
+              :value="opt.nodeName"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="运行次数:" prop="runNumber">
           <el-input v-model.number="formData.runNumber" :clearable="false" placeholder="请输入运行次数" />
         </el-form-item>
@@ -222,6 +235,9 @@
         </el-descriptions-item>
         <el-descriptions-item label="运行次数">
           {{ detailForm.runNumber }}
+        </el-descriptions-item>
+        <el-descriptions-item label="运行节点">
+          {{ detailForm.runnerNodeName || '-' }}
         </el-descriptions-item>
         <el-descriptions-item label="运行配置">
           {{ detailForm.configName }}
@@ -369,6 +385,7 @@
   } from '@/api/automation/timertask'
   import { getTagList } from '@/api/automation/tag'
   import { getReportNotifyChannelList } from '@/api/projectmgr/reportNotify'
+  import { getRunnerNodeList } from '@/api/platform/runnernode'
   import TagManager from '@/components/automation/TagManager.vue'
   import TaskCaseDetail from './components/TaskCaseDetail.vue'
   
@@ -388,7 +405,7 @@
     onDownloadFile
   } from '@/utils/format'
   import { ElMessage, ElMessageBox } from 'element-plus'
-  import { ref, reactive, computed } from 'vue'
+  import { ref, reactive, computed, onMounted } from 'vue'
   import { useAppStore } from '@/pinia'
   import { useUserStore } from '@/pinia/modules/user'
 
@@ -421,7 +438,8 @@
     messageID: null,
     notifyEnabled: false,
     notifyRule: 'always',
-    describe: ''
+    describe: '',
+    runnerNodeName: ''
   })
 
 
@@ -478,11 +496,10 @@
     }
   }
 
-  getTableData()
-
   const tagOptions = ref([])
   const tagNameMap = ref({})
   const notifyChannelOptions = ref([])
+  const runnerNodeOptions = ref([])
 
   const loadTagOptions = async () => {
     const res = await getTagList({ page: 1, pageSize: 1000 })
@@ -499,6 +516,14 @@
     const res = await getReportNotifyChannelList({ page: 1, pageSize: 1000 })
     if (res.code === 0) {
       notifyChannelOptions.value = res.data.list || []
+    }
+  }
+
+  const loadRunnerNodeOptions = async () => {
+    const res = await getRunnerNodeList({ page: 1, pageSize: 1000, runContents: ['timer', 'all'] })
+    if (res.code === 0) {
+      const list = res.data.list || []
+      runnerNodeOptions.value = list.filter((x) => x.nodeName)
     }
   }
 
@@ -553,8 +578,11 @@
     await loadNotifyChannelOptions()
   }
 
-  // 获取需要的字典 可能为空 按需保留
-  setOptions()
+  onMounted(() => {
+    getTableData()
+    loadRunnerNodeOptions()
+    setOptions()
+  })
 
   const ciDialogVisible = ref(false)
   const ciPreviewTab = ref('get')
@@ -735,6 +763,7 @@
     if (res.code === 0) {
       formData.value = res.data
       formData.value.tag = normalizeTagArray(res.data.tag)
+      if (!formData.value.runnerNodeName) formData.value.runnerNodeName = ''
       if (formData.value.notifyEnabled == null) formData.value.notifyEnabled = false
       if (!formData.value.notifyRule) formData.value.notifyRule = 'always'
       dialogFormVisible.value = true
@@ -800,7 +829,8 @@
       messageID: null,
       notifyEnabled: false,
       notifyRule: 'always',
-      describe: ''
+      describe: '',
+      runnerNodeName: ''
     }
   }
   // 弹窗确定

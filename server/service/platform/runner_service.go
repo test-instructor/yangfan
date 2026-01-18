@@ -56,7 +56,7 @@ func (s *RunnerService) RunTask(req request.RunnerRequest) (*request.RunnerRespo
 	taskID := uuid.New().String()
 
 	// 3. 创建测试报告（状态为待运行）
-	report, err := s.createPendingReport(req)
+	report, err := s.CreatePendingReport(req)
 	if err != nil {
 		global.GVA_LOG.Error("创建测试报告失败", zap.Error(err))
 		return nil, errors.New("创建测试报告失败: " + err.Error())
@@ -90,8 +90,8 @@ func (s *RunnerService) RunTask(req request.RunnerRequest) (*request.RunnerRespo
 	}, nil
 }
 
-// createPendingReport 根据请求参数创建待运行状态的测试报告
-func (s *RunnerService) createPendingReport(req request.RunnerRequest) (*automation.AutoReport, error) {
+// CreatePendingReport 根据请求参数创建待运行状态的测试报告
+func (s *RunnerService) CreatePendingReport(req request.RunnerRequest) (*automation.AutoReport, error) {
 	var name string
 	var projectId int64
 

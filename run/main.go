@@ -1,13 +1,16 @@
 package main
 
 import (
+	"context"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/test-instructor/yangfan/httprunner/hrp"
 	"github.com/test-instructor/yangfan/run/internal/mq"
 	"github.com/test-instructor/yangfan/run/internal/service"
+	runtimer "github.com/test-instructor/yangfan/run/internal/timer"
 	"github.com/test-instructor/yangfan/server/v2/core"
 	"github.com/test-instructor/yangfan/server/v2/global"
 	"github.com/test-instructor/yangfan/server/v2/initialize"
@@ -18,6 +21,22 @@ import (
 func main() {
 	// 1. Initialize System
 	initializeSystem()
+
+	mode := strings.ToLower(strings.TrimSpace(os.Getenv("RUN_SERVICE_MODE")))
+	if mode == "" {
+		mode = "runner"
+	}
+	enableRunnerConsumer := mode == "runner" || mode == "all"
+	enableTimer := mode == "timer" || mode == "all"
+
+	if mode != "runner" && mode != "timer" && mode != "all" {
+		global.GVA_LOG.Warn("Unknown RUN_SERVICE_MODE, fallback to runner", zap.String("mode", mode))
+		mode = "runner"
+		enableRunnerConsumer = true
+		enableTimer = false
+	}
+
+	runContent := mode
 
 	// 2. Initialize MQ Client
 	mqConfig := global.GVA_CONFIG.MQ
@@ -34,33 +53,57 @@ func main() {
 
 	// 3. Prepare Runner Config (only NodeName is used for MQ queue naming)
 	runnerConfig := global.GVA_CONFIG.Runner
+	hostname, err := os.Hostname()
+	if err != nil || strings.TrimSpace(hostname) == "" {
+		hostname = "unknown"
+	}
+
 	// Support Env Override
 	if envNode := os.Getenv("NODE_NAME"); envNode != "" {
 		runnerConfig.NodeName = envNode
 	}
 
 	if runnerConfig.NodeName == "" {
-		hostname, err := os.Hostname()
-		if err != nil {
-			hostname = "unknown"
-		}
 		runnerConfig.NodeName = "yf_runner_" + hostname
 		global.GVA_LOG.Info("Runner NodeName not specified, using generated name", zap.String("name", runnerConfig.NodeName))
 	}
 
-	runnerSvc := service.NewRunnerService(runnerConfig.NodeName, runnerConfig.Port)
+	nodeAlias := strings.TrimSpace(os.Getenv("NODE_ALIAS"))
+	if nodeAlias == "" {
+		nodeAlias = hostname
+	}
+
+	runnerSvc := service.NewRunnerService(runnerConfig.NodeName, nodeAlias, runContent, runnerConfig.Port)
 	if err := runnerSvc.Register(); err != nil {
 		global.GVA_LOG.Fatal("Runner registration failed", zap.Error(err))
 	}
 	runnerSvc.StartHeartbeat()
 	defer runnerSvc.Stop()
 
-	// 4. Initialize MQ Consumer
-	consumer := mq.NewRunnerTaskConsumer(mqClient, runnerConfig.NodeName)
-	if err := consumer.StartListen(); err != nil {
-		global.GVA_LOG.Fatal("Failed to start consumer", zap.Error(err))
+	var runnerConsumer *mq.RunnerTaskConsumer
+	if enableRunnerConsumer {
+		runnerConsumer = mq.NewRunnerTaskConsumer(mqClient, runnerConfig.NodeName)
+		if err := runnerConsumer.StartListen(); err != nil {
+			global.GVA_LOG.Fatal("Failed to start runner consumer", zap.Error(err))
+		}
+		defer runnerConsumer.Stop()
+	} else {
+		global.GVA_LOG.Info("Runner task consumer disabled by RUN_SERVICE_MODE", zap.String("mode", mode))
 	}
-	defer consumer.Stop()
+
+	if enableTimer {
+		scheduler := runtimer.NewTimerTaskScheduler(runnerConfig.NodeName)
+		scheduler.Start(context.Background())
+		defer scheduler.Stop()
+
+		timerConsumer := mq.NewTimerTaskControlConsumer(mqClient, runnerConfig.NodeName, scheduler)
+		if err := timerConsumer.StartListen(); err != nil {
+			global.GVA_LOG.Fatal("Failed to start timer control consumer", zap.Error(err))
+		}
+		defer timerConsumer.Stop()
+
+		global.GVA_LOG.Info("Timer mode enabled by RUN_SERVICE_MODE", zap.String("mode", mode))
+	}
 
 	// 5. Wait for Signal
 	quit := make(chan os.Signal, 1)

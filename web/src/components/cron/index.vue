@@ -243,7 +243,7 @@ import { Calendar } from '@element-plus/icons-vue'
 const props = defineProps({
   modelValue: {
     type: String,
-    default: '* * * * * ?'
+    default: '0 * * * * ?'
   }
 })
 
@@ -262,10 +262,10 @@ const weekMap = {
 }
 
 const second = reactive({
-  type: '*',
+  type: ',',
   range: { start: 0, end: 0 },
   loop: { start: 0, interval: 1 },
-  list: []
+  list: ['0']
 })
 
 const minute = reactive({
@@ -308,21 +308,25 @@ const week = reactive({
 // 解析Cron表达式
 const parseCron = (val) => {
   if (!val) return
-  const arr = val.split(' ')
+  const arr = val.split(' ').filter(Boolean)
+  if (arr.length === 5) {
+    arr.unshift('0')
+  }
   if (arr.length < 6) return
+  const fields = arr.slice(0, 6)
 
   // 秒
-  parseItem(arr[0], second)
+  parseItem(fields[0], second)
   // 分
-  parseItem(arr[1], minute)
+  parseItem(fields[1], minute)
   // 时
-  parseItem(arr[2], hour)
+  parseItem(fields[2], hour)
   // 日
-  parseItem(arr[3], day)
+  parseItem(fields[3], day)
   // 月
-  parseItem(arr[4], month)
+  parseItem(fields[4], month)
   // 周
-  parseItem(arr[5], week)
+  parseItem(fields[5], week)
 }
 
 const parseItem = (str, obj) => {

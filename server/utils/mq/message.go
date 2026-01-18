@@ -18,3 +18,9 @@ type TaskMessage struct {
 	CreateTime       int64       `json:"create_time"`
 	ExpireTime       int64       `json:"expire_time"`
 }
+
+type TimerTaskControlMessage struct {
+	Action   string `json:"action"`
+	TaskID   uint   `json:"task_id"`
+	SendTime int64  `json:"send_time"`
+}

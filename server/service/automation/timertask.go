@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/test-instructor/yangfan/server/v2/global"
 	"github.com/test-instructor/yangfan/server/v2/model/automation"
@@ -19,6 +20,7 @@ func (tkService *TimerTaskService) CreateTimerTask(ctx context.Context, tk *auto
 	err = global.GVA_DB.Create(tk).Error
 	if err == nil {
 		RefreshTimerTaskSchedules(ctx)
+		tkService.publishTimerTaskControl(ctx, tk.ID, tk.RunnerNodeName)
 	}
 	return err
 }
@@ -34,6 +36,7 @@ func (tkService *TimerTaskService) DeleteTimerTask(ctx context.Context, ID strin
 	if tk.ProjectId != projectId {
 		return errors.New("没有该项目的操作权限")
 	}
+	tkService.publishTimerTaskControlDelete(ctx, tk.ID, tk.RunnerNodeName)
 	err = global.GVA_DB.Delete(&automation.TimerTask{}, "id = ?", ID).Error
 	if err == nil {
 		RefreshTimerTaskSchedules(ctx)
@@ -44,6 +47,13 @@ func (tkService *TimerTaskService) DeleteTimerTask(ctx context.Context, ID strin
 // DeleteTimerTaskByIds 批量删除定时任务记录
 // Author [yourname](https://github.com/yourname)
 func (tkService *TimerTaskService) DeleteTimerTaskByIds(ctx context.Context, IDs []string) (err error) {
+	var tasks []automation.TimerTask
+	_ = global.GVA_DB.WithContext(ctx).
+		Select("id", "runner_node_name").
+		Find(&tasks, "id in ?", IDs).Error
+	for _, t := range tasks {
+		tkService.publishTimerTaskControlDelete(ctx, t.ID, t.RunnerNodeName)
+	}
 	err = global.GVA_DB.Delete(&[]automation.TimerTask{}, "id in ?", IDs).Error
 	if err == nil {
 		RefreshTimerTaskSchedules(ctx)
@@ -66,8 +76,68 @@ func (tkService *TimerTaskService) UpdateTimerTask(ctx context.Context, tk autom
 	err = global.GVA_DB.Model(&automation.TimerTask{}).Where("id = ?", tk.ID).Updates(&tk).Error
 	if err == nil {
 		RefreshTimerTaskSchedules(ctx)
+		var current automation.TimerTask
+		_ = global.GVA_DB.WithContext(ctx).
+			Select("id", "run_time", "status", "runner_node_name").
+			First(&current, "id = ?", tk.ID).Error
+
+		oldNode := ""
+		if oldTimerTask.RunnerNodeName != nil {
+			oldNode = strings.TrimSpace(*oldTimerTask.RunnerNodeName)
+		}
+		newNode := ""
+		if current.RunnerNodeName != nil {
+			newNode = strings.TrimSpace(*current.RunnerNodeName)
+		}
+
+		if oldNode != "" && oldNode != newNode {
+			tkService.publishTimerTaskControlDelete(ctx, tk.ID, oldTimerTask.RunnerNodeName)
+		}
+		tkService.publishTimerTaskControl(ctx, tk.ID, current.RunnerNodeName)
 	}
 	return err
+}
+
+func (tkService *TimerTaskService) publishTimerTaskControl(ctx context.Context, taskID uint, runnerNodeName *string) {
+	if global.GVA_MQ_TIMER_PRODUCER == nil {
+		return
+	}
+	if runnerNodeName == nil {
+		return
+	}
+	node := strings.TrimSpace(*runnerNodeName)
+	if node == "" {
+		return
+	}
+
+	var t automation.TimerTask
+	if err := global.GVA_DB.WithContext(ctx).
+		Select("id", "run_time", "status", "runner_node_name").
+		First(&t, "id = ?", taskID).Error; err != nil {
+		return
+	}
+
+	enabled := t.Status != nil && *t.Status
+	hasSpec := t.RunTime != nil && strings.TrimSpace(*t.RunTime) != ""
+	action := "delete"
+	if enabled && hasSpec {
+		action = "upsert"
+	}
+	_ = global.GVA_MQ_TIMER_PRODUCER.Send(action, taskID, node)
+}
+
+func (tkService *TimerTaskService) publishTimerTaskControlDelete(ctx context.Context, taskID uint, runnerNodeName *string) {
+	if global.GVA_MQ_TIMER_PRODUCER == nil {
+		return
+	}
+	if runnerNodeName == nil {
+		return
+	}
+	node := strings.TrimSpace(*runnerNodeName)
+	if node == "" {
+		return
+	}
+	_ = global.GVA_MQ_TIMER_PRODUCER.Send("delete", taskID, node)
 }
 
 // GetTimerTask 根据ID获取定时任务记录

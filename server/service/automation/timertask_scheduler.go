@@ -25,7 +25,8 @@ func RefreshTimerTaskSchedules(ctx context.Context) {
 	var tasks []automation.TimerTask
 	db := global.GVA_DB.WithContext(ctx).Model(&automation.TimerTask{}).
 		Where("status = ?", true).
-		Where("run_time IS NOT NULL AND run_time <> ''")
+		Where("run_time IS NOT NULL AND run_time <> ''").
+		Where("(runner_node_name IS NULL OR runner_node_name = '')")
 	if err := db.Find(&tasks).Error; err != nil {
 		return
 	}

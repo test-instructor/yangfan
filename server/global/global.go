@@ -41,6 +41,7 @@ var (
 	GVA_MCP_SERVER          *server.MCPServer
 	GVA_MQ                  *mq.MQClient
 	GVA_MQ_PRODUCER         *mq.RunnerTaskProducer
+	GVA_MQ_TIMER_PRODUCER   *mq.TimerTaskControlProducer
 	BlackCache              local_cache.Cache
 	lock                    sync.RWMutex
 

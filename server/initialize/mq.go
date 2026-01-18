@@ -26,5 +26,6 @@ func InitMQ() {
 
 	global.GVA_MQ = client
 	global.GVA_MQ_PRODUCER = mq.NewRunnerTaskProducer(client, global.GVA_DB, config, global.GVA_LOG)
+	global.GVA_MQ_TIMER_PRODUCER = mq.NewTimerTaskControlProducer(client, config, global.GVA_LOG)
 	global.GVA_LOG.Info("MQ Initialized successfully", zap.String("type", config.Type))
 }
