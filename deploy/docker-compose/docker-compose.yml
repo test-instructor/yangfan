@@ -3,10 +3,6 @@ services:
     image: "${REGISTRY:-yangfanz/}server${IMAGE_SUFFIX:-}:${IMAGE_TAG:-latest}"
     container_name: yangfan-server
     restart: always
-    depends_on:
-      - mysql
-      - redis
-      - rabbitmq
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml:ro
     ports:
@@ -21,9 +17,37 @@ services:
     restart: always
     depends_on:
       - server
-      - mysql
-      - redis
-      - rabbitmq
+    environment:
+      RUN_SERVICE_MODE: runner
+      NODE_NAME: runner
+    volumes:
+      - ./config/docker.config.yaml:/yangfan/docker.config.yaml:ro
+    networks:
+      - yangfan-network
+
+  run-all:
+    image: "${REGISTRY:-yangfanz/}run${IMAGE_SUFFIX:-}:${IMAGE_TAG:-latest}"
+    container_name: yangfan-run-all
+    restart: always
+    depends_on:
+      - server
+    environment:
+      RUN_SERVICE_MODE: all
+      NODE_NAME: runner-all
+    volumes:
+      - ./config/docker.config.yaml:/yangfan/docker.config.yaml:ro
+    networks:
+      - yangfan-network
+
+  run-timer:
+    image: "${REGISTRY:-yangfanz/}run${IMAGE_SUFFIX:-}:${IMAGE_TAG:-latest}"
+    container_name: yangfan-run-timer
+    restart: always
+    depends_on:
+      - server
+    environment:
+      RUN_SERVICE_MODE: timer
+      NODE_NAME: runner-timer
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml:ro
     networks:
@@ -33,10 +57,6 @@ services:
     image: "${REGISTRY:-yangfanz/}data${IMAGE_SUFFIX:-}:${IMAGE_TAG:-latest}"
     container_name: yangfan-data
     restart: always
-    depends_on:
-      - mysql
-      - redis
-      - rabbitmq
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml:ro
     ports:
