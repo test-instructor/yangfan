@@ -63,6 +63,10 @@ func (s *RunnerService) RunTask(req request.RunnerRequest) (*request.RunnerRespo
 	}
 
 	// 4. Send to MQ (携带报告ID)
+	if global.GVA_MQ_PRODUCER == nil {
+		global.GVA_LOG.Error("MQ未初始化，无法运行任务")
+		return nil, errors.New("MQ未初始化，无法运行任务")
+	}
 	nodeName, err := global.GVA_MQ_PRODUCER.SendTask(
 		taskID,
 		report.ID,

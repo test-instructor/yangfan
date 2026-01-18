@@ -284,7 +284,7 @@ mcp:
 
 # MQ configuration
 mq:
-  type: rabbitmq           # MQ类型: rabbitmq, rocketmq, kafka (留空则不启用MQ)
+  type: ""           # MQ类型: rabbitmq, rocketmq, kafka (留空则不启用MQ)
   host: 127.0.0.1          # MQ服务器地址
   port: 5672               # MQ端口
   username: guest          # 用户名

@@ -49,6 +49,7 @@ func Reload() error {
 		global.GVA_MQ.Close()
 		global.GVA_MQ = nil
 		global.GVA_MQ_PRODUCER = nil
+		global.GVA_MQ_TIMER_PRODUCER = nil
 	}
 	InitMQ()
 
