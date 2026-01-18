@@ -286,6 +286,17 @@
         <el-form-item label="运行环境">
           <Env v-model="ciForm.envId" @change="handleCIEnvChange" style="width: 100%" />
         </el-form-item>
+        <el-form-item label="运行节点">
+          <el-select v-model="ciForm.nodeName" filterable clearable placeholder="选择节点" style="width: 100%">
+            <el-option label="不指定" value="" />
+            <el-option
+              v-for="opt in ciRunnerNodeOptions"
+              :key="opt.nodeName"
+              :label="opt.alias ? `${opt.alias}(${opt.nodeName})` : opt.nodeName"
+              :value="opt.nodeName"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="发送消息">
           <el-switch v-model="ciForm.notifyEnabled" active-color="#13ce66" inactive-color="#ff4949" active-text="是"
                      inactive-text="否" clearable></el-switch>
@@ -500,6 +511,7 @@
   const tagNameMap = ref({})
   const notifyChannelOptions = ref([])
   const runnerNodeOptions = ref([])
+  const ciRunnerNodeOptions = ref([])
 
   const loadTagOptions = async () => {
     const res = await getTagList({ page: 1, pageSize: 1000 })
@@ -524,6 +536,14 @@
     if (res.code === 0) {
       const list = res.data.list || []
       runnerNodeOptions.value = list.filter((x) => x.nodeName)
+    }
+  }
+
+  const loadCIRunnerNodeOptions = async () => {
+    const res = await getRunnerNodeList({ page: 1, pageSize: 1000, runContents: ['runner', 'all'] })
+    if (res.code === 0) {
+      const list = res.data.list || []
+      ciRunnerNodeOptions.value = list.filter((x) => x.nodeName)
     }
   }
 
@@ -589,6 +609,7 @@
   const ciForm = reactive({
     tagId: null,
     envId: null,
+    nodeName: '',
     notifyEnabled: false,
     notifyRule: 'always',
     notifyChannelIds: [],
@@ -618,6 +639,9 @@
     params.set('case_type', 'tag')
     params.set('case_id', ciForm.tagId ? String(ciForm.tagId) : '')
     params.set('env_id', ciForm.envId ? String(ciForm.envId) : '')
+    if (ciForm.nodeName) {
+      params.set('node_name', ciForm.nodeName)
+    }
     params.set('notify_enabled', String(!!ciForm.notifyEnabled))
     params.set('notify_rule', ciForm.notifyRule || '')
     if (Array.isArray(ciForm.notifyChannelIds)) {
@@ -643,6 +667,7 @@
       case_type: 'tag',
       case_id: ciForm.tagId || 0,
       env_id: ciForm.envId || 0,
+      node_name: ciForm.nodeName || '',
       notify_enabled: !!ciForm.notifyEnabled,
       notify_rule: ciForm.notifyRule || '',
       notify_channel_ids: Array.isArray(ciForm.notifyChannelIds) ? ciForm.notifyChannelIds : [],
@@ -662,6 +687,7 @@
   const openCIDialog = async () => {
     await loadTagOptions()
     await loadNotifyChannelOptions()
+    await loadCIRunnerNodeOptions()
     ciDialogVisible.value = true
     ciPreviewTab.value = 'get'
   }

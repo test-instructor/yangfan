@@ -294,12 +294,17 @@ func runStepRequest(r *SessionRunner, step IStep) (stepResult *StepResult, err e
 		StartTime:   start.UnixMilli(),
 	}
 
+	sessionData := &SessionData{
+		ReqResps: &ReqResps{},
+	}
+
 	defer func() {
 		stepResult.Elapsed = time.Since(start).Milliseconds()
 		// update testcase summary
 		if err != nil {
 			stepResult.Attachments = err.Error()
 		}
+		stepResult.Data = sessionData
 	}()
 
 	err = prepareUpload(r.caseRunner.parser, stepRequest.StepRequest, stepRequest.Variables)
@@ -307,13 +312,11 @@ func runStepRequest(r *SessionRunner, step IStep) (stepResult *StepResult, err e
 		return
 	}
 
-	sessionData := &SessionData{
-		ReqResps: &ReqResps{},
-	}
 	parser := r.caseRunner.parser
 	config := r.caseRunner.Config.Get()
 
 	rb := newRequestBuilder(parser, config, stepRequest.Request)
+	sessionData.ReqResps.Request = rb.requestMap
 	rb.req.Method = strings.ToUpper(string(stepRequest.Request.Method))
 
 	err = rb.prepareUrlParams(stepRequest.Variables)
@@ -420,7 +423,6 @@ func runStepRequest(r *SessionRunner, step IStep) (stepResult *StepResult, err e
 		}
 	}
 
-	sessionData.ReqResps.Request = rb.requestMap
 	sessionData.ReqResps.Response = builtin.FormatResponse(respObj.respObjMeta)
 
 	// extract variables from response
@@ -438,7 +440,6 @@ func runStepRequest(r *SessionRunner, step IStep) (stepResult *StepResult, err e
 		stepResult.Success = true
 	}
 	stepResult.ContentSize = resp.ContentLength
-	stepResult.Data = sessionData
 
 	return stepResult, err
 }

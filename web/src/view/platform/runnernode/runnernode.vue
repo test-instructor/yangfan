@@ -56,9 +56,15 @@
             <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
         </el-table-column>
         
-            <el-table-column align="left" label="节点ID" prop="nodeId" width="120" />
+            <el-table-column align="left" label="节点名称" prop="nodeName" width="180" />
+
+            <el-table-column align="left" label="节点ID" prop="nodeId" width="180" />
 
             <el-table-column align="left" label="别名" prop="alias" width="120" />
+
+            <el-table-column align="left" label="运行内容" prop="runContent" width="120">
+              <template #default="scope">{{ runContentLabel(scope.row.runContent) }}</template>
+            </el-table-column>
 
             <el-table-column align="left" label="IP" prop="ip" width="120" />
 
@@ -104,12 +110,22 @@
             </template>
 
           <el-form :model="formData" label-position="top" ref="elFormRef" :rules="rule" label-width="80px">
+            <el-form-item label="节点名称:" prop="nodeName">
+              <el-input v-model="formData.nodeName" :clearable="false" :disabled="type === 'update'" placeholder="请输入节点名称" />
+            </el-form-item>
             <el-form-item label="节点ID:" prop="nodeId">
-    <el-input v-model="formData.nodeId" :clearable="false" placeholder="请输入节点ID" />
+    <el-input v-model="formData.nodeId" :clearable="false" :disabled="type === 'update'" placeholder="请输入节点ID" />
 </el-form-item>
             <el-form-item label="别名:" prop="alias">
     <el-input v-model="formData.alias" :clearable="false" placeholder="请输入别名" />
 </el-form-item>
+            <el-form-item label="运行内容:" prop="runContent">
+              <el-select v-model="formData.runContent" placeholder="请选择运行内容" style="width:100%">
+                <el-option label="运行" value="runner" />
+                <el-option label="定时任务" value="timer" />
+                <el-option label="所有" value="all" />
+              </el-select>
+            </el-form-item>
             <el-form-item label="IP:" prop="ip">
     <el-input v-model="formData.ip" :clearable="false" placeholder="请输入IP" />
 </el-form-item>
@@ -130,11 +146,17 @@
 
     <el-drawer destroy-on-close :size="appStore.drawerSize" v-model="detailShow" :show-close="true" :before-close="closeDetailShow" title="查看">
             <el-descriptions :column="1" border>
+                    <el-descriptions-item label="节点名称">
+    {{ detailForm.nodeName }}
+</el-descriptions-item>
                     <el-descriptions-item label="节点ID">
     {{ detailForm.nodeId }}
 </el-descriptions-item>
                     <el-descriptions-item label="别名">
     {{ detailForm.alias }}
+</el-descriptions-item>
+                    <el-descriptions-item label="运行内容">
+    {{ runContentLabel(detailForm.runContent) }}
 </el-descriptions-item>
                     <el-descriptions-item label="IP">
     {{ detailForm.ip }}
@@ -189,8 +211,10 @@ const showAllQuery = ref(false)
 
 // 自动化生成的字典（可能为空）以及字段
 const formData = ref({
+            nodeName: '',
             nodeId: '',
             alias: '',
+            runContent: '',
             ip: '',
             port: 0,
             status: 0,
@@ -202,6 +226,17 @@ const formData = ref({
 
 // 验证规则
 const rule = reactive({
+               nodeName : [{
+                   required: true,
+                   message: '',
+                   trigger: ['input','blur'],
+               },
+               {
+                   whitespace: true,
+                   message: '不能只输入空格',
+                   trigger: ['input', 'blur'],
+              }
+              ],
                nodeId : [{
                    required: true,
                    message: '',
@@ -389,8 +424,10 @@ const openDialog = () => {
 const closeDialog = () => {
     dialogFormVisible.value = false
     formData.value = {
+        nodeName: '',
         nodeId: '',
         alias: '',
+        runContent: '',
         ip: '',
         port: 0,
         status: 0,
@@ -456,6 +493,12 @@ const closeDetailShow = () => {
   detailForm.value = {}
 }
 
+const runContentLabel = (v) => {
+  if (v === 'runner') return '运行'
+  if (v === 'timer') return '定时任务'
+  if (v === 'all') return '所有'
+  return v || ''
+}
 
 </script>
 

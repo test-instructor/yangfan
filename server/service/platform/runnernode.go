@@ -57,6 +57,11 @@ func (rnService *RunnerNodeService) GetRunnerNodeInfoList(ctx context.Context, i
 	if len(info.CreatedAtRange) == 2 {
 		db = db.Where("created_at BETWEEN ? AND ?", info.CreatedAtRange[0], info.CreatedAtRange[1])
 	}
+	if len(info.RunContents) > 0 {
+		db = db.Where("run_content IN ?", info.RunContents)
+	} else if info.RunContent != "" {
+		db = db.Where("run_content = ?", info.RunContent)
+	}
 	db.Order("id desc")
 
 	err = db.Count(&total).Error

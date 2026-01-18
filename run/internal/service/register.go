@@ -12,20 +12,24 @@ import (
 )
 
 type RunnerService struct {
-	nodeName string
-	nodeID   string
-	ip       string
-	port     int
-	stopChan chan struct{}
+	nodeName   string
+	nodeAlias  string
+	runContent string
+	nodeID     string
+	ip         string
+	port       int
+	stopChan   chan struct{}
 }
 
-func NewRunnerService(nodeName string, port int) *RunnerService {
+func NewRunnerService(nodeName, nodeAlias, runContent string, port int) *RunnerService {
 	return &RunnerService{
-		nodeName: nodeName,
-		nodeID:   uuid.New().String(),
-		ip:       "127.0.0.1", // TODO: Get actual IP
-		port:     port,
-		stopChan: make(chan struct{}),
+		nodeName:   nodeName,
+		nodeAlias:  nodeAlias,
+		runContent: runContent,
+		nodeID:     uuid.New().String(),
+		ip:         "127.0.0.1", // TODO: Get actual IP
+		port:       port,
+		stopChan:   make(chan struct{}),
 	}
 }
 
@@ -47,7 +51,8 @@ func (s *RunnerService) Register() error {
 			Status:        &status,
 			LastHeartbeat: &now,
 			CreateTime:    &now,
-			Alias:         &s.nodeName, // Default alias
+			Alias:         &s.nodeAlias,
+			RunContent:    &s.runContent,
 		}
 		if err := global.GVA_DB.Create(&node).Error; err != nil {
 			return err
@@ -55,6 +60,8 @@ func (s *RunnerService) Register() error {
 	} else if err == nil {
 		// Update existing
 		node.NodeId = &s.nodeID
+		node.Alias = &s.nodeAlias
+		node.RunContent = &s.runContent
 		node.Ip = &s.ip
 		node.Port = &port
 		node.Status = &status
