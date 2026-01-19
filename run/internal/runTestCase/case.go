@@ -73,7 +73,9 @@ func (r *runCase) LoadCase() (err error) {
 	// DebugTalk
 	r.d.ProjectID = uint(autoCase.ProjectId)
 	r.d.ID = uint(r.runCaseReq.CaseID)
-	r.d.RunDebugTalkFile()
+	if err := r.d.RunDebugTalkFile(); err != nil {
+		return errors.New("准备DebugTalk环境失败")
+	}
 	tConfig.Path = r.d.FilePath
 
 	// 构建步骤列表

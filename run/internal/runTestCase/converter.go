@@ -2,6 +2,7 @@ package runTestCase
 
 import (
 	"encoding/json"
+	"strings"
 
 	"github.com/test-instructor/yangfan/httprunner/hrp"
 	"github.com/test-instructor/yangfan/server/v2/global"
@@ -109,7 +110,7 @@ func convertRequestToHrpRequest(req *automation.Request) *hrp.Request {
 
 	hrpReq := &hrp.Request{
 		Method:         hrp.HTTPMethod(req.Method),
-		URL:            req.URL,
+		URL:            sanitizeRequestURL(req.URL),
 		HTTP2:          req.HTTP2,
 		Timeout:        req.Timeout,
 		AllowRedirects: req.AllowRedirects,
@@ -178,6 +179,16 @@ func convertRequestToHrpRequest(req *automation.Request) *hrp.Request {
 	}
 
 	return hrpReq
+}
+
+func sanitizeRequestURL(rawURL string) string {
+	u := strings.TrimSpace(rawURL)
+	u = strings.Trim(u, "`")
+	u = strings.TrimSpace(u)
+	u = strings.Trim(u, `"'`)
+	u = strings.TrimSpace(u)
+	u = strings.TrimSuffix(u, `\`)
+	return u
 }
 
 // convertStepConfigToHrpStepConfig 将业务 StepConfig 转换为 httprunner StepConfig

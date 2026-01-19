@@ -65,7 +65,9 @@ func (r *runStep) LoadCase() (err error) {
 	// DebugTalk
 	r.d.ProjectID = uint(apiConfig.ProjectId)
 	r.d.ID = r.CaseID
-	r.d.RunDebugTalkFile()
+	if err := r.d.RunDebugTalkFile(); err != nil {
+		return errors.New("准备DebugTalk环境失败")
+	}
 	tConfig.Path = r.d.FilePath
 
 	// 构建步骤列表

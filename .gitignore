@@ -42,3 +42,4 @@ deploy/docker/logs
 /capture_screenshots_v4.py
 /deploy/docker-compose/rabbitmq/
 /deploy/docker-compose/redis/
+/deploy/docker-compose/mysql/

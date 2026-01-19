@@ -170,9 +170,9 @@ const (
 )
 
 var (
-	regexCompileVariable = regexp.MustCompile(fmt.Sprintf(`\$\{(%s)\}|\$(%s)`, regexVariable, regexVariable))     // parse ${var} or $var
-	regexCompileFunction = regexp.MustCompile(fmt.Sprintf(`\$\{(%s)\(([\$\w\.\-/\s=,]*)\)\}`, regexFunctionName)) // parse ${func1($a, $b)}
-	regexCompileNumber   = regexp.MustCompile(regexNumber)                                                        // parse number
+	regexCompileVariable = regexp.MustCompile(fmt.Sprintf(`\$\{(%s)\}|\$(%s)`, regexVariable, regexVariable)) // parse ${var} or $var
+	regexCompileFunction = regexp.MustCompile(fmt.Sprintf(`\$\{(%s)\((.*?)\)\}`, regexFunctionName))          // parse ${func1($a, $b)}
+	regexCompileNumber   = regexp.MustCompile(regexNumber)                                                    // parse number
 )
 
 // ParseString parse string with variables
@@ -296,15 +296,24 @@ func (p *Parser) CallFunc(funcName string, arguments ...interface{}) (interface{
 		}
 	}
 
-	// get builtin function
-	function, ok := builtin.Functions[funcName]
-	if !ok {
-		return nil, fmt.Errorf("function %s is not found", funcName)
-	}
-	fn := reflect.ValueOf(function)
-
 	// call with builtin function
-	return fungo.CallFunc(fn, arguments...)
+	if function, ok := builtin.Functions[funcName]; ok {
+		return fungo.CallFunc(reflect.ValueOf(function), arguments...)
+	}
+
+	if p.Plugin != nil {
+		if result, err := p.Plugin.Call(funcName, arguments...); err == nil {
+			return result, nil
+		}
+		commonName := fungo.ConvertCommonName(funcName)
+		if commonName != funcName {
+			if result, err := p.Plugin.Call(commonName, arguments...); err == nil {
+				return result, nil
+			}
+		}
+	}
+
+	return nil, fmt.Errorf("function %s is not found", funcName)
 }
 
 // CallMCPTool calls a MCP tool on a specific MCP server

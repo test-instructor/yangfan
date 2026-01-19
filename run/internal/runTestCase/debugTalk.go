@@ -9,6 +9,7 @@ import (
 	"github.com/test-instructor/yangfan/httprunner/hrp"
 	"github.com/test-instructor/yangfan/server/v2/global"
 	"github.com/test-instructor/yangfan/server/v2/model/platform"
+	"go.uber.org/zap"
 )
 
 // Adapted from yangfan/run/runTestCase/debugTalk.go
@@ -70,7 +71,13 @@ func (d *debugTalkOperation) getDebugTalkFile(projectID uint) (debugTalkByte []b
 	return []byte(debugTalkFirst.Code), err
 }
 
-func (d *debugTalkOperation) RunDebugTalkFile() {
+func (d *debugTalkOperation) RunDebugTalkFile() error {
+	debugTalkByte, err := d.getDebugTalkFile(d.ProjectID)
+	if err != nil {
+		global.GVA_LOG.Error("getDebugTalkFile failed", zap.Error(err))
+		return err
+	}
+
 	d.FilePath = d.CreateDebugTalk(fmt.Sprintf("TdebugTalk_%d_%d/", d.ID, rand.Int31n(99999999)))
 	DebugTalkFileLock.Lock()
 	fmt.Println("RunDebugTalkFile:", d.FilePath)
@@ -82,8 +89,8 @@ func (d *debugTalkOperation) RunDebugTalkFile() {
 	DebugTalkLock[d.FilePath].Lock()
 	DebugTalkFileLock.Unlock()
 
-	debugTalkByte, _ := d.getDebugTalkFile(d.ProjectID)
 	hrp.BuildHashicorpPyPlugin(debugTalkByte, d.FilePath)
+	return nil
 }
 
 func (d *debugTalkOperation) StopDebugTalkFile() {

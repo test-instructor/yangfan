@@ -55,7 +55,9 @@ func (r *runTag) LoadCase() (err error) {
 	// DebugTalk
 	r.d.ProjectID = uint(tag.ProjectId)
 	r.d.ID = r.TagID
-	r.d.RunDebugTalkFile()
+	if err := r.d.RunDebugTalkFile(); err != nil {
+		return errors.New("准备DebugTalk环境失败")
+	}
 
 	// 查找包含此标签的定时任务
 	var tasks []automation.TimerTask

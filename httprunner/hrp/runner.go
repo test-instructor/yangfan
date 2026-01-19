@@ -34,6 +34,8 @@ import (
 	"github.com/test-instructor/yangfan/httprunner/uixt/option"
 )
 
+var initPluginFunc = initPlugin
+
 // Run starts to run testcase with default configs.
 func Run(t *testing.T, testcases ...ITestCase) error {
 	return NewRunner(t).SetSaveTests(true).Run(testcases...)
@@ -376,26 +378,38 @@ func NewCaseRunner(testcase TestCase, hrpRunner *HRPRunner) (*CaseRunner, error)
 	config := testcase.Config.Get()
 
 	// init parser plugin
-	if config.PluginSetting != nil {
-		plugin, err := initPlugin(config.Path, hrpRunner.venv, hrpRunner.pluginLogOn)
-		if err != nil {
-			return nil, errors.Wrap(err, "init plugin failed")
+	explicitEnablePlugin := config.PluginSetting != nil
+	autoEnablePlugin := false
+	if !explicitEnablePlugin && config.Path != "" {
+		if _, err := LocatePlugin(config.Path); err == nil {
+			autoEnablePlugin = true
+			config.PluginSetting = &PluginConfig{}
 		}
-		caseRunner.parser.Plugin = plugin
+	}
+	if explicitEnablePlugin || autoEnablePlugin {
+		plugin, err := initPluginFunc(config.Path, hrpRunner.venv, hrpRunner.pluginLogOn)
+		if err != nil {
+			if explicitEnablePlugin {
+				return nil, errors.Wrap(err, "init plugin failed")
+			}
+			log.Warn().Err(err).Str("path", config.Path).Msg("auto init plugin failed, continue without plugin")
+		} else {
+			caseRunner.parser.Plugin = plugin
 
-		// load plugin info to testcase config
-		pluginPath := plugin.Path()
-		pluginContent, err := builtin.LoadFile(pluginPath)
-		if err != nil {
-			return nil, err
+			// load plugin info to testcase config
+			pluginPath := plugin.Path()
+			pluginContent, err := builtin.LoadFile(pluginPath)
+			if err != nil {
+				return nil, err
+			}
+			config.PluginSetting.Path = pluginPath
+			config.PluginSetting.Content = pluginContent
+			tp := strings.Split(pluginPath, ".")
+			config.PluginSetting.Type = tp[len(tp)-1]
+			log.Info().Str("pluginPath", pluginPath).
+				Str("pluginType", config.PluginSetting.Type).
+				Msg("plugin info loaded")
 		}
-		config.PluginSetting.Path = pluginPath
-		config.PluginSetting.Content = pluginContent
-		tp := strings.Split(pluginPath, ".")
-		config.PluginSetting.Type = tp[len(tp)-1]
-		log.Info().Str("pluginPath", pluginPath).
-			Str("pluginType", config.PluginSetting.Type).
-			Msg("plugin info loaded")
 	}
 
 	// init MCP servers
