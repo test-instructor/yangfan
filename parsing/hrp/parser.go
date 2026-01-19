@@ -302,15 +302,24 @@ func (p *Parser) callFunc(funcName string, arguments ...interface{}) (interface{
 		}
 	}
 
-	// get builtin function
-	function, ok := builtin.Functions[funcName]
-	if !ok {
-		return nil, fmt.Errorf("function %s is not found", funcName)
-	}
-	fn := reflect.ValueOf(function)
-
 	// call with builtin function
-	return shared.CallFunc(fn, arguments...)
+	if function, ok := builtin.Functions[funcName]; ok {
+		return shared.CallFunc(reflect.ValueOf(function), arguments...)
+	}
+
+	if p.plugin != nil {
+		if result, err := p.plugin.Call(funcName, arguments...); err == nil {
+			return result, nil
+		}
+		commonName := shared.ConvertCommonName(funcName)
+		if commonName != funcName {
+			if result, err := p.plugin.Call(commonName, arguments...); err == nil {
+				return result, nil
+			}
+		}
+	}
+
+	return nil, fmt.Errorf("function %s is not found", funcName)
 }
 
 // merge two variables mapping, the first variables have higher priority

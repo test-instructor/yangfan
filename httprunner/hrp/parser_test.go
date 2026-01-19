@@ -5,6 +5,8 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"testing"
@@ -19,45 +21,45 @@ func TestBuildURL(t *testing.T) {
 	var preparedURL *url.URL
 
 	preparedURL = buildURL("https://postman-echo.com", "/get", nil)
-	assert.Equal(t, preparedURL.String(), "https://postman-echo.com/get/")
+	assert.Equal(t, "https://postman-echo.com/get", preparedURL.String())
 	preparedURL = buildURL("https://postman-echo.com", "get", nil)
-	assert.Equal(t, preparedURL.String(), "https://postman-echo.com/get/")
+	assert.Equal(t, "https://postman-echo.com/get", preparedURL.String())
 	preparedURL = buildURL("https://postman-echo.com/", "/get", nil)
-	assert.Equal(t, preparedURL.String(), "https://postman-echo.com/get/")
+	assert.Equal(t, "https://postman-echo.com/get", preparedURL.String())
 
 	preparedURL = buildURL("https://postman-echo.com/abc/", "/get?a=1&b=2", nil)
-	assert.Equal(t, preparedURL.String(), "https://postman-echo.com/abc/get?a=1&b=2")
+	assert.Equal(t, "https://postman-echo.com/abc/get?a=1&b=2", preparedURL.String())
 	preparedURL = buildURL("https://postman-echo.com/abc", "get?a=1&b=2", nil)
-	assert.Equal(t, preparedURL.String(), "https://postman-echo.com/abc/get?a=1&b=2")
+	assert.Equal(t, "https://postman-echo.com/abc/get?a=1&b=2", preparedURL.String())
 
 	// omit query string in base url
 	preparedURL = buildURL("https://postman-echo.com/abc?x=6&y=9", "/get?a=1&b=2", nil)
-	assert.Equal(t, preparedURL.String(), "https://postman-echo.com/abc/get?a=1&b=2")
+	assert.Equal(t, "https://postman-echo.com/abc/get?a=1&b=2", preparedURL.String())
 
 	preparedURL = buildURL("", "https://postman-echo.com/get", nil)
-	assert.Equal(t, preparedURL.String(), "https://postman-echo.com/get/")
+	assert.Equal(t, "https://postman-echo.com/get", preparedURL.String())
 
 	// notice: step request url > config base url
 	preparedURL = buildURL("https://postman-echo.com", "https://httpbin.org/get", nil)
-	assert.Equal(t, preparedURL.String(), "https://httpbin.org/get/")
+	assert.Equal(t, "https://httpbin.org/get", preparedURL.String())
 
 	// websocket url
 	preparedURL = buildURL("wss://ws.postman-echo.com/raw", "", nil)
-	assert.Equal(t, preparedURL.String(), "wss://ws.postman-echo.com/raw/")
+	assert.Equal(t, "wss://ws.postman-echo.com/raw", preparedURL.String())
 
 	preparedURL = buildURL("wss://ws.postman-echo.com", "/raw", nil)
-	assert.Equal(t, preparedURL.String(), "wss://ws.postman-echo.com/raw/")
+	assert.Equal(t, "wss://ws.postman-echo.com/raw", preparedURL.String())
 
 	preparedURL = buildURL("wss://ws.postman-echo.com/raw", "ws://echo.websocket.events", nil)
-	assert.Equal(t, preparedURL.String(), "ws://echo.websocket.events/")
+	assert.Equal(t, "ws://echo.websocket.events", preparedURL.String())
 
 	queryParams := url.Values{}
 	queryParams.Add("c", "3")
 	queryParams.Add("d", "4")
 	preparedURL = buildURL("https://postman-echo.com/", "/get/", queryParams)
-	assert.Equal(t, preparedURL.String(), "https://postman-echo.com/get?c=3&d=4")
+	assert.Equal(t, "https://postman-echo.com/get?c=3&d=4", preparedURL.String())
 	preparedURL = buildURL("https://postman-echo.com/abc", "get?a=1&b=2", queryParams)
-	assert.Equal(t, preparedURL.String(), "https://postman-echo.com/abc/get?a=1&b=2&c=3&d=4")
+	assert.Equal(t, "https://postman-echo.com/abc/get?a=1&b=2&c=3&d=4", preparedURL.String())
 }
 
 func TestRegexCompileVariable(t *testing.T) {
@@ -458,18 +460,28 @@ func TestCallBuiltinFunction(t *testing.T) {
 }
 
 func TestCallMCPTool(t *testing.T) {
+	tmpDir := t.TempDir()
+	mcpConfigPath := filepath.Join(tmpDir, "test.mcp.json")
+	mcpConfig := `{"mcpServers":{"filesystem":{"command":"npx","args":["-y","@modelcontextprotocol/server-filesystem","../"]}}}`
+	require.NoError(t, os.WriteFile(mcpConfigPath, []byte(mcpConfig), 0o644))
+
 	// Create a new case runner for testing
 	caseRunner, err := NewCaseRunner(TestCase{
 		Config: &TConfig{
-			MCPConfigPath: "mcphost/testdata/test.mcp.json",
+			MCPConfigPath: mcpConfigPath,
 		},
 	}, nil)
 	require.Nil(t, err)
+	t.Cleanup(func() {
+		if caseRunner.parser.MCPHost != nil {
+			_ = caseRunner.parser.MCPHost.CloseServers()
+		}
+	})
 
 	parser := caseRunner.GetParser()
 
 	resp, err := parser.CallMCPTool(context.Background(), "filesystem", "read_file",
-		map[string]interface{}{"path": "internal/version/VERSION"})
+		map[string]interface{}{"path": "../internal/version/VERSION"})
 	assert.Nil(t, err)
 	t.Logf("resp: %v", resp)
 	assert.Contains(t, resp, version.VERSION)

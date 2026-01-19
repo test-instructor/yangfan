@@ -448,6 +448,7 @@ func runStepRequest(r *SessionRunner, step IStep) (stepResult *StepResult, err e
 		// 调用hook
 		res, err := parser.Parse(teardownHook, stepRequest.Variables)
 		if err != nil {
+			global.GVA_LOG.Error("run teardown hooks failed", zap.Error(err))
 			return stepResult, errors.Wrap(err, "run teardown hooks failed")
 		}
 		global.GVA_LOG.Debug("--", zap.Any("res", res))
@@ -456,6 +457,8 @@ func runStepRequest(r *SessionRunner, step IStep) (stepResult *StepResult, err e
 		if ok {
 			stepRequest.Variables["response"] = resMpa
 			respObj.respObjMeta = resMpa
+		} else {
+			log.Warn().Interface("res", res).Msg("teardown hook result is not a map, response not updated. Please check if the hook is wrapped in ${} and returns a dict.")
 		}
 	}
 	// 将hook处理后的结果回写到响应对象中
