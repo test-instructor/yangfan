@@ -19,6 +19,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
+	"go.uber.org/zap"
 
 	"github.com/test-instructor/yangfan/httprunner/code"
 	"github.com/test-instructor/yangfan/httprunner/internal/builtin"
@@ -335,15 +336,42 @@ func runStepRequest(r *SessionRunner, step IStep) (stepResult *StepResult, err e
 	}
 
 	// add request object to step variables, could be used in setup hooks
+	// 将请求对象添加到step变量中，hook中可以直接使用hrp_step_name、hrp_step_request、request 变量
 	stepRequest.Variables["hrp_step_name"] = step.Name
 	stepRequest.Variables["hrp_step_request"] = rb.requestMap
-	stepRequest.Variables["request"] = rb.requestMap // setup hooks compatible with v3
+	stepRequest.Variables["request"] = rb.requestMap
 
 	// deal with setup hooks
+	// 遍历setp hook并执行
 	for _, setupHook := range stepRequest.SetupHooks {
-		_, err := parser.Parse(setupHook, stepRequest.Variables)
+		// 调用hook
+		req, err := parser.Parse(setupHook, stepRequest.Variables)
 		if err != nil {
 			return stepResult, errors.Wrap(err, "run setup hooks failed")
+		}
+		// 处理hook返回的结果
+		reqMap, ok := req.(map[string]interface{})
+		if ok && reqMap != nil {
+			rb.requestMap = reqMap
+			stepRequest.Variables["request"] = reqMap
+		}
+	}
+	// 将hook处理后的结果回写到请求对象中
+	if len(stepRequest.SetupHooks) > 0 {
+		// 更新body的内容
+		requestBody, ok := rb.requestMap["body"].(map[string]interface{})
+		if ok {
+			body, err := json.Marshal(requestBody)
+			if err == nil {
+				rb.req.Body = io.NopCloser(bytes.NewReader(body))
+				rb.req.ContentLength = int64(len(body))
+			}
+		}
+		// 更新header的内容
+		headers, ok := rb.requestMap["headers"].(map[string]string)
+		rb.req.Header = map[string][]string{}
+		for key, value := range headers {
+			rb.req.Header.Set(key, value)
 		}
 	}
 
@@ -411,17 +439,27 @@ func runStepRequest(r *SessionRunner, step IStep) (stepResult *StepResult, err e
 		httpStat.Print()
 	}
 
-	// add response object to step variables, could be used in teardown hooks
 	stepRequest.Variables["hrp_step_response"] = respObj.respObjMeta
 	stepRequest.Variables["response"] = respObj.respObjMeta
 
 	// deal with teardown hooks
+	// 遍历teardown hook并执行
 	for _, teardownHook := range stepRequest.TeardownHooks {
-		_, err := parser.Parse(teardownHook, stepRequest.Variables)
+		// 调用hook
+		res, err := parser.Parse(teardownHook, stepRequest.Variables)
 		if err != nil {
 			return stepResult, errors.Wrap(err, "run teardown hooks failed")
 		}
+		global.GVA_LOG.Debug("--", zap.Any("res", res))
+		// 处理hook返回的结果
+		resMpa, ok := res.(map[string]interface{})
+		if ok {
+			stepRequest.Variables["response"] = resMpa
+			respObj.respObjMeta = resMpa
+		}
 	}
+	// 将hook处理后的结果回写到响应对象中
+	sessionData.ReqResps.Request = rb.requestMap
 
 	sessionData.ReqResps.Response = builtin.FormatResponse(respObj.respObjMeta)
 

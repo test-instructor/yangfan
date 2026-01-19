@@ -96,7 +96,9 @@ func (r *runTask) LoadCase() (err error) {
 	// DebugTalk，按项目维度创建调试脚本目录
 	r.d.ProjectID = uint(task.ProjectId)
 	r.d.ID = uint(r.runCaseReq.CaseID)
-	r.d.RunDebugTalkFile()
+	if err := r.d.RunDebugTalkFile(); err != nil {
+		return errors.New("准备DebugTalk环境失败")
+	}
 	debugTalkStarted = true
 
 	// 遍历每个用例，转换为 ITestCase

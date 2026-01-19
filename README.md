@@ -5,7 +5,7 @@
 <img src="docs/img/mp.png" alt="公众号" width="500" >
 
 - [使用文档](https://yangfan.gd.cn/)
-- 前后端采用[gin-vue-admin v2.5.3](https://www.gin-vue-admin.com/), Gin + Vue全栈开发基础平台
+- 前后端采用[gin-vue-admin](https://www.gin-vue-admin.com/), Gin + Vue全栈开发基础平台
 - 测试引擎采用[HttpRunner V5](https://httprunner.com/),支持 HTTP(S)/HTTP2/WebSocket/RPC 等网络协议，涵盖接口测试、性能测试、数字体验监测等测试类型。简单易用，功能强大，具有丰富的插件化机制和高度的可扩展能力。
 
 #  V2支持功能
@@ -65,7 +65,7 @@
 
 # 项目部署
 
-[本地调试、docker部署、k8s部署](./deploy/README.md)
+[本地调试、docker部署](./deploy/README.md)
 
 # 项目概况
 

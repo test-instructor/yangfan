@@ -10,7 +10,12 @@ from debugtalk import *
 
 if __name__ == "__main__":
     import funppy
-{{- range $functionName := .FunctionNames }}
-    funppy.register("{{ $functionName }}", {{ $functionName }})
-{{- end }}
+    import inspect
+
+    for name, obj in list(globals().items()):
+        if name.startswith("__"):
+            continue
+        if not inspect.isroutine(obj):
+            continue
+        funppy.register(name, obj)
     funppy.serve()

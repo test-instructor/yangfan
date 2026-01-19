@@ -25,8 +25,9 @@ func TestRun(t *testing.T) {
 	content := string(contentBytes)
 	assert.Contains(t, content, "import funppy")
 	assert.Contains(t, content, "funppy.register")
+	assert.Contains(t, content, "for name, obj in list(globals().items()):")
 
 	reg, _ := regexp.Compile(`funppy\.register`)
 	matchedSlice := reg.FindAllStringSubmatch(content, -1)
-	assert.Len(t, matchedSlice, 10)
+	assert.Len(t, matchedSlice, 1)
 }

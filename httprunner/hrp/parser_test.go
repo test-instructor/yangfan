@@ -99,6 +99,8 @@ func TestRegexCompileFunction(t *testing.T) {
 		"${func1($a, 123)}",
 		"${func1(123, $b)}",
 		"abc${func1(123, $b)}123",
+		"${func1(测试)}",
+		"${func1(\"string\")}",
 	}
 
 	for _, expr := range testData {

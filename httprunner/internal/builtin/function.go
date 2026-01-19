@@ -36,6 +36,7 @@ var Functions = map[string]interface{}{
 	"load_ws_message":        loadMessage,
 	"multipart_encoder":      multipartEncoder,
 	"multipart_content_type": multipartContentType,
+	"append_address":         appendAddress,
 }
 
 // upload file path must starts with @, like @\"PATH\" or @PATH
@@ -74,6 +75,24 @@ func MD5(str string) string {
 	hasher := md5.New()
 	hasher.Write([]byte(str))
 	return hex.EncodeToString(hasher.Sum(nil))
+}
+
+func appendAddress(request map[string]interface{}, suffix ...interface{}) map[string]interface{} {
+	s := "123"
+	if len(suffix) > 0 && suffix[0] != nil {
+		s = fmt.Sprintf("%v", suffix[0])
+	}
+	body, ok := request["body"].(map[string]interface{})
+	if !ok || body == nil {
+		body = make(map[string]interface{})
+	}
+	address := ""
+	if v, ok := body["address"]; ok && v != nil {
+		address = fmt.Sprintf("%v", v)
+	}
+	body["address"] = address + s
+	request["body"] = body
+	return request
 }
 
 type TFormDataWriter struct {

@@ -170,9 +170,9 @@ const (
 )
 
 var (
-	regexCompileVariable = regexp.MustCompile(fmt.Sprintf(`\$\{(%s)\}|\$(%s)`, regexVariable, regexVariable))     // parse ${var} or $var
-	regexCompileFunction = regexp.MustCompile(fmt.Sprintf(`\$\{(%s)\(([\$\w\.\-/\s=,]*)\)\}`, regexFunctionName)) // parse ${func1($a, $b)}
-	regexCompileNumber   = regexp.MustCompile(regexNumber)                                                        // parse number
+	regexCompileVariable = regexp.MustCompile(fmt.Sprintf(`\$\{(%s)\}|\$(%s)`, regexVariable, regexVariable)) // parse ${var} or $var
+	regexCompileFunction = regexp.MustCompile(fmt.Sprintf(`\$\{(%s)\((.*?)\)\}`, regexFunctionName))          // parse ${func1($a, $b)}
+	regexCompileNumber   = regexp.MustCompile(regexNumber)                                                    // parse number
 )
 
 // ParseString parse string with variables

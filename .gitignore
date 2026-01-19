@@ -39,3 +39,6 @@ deploy/docker/logs
 /debugcode/
 /log/
 /.trae/
+/deploy/docker-compose/redis/
+/deploy/docker-compose/rabbitmq/
+/deploy/docker-compose/mysql/

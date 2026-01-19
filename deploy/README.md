@@ -17,34 +17,27 @@
 1. 新建数据库，并导入`docs/sql/yangfan.sql`文件
 2. 管理员账号`yangfan`,密码`123456`
 
-## shell 脚本一键安装
-```shell
-# 进入目录
-mkdir -p /home/yangfan && cd /home/yangfan
-# 执行安装
-bash -c "$(curl -fsSLk http://docs.yangfan.gd.cn/install/install.sh)"
-```
-> 1. 脚本默认安装在/data/yangfan目录下
-> 2. 如需修改配置请到安装目录下修改`./config/docker.config.yaml`文件
-> 3. `./config/docker.config.yaml`中的`grafana-host`需要手动修改为`http://IP:3000`，否则无法访问grafana
-> 4. `./config/docker.config.yaml`中的`fs`需要手动修改为飞书登录相关配置，否则无法登录
-> 5. 修改配置后重新执行安装脚本即可
+
 
 ## 本地调试
 ### 后端
-1. 下载golang安装 版本号需>=1.18
+1. 下载golang安装 版本号需>=1.23
    * 国际: https://golang.org/dl/
    * 国内: https://golang.google.cn/dl/
 2. goland 打开项目根目录
-3. 修改`config.yaml`中的数据库`mysql`、飞书登录`fs`相关配置
-4. 使用软件包进行运行，目前已有的软件包为
+3. 使用软件包进行运行，目前已有的软件包为
    ```shell
    github.com/test-instructor/yangfan/server  # 后端服务
    github.com/test-instructor/yangfan/run     # 用例运行服务
-   github.com/test-instructor/yangfan/master  # 性能测试master服务
-   github.com/test-instructor/yangfan/work    # 性能测试worker服务
-   github.com/test-instructor/yangfan/timer   # 定时任务服务
+   github.com/test-instructor/yangfan/web     # 前端
+   github.com/test-instructor/yangfan/data    # 数据仓库
    ```
+4. 启动server、web，访问后进行初始化设置
+5. 重启server服务
+6. MQ设置：在 系统工具 - 系统配置 - MQ配置 设置MQ相关内容，
+7. 数据仓库设置：在 系统工具 - 系统配置 - 平台配置 设置数据仓库相关内容
+8. 启动 run、data 服务
+
 ### 前端
 1. 前往https://nodejs.org/zh-cn/下载当前版本node 
 2. 命令行运行 node -v 若控制台输出版本号则前端环境搭建成功 
@@ -55,7 +48,6 @@ bash -c "$(curl -fsSLk http://docs.yangfan.gd.cn/install/install.sh)"
 ## 二、docker 部署
 
 * 前端：修改对应`docker-compose`文件中的`ENV_VITE_FS_APP_ID`、`ENV_VITE_FS_LOGIN`
-* 后端：修改`deploy/docker-compose/config/docker.config.yaml`中的数据库`mysql`、飞书登录`fs`相关配置
 * docker镜像源：目前使用阿里云镜像源(registry.cn-hangzhou.aliyuncs.com)，如需使用docker官方镜像源，请将阿里云镜像源(registry.cn-hangzhou.aliyuncs.com/)删除即可
 
 1. 本地构建模式文件：`deploy/docker-compose/docker-compose-build.yaml`
@@ -63,10 +55,10 @@ bash -c "$(curl -fsSLk http://docs.yangfan.gd.cn/install/install.sh)"
 3. 执行命令：
    ```shell
    cd deploy/docker-compose
-   # 本地构建模式
-   docker-compose up --build -f docker-compose-build.yaml --force-recreate -d
-   # 远程镜像模式
-   docker-compose up -f docker-compose-image.yaml
+   # 数据库相关配置，mysql、mq、redis
+   docker-compose up -f docker-compose.data.yml
+   # 启动服务
+   docker-compose up -f docker-compose.yml
       
    ```
    
