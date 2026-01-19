@@ -19,7 +19,10 @@ func InitLogger(logLevel string, logJSON bool, logFile bool) {
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 
 	// set log timestamp precise to milliseconds with Beijing timezone (UTC+8)
-	beijingLoc, _ := time.LoadLocation("Asia/Shanghai")
+	beijingLoc := time.FixedZone("Asia/Shanghai", 8*3600)
+	if loc, err := time.LoadLocation("Asia/Shanghai"); err == nil && loc != nil {
+		beijingLoc = loc
+	}
 	zerolog.TimestampFunc = func() time.Time {
 		return time.Now().In(beijingLoc)
 	}

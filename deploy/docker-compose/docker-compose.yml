@@ -4,10 +4,9 @@ services:
     container_name: yangfan-server
     restart: always
     volumes:
-      - ./config/docker.config.yaml:/yangfan/docker.config.yaml:ro
+      - ./config/docker.config.yaml:/yangfan/docker.config.yaml:rw
     ports:
       - "8888:8888"
-      - "7967:7967"
     networks:
       - yangfan-network
 
