@@ -29,6 +29,10 @@ func NewServer() *Server {
 	engine := gin.New()
 	engine.Use(gin.Logger(), gin.Recovery())
 
+	engine.GET("/healthz", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	})
+
 	s := &Server{engine: engine}
 	s.registerRoutes()
 	return s
@@ -67,6 +71,13 @@ func (s *Server) Shutdown(ctx context.Context) error {
 func (s *Server) registerRoutes() {
 	// 公共路由组（无需鉴权）
 	publicGroup := s.engine.Group("/api")
+	publicGroup.Use(func(c *gin.Context) {
+		if global.GVA_DB == nil {
+			c.AbortWithStatusJSON(http.StatusServiceUnavailable, gin.H{"message": "database not ready"})
+			return
+		}
+		c.Next()
+	})
 
 	// 注册业务路由
 	initBizRouter(publicGroup)

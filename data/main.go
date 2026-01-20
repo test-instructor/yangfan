@@ -16,6 +16,7 @@ import (
 	"github.com/test-instructor/yangfan/server/v2/global"
 	"github.com/test-instructor/yangfan/server/v2/initialize"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 // 全局调度器实例
@@ -33,6 +34,9 @@ func main() {
 
 	// 3. Initialize and Start Timer
 	initializeTimer()
+
+	// 4. Initialize DB/Redis/Python in background (avoid blocking HTTP/timer startup)
+	initializeBackendAsync()
 
 	// 4. Wait for Signal
 	quit := make(chan os.Signal, 1)
@@ -59,16 +63,52 @@ func initializeSystem() {
 	global.GVA_LOG = core.Zap() // 初始化zap日志库
 	zap.ReplaceGlobals(global.GVA_LOG)
 	hrp.InitLogger("INFO", true, false)
-	global.GVA_DB = initialize.Gorm() // gorm连接数据库
-	if global.GVA_CONFIG.System.UseRedis {
-		// 初始化redis服务
-		initialize.Redis()
-		if global.GVA_CONFIG.System.UseMultipoint {
-			initialize.RedisList()
-		}
-	}
-	initialize.InitPython()
 	os.Setenv("DISABLE_GA", "true") // 禁用GA
+}
+
+func initializeBackendAsync() {
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				global.GVA_LOG.Error("后端初始化异常退出", zap.Any("recover", r))
+			}
+		}()
+
+		for {
+			global.GVA_LOG.Info("数据库初始化开始")
+			db, err := tryInitDB()
+			if err == nil && db != nil {
+				global.GVA_DB = db
+				global.GVA_LOG.Info("数据库初始化成功")
+				break
+			}
+			global.GVA_LOG.Warn("数据库初始化失败，稍后重试", zap.Error(err))
+			time.Sleep(5 * time.Second)
+		}
+
+		if global.GVA_CONFIG.System.UseRedis {
+			global.GVA_LOG.Info("Redis 初始化开始")
+			initialize.Redis()
+			if global.GVA_CONFIG.System.UseMultipoint {
+				initialize.RedisList()
+			}
+			global.GVA_LOG.Info("Redis 初始化结束")
+		}
+
+		global.GVA_LOG.Info("Python 初始化开始")
+		initialize.InitPython()
+		global.GVA_LOG.Info("Python 初始化结束")
+	}()
+}
+
+func tryInitDB() (db *gorm.DB, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("%v", r)
+			db = nil
+		}
+	}()
+	return initialize.Gorm(), nil
 }
 
 // initializeTimer 初始化定时任务
@@ -82,6 +122,8 @@ func initializeTimer() {
 	}
 	if err := scheduler.Start(); err != nil {
 		global.GVA_LOG.Error("启动定时任务失败", zap.Error(err))
+	} else {
+		global.GVA_LOG.Info("定时任务启动完成")
 	}
 }
 

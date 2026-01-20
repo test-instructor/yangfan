@@ -59,7 +59,7 @@ services:
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml:ro
     ports:
-      - "18080:18080"
+      - "19000:9000"
 
   web:
     image: "${REGISTRY:-yangfanz/}web${IMAGE_SUFFIX:-}:${IMAGE_TAG:-latest}"
