@@ -60,6 +60,8 @@ services:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml:ro
     ports:
       - "19000:9000"
+    networks:
+      - yangfan-network
 
   web:
     image: "${REGISTRY:-yangfanz/}web${IMAGE_SUFFIX:-}:${IMAGE_TAG:-latest}"

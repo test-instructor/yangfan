@@ -21,6 +21,17 @@
             </el-select>
           </el-form-item>
 
+          <el-form-item label="运行节点:">
+            <el-select v-model="form.node_name" filterable clearable placeholder="默认随机节点" style="width: 100%" :loading="nodeLoading">
+              <el-option
+                v-for="opt in runnerNodeOptions"
+                :key="opt.nodeName"
+                :label="opt.alias ? `${opt.alias}(${opt.nodeName})` : opt.nodeName"
+                :value="opt.nodeName"
+              />
+            </el-select>
+          </el-form-item>
+
           <el-form-item label="运行配置:">
             <RunConfigSelector v-model="form.config_id" width="100%" />
           </el-form-item>
@@ -104,6 +115,7 @@ import RunConfigSelector from '@/components/platform/runConfig.vue'
 import { runTask } from '@/api/run.js'
 import { getAutoReportNotifyStatus } from '@/api/projectmgr/reportNotify'
 import { getReportNotifyChannelList } from '@/api/projectmgr/reportNotify'
+import { getRunnerNodeList } from '@/api/platform/runnernode'
 import { useRouter } from 'vue-router'
 
 const props = defineProps({
@@ -121,7 +133,9 @@ const visible = ref(false)
 const loading = ref(false)
 const notifyLoading = ref(false)
 const notifyChannelLoading = ref(false)
+const nodeLoading = ref(false)
 const notifyChannelOptions = ref([])
+const runnerNodeOptions = ref([])
 const notifyItems = ref([])
 const selectedChannelIds = ref([])
 const runResult = reactive({
@@ -133,6 +147,7 @@ let notifyTimer = null
 
 const form = reactive({
   run_mode: '调试模式', // 默认调试
+  node_name: '',
   config_id: null,
   env_id: null,
   notify_enabled: false,
@@ -150,6 +165,7 @@ const runModes = [
 const handleOpen = () => {
   // 每次打开可以重置或保持状态，这里保持状态
   loadNotifyChannels()
+  loadRunnerNodes()
   visible.value = true
 }
 
@@ -181,6 +197,19 @@ const loadNotifyChannels = async () => {
     }
   } finally {
     notifyChannelLoading.value = false
+  }
+}
+
+const loadRunnerNodes = async () => {
+  nodeLoading.value = true
+  try {
+    const res = await getRunnerNodeList({ page: 1, pageSize: 1000, runContents: ['runner', 'all'] })
+    if (res.code === 0) {
+      const list = res.data?.list || []
+      runnerNodeOptions.value = list.filter((x) => x.nodeName)
+    }
+  } finally {
+    nodeLoading.value = false
   }
 }
 
@@ -234,6 +263,7 @@ const handleRun = async () => {
       config_id: form.config_id || 0,
       env_id: form.env_id || 0,
       run_mode: form.run_mode,
+      node_name: form.node_name || '',
       notify_enabled: !!form.notify_enabled,
       notify_rule: form.notify_rule || '',
       notify_channel_ids: Array.isArray(form.notify_channel_ids) ? form.notify_channel_ids : []

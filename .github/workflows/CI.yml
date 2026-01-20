@@ -26,15 +26,31 @@ jobs:
       - name: Determine image_tag and image_suffix
         id: determine
         run: |
-          if [[ ${{ github.event_name }} == 'push' && ${{ github.ref }} =~ ^refs/tags/.* ]]; then
-            image_tag=$(echo "${{ github.ref }}" | sed -e 's|^refs/tags/||')
+          ref="${{ github.ref }}"
+          if [[ "${{ github.event_name }}" == "push" && "$ref" =~ ^refs/tags/.* ]]; then
+            tag_name="${ref#refs/tags/}"
+            image_tag="$tag_name"
             image_suffix=''
+            if [[ "$tag_name" == "debug" ]]; then
+              push_latest='false'
+            else
+              push_latest='true'
+            fi
           else
-            image_tag=${{ env.IMAGE_TAG }}
-            image_suffix='-debug'
+            branch="${ref#refs/heads/}"
+            if [[ "$branch" == "main" || "$branch" == "dev" || "$branch" == "v2" ]]; then
+              image_tag='debug'
+              image_suffix=''
+              push_latest='false'
+            else
+              image_tag="${{ env.IMAGE_TAG }}"
+              image_suffix='-debug'
+              push_latest='true'
+            fi
           fi
           echo "image_tag=${image_tag}" >> $GITHUB_OUTPUT
           echo "image_suffix=${image_suffix}" >> $GITHUB_OUTPUT
+          echo "push_latest=${push_latest}" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v3
       - name: Login to Docker Container Registry
         uses: docker/login-action@v1
@@ -46,8 +62,10 @@ jobs:
           docker build -t server -f server/Dockerfile .
           docker tag server ${{ env.REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
           docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker tag server ${{ env.REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:latest
-          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:latest
+          if [[ "${{ steps.determine.outputs.push_latest }}" == "true" ]]; then
+            docker tag server ${{ env.REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:latest
+            docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:latest
+          fi
 
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
@@ -59,8 +77,10 @@ jobs:
         run: |
           docker tag server ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
           docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker tag server ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:latest
-          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:latest
+          if [[ "${{ steps.determine.outputs.push_latest }}" == "true" ]]; then
+            docker tag server ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:latest
+            docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_SERVER }}${{ steps.determine.outputs.image_suffix }}:latest
+          fi
 
   run:
     name: Building a run image
@@ -69,15 +89,31 @@ jobs:
       - name: Determine image_tag and image_suffix
         id: determine
         run: |
-          if [[ ${{ github.event_name }} == 'push' && ${{ github.ref }} =~ ^refs/tags/.* ]]; then
-            image_tag=$(echo "${{ github.ref }}" | sed -e 's|^refs/tags/||')
+          ref="${{ github.ref }}"
+          if [[ "${{ github.event_name }}" == "push" && "$ref" =~ ^refs/tags/.* ]]; then
+            tag_name="${ref#refs/tags/}"
+            image_tag="$tag_name"
             image_suffix=''
+            if [[ "$tag_name" == "debug" ]]; then
+              push_latest='false'
+            else
+              push_latest='true'
+            fi
           else
-            image_tag=${{ env.IMAGE_TAG }}
-            image_suffix='-debug'
+            branch="${ref#refs/heads/}"
+            if [[ "$branch" == "main" || "$branch" == "dev" || "$branch" == "v2" ]]; then
+              image_tag='debug'
+              image_suffix=''
+              push_latest='false'
+            else
+              image_tag="${{ env.IMAGE_TAG }}"
+              image_suffix='-debug'
+              push_latest='true'
+            fi
           fi
           echo "image_tag=${image_tag}" >> $GITHUB_OUTPUT
           echo "image_suffix=${image_suffix}" >> $GITHUB_OUTPUT
+          echo "push_latest=${push_latest}" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v3
       - name: Login to Docker Container Registry
         uses: docker/login-action@v1
@@ -89,8 +125,10 @@ jobs:
           docker build -t run -f run/Dockerfile .
           docker tag run ${{ env.REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
           docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker tag run ${{ env.REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:latest
-          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:latest
+          if [[ "${{ steps.determine.outputs.push_latest }}" == "true" ]]; then
+            docker tag run ${{ env.REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:latest
+            docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:latest
+          fi
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
@@ -101,8 +139,10 @@ jobs:
         run: |
           docker tag run ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
           docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker tag run ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:latest
-          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:latest
+          if [[ "${{ steps.determine.outputs.push_latest }}" == "true" ]]; then
+            docker tag run ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:latest
+            docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_RUN }}${{ steps.determine.outputs.image_suffix }}:latest
+          fi
 
   data:
     name: Building a data image
@@ -111,15 +151,31 @@ jobs:
       - name: Determine image_tag and image_suffix
         id: determine
         run: |
-          if [[ ${{ github.event_name }} == 'push' && ${{ github.ref }} =~ ^refs/tags/.* ]]; then
-            image_tag=$(echo "${{ github.ref }}" | sed -e 's|^refs/tags/||')
+          ref="${{ github.ref }}"
+          if [[ "${{ github.event_name }}" == "push" && "$ref" =~ ^refs/tags/.* ]]; then
+            tag_name="${ref#refs/tags/}"
+            image_tag="$tag_name"
             image_suffix=''
+            if [[ "$tag_name" == "debug" ]]; then
+              push_latest='false'
+            else
+              push_latest='true'
+            fi
           else
-            image_tag=${{ env.IMAGE_TAG }}
-            image_suffix='-debug'
+            branch="${ref#refs/heads/}"
+            if [[ "$branch" == "main" || "$branch" == "dev" || "$branch" == "v2" ]]; then
+              image_tag='debug'
+              image_suffix=''
+              push_latest='false'
+            else
+              image_tag="${{ env.IMAGE_TAG }}"
+              image_suffix='-debug'
+              push_latest='true'
+            fi
           fi
           echo "image_tag=${image_tag}" >> $GITHUB_OUTPUT
           echo "image_suffix=${image_suffix}" >> $GITHUB_OUTPUT
+          echo "push_latest=${push_latest}" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v3
       - name: Login to Docker Container Registry
         uses: docker/login-action@v1
@@ -131,8 +187,10 @@ jobs:
           docker build -t data -f data/Dockerfile .
           docker tag data ${{ env.REGISTRY }}${{ env.IMAGE_NAME_DATA }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
           docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_DATA }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker tag data ${{ env.REGISTRY }}${{ env.IMAGE_NAME_DATA }}${{ steps.determine.outputs.image_suffix }}:latest
-          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_DATA }}${{ steps.determine.outputs.image_suffix }}:latest
+          if [[ "${{ steps.determine.outputs.push_latest }}" == "true" ]]; then
+            docker tag data ${{ env.REGISTRY }}${{ env.IMAGE_NAME_DATA }}${{ steps.determine.outputs.image_suffix }}:latest
+            docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_DATA }}${{ steps.determine.outputs.image_suffix }}:latest
+          fi
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
@@ -143,8 +201,10 @@ jobs:
         run: |
           docker tag data ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_DATA }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
           docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_DATA }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker tag data ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_DATA }}${{ steps.determine.outputs.image_suffix }}:latest
-          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_DATA }}${{ steps.determine.outputs.image_suffix }}:latest
+          if [[ "${{ steps.determine.outputs.push_latest }}" == "true" ]]; then
+            docker tag data ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_DATA }}${{ steps.determine.outputs.image_suffix }}:latest
+            docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_DATA }}${{ steps.determine.outputs.image_suffix }}:latest
+          fi
 
   web:
     name: Building a web image
@@ -153,15 +213,31 @@ jobs:
       - name: Determine image_tag and image_suffix
         id: determine
         run: |
-          if [[ ${{ github.event_name }} == 'push' && ${{ github.ref }} =~ ^refs/tags/.* ]]; then
-            image_tag=$(echo "${{ github.ref }}" | sed -e 's|^refs/tags/||')
+          ref="${{ github.ref }}"
+          if [[ "${{ github.event_name }}" == "push" && "$ref" =~ ^refs/tags/.* ]]; then
+            tag_name="${ref#refs/tags/}"
+            image_tag="$tag_name"
             image_suffix=''
+            if [[ "$tag_name" == "debug" ]]; then
+              push_latest='false'
+            else
+              push_latest='true'
+            fi
           else
-            image_tag=${{ env.IMAGE_TAG }}
-            image_suffix='-debug'
+            branch="${ref#refs/heads/}"
+            if [[ "$branch" == "main" || "$branch" == "dev" || "$branch" == "v2" ]]; then
+              image_tag='debug'
+              image_suffix=''
+              push_latest='false'
+            else
+              image_tag="${{ env.IMAGE_TAG }}"
+              image_suffix='-debug'
+              push_latest='true'
+            fi
           fi
           echo "image_tag=${image_tag}" >> $GITHUB_OUTPUT
           echo "image_suffix=${image_suffix}" >> $GITHUB_OUTPUT
+          echo "push_latest=${push_latest}" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v3
       - name: Login to Docker Container Registry
         uses: docker/login-action@v1
@@ -173,8 +249,10 @@ jobs:
           docker build -t web -f ./web/Dockerfile ./web
           docker tag web ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
           docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker tag web ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:latest
-          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:latest
+          if [[ "${{ steps.determine.outputs.push_latest }}" == "true" ]]; then
+            docker tag web ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:latest
+            docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:latest
+          fi
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v1
         with:
@@ -185,5 +263,7 @@ jobs:
         run: |
           docker tag web ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
           docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
-          docker tag web ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:latest
-          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:latest
+          if [[ "${{ steps.determine.outputs.push_latest }}" == "true" ]]; then
+            docker tag web ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:latest
+            docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_WEB }}${{ steps.determine.outputs.image_suffix }}:latest
+          fi

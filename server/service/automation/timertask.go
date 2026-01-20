@@ -9,6 +9,7 @@ import (
 	"github.com/test-instructor/yangfan/server/v2/global"
 	"github.com/test-instructor/yangfan/server/v2/model/automation"
 	automationReq "github.com/test-instructor/yangfan/server/v2/model/automation/request"
+	"github.com/test-instructor/yangfan/server/v2/model/platform"
 	"gorm.io/gorm"
 )
 
@@ -17,6 +18,9 @@ type TimerTaskService struct{}
 // CreateTimerTask 创建定时任务记录
 // Author [yourname](https://github.com/yourname)
 func (tkService *TimerTaskService) CreateTimerTask(ctx context.Context, tk *automation.TimerTask) (err error) {
+	if err := tkService.validateTimerTaskRunnerNode(ctx, tk.ProjectId, tk.RunnerNodeName); err != nil {
+		return err
+	}
 	err = global.GVA_DB.Create(tk).Error
 	if err == nil {
 		RefreshTimerTaskSchedules(ctx)
@@ -73,6 +77,14 @@ func (tkService *TimerTaskService) UpdateTimerTask(ctx context.Context, tk autom
 		return errors.New("没有该项目的操作权限")
 	}
 
+	validateProjectID := oldTimerTask.ProjectId
+	if tk.ProjectId != 0 {
+		validateProjectID = tk.ProjectId
+	}
+	if err := tkService.validateTimerTaskRunnerNode(ctx, validateProjectID, tk.RunnerNodeName); err != nil {
+		return err
+	}
+
 	err = global.GVA_DB.Model(&automation.TimerTask{}).Where("id = ?", tk.ID).Updates(&tk).Error
 	if err == nil {
 		RefreshTimerTaskSchedules(ctx)
@@ -96,6 +108,41 @@ func (tkService *TimerTaskService) UpdateTimerTask(ctx context.Context, tk autom
 		tkService.publishTimerTaskControl(ctx, tk.ID, current.RunnerNodeName)
 	}
 	return err
+}
+
+func (tkService *TimerTaskService) validateTimerTaskRunnerNode(ctx context.Context, projectID int64, runnerNodeName *string) error {
+	if runnerNodeName == nil {
+		return nil
+	}
+	node := strings.TrimSpace(*runnerNodeName)
+	if node == "" {
+		return nil
+	}
+	if projectID == 0 {
+		return nil
+	}
+
+	var rn platform.RunnerNode
+	err := global.GVA_DB.WithContext(ctx).
+		Model(&platform.RunnerNode{}).
+		Select("run_content").
+		Where("project_id = ? AND node_name = ?", projectID, node).
+		First(&rn).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return fmt.Errorf("运行节点不存在: %s", node)
+	}
+	if err != nil {
+		return err
+	}
+	if rn.RunContent == nil || strings.TrimSpace(*rn.RunContent) == "" {
+		return nil
+	}
+	switch strings.ToLower(strings.TrimSpace(*rn.RunContent)) {
+	case "runner", "all":
+		return nil
+	default:
+		return fmt.Errorf("运行节点不支持定时任务，仅支持 runner/all: %s", node)
+	}
 }
 
 func (tkService *TimerTaskService) publishTimerTaskControl(ctx context.Context, taskID uint, runnerNodeName *string) {
