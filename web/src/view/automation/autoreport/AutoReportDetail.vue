@@ -80,14 +80,16 @@
             <div class="flex-1 min-w-0 mr-4">
               <div class="text-gray-500 dark:text-gray-400 text-sm mb-1">执行状态</div>
               <div class="mb-2">
-                <el-tag :type="statusType" effect="light" size="large" class="!text-base px-4 py-1 rounded-full flex items-center w-fit">
-                   <el-icon class="mr-1">
-                     <CircleCheckFilled v-if="detail.status === 3" />
-                     <CircleCloseFilled v-else-if="detail.status === 2" />
-                     <Refresh v-else-if="detail.status === 1" />
-                     <Clock v-else />
-                   </el-icon>
-                   {{ statusText }}
+                <el-tag :type="statusType" :effect="statusTagEffect" size="large" class="!text-sm px-3 py-1.5 rounded-full w-fit">
+                   <span class="flex items-center">
+                     <el-icon class="mr-1" :size="16">
+                       <CircleCheckFilled v-if="detail.status === 3" />
+                       <CircleCloseFilled v-else-if="detail.status === 2" />
+                       <Refresh v-else-if="detail.status === 1" />
+                       <Clock v-else />
+                     </el-icon>
+                     <span>{{ statusText }}</span>
+                   </span>
                 </el-tag>
               </div>
               <div class="text-sm text-gray-500 dark:text-gray-400 truncate w-full" :title="detail.node_name">
@@ -105,9 +107,7 @@
                  <el-button type="primary" link icon="Refresh" @click="refreshData" :loading="loading">刷新</el-button>
               </div>
             </div>
-            <div class="p-3 bg-green-50 dark:bg-green-900/30 rounded-lg text-green-500 dark:text-green-300">
-               <el-icon :size="24"><CircleCheck /></el-icon>
-            </div>
+
          </div>
       </el-card>
     </div>
@@ -529,6 +529,26 @@ const statusType = computed(() => {
     if (s === 2) return 'danger'
     if (s === 3) return 'success'
     return 'info'
+})
+
+const statusTagEffect = computed(() => {
+    return detail.value.status === 2 ? 'plain' : 'light'
+})
+
+const statusDecorIcon = computed(() => {
+    const s = detail.value.status
+    if (s === 3) return CircleCheck
+    if (s === 2) return CircleCloseFilled
+    if (s === 1) return Refresh
+    return Clock
+})
+
+const statusDecorClass = computed(() => {
+    const s = detail.value.status
+    if (s === 3) return 'bg-green-50 dark:bg-green-900/30 text-green-500 dark:text-green-300'
+    if (s === 2) return 'bg-red-50 dark:bg-red-900/30 text-red-500 dark:text-red-300'
+    if (s === 1) return 'bg-blue-50 dark:bg-blue-900/30 text-blue-500 dark:text-blue-300'
+    return 'bg-gray-50 dark:bg-gray-900/30 text-gray-500 dark:text-gray-300'
 })
 
 const apiStats = computed(() => {
