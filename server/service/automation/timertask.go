@@ -126,7 +126,7 @@ func (tkService *TimerTaskService) validateTimerTaskRunnerNode(ctx context.Conte
 	err := global.GVA_DB.WithContext(ctx).
 		Model(&platform.RunnerNode{}).
 		Select("run_content").
-		Where("project_id = ? AND node_name = ?", projectID, node).
+		Where(" node_name = ?", node).
 		First(&rn).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return fmt.Errorf("运行节点不存在: %s", node)
@@ -138,10 +138,10 @@ func (tkService *TimerTaskService) validateTimerTaskRunnerNode(ctx context.Conte
 		return nil
 	}
 	switch strings.ToLower(strings.TrimSpace(*rn.RunContent)) {
-	case "runner", "all":
+	case "timer", "all":
 		return nil
 	default:
-		return fmt.Errorf("运行节点不支持定时任务，仅支持 runner/all: %s", node)
+		return fmt.Errorf("运行节点不支持定时任务，仅支持 timer/all: %s", node)
 	}
 }
 

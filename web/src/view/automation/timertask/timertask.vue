@@ -532,7 +532,7 @@
   }
 
   const loadRunnerNodeOptions = async () => {
-    const res = await getRunnerNodeList({ page: 1, pageSize: 1000, runContents: ['runner', 'all'] })
+    const res = await getRunnerNodeList({ page: 1, pageSize: 1000, runContents: ['timer', 'all'] })
     if (res.code === 0) {
       const list = res.data.list || []
       runnerNodeOptions.value = list.filter((x) => x.nodeName)

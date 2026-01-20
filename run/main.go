@@ -27,13 +27,13 @@ func main() {
 		mode = "runner"
 	}
 	enableRunnerConsumer := mode == "runner" || mode == "all"
-	enableTimer := mode == "runner" || mode == "timer" || mode == "all"
+	enableTimer := mode == "timer" || mode == "all"
 
 	if mode != "runner" && mode != "timer" && mode != "all" {
 		global.GVA_LOG.Warn("Unknown RUN_SERVICE_MODE, fallback to runner", zap.String("mode", mode))
 		mode = "runner"
 		enableRunnerConsumer = true
-		enableTimer = true
+		enableTimer = false
 	}
 
 	runContent := mode
