@@ -5,7 +5,7 @@
       <div>
         <h1 class="text-2xl font-bold text-blue-600 mb-2">{{ detail.name || '报告名称' }}</h1>
         <div class="text-gray-500 dark:text-gray-400 text-sm">
-          任务 ID: {{ detail.ID }} | 生成时间: {{ formatDate(detail.CreatedAt) }}
+          任务 ID: {{ detail.ID }} | 创建任务时间: {{ formatDate(detail.CreatedAt) }}
         </div>
       </div>
       <div class="flex gap-2">
@@ -26,7 +26,9 @@
               <span class="w-3 h-3 rounded-full bg-green-500 mr-1"></span>
               <span class="mr-3">{{ detail.stat?.testcases?.success || 0 }} 成功</span>
               <span class="w-3 h-3 rounded-full bg-red-500 mr-1"></span>
-              <span>{{ detail.stat?.testcases?.fail || 0 }} 失败</span>
+              <span class="mr-3">{{ detail.stat?.testcases?.fail || 0 }} 失败</span>
+              <span class="w-3 h-3 rounded-full bg-gray-400 mr-1"></span>
+              <span>{{ detail.stat?.testcases?.skip || 0 }} 跳过</span>
             </div>
           </div>
           <div class="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-blue-500 dark:text-blue-300">
@@ -45,7 +47,9 @@
                <span class="w-3 h-3 rounded-full bg-green-500 mr-1"></span>
                <span class="mr-3">{{ apiStats.success }} 成功</span>
                <span class="w-3 h-3 rounded-full bg-red-500 mr-1"></span>
-               <span>{{ apiStats.fail }} 失败</span>
+               <span class="mr-3">{{ apiStats.fail }} 失败</span>
+               <span class="w-3 h-3 rounded-full bg-gray-400 mr-1"></span>
+               <span>{{ apiStats.skip }} 跳过</span>
              </div>
           </div>
           <div class="p-3 bg-green-50 dark:bg-green-900/30 rounded-lg text-green-500 dark:text-green-300">
@@ -70,25 +74,32 @@
          </div>
       </el-card>
 
-       <!-- Card 4: Status -->
+  <!-- Card 4: Status -->
       <el-card shadow="hover" class="summary-card rounded-lg">
          <div class="flex justify-between items-start">
-            <div>
+            <div class="flex-1 min-w-0 mr-4">
               <div class="text-gray-500 dark:text-gray-400 text-sm mb-1">执行状态</div>
               <div class="mb-2">
                 <el-tag :type="statusType" effect="light" size="large" class="!text-base px-4 py-1 rounded-full flex items-center w-fit">
-                   <el-icon class="mr-1"><CircleCheckFilled v-if="detail.success" /><CircleCloseFilled v-else />{{ statusText }}</el-icon>
+                   <el-icon class="mr-1">
+                     <CircleCheckFilled v-if="detail.status === 3" />
+                     <CircleCloseFilled v-else-if="detail.status === 2" />
+                     <Refresh v-else-if="detail.status === 1" />
+                     <Clock v-else />
+                   </el-icon>
+                   {{ statusText }}
                 </el-tag>
               </div>
-              <div class="text-sm text-gray-500 dark:text-gray-400 truncate w-100" :title="detail.hostname">
-                主机名: {{ detail.hostname }}
+              <div class="text-sm text-gray-500 dark:text-gray-400 truncate w-full" :title="detail.node_name">
+                运行节点: {{ detail.node_name || '-' }}
               </div>
               <div v-if="showProgress" class="mt-3 w-full">
                  <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
-                    <span>执行进度</span>
-                    <span>{{ progressText }}</span>
+                    <span>执行进度({{progressText}}）</span>
                  </div>
-                 <el-progress :percentage="progressPercentage" :status="progressStatus" :stroke-width="10" />
+                 <el-progress :percentage="progressPercentage" :status="progressStatus" :stroke-width="16" :text-inside="true"
+                              striped
+                              striped-flow />
               </div>
               <div v-if="!isFinished" class="mt-2">
                  <el-button type="primary" link icon="Refresh" @click="refreshData" :loading="loading">刷新</el-button>
@@ -116,6 +127,7 @@
            <div class="flex justify-center gap-4 mt-[-20px]">
               <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-green-500 mr-1"></span>成功</div>
               <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-red-500 mr-1"></span>失败</div>
+              <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-gray-400 mr-1"></span>跳过</div>
            </div>
         </div>
       </el-card>
@@ -162,7 +174,8 @@
            <div class="p-4 flex items-center justify-between bg-white dark:bg-slate-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors" @click="toggleExpand(item.ID)">
               <div class="flex items-center gap-3">
                  <span class="font-bold text-lg">用例{{ index + 1 }}</span>
-                 <el-tag :type="item.success ? 'success' : 'danger'" effect="light">{{ item.success ? '成功' : '失败' }}</el-tag>
+                 <el-tag v-if="item.skip" type="info" effect="light">跳过</el-tag>
+                 <el-tag v-else :type="item.success ? 'success' : 'danger'" effect="light">{{ item.success ? '成功' : '失败' }}</el-tag>
                  <span class="font-medium ml-2 text-gray-700 dark:text-gray-200">{{ item.name }}</span>
               </div>
               <div class="flex items-center gap-6 text-gray-500 dark:text-gray-400 text-sm">
@@ -214,10 +227,11 @@
                              </div>
                              
                              <div class="flex items-center gap-6 shrink-0">
-                                <el-tag :type="record.success ? 'success' : 'danger'" size="small" effect="light">{{ record.success ? '成功' : '失败' }}</el-tag>
+                                <el-tag v-if="record.skip" type="info" size="small" effect="light">跳过</el-tag>
+                                <el-tag v-else :type="record.success ? 'success' : 'danger'" size="small" effect="light">{{ record.success ? '成功' : '失败' }}</el-tag>
                                 <div class="text-sm text-gray-500 dark:text-gray-400 w-24 text-right flex justify-end items-center"><el-icon class="mr-1"><Timer /></el-icon>{{ record.elapsed_ms }} ms</div>
                                 <el-button
-                                  v-if="['request', 'api'].includes(record.step_type) || getRequestMethod(record)"
+                                  v-if="['request', 'api'].includes(record.step_type) || getRequestMethod(record) || record.skip"
                                   link 
                                   type="primary" 
                                   @click.stop="showDetail(record)"
@@ -259,10 +273,11 @@
               {{ currentRecord.data?.req_resps?.request?.url || '-' }}
             </el-descriptions-item>
             <el-descriptions-item label="Method">
-              <el-tag>{{ currentRecord.data?.req_resps?.request?.method || '-' }}</el-tag>
+              <el-tag>{{ currentRecord.data?.req_resps?.request?.method || (currentRecord.skip ? 'SKIP' : '-') }}</el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="状态码">
-              <el-tag :type="(currentRecord.data?.req_resps?.response?.status_code || 0) < 400 ? 'success' : 'danger'">
+              <el-tag v-if="currentRecord.skip" type="info">SKIPPED</el-tag>
+              <el-tag v-else :type="(currentRecord.data?.req_resps?.response?.status_code || 0) < 400 ? 'success' : 'danger'">
                 {{ currentRecord.data?.req_resps?.response?.status_code ?? '-' }}
               </el-tag>
             </el-descriptions-item>
@@ -273,7 +288,18 @@
         </div>
 
         <el-tabs v-model="activeTab" type="border-card" class="flex-1 overflow-hidden flex flex-col">
-          <el-tab-pane label="请求内容" name="request" class="h-full overflow-auto">
+          <el-tab-pane v-if="currentRecord.skip" label="跳过原因" name="skip" class="h-full overflow-auto">
+            <div class="p-4 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 rounded border border-orange-200 dark:border-orange-800/50">
+               <div class="font-bold mb-2 flex items-center">
+                  <el-icon class="mr-1"><Warning /></el-icon> 跳过原因
+               </div>
+               <pre class="whitespace-pre-wrap font-mono text-sm">{{ currentRecord.attachments }}</pre>
+            </div>
+          </el-tab-pane>
+          <el-tab-pane v-if="!currentRecord.success && !currentRecord.skip && currentRecord.attachments" label="失败原因" name="error" class="h-full overflow-auto">
+            <pre class="code-block">{{ currentRecord.attachments }}</pre>
+          </el-tab-pane>
+          <el-tab-pane label="请求内容" name="request" class="h-full overflow-auto" v-if="!currentRecord.skip">
             <el-tabs v-model="requestSubTab" type="card" class="h-full">
               <el-tab-pane label="Headers" name="headers" class="h-full overflow-auto">
                 <h4 class="font-bold my-2">Request Headers</h4>
@@ -293,7 +319,7 @@
             </el-tabs>
           </el-tab-pane>
 
-          <el-tab-pane label="响应内容" name="response" class="h-full overflow-auto">
+          <el-tab-pane label="响应内容" name="response" class="h-full overflow-auto" v-if="!currentRecord.skip">
             <el-tabs v-model="responseSubTab" type="card" class="h-full">
               <el-tab-pane label="Headers" name="headers" class="h-full overflow-auto">
                 <h4 class="font-bold my-2">Response Headers</h4>
@@ -313,7 +339,7 @@
             </el-tabs>
           </el-tab-pane>
 
-          <el-tab-pane label="断言信息" name="assert" class="h-full overflow-auto">
+          <el-tab-pane label="断言信息" name="assert" class="h-full overflow-auto" v-if="!currentRecord.skip">
             <el-table :data="currentRecord.data?.validators" border>
               <el-table-column prop="check" label="Check" />
               <el-table-column prop="assert" label="Assert" />
@@ -329,7 +355,7 @@
             </el-table>
           </el-tab-pane>
 
-          <el-tab-pane label="参数提取" name="extract" class="h-full overflow-auto">
+          <el-tab-pane label="参数提取" name="extract" class="h-full overflow-auto" v-if="!currentRecord.skip">
             <el-table :data="objectToTableData(currentRecord.export_vars)" border>
               <el-table-column prop="key" label="Variable Name" />
               <el-table-column prop="value" label="Value" />
@@ -350,7 +376,7 @@ import * as echarts from 'echarts'
 import { ElMessage } from 'element-plus'
 import { 
   Document, Sort, Timer, CircleCheck, CircleCheckFilled, CircleCloseFilled, 
-  List, ArrowDown, ArrowRight, Link, Calendar, Search, Refresh
+  List, ArrowDown, ArrowRight, Link, Calendar, Search, Refresh, Clock, Warning
 } from '@element-plus/icons-vue'
 
 const route = useRoute()
@@ -510,7 +536,8 @@ const apiStats = computed(() => {
     return {
         total: api.total || 0,
         success: api.success || 0,
-        fail: api.fail || 0
+        fail: api.fail || 0,
+        skip: api.skip || 0
     }
 })
 
@@ -697,7 +724,11 @@ const renderHttpstatChart = () => {
 // Actions
 const showDetail = (record) => {
     currentRecord.value = record
-    activeTab.value = 'request'
+    if (record.skip) {
+        activeTab.value = 'skip'
+    } else {
+        activeTab.value = (!record.success && record.attachments) ? 'error' : 'request'
+    }
     requestSubTab.value = 'headers'
     responseSubTab.value = 'headers'
     dialogVisible.value = true
@@ -726,7 +757,7 @@ const renderResultChart = () => {
     const chart = echarts.init(resultChartRef.value)
     const success = detail.value.stat?.testcases?.success || 0
     const fail = detail.value.stat?.testcases?.fail || 0
-    const total = success + fail
+    const skip = detail.value.stat?.testcases?.skip || 0
     
     // Donut Chart
     const option = {
@@ -758,7 +789,8 @@ const renderResultChart = () => {
                 },
                 data: [
                     { value: success, name: '成功', itemStyle: { color: '#67C23A' } },
-                    { value: fail, name: '失败', itemStyle: { color: '#F56C6C' } }
+                    { value: fail, name: '失败', itemStyle: { color: '#F56C6C' } },
+                    { value: skip, name: '跳过', itemStyle: { color: '#909399' } }
                 ]
             }
         ]

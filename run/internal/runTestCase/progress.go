@@ -211,9 +211,6 @@ func finalizeReportProgress(reportID uint) {
 	totalCasesCmd := pipe.Get(ctx, BuildReportProgressKey(reportID, "total_cases"))
 	totalStepsCmd := pipe.Get(ctx, BuildReportProgressKey(reportID, "total_steps"))
 	totalApisCmd := pipe.Get(ctx, BuildReportProgressKey(reportID, "total_apis"))
-	executedCasesCmd := pipe.Get(ctx, BuildReportProgressKey(reportID, "executed_cases"))
-	executedStepsCmd := pipe.Get(ctx, BuildReportProgressKey(reportID, "executed_steps"))
-	executedApisCmd := pipe.Get(ctx, BuildReportProgressKey(reportID, "executed_apis"))
 
 	if _, err := pipe.Exec(ctx); err != nil {
 		global.GVA_LOG.Error("read progress from redis failed", zap.Uint("report_id", reportID), zap.Error(err))
@@ -224,9 +221,11 @@ func finalizeReportProgress(reportID uint) {
 	totalCases, _ := totalCasesCmd.Int()
 	totalSteps, _ := totalStepsCmd.Int()
 	totalApis, _ := totalApisCmd.Int()
-	executedCases, _ := executedCasesCmd.Int()
-	executedSteps, _ := executedStepsCmd.Int()
-	executedApis, _ := executedApisCmd.Int()
+
+	// 强制设置进度为 100% (无论是否有失败跳过)
+	executedCases := totalCases
+	executedSteps := totalSteps
+	executedApis := totalApis
 
 	// 写入数据库
 	if global.GVA_DB != nil {

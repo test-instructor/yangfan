@@ -100,6 +100,8 @@ type HRPRunner struct {
 	caseTimeoutTimer *time.Timer          // case timeout timer
 	interruptSignal  chan os.Signal       // interrupt signal channel
 	onStepComplete   StepCompleteCallback // callback for step completion
+	Skip             bool                 // whether to skip remaining steps
+	SkipReason       string               // reason for skipping
 }
 
 // SetClientTransport configures transport of http client for high concurrency load testing
@@ -130,6 +132,11 @@ func (r *HRPRunner) SetFailfast(failfast bool) *HRPRunner {
 	log.Info().Bool("failfast", failfast).Msg("[init] SetFailfast")
 	r.failfast = failfast
 	return r
+}
+
+// GetFailfast returns the failfast setting.
+func (r *HRPRunner) GetFailfast() bool {
+	return r.failfast
 }
 
 // SetRequestsLogOn turns on request & response details logging.
@@ -353,7 +360,8 @@ func (r *HRPRunner) Run(testcases ...ITestCase) (err error) {
 			if err != nil {
 				log.Error().Err(err).Msg("[Run] run testcase failed")
 				if r.failfast {
-					return err
+					runErr = err
+					continue
 				}
 				runErr = err
 			}
@@ -767,13 +775,34 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) (summary *TestCa
 	}()
 
 	// run step in sequential order
+	if r.caseRunner.hrpRunner.Skip {
+		r.summary.Skipped = true
+	}
 	for _, step := range r.caseRunner.TestSteps {
 		select {
 		case <-r.caseRunner.hrpRunner.caseTimeoutTimer.C:
 			log.Warn().Msg("timeout in session runner")
 			return summary, errors.Wrap(code.TimeoutError, "session runner timeout")
 		default:
-			_, err := r.RunStep(step)
+			// check if skip remaining steps
+			if r.caseRunner.hrpRunner.Skip {
+				stepResult := &StepResult{
+					Name:        step.Name(),
+					StepType:    step.Type(),
+					Success:     false,
+					Skipped:     true,
+					StartTime:   time.Now().UnixMilli(),
+					Attachments: r.caseRunner.hrpRunner.SkipReason,
+				}
+				r.summary.AddStepResult(stepResult)
+				// update progress for skipped steps
+				if r.caseRunner.hrpRunner.onStepComplete != nil {
+					r.caseRunner.hrpRunner.onStepComplete(string(step.Type()), stepResult)
+				}
+				continue
+			}
+
+			stepResult, err := r.RunStep(step)
 			if err == nil {
 				continue
 			}
@@ -784,7 +813,52 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) (summary *TestCa
 
 			// check if failfast
 			if r.caseRunner.hrpRunner.failfast {
-				return summary, errors.Wrap(err, "abort running due to failfast setting")
+				r.caseRunner.hrpRunner.Skip = true
+
+				caseName := r.caseRunner.TestCase.Config.Get().Name
+				if name, ok := r.caseRunner.TestCase.Config.Get().Variables["__case_name__"]; ok {
+					caseName = fmt.Sprintf("%v", name)
+				}
+				stepName := step.Config().StepName
+				if stepName == "" {
+					stepName = "无步骤名称"
+				}
+
+				interfaceInfo := "无接口信息"
+				if stepResult != nil {
+					// Check step type first
+					if stepResult.StepType == "request" || stepResult.StepType == "api" || strings.Contains(string(stepResult.StepType), "request") {
+						if sd, ok := stepResult.Data.(*SessionData); ok && sd.ReqResps != nil && sd.ReqResps.Request != nil {
+							req := sd.ReqResps.Request
+
+							// Try to extract Method and URL
+							v := reflect.ValueOf(req)
+							if v.Kind() == reflect.Ptr {
+								v = v.Elem()
+							}
+
+							if v.Kind() == reflect.Struct {
+								methodField := v.FieldByName("Method")
+								urlField := v.FieldByName("URL")
+								if methodField.IsValid() && urlField.IsValid() {
+									interfaceInfo = fmt.Sprintf("%s %s", methodField.Interface(), urlField.Interface())
+								}
+							} else if m, ok := req.(map[string]interface{}); ok {
+								method, _ := m["method"].(string)
+								url, _ := m["url"].(string)
+								if method != "" && url != "" {
+									interfaceInfo = fmt.Sprintf("%s %s %s", stepName, method, url)
+								}
+							}
+						}
+					}
+				}
+
+				r.caseRunner.hrpRunner.SkipReason = fmt.Sprintf("测试步骤：%s\n接口：%s\n错误信息：%s",
+					caseName, interfaceInfo, err.Error())
+
+				log.Warn().Err(err).Msg("failfast enabled, skip remaining steps")
+				continue
 			}
 		}
 	}
@@ -983,7 +1057,7 @@ func (r *SessionRunner) RunStep(step IStep) (stepResult *StepResult, err error) 
 					Str("step", task.stepName).
 					Int("completed_tasks", len(stepResults)).
 					Msg("execute step failed in failfast mode, step result saved")
-				return nil, errors.Wrap(stepErr, "execute step failed")
+				return stepResult, errors.Wrap(stepErr, "execute step failed")
 			}
 			log.Warn().Err(stepErr).Str("step", task.stepName).Msg("execute step failed")
 		}

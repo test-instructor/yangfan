@@ -88,6 +88,10 @@
 
         <el-table-column align="left" label="运行节点" prop="runnerNodeName" width="180" />
 
+        <el-table-column align="left" label="失败停止" prop="failfast" width="100">
+          <template #default="scope">{{ formatBoolean(scope.row.failfast) }}</template>
+        </el-table-column>
+
         <el-table-column align="left" label="运行配置" prop="configName" width="120" />
 
         <el-table-column label="标签" prop="tag" width="200">
@@ -173,6 +177,10 @@
         </el-form-item>
         <el-form-item label="运行次数:" prop="runNumber">
           <el-input v-model.number="formData.runNumber" :clearable="false" placeholder="请输入运行次数" />
+        </el-form-item>
+        <el-form-item label="失败停止:" prop="failfast">
+          <el-switch v-model="formData.failfast" active-color="#13ce66" inactive-color="#ff4949" active-text="是"
+                     inactive-text="否" clearable></el-switch>
         </el-form-item>
         <el-form-item label="运行配置:" prop="configName">
           <RunConfig v-model="formData.configID" @change="handleConfigSelect" />
@@ -296,6 +304,10 @@
               :value="opt.nodeName"
             />
           </el-select>
+        </el-form-item>
+        <el-form-item label="失败停止">
+          <el-switch v-model="ciForm.failfast" active-color="#13ce66" inactive-color="#ff4949" active-text="是"
+                     inactive-text="否" clearable></el-switch>
         </el-form-item>
         <el-form-item label="发送消息">
           <el-switch v-model="ciForm.notifyEnabled" active-color="#13ce66" inactive-color="#ff4949" active-text="是"
@@ -439,7 +451,8 @@
     runTime: '',
     nextRunTime: new Date(),
     status: false,
-    runNumber: 0,
+      failfast: false,
+      runNumber: 0,
     configName: '',
     configID: null,
     tag: [],
@@ -642,6 +655,7 @@
     if (ciForm.nodeName) {
       params.set('node_name', ciForm.nodeName)
     }
+    params.set('failfast', String(!!ciForm.failfast))
     params.set('notify_enabled', String(!!ciForm.notifyEnabled))
     params.set('notify_rule', ciForm.notifyRule || '')
     if (Array.isArray(ciForm.notifyChannelIds)) {
@@ -845,6 +859,7 @@
       runTime: '',
       nextRunTime: new Date(),
       status: false,
+      failfast: false,
       runNumber: 0,
       configName: '',
       configID: null,

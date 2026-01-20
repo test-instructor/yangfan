@@ -20,6 +20,7 @@ type StepResult struct {
 	Name        string                 `json:"name" yaml:"name"`                                   // step name
 	StepType    StepType               `json:"step_type" yaml:"step_type"`                         // step type, testcase/request/transaction/rendezvous
 	Success     bool                   `json:"success" yaml:"success"`                             // step execution result
+	Skipped     bool                   `json:"skipped" yaml:"skipped"`                             // step execution result
 	Elapsed     int64                  `json:"elapsed_ms" yaml:"elapsed_ms"`                       // step execution time in millisecond(ms)
 	HttpStat    map[string]int64       `json:"httpstat,omitempty" yaml:"httpstat,omitempty"`       // httpstat in millisecond(ms)
 	Data        interface{}            `json:"data,omitempty" yaml:"data,omitempty"`               // session data or slice of step data

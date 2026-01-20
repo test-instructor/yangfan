@@ -9,6 +9,7 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -76,6 +77,8 @@ type HRPRunner struct {
 	http2Client   *http.Client               // 指向 HTTP/2 客户端实例的指针。用于在测试执行期间进行 HTTP/2 请求。
 	wsDialer      *websocket.Dialer          // 指向 WebSocket 拨号器实例的指针。用于在测试执行期间建立 WebSocket 连接。
 	uiClients     map[string]*uixt.DriverExt // UI 客户端的映射。用于管理具有唯一键作为标识符的 UI 测试驱动程序。
+	Skip          bool                       // 是否跳过后续步骤
+	SkipReason    string                     // 跳过的原因
 }
 
 // SetClientTransport 配置 HTTP 客户端的传输以进行高并发负载测试。
@@ -245,7 +248,7 @@ func (r *HRPRunner) Run(testcases ...ITestCase) error {
 			// 如果发生错误且设置了failfast标志，则终止运行
 			// 实际操作一般都会执行所有用例后，最后获取用例执行情况
 			if runErr != nil && r.failfast {
-				break
+				continue
 			}
 		}
 	}
@@ -517,6 +520,9 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 	}()
 
 	// 按顺序运行每个步骤
+	if r.caseRunner.hrpRunner.Skip {
+		r.summary.Skipped = true
+	}
 	for _, step := range r.caseRunner.testCase.TestSteps {
 		// TODO: 解析步骤结构
 		// 解析步骤名称
@@ -528,6 +534,18 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 		log.Info().Str("step", stepName).
 			Str("type", string(step.Type())).Msg("运行步骤开始")
 
+		// 判断是否跳过后续步骤
+		if r.caseRunner.hrpRunner.Skip {
+			stepResult := &StepResult{
+				Name:        stepName,
+				StepType:    step.Type(),
+				Success:     false,
+				Skipped:     true,
+				Attachments: r.caseRunner.hrpRunner.SkipReason,
+			}
+			r.updateSummary(stepResult)
+			continue
+		}
 		// 获取步骤运行次数
 		loopTimes := step.Struct().Loops
 		if loopTimes < 0 {
@@ -577,7 +595,45 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) error {
 
 		// 检查是否设置了 failfast
 		if r.caseRunner.hrpRunner.failfast {
-			return errors.Wrap(err, "由于设置了 failfast，中止运行")
+			r.caseRunner.hrpRunner.Skip = true
+
+			caseName := r.caseRunner.parsedConfig.Name
+			if name, ok := r.caseRunner.parsedConfig.Variables["__case_name__"]; ok {
+				caseName = fmt.Sprintf("%v", name)
+			}
+			// stepName 已在循环开始处定义并解析
+
+			interfaceInfo := "无接口信息"
+			if stepResult != nil {
+				if sd, ok := stepResult.Data.(*SessionData); ok && sd.ReqResps != nil && sd.ReqResps.Request != nil {
+					req := sd.ReqResps.Request
+
+					v := reflect.ValueOf(req)
+					if v.Kind() == reflect.Ptr {
+						v = v.Elem()
+					}
+
+					if v.Kind() == reflect.Struct {
+						methodField := v.FieldByName("Method")
+						urlField := v.FieldByName("URL")
+						if methodField.IsValid() && urlField.IsValid() {
+							interfaceInfo = fmt.Sprintf("%s %s", methodField.Interface(), urlField.Interface())
+						}
+					} else if m, ok := req.(map[string]interface{}); ok {
+						method, _ := m["method"].(string)
+						url, _ := m["url"].(string)
+						if method != "" && url != "" {
+							interfaceInfo = fmt.Sprintf("%s %s", method, url)
+						}
+					}
+				}
+			}
+
+			r.caseRunner.hrpRunner.SkipReason = fmt.Sprintf("测试用例：%s\n测试步骤：%s\n接口：%s\n错误信息：%s",
+				caseName, stepName, interfaceInfo, err.Error())
+
+			log.Warn().Err(err).Msg("由于设置了 failfast，后续步骤将跳过")
+			continue
 		}
 	}
 
@@ -675,7 +731,9 @@ func (r *SessionRunner) addSingleStepResult(stepResult *StepResult) {
 	// 更新摘要信息
 	r.summary.Records = append(r.summary.Records, stepResult)
 	r.summary.Stat.Total += 1
-	if stepResult.Success {
+	if stepResult.Skipped {
+		r.summary.Stat.Skipped += 1
+	} else if stepResult.Success {
 		r.summary.Stat.Successes += 1
 	} else {
 		r.summary.Stat.Failures += 1

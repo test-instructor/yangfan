@@ -93,6 +93,13 @@
              </template>
           </el-table-column>
 
+          <el-table-column label="节点" prop="node_name" width="140">
+             <template #default="scope">
+               <el-tag v-if="scope.row.node_name" type="info" effect="plain">{{ scope.row.node_name }}</el-tag>
+               <span v-else class="text-gray-400">-</span>
+             </template>
+          </el-table-column>
+
           <el-table-column label="状态" prop="status" width="100">
               <template #default="scope">
                   <el-tag v-if="scope.row.status===1" effect="dark">运行中</el-tag>
@@ -200,8 +207,8 @@
                </el-col>
             </el-row>
             
-            <el-form-item label="主机名:" prop="hostname">
-                <el-input v-model="formData.hostname" :clearable="false" placeholder="请输入主机名" />
+            <el-form-item label="运行节点:" prop="node_name">
+                <el-input v-model="formData.node_name" :clearable="false" placeholder="请输入运行节点" disabled />
             </el-form-item>
           </el-form>
     </el-drawer>
@@ -242,8 +249,8 @@
                     <el-descriptions-item label="API环境ID">
                         {{ detailForm.api_env_id }}
                     </el-descriptions-item>
-                    <el-descriptions-item label="主机名">
-                        {{ detailForm.hostname }}
+                    <el-descriptions-item label="运行节点">
+                        {{ detailForm.node_name || '-' }}
                     </el-descriptions-item>
             </el-descriptions>
         </el-drawer>
@@ -295,7 +302,7 @@ const formData = ref({
             describe: '',
             api_env_name: '',
             api_env_id: 0,
-            hostname: '',
+            node_name: '',
         })
 
 
@@ -472,7 +479,7 @@ const closeDialog = () => {
         describe: '',
         api_env_name: '',
         api_env_id: 0,
-        hostname: '',
+        node_name: '',
         }
 }
 // 弹窗确定

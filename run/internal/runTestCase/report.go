@@ -3,6 +3,7 @@ package runTestCase
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 
@@ -17,6 +18,27 @@ import (
 
 type ReportOperation struct {
 	report *automation.AutoReport
+}
+
+func stringifyAttachments(v interface{}) string {
+	if v == nil {
+		return ""
+	}
+	switch vv := v.(type) {
+	case string:
+		return vv
+	case []byte:
+		return string(vv)
+	default:
+		b, err := json.Marshal(vv)
+		if err == nil {
+			s := strings.TrimSpace(string(b))
+			if s != "" && s != "null" && s != `""` {
+				return s
+			}
+		}
+		return fmt.Sprint(vv)
+	}
 }
 
 func buildReportFromSummary(s *hrp.Summary) *automation.AutoReport {
@@ -34,20 +56,23 @@ func buildReportFromSummary(s *hrp.Summary) *automation.AutoReport {
 			Total:   s.Stat.TestCases.Total,
 			Success: s.Stat.TestCases.Success,
 			Fail:    s.Stat.TestCases.Fail,
+			Skip:    s.Stat.TestCases.Skipped,
 		}
 
 		stepStat := &automation.AutoReportStatTeststeps{
-			Actions: datatypes.JSONMap{},
+			Actions:   datatypes.JSONMap{},
+			Total:     s.Stat.TestSteps.Total,
+			Successes: s.Stat.TestSteps.Successes,
+			Failures:  s.Stat.TestSteps.Failures,
+			Skip:      s.Stat.TestSteps.Skipped,
 		}
 
 		apiStat := &automation.AutoReportStatTeststepapi{}
 
-		stepTotal := 0
-		stepSuccess := 0
-		stepFail := 0
 		apiTotal := 0
 		apiSuccess := 0
 		apiFail := 0
+		apiSkip := 0
 		for _, cs := range s.Details {
 			if cs == nil {
 				continue
@@ -56,17 +81,13 @@ func buildReportFromSummary(s *hrp.Summary) *automation.AutoReport {
 				if step == nil {
 					continue
 				}
-				stepTotal++
-				if step.Success {
-					stepSuccess++
-				} else {
-					stepFail++
-				}
 
 				stepTypeStr := string(step.StepType)
 				if strings.Contains(stepTypeStr, "request") || strings.Contains(stepTypeStr, "api") {
 					apiTotal++
-					if step.Success {
+					if step.Skipped {
+						apiSkip++
+					} else if step.Success {
 						apiSuccess++
 					} else {
 						apiFail++
@@ -75,13 +96,10 @@ func buildReportFromSummary(s *hrp.Summary) *automation.AutoReport {
 			}
 		}
 
-		stepStat.Total = stepTotal
-		stepStat.Successes = stepSuccess
-		stepStat.Failures = stepFail
-
 		apiStat.Total = apiTotal
 		apiStat.Success = apiSuccess
 		apiStat.Fail = apiFail
+		apiStat.Skip = apiSkip
 
 		summaryReport.Stat = &automation.AutoReportStat{
 			Testcases:   caseStat,
@@ -120,6 +138,7 @@ func buildReportFromSummary(s *hrp.Summary) *automation.AutoReport {
 			caseStat["total"] = cs.Stat.Total
 			caseStat["successes"] = cs.Stat.Successes
 			caseStat["failures"] = cs.Stat.Failures
+			caseStat["skip"] = cs.Stat.Skipped
 		}
 
 		caseTime := datatypes.JSONMap{}
@@ -146,6 +165,7 @@ func buildReportFromSummary(s *hrp.Summary) *automation.AutoReport {
 		detail := automation.AutoReportDetail{
 			Name:    name,
 			Success: cs.Success,
+			Skip:    cs.Skipped,
 			Stat:    caseStat,
 			Time:    caseTime,
 			InOut:   inOut,
@@ -189,9 +209,11 @@ func buildReportFromSummary(s *hrp.Summary) *automation.AutoReport {
 				StartTime:   step.StartTime,
 				StepType:    string(step.StepType),
 				Success:     step.Success,
+				Skip:        step.Skipped,
 				ElapsedMs:   step.Elapsed,
 				HttpStat:    httpStat,
 				Data:        dataMap,
+				Attachments: stringifyAttachments(step.Attachments),
 				ContentSize: step.ContentSize,
 				ExportVars:  exportVars,
 			}
@@ -269,6 +291,14 @@ func (r *ReportOperation) UpdateReport(report *automation.AutoReport) {
 		}
 	}
 
+	nodeName := r.report.NodeName
+	if nodeName == nil {
+		var dbReport automation.AutoReport
+		if err := global.GVA_DB.Select("node_name").First(&dbReport, "id = ?", r.report.ID).Error; err == nil {
+			nodeName = dbReport.NodeName
+		}
+	}
+
 	// Update fields from latest execution result
 	r.report.Success = report.Success
 	var finishStatus int64 = 2
@@ -284,6 +314,7 @@ func (r *ReportOperation) UpdateReport(report *automation.AutoReport) {
 
 	// 设置 ProgressID，确保不被覆盖
 	r.report.ProgressID = progressID
+	r.report.NodeName = nodeName
 
 	// 使用 Save + FullSaveAssociations：
 	// 1）根据主键 ID 更新 yf_auto_reports 本身；

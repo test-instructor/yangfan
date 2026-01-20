@@ -126,7 +126,7 @@ func (tkService *TimerTaskService) validateTimerTaskRunnerNode(ctx context.Conte
 	err := global.GVA_DB.WithContext(ctx).
 		Model(&platform.RunnerNode{}).
 		Select("run_content").
-		Where(" node_name = ?", node).
+		Where("node_name = ?", node).
 		First(&rn).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return fmt.Errorf("运行节点不存在: %s", node)

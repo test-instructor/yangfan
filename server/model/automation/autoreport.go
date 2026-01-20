@@ -34,6 +34,7 @@ type AutoReport struct {
 	SetupCase  *bool               `json:"setup_case" form:"setup_case" gorm: "column:setup_case;"`               //设置案例
 	Describe   *string             `json:"describe" form:"describe" gorm:"column:describe;"`                      //描述
 	Hostname   *string             `json:"hostname" form:"hostname" gorm:"comment:主机名;;​​column:hostname;"`       //主机名
+	NodeName   *string             `json:"node_name" form:"node_name" gorm:"column:node_name;"`                   //节点名
 	Details    []AutoReportDetail  `json:"details" gorm:"foreignKey:AutoReportID"`
 
 	ProjectId  int64  `json:"projectId" form:"projectId" gorm:"column:project_id;"` //项目信息
@@ -136,6 +137,7 @@ type AutoReportStatTestcases struct {
 	Total   int `json:"total" gorm:"column:total"`
 	Success int `json:"success" gorm:"column:success"`
 	Fail    int `json:"fail" gorm:"column:fail"`
+	Skip    int `json:"skip" gorm:"column:skip"`
 }
 
 func (AutoReportStatTestcases) TableName() string {
@@ -147,6 +149,7 @@ type AutoReportStatTeststeps struct {
 	Total     int               `json:"total" gorm:"column:total"`
 	Successes int               `json:"successes" gorm:"column:successes"`
 	Failures  int               `json:"failures" gorm:"column:failures"`
+	Skip      int               `json:"skip" gorm:"column:skip"`
 	Actions   datatypes.JSONMap `json:"actions" gorm:"column:actions"`
 }
 
@@ -159,6 +162,7 @@ type AutoReportStatTeststepapi struct {
 	Total   int `json:"total" gorm:"column:total"`
 	Success int `json:"success" gorm:"column:success"`
 	Fail    int `json:"fail" gorm:"column:fail"`
+	Skip    int `json:"skip" gorm:"column:skip"`
 }
 
 func (AutoReportStatTeststepapi) TableName() string {
@@ -182,6 +186,7 @@ type AutoReportDetail struct {
 	AutoReportID uint               `json:"auto_report_id" gorm:"column:auto_report_id"`
 	Name         string             `json:"name" gorm:"column:name"`
 	Success      bool               `json:"success" gorm:"column:success"`
+	Skip         bool               `json:"skip" gorm:"column:skip"`
 	Stat         datatypes.JSONMap  `json:"stat" gorm:"column:stat"`
 	Time         datatypes.JSONMap  `json:"time" gorm:"column:time"`
 	InOut        datatypes.JSONMap  `json:"in_out" gorm:"column:in_out"`
@@ -200,9 +205,11 @@ type AutoReportRecord struct {
 	StartTime          int64             `json:"start_time" gorm:"column:start_time"`
 	StepType           string            `json:"step_type" gorm:"column:step_type"`
 	Success            bool              `json:"success" gorm:"column:success"`
+	Skip               bool              `json:"skip" gorm:"column:skip"`
 	ElapsedMs          int64             `json:"elapsed_ms" gorm:"column:elapsed_ms"`
 	HttpStat           datatypes.JSONMap `json:"httpstat" gorm:"column:httpstat"`
 	Data               datatypes.JSONMap `json:"data" gorm:"column:data"`
+	Attachments        string            `json:"attachments" gorm:"column:attachments;type:text"`
 	ContentSize        int64             `json:"content_size" gorm:"column:content_size"`
 	ExportVars         datatypes.JSONMap `json:"export_vars" gorm:"column:export_vars"`
 }

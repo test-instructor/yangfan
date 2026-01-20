@@ -34,8 +34,8 @@
         <el-form-item label="API环境ID:" prop="api_env_id">
     <el-input v-model.number="formData.api_env_id" :clearable="false" placeholder="请输入API环境ID" />
 </el-form-item>
-        <el-form-item label="主机名:" prop="hostname">
-    <el-input v-model="formData.hostname" :clearable="false" placeholder="请输入主机名" />
+        <el-form-item label="运行节点:" prop="node_name">
+    <el-input v-model="formData.node_name" :clearable="false" placeholder="请输入运行节点" disabled />
 </el-form-item>
         <el-form-item>
           <el-button :loading="btnLoading" type="primary" @click="save">保存</el-button>
@@ -82,7 +82,7 @@ const formData = ref({
             describe: '',
             api_env_name: '',
             api_env_id: 0,
-            hostname: '',
+            node_name: '',
         })
 // 验证规则
 const rule = reactive({

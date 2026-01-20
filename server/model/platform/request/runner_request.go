@@ -14,6 +14,7 @@ type RunnerRequest struct {
 	NotifyEnabled    *bool  `json:"notify_enabled"`
 	NotifyRule       string `json:"notify_rule"`
 	NotifyChannelIDs []uint `json:"notify_channel_ids"`
+	Failfast         *bool  `json:"failfast"`
 }
 
 type RunnerResponse struct {

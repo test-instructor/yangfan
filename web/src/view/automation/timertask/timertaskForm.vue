@@ -18,6 +18,9 @@
         <el-form-item label="运行次数:" prop="runNumber">
     <el-input v-model.number="formData.runNumber" :clearable="false" placeholder="请输入运行次数" />
 </el-form-item>
+        <el-form-item label="失败停止:" prop="failfast">
+    <el-switch v-model="formData.failfast" active-color="#13ce66" inactive-color="#ff4949" active-text="是" inactive-text="否" clearable ></el-switch>
+</el-form-item>
         <el-form-item label="运行配置:" prop="configName">
     <el-input v-model="formData.configName" :clearable="true" placeholder="请输入运行配置" />
 </el-form-item>
@@ -80,6 +83,7 @@ const formData = ref({
             runTime: '',
             nextRunTime: new Date(),
             status: false,
+            failfast: false,
             runNumber: 0,
             configName: '',
             tag: [],

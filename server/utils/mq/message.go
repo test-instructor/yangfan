@@ -15,6 +15,7 @@ type TaskMessage struct {
 	NotifyEnabled    *bool       `json:"notify_enabled,omitempty"`
 	NotifyRule       string      `json:"notify_rule,omitempty"`
 	NotifyChannelIDs []uint      `json:"notify_channel_ids,omitempty"`
+	Failfast         *bool       `json:"failfast,omitempty"`
 	CreateTime       int64       `json:"create_time"`
 	ExpireTime       int64       `json:"expire_time"`
 }

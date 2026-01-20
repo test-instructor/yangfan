@@ -37,6 +37,9 @@
       </div>
 
       <el-tabs v-model="activeTab" type="border-card" class="flex-1 overflow-hidden flex flex-col">
+        <el-tab-pane v-if="!currentRecord.success && currentRecord.attachments" label="失败原因" name="error" class="h-full overflow-auto">
+          <pre class="code-block">{{ currentRecord.attachments }}</pre>
+        </el-tab-pane>
         <el-tab-pane label="请求内容" name="request" class="h-full overflow-auto">
           <el-tabs v-model="requestSubTab" type="card" class="h-full">
             <el-tab-pane label="Headers" name="headers" class="h-full overflow-auto">
@@ -288,7 +291,8 @@ onBeforeUnmount(() => {
 })
 
 watch(() => props.record, () => {
-  activeTab.value = 'request'
+  const record = props.record
+  activeTab.value = record && !record.success && record.attachments ? 'error' : 'request'
   requestSubTab.value = 'headers'
   responseSubTab.value = 'headers'
 })

@@ -30,6 +30,7 @@ type OpenRunnerRunRequest struct {
 	NotifyEnabled    *bool  `json:"notify_enabled" form:"notify_enabled"`
 	NotifyRule       string `json:"notify_rule" form:"notify_rule"`
 	NotifyChannelIDs []uint `json:"notify_channel_ids" form:"notify_channel_ids"`
+	Failfast         *bool  `json:"failfast" form:"failfast"`
 	ResponseMode     string `json:"response_mode" form:"response_mode"`
 	CallbackURL      string `json:"callback_url" form:"callback_url"`
 	WebhookChannelID uint   `json:"webhook_channel_id" form:"webhook_channel_id"`
@@ -216,6 +217,9 @@ func mergeOpenRunnerRunRequest(a OpenRunnerRunRequest, b OpenRunnerRunRequest) O
 	}
 	if len(b.NotifyChannelIDs) > 0 {
 		out.NotifyChannelIDs = b.NotifyChannelIDs
+	}
+	if b.Failfast != nil {
+		out.Failfast = b.Failfast
 	}
 	if b.ResponseMode != "" {
 		out.ResponseMode = b.ResponseMode

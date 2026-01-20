@@ -80,10 +80,15 @@ func (s *RunnerService) RunTask(req request.RunnerRequest) (*request.RunnerRespo
 		req.NotifyEnabled,
 		req.NotifyRule,
 		req.NotifyChannelIDs,
+		req.Failfast,
 	)
 
 	if err != nil {
 		return nil, err
+	}
+
+	if uerr := global.GVA_DB.Model(&automation.AutoReport{}).Where("id = ?", report.ID).Update("node_name", nodeName).Error; uerr != nil {
+		global.GVA_LOG.Warn("写入测试报告 node_name 失败", zap.Uint("report_id", report.ID), zap.String("node_name", nodeName), zap.Error(uerr))
 	}
 
 	return &request.RunnerResponse{
@@ -147,6 +152,9 @@ func (s *RunnerService) CreatePendingReport(req request.RunnerRequest) (*automat
 				req.NotifyChannelIDs = []uint{*task.MessageID}
 			}
 		}
+		if req.Failfast == nil && task.Failfast != nil {
+			req.Failfast = task.Failfast
+		}
 
 	case "标签", "tag":
 		var tag automation.TimerTaskTag
@@ -179,6 +187,11 @@ func (s *RunnerService) CreatePendingReport(req request.RunnerRequest) (*automat
 			notifyChannelBytes = b
 		}
 	}
+	var nodeName *string
+	if req.NodeName != "" {
+		v := req.NodeName
+		nodeName = &v
+	}
 	report := &automation.AutoReport{
 		Name:             &name,
 		Status:           &pendingStatus,
@@ -188,6 +201,7 @@ func (s *RunnerService) CreatePendingReport(req request.RunnerRequest) (*automat
 		ConfigID:         req.ConfigID,
 		EnvID:            req.EnvID,
 		CaseID:           req.CaseID,
+		NodeName:         nodeName,
 		NotifyEnabled:    notifyEnabled,
 		NotifyRule:       req.NotifyRule,
 		NotifyChannelIDs: notifyChannelBytes,

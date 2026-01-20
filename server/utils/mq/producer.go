@@ -31,7 +31,7 @@ func NewRunnerTaskProducer(client *MQClient, db *gorm.DB, cfg config.MQ, logger 
 // nodeName: 指定节点名称 (e.g. "run1"), 如果为空则随机选择
 // reportID: 测试报告ID
 // Returns: (selectedNodeName, error)
-func (p *RunnerTaskProducer) SendTask(taskID string, reportID uint, caseType string, caseID uint, runMode string, nodeName string, envID int, configID int, projectID uint, notifyEnabled *bool, notifyRule string, notifyChannelIDs []uint) (string, error) {
+func (p *RunnerTaskProducer) SendTask(taskID string, reportID uint, caseType string, caseID uint, runMode string, nodeName string, envID int, configID int, projectID uint, notifyEnabled *bool, notifyRule string, notifyChannelIDs []uint, failfast *bool) (string, error) {
 	// 1. Node Selection
 	targetNode := nodeName
 	if targetNode == "" {
@@ -56,6 +56,7 @@ func (p *RunnerTaskProducer) SendTask(taskID string, reportID uint, caseType str
 		NotifyEnabled:    notifyEnabled,
 		NotifyRule:       notifyRule,
 		NotifyChannelIDs: notifyChannelIDs,
+		Failfast:         failfast,
 		CreateTime:       time.Now().Unix(),
 		ExpireTime:       time.Now().Add(24 * time.Hour).Unix(), // Default expiration 24h
 	}

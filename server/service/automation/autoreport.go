@@ -54,7 +54,7 @@ func (arService *AutoReportService) UpdateAutoReport(ctx context.Context, ar aut
 		return errors.New("没有该项目的操作权限")
 	}
 
-	err = global.GVA_DB.Model(&automation.AutoReport{}).Where("id = ?", ar.ID).Updates(&ar).Error
+	err = global.GVA_DB.Model(&automation.AutoReport{}).Where("id = ?", ar.ID).Omit("node_name").Updates(&ar).Error
 	if err == nil {
 		oldStatus := int64(-1)
 		if oldAutoReport.Status != nil {

@@ -27,6 +27,7 @@ type TimerTask struct {
 	NotifyRule     *string        `json:"notifyRule" form:"notifyRule" gorm:"comment:发送规则(always/success/fail);column:notify_rule;"` //发送规则
 	Describe       *string        `json:"describe" form:"describe" gorm:"comment:备注;column:describe;"`                               //备注
 	RunnerNodeName *string        `json:"runnerNodeName" form:"runnerNodeName" gorm:"comment:运行节点;column:runner_node_name;"`         //运行节点
+	Failfast       *bool          `json:"failfast" form:"failfast" gorm:"comment:失败停止;column:failfast;"`                             //失败停止
 	ProjectId      int64          `json:"projectId" form:"projectId" gorm:"column:project_id;"`                                      //项目信息
 }
 

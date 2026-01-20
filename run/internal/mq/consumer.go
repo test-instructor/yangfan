@@ -101,6 +101,7 @@ func (c *RunnerTaskConsumer) handleMessage(msg amqp.Delivery) {
 		NotifyEnabled:    taskMsg.NotifyEnabled,
 		NotifyRule:       taskMsg.NotifyRule,
 		NotifyChannelIDs: taskMsg.NotifyChannelIDs,
+		Failfast:         taskMsg.Failfast,
 	}
 
 	msgBody := string(msg.Body)

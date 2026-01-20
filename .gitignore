@@ -43,3 +43,4 @@ deploy/docker/logs
 /deploy/docker-compose/rabbitmq/
 /deploy/docker-compose/redis/
 /deploy/docker-compose/mysql/
+/examples/

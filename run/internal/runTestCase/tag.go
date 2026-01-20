@@ -191,6 +191,10 @@ func (r *runTag) LoadCase() (err error) {
 	if r.reportOperation.report != nil {
 		r.reportOperation.report.Hostname = &hostname
 		r.reportOperation.report.SetupCase = &r.tcm.SetupCase
+		if r.reportOperation.report.NodeName == nil && r.runCaseReq.NodeName != "" {
+			v := r.runCaseReq.NodeName
+			r.reportOperation.report.NodeName = &v
+		}
 	}
 	if r.reportOperation.report != nil {
 		// 使用精确的进度计算，考虑 Parameters 循环
@@ -230,10 +234,15 @@ func (r *runTag) RunCase() (err error) {
 		reportID = r.reportOperation.report.ID
 	}
 
+	failfast := false
+	if r.runCaseReq.Failfast != nil {
+		failfast = *r.runCaseReq.Failfast
+	}
+
 	reportHRP, err := runCasesWithProgress(
 		hrp.NewRunner(t).
 			SetHTTPStatOn().
-			SetFailfast(false),
+			SetFailfast(failfast),
 		reportID,
 		r.tcm.Case...,
 	)

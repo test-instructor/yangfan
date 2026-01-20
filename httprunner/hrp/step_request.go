@@ -284,6 +284,42 @@ func prepareUpload(parser *Parser, stepRequest *StepRequest, stepVariables map[s
 	return
 }
 
+func parseHeadersMap(v interface{}) (map[string]string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	switch vv := v.(type) {
+	case map[string]string:
+		return vv, nil
+	case map[string]interface{}:
+		m := make(map[string]string, len(vv))
+		for k, val := range vv {
+			s, ok := val.(string)
+			if !ok {
+				return nil, errors.Errorf("hook数据处理失败: header %s 的值不是 string, 实际 %T", k, val)
+			}
+			m[k] = s
+		}
+		return m, nil
+	default:
+		return nil, errors.Errorf("hook数据处理失败: headers 类型不支持, 实际 %T", v)
+	}
+}
+
+func marshalRequestBody(v interface{}) ([]byte, error) {
+	if v == nil {
+		return nil, nil
+	}
+	switch vv := v.(type) {
+	case string:
+		return []byte(vv), nil
+	case []byte:
+		return vv, nil
+	default:
+		return json.Marshal(v)
+	}
+}
+
 func runStepRequest(r *SessionRunner, step IStep) (stepResult *StepResult, err error) {
 	stepRequest := step.(*StepRequestWithOptionalArgs)
 	start := time.Now()
@@ -350,28 +386,40 @@ func runStepRequest(r *SessionRunner, step IStep) (stepResult *StepResult, err e
 			return stepResult, errors.Wrap(err, "run setup hooks failed")
 		}
 		// 处理hook返回的结果
-		reqMap, ok := req.(map[string]interface{})
-		if ok && reqMap != nil {
-			rb.requestMap = reqMap
-			stepRequest.Variables["request"] = reqMap
+		if req == nil {
+			continue
 		}
+		reqMap, ok := req.(map[string]interface{})
+		if !ok || reqMap == nil {
+			return stepResult, errors.Errorf("hook数据处理失败: setup hook 返回非 map, hook=%s, 实际=%T", setupHook, req)
+		}
+		rb.requestMap = reqMap
+		stepRequest.Variables["request"] = reqMap
 	}
 	// 将hook处理后的结果回写到请求对象中
 	if len(stepRequest.SetupHooks) > 0 {
-		// 更新body的内容
-		requestBody, ok := rb.requestMap["body"].(map[string]interface{})
-		if ok {
-			body, err := json.Marshal(requestBody)
-			if err == nil {
+		if bodyVal, ok := rb.requestMap["body"]; ok {
+			body, err := marshalRequestBody(bodyVal)
+			if err != nil {
+				return stepResult, errors.Wrap(err, "hook数据处理失败: 序列化 body 失败")
+			}
+			if body != nil {
 				rb.req.Body = io.NopCloser(bytes.NewReader(body))
 				rb.req.ContentLength = int64(len(body))
 			}
 		}
-		// 更新header的内容
-		headers, ok := rb.requestMap["headers"].(map[string]string)
-		rb.req.Header = map[string][]string{}
-		for key, value := range headers {
-			rb.req.Header.Set(key, value)
+
+		if headersVal, ok := rb.requestMap["headers"]; ok {
+			headers, err := parseHeadersMap(headersVal)
+			if err != nil {
+				return stepResult, err
+			}
+			if headers != nil {
+				rb.req.Header = map[string][]string{}
+				for key, value := range headers {
+					rb.req.Header.Set(key, value)
+				}
+			}
 		}
 	}
 
@@ -451,15 +499,16 @@ func runStepRequest(r *SessionRunner, step IStep) (stepResult *StepResult, err e
 			global.GVA_LOG.Error("run teardown hooks failed", zap.Error(err))
 			return stepResult, errors.Wrap(err, "run teardown hooks failed")
 		}
-		global.GVA_LOG.Debug("--", zap.Any("res", res))
 		// 处理hook返回的结果
-		resMpa, ok := res.(map[string]interface{})
-		if ok {
-			stepRequest.Variables["response"] = resMpa
-			respObj.respObjMeta = resMpa
-		} else {
-			log.Warn().Interface("res", res).Msg("teardown hook result is not a map, response not updated. Please check if the hook is wrapped in ${} and returns a dict.")
+		if res == nil {
+			continue
 		}
+		resMap, ok := res.(map[string]interface{})
+		if !ok || resMap == nil {
+			return stepResult, errors.Errorf("hook数据处理失败: teardown hook 返回非 map, hook=%s, 实际=%T", teardownHook, res)
+		}
+		stepRequest.Variables["response"] = resMap
+		respObj.respObjMeta = resMap
 	}
 	// 将hook处理后的结果回写到响应对象中
 	sessionData.ReqResps.Request = rb.requestMap

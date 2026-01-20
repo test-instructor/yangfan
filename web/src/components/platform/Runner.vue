@@ -21,6 +21,10 @@
             </el-select>
           </el-form-item>
 
+          <el-form-item label="失败停止:">
+             <el-switch v-model="form.failfast" active-color="#13ce66" inactive-color="#ff4949" active-text="是" inactive-text="否"></el-switch>
+          </el-form-item>
+
           <el-form-item label="运行节点:">
             <el-select v-model="form.node_name" filterable clearable placeholder="默认随机节点" style="width: 100%" :loading="nodeLoading">
               <el-option
@@ -147,6 +151,7 @@ let notifyTimer = null
 
 const form = reactive({
   run_mode: '调试模式', // 默认调试
+  failfast: false,
   node_name: '',
   config_id: null,
   env_id: null,
@@ -263,6 +268,7 @@ const handleRun = async () => {
       config_id: form.config_id || 0,
       env_id: form.env_id || 0,
       run_mode: form.run_mode,
+      failfast: form.failfast,
       node_name: form.node_name || '',
       notify_enabled: !!form.notify_enabled,
       notify_rule: form.notify_rule || '',

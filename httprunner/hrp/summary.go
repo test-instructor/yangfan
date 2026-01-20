@@ -55,13 +55,16 @@ func (s *Summary) AddCaseSummary(caseSummary *TestCaseSummary) {
 	s.Success = s.Success && caseSummary.Success
 	s.Stat.TestCases.Total += 1
 	s.Stat.TestSteps.Total += caseSummary.Stat.Total
-	if caseSummary.Success {
+	if caseSummary.Stat.Total > 0 && caseSummary.Stat.Total == caseSummary.Stat.Skipped {
+		s.Stat.TestCases.Skipped += 1
+	} else if caseSummary.Success {
 		s.Stat.TestCases.Success += 1
 	} else {
 		s.Stat.TestCases.Fail += 1
 	}
 	s.Stat.TestSteps.Successes += caseSummary.Stat.Successes
 	s.Stat.TestSteps.Failures += caseSummary.Stat.Failures
+	s.Stat.TestSteps.Skipped += caseSummary.Stat.Skipped
 	s.Details = append(s.Details, caseSummary)
 
 	// specify output reports dir
@@ -131,12 +134,14 @@ type TestCaseStat struct {
 	Total   int `json:"total" yaml:"total"`
 	Success int `json:"success" yaml:"success"`
 	Fail    int `json:"fail" yaml:"fail"`
+	Skipped int `json:"skipped" yaml:"skipped"`
 }
 
 type TestStepStat struct {
 	Total     int                       `json:"total" yaml:"total"`
 	Successes int                       `json:"successes" yaml:"successes"`
 	Failures  int                       `json:"failures" yaml:"failures"`
+	Skipped   int                       `json:"skipped" yaml:"skipped"`
 	Actions   map[option.ActionName]int `json:"actions" yaml:"actions"` // record action stats
 }
 
@@ -169,6 +174,7 @@ func NewCaseSummary() *TestCaseSummary {
 type TestCaseSummary struct {
 	Name    string         `json:"name" yaml:"name"`
 	Success bool           `json:"success" yaml:"success"`
+	Skipped bool           `json:"skipped" yaml:"skipped"`
 	CaseId  string         `json:"case_id,omitempty" yaml:"case_id,omitempty"` // TODO
 	Stat    *TestStepStat  `json:"stat" yaml:"stat"`
 	Time    *TestCaseTime  `json:"time" yaml:"time"`
@@ -180,6 +186,10 @@ type TestCaseSummary struct {
 
 // AddStepResult updates summary of StepResult.
 func (s *TestCaseSummary) AddStepResult(stepResult *StepResult) {
+	if stepResult.Skipped {
+		s.addSingleStepResult(stepResult)
+		return
+	}
 	switch stepResult.StepType {
 	case StepTypeTestCase:
 		// record requests of testcase step
@@ -200,6 +210,12 @@ func (s *TestCaseSummary) AddStepResult(stepResult *StepResult) {
 }
 
 func (s *TestCaseSummary) addSingleStepResult(stepResult *StepResult) {
+	if stepResult.Skipped {
+		s.Stat.Total += 1
+		s.Stat.Skipped += 1
+		s.Records = append(s.Records, stepResult)
+		return
+	}
 	s.Success = s.Success && stepResult.Success
 	s.Stat.Total += 1
 	if stepResult.Success {
