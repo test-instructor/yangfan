@@ -48,6 +48,7 @@
           </div>
           <div class="action-buttons">
             <el-button type="primary" icon="plus" @click="openDialog('create')">新增</el-button>
+            <el-button type="primary" icon="upload" @click="openCurlImport">导入CURL</el-button>
             <el-button icon="delete" :disabled="!multipleSelection.length" @click="onDelete">删除</el-button>
           </div>
           <div class="table-wrapper">
@@ -223,8 +224,7 @@
         </el-descriptions-item>
       </el-descriptions>
     </el-drawer>
-
-
+    <CurlImport ref="curlImportRef" @success="handleCurlSuccess" />
   </div>
 </template>
 
@@ -255,6 +255,7 @@
   import { ElMessage, ElMessageBox } from 'element-plus'
   import { ref, reactive } from 'vue'
   import { useAppStore } from '@/pinia'
+  import CurlImport from '@/components/curlImport/index.vue'
 
 
   defineOptions({
@@ -264,6 +265,42 @@
   // 提交按钮loading
   const btnLoading = ref(false)
   const appStore = useAppStore()
+
+  // CURL 导入相关
+  const curlImportRef = ref(null)
+  const openCurlImport = () => {
+    if (curlImportRef.value) {
+      curlImportRef.value.open()
+    } else {
+      ElMessage.error('CURL 导入组件未加载完成，请稍后重试')
+    }
+  }
+  
+  const handleCurlSuccess = (parsedData) => {
+    // 重置 formData
+    formData.value = {
+      name: '',
+      loops: 0,
+      retry: 0,
+      request: {
+        method: parsedData.method,
+        url: parsedData.url,
+        header_temp: parsedData.headers,
+        headers: {}, // 实际保存时会根据 header_temp 生成
+        json: parsedData.json,
+        param_temp: parsedData.params,
+        params: {}, // 实际保存时会根据 param_temp 生成
+        data_warehouse: {}
+      },
+      parameters: {},
+      parameters_temp: {},
+      menu: 0
+    }
+    
+    // 打开新增弹窗
+    type.value = 'create'
+    dialogFormVisible.value = true
+  }
 
   // 控制更多查询条件显示/隐藏状态
   const showAllQuery = ref(false)
