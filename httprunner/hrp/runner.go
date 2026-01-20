@@ -740,6 +740,7 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) (summary *TestCa
 
 		// dump summary with original user variables only (exclude environment variables)
 		summary.InOut.ConfigVars = config.OriginalVariables
+		summary.UpdateSkippedFromInterfaceRecords()
 
 		// Save JSON case content to results directory
 		if config.Path != "" {

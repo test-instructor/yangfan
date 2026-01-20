@@ -55,7 +55,7 @@ func (s *Summary) AddCaseSummary(caseSummary *TestCaseSummary) {
 	s.Success = s.Success && caseSummary.Success
 	s.Stat.TestCases.Total += 1
 	s.Stat.TestSteps.Total += caseSummary.Stat.Total
-	if caseSummary.Stat.Total > 0 && caseSummary.Stat.Total == caseSummary.Stat.Skipped {
+	if caseSummary.Skipped {
 		s.Stat.TestCases.Skipped += 1
 	} else if caseSummary.Success {
 		s.Stat.TestCases.Success += 1
@@ -182,6 +182,34 @@ type TestCaseSummary struct {
 	Logs    []interface{}  `json:"logs,omitempty" yaml:"logs,omitempty"`
 	Records []*StepResult  `json:"records" yaml:"records"`
 	RootDir string         `json:"root_dir,omitempty" yaml:"root_dir,omitempty"`
+}
+
+func (s *TestCaseSummary) UpdateSkippedFromInterfaceRecords() {
+	if !s.Success {
+		s.Skipped = false
+		return
+	}
+
+	var interfaceTotal, interfaceSkipped int
+	for _, record := range s.Records {
+		if record == nil {
+			continue
+		}
+		if record.StepType != StepTypeRequest && record.StepType != StepTypeAPI {
+			continue
+		}
+		interfaceTotal++
+		if record.Skipped {
+			interfaceSkipped++
+		}
+	}
+	if interfaceTotal == 0 {
+		if s.Stat != nil && s.Stat.Total > 0 && s.Stat.Total == s.Stat.Skipped {
+			s.Skipped = true
+		}
+		return
+	}
+	s.Skipped = interfaceSkipped == interfaceTotal
 }
 
 // AddStepResult updates summary of StepResult.
