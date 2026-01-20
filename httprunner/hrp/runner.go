@@ -784,23 +784,6 @@ func (r *SessionRunner) Start(givenVars map[string]interface{}) (summary *TestCa
 			log.Warn().Msg("timeout in session runner")
 			return summary, errors.Wrap(code.TimeoutError, "session runner timeout")
 		default:
-			// check if skip remaining steps
-			if r.caseRunner.hrpRunner.Skip {
-				stepResult := &StepResult{
-					Name:        step.Name(),
-					StepType:    step.Type(),
-					Success:     false,
-					Skipped:     true,
-					StartTime:   time.Now().UnixMilli(),
-					Attachments: r.caseRunner.hrpRunner.SkipReason,
-				}
-				r.summary.AddStepResult(stepResult)
-				// update progress for skipped steps
-				if r.caseRunner.hrpRunner.onStepComplete != nil {
-					r.caseRunner.hrpRunner.onStepComplete(string(step.Type()), stepResult)
-				}
-				continue
-			}
 
 			stepResult, err := r.RunStep(step)
 			if err == nil {

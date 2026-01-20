@@ -227,6 +227,11 @@ func finalizeReportProgress(reportID uint) {
 	executedSteps := totalSteps
 	executedApis := totalApis
 
+	// 更新 Redis 中的 executed 计数器，使其与 total 一致，确保前端看到的进度也是 100%
+	pipe.Set(ctx, BuildReportProgressKey(reportID, "executed_cases"), executedCases, RedisReportTTL)
+	pipe.Set(ctx, BuildReportProgressKey(reportID, "executed_steps"), executedSteps, RedisReportTTL)
+	pipe.Set(ctx, BuildReportProgressKey(reportID, "executed_apis"), executedApis, RedisReportTTL)
+
 	// 写入数据库
 	if global.GVA_DB != nil {
 		progress := automation.AutoReportProgress{

@@ -450,6 +450,14 @@ func runStepRequest(r *SessionRunner, step IStep) (stepResult *StepResult, err e
 		client.Timeout = time.Duration(stepRequest.Request.Timeout*1000) * time.Millisecond
 	}
 
+	// check if skip
+	if r.caseRunner.hrpRunner.Skip {
+		stepResult.Skipped = true
+		stepResult.Success = false
+		stepResult.Attachments = r.caseRunner.hrpRunner.SkipReason
+		return stepResult, nil
+	}
+
 	// do request action
 	resp, err := client.Do(rb.req)
 	if err != nil {

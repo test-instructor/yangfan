@@ -81,29 +81,28 @@ func runCasesWithProgress(runner *hrp.HRPRunner, reportID uint, testcases ...hrp
 			// Instead, we let HRPRunner.Skip handle the skipping of subsequent steps/cases.
 		}
 		// if failfast is enabled, we don't break the loop here.
-
-		// Finalize summary timing
-		if s.Time != nil {
-			s.Time.Duration = time.Since(s.Time.StartAt).Seconds()
-		}
-
-		// Marshal summary to JSON for downstream reuse (unmarshal into AutoReport)
-		sj, marshalErr := json.Marshal(s)
-		if marshalErr != nil {
-			// Prefer returning marshal error explicitly
-			log.Error().Err(marshalErr).Msg("runCasesWithProgress: marshal summary failed")
-			if runErr == nil {
-				return nil, errors.Wrap(marshalErr, "marshal summary failed")
-			}
-			// If execution already had errors, keep runErr as primary but still log
-		}
-
-		// Only mark TTL refresh once execution is done
-		if reportID != 0 {
-			finalizeReportProgress(reportID)
-		}
-
-		return sj, runErr
 	}
-	return
+
+	// Finalize summary timing
+	if s.Time != nil {
+		s.Time.Duration = time.Since(s.Time.StartAt).Seconds()
+	}
+
+	// Marshal summary to JSON for downstream reuse (unmarshal into AutoReport)
+	sj, marshalErr := json.Marshal(s)
+	if marshalErr != nil {
+		// Prefer returning marshal error explicitly
+		log.Error().Err(marshalErr).Msg("runCasesWithProgress: marshal summary failed")
+		if runErr == nil {
+			return nil, errors.Wrap(marshalErr, "marshal summary failed")
+		}
+		// If execution already had errors, keep runErr as primary but still log
+	}
+
+	// Only mark TTL refresh once execution is done
+	if reportID != 0 {
+		finalizeReportProgress(reportID)
+	}
+
+	return sj, runErr
 }
