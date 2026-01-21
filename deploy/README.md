@@ -12,40 +12,15 @@
 密码： 123456
 
 # 部署方式
-> 部署前请先安装好数据看，以下所有部分方式都需要手动配置数据库
-> 一键部署方式正在开发中，尽请期待
-1. 新建数据库，并导入`docs/sql/yangfan.sql`文件
-2. 管理员账号`yangfan`,密码`123456`
+> 部署前请先准备好依赖服务（MySQL / RabbitMQ / Redis 可选）。
+> 首次启动推荐通过前端“初始化”页面完成建库建表与管理员初始化，而不是手动导入 SQL。
 
+使用文档：
 
+- 本地调试：[本地调试.md](file:///Users/taylor/Documents/yangfan/yangfan/docs/使用文档/本地调试.md)
+- 服务端部署：[服务端部署.md](file:///Users/taylor/Documents/yangfan/yangfan/docs/使用文档/服务端部署.md)
+- 依赖服务清单：[项目前置依赖服务清单.md](file:///Users/taylor/Documents/yangfan/yangfan/docs/使用文档/项目前置依赖服务清单.md)
 
-## 本地调试
-### 后端
-1. 下载golang安装 版本号需>=1.23
-   * 国际: https://golang.org/dl/
-   * 国内: https://golang.google.cn/dl/
-2. goland 打开项目根目录
-3. 使用软件包进行运行，目前已有的软件包为
-   ```shell
-   github.com/test-instructor/yangfan/server  # 后端服务
-   github.com/test-instructor/yangfan/run     # 用例运行服务
-   github.com/test-instructor/yangfan/web     # 前端
-   github.com/test-instructor/yangfan/data    # 数据仓库
-   ```
-4. 启动server、web，访问后进行初始化设置
-5. 重启server服务
-6. MQ设置：在 系统工具 - 系统配置 - MQ配置 设置MQ相关内容，
-7. 数据仓库设置：在 系统工具 - 系统配置 - 平台配置 设置数据仓库相关内容
-8. 启动 run、data 服务
-
-### 前端
-1. 前往https://nodejs.org/zh-cn/下载当前版本node 
-2. 命令行运行 node -v 若控制台输出版本号则前端环境搭建成功 
-3. node 版本需大于 16.4 
-4. 开发工具推荐vscode https://code.visualstudio.com/
-
-
-## 二、docker 部署
 
 * 前端：修改对应`docker-compose`文件中的`ENV_VITE_FS_APP_ID`、`ENV_VITE_FS_LOGIN`
 * docker镜像源：目前使用阿里云镜像源(registry.cn-hangzhou.aliyuncs.com)，如需使用docker官方镜像源，请将阿里云镜像源(registry.cn-hangzhou.aliyuncs.com/)删除即可
@@ -57,10 +32,11 @@
    cd deploy/docker-compose
    # 数据库相关配置，mysql、mq、redis
    docker-compose up -f docker-compose.data.yml
-   # 启动服务
+   docker-compose -f docker-compose.data.yml up -d
    docker-compose up -f docker-compose.yml
-      
+   docker-compose -f docker-compose.yml up -d
    ```
+   
    
 ## 三、k8s 部署
 文件目录`./deploy/kubernetes`
@@ -81,7 +57,6 @@ kubernetes
    cd deploy/kubernetes
    kubectl apply -f k8s_yangfan.yaml
    ```
-
 
 
 
