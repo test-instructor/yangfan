@@ -175,6 +175,40 @@ func (r *runTag) LoadCase() (err error) {
 	}
 
 	if len(r.tcm.Case) == 0 {
+		r.reportOperation = &ReportOperation{}
+		if r.runCaseReq.ReportID != 0 {
+			_ = r.reportOperation.LoadReport(r.runCaseReq.ReportID)
+			if r.reportOperation.report != nil {
+				totals := ReportProgressTotals{
+					TotalCases: 0,
+					TotalSteps: 0,
+					TotalApis:  0,
+				}
+				progressID := initReportProgress(r.reportOperation.report.ID, totals)
+				if progressID != 0 {
+					r.reportOperation.report.ProgressID = &progressID
+				}
+				errMsg := "运行失败，标签未关联任何任务或用例"
+				failStatus := int64(2)
+				success := false
+				r.reportOperation.report.Status = &failStatus
+				r.reportOperation.report.Success = &success
+				detail := automation.AutoReportDetail{
+					Name:    "Tag Execution Error",
+					Success: false,
+					Records: []automation.AutoReportRecord{
+						{
+							Name:        "Load Tag",
+							StepType:    "tag",
+							Success:     false,
+							Attachments: errMsg,
+						},
+					},
+				}
+				r.reportOperation.report.Details = []automation.AutoReportDetail{detail}
+				r.reportOperation.UpdateReport(r.reportOperation.report)
+			}
+		}
 		return errors.New("未找到关联的用例")
 	}
 

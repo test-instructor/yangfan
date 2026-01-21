@@ -531,7 +531,7 @@ const getDetails = async (row) => {
       const report = res.data
       if (report.details && report.details.length > 0 && report.details[0].records && report.details[0].records.length > 0) {
         const record = report.details[0].records[0]
-         if (['task', 'case', 'step'].includes(record.step_type) && record.attachments) {
+         if (['task', 'case', 'step', 'tag'].includes(record.step_type) && record.attachments) {
            ElMessageBox.alert(record.attachments, '错误信息', {
              confirmButtonText: '确定',
              type: 'error'

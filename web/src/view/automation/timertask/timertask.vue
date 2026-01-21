@@ -276,7 +276,8 @@
     <el-dialog
       v-model="ciDialogVisible"
       title="CI调用"
-      width="760px"
+      width="880px"
+      top="40px"
       append-to-body
       destroy-on-close
     >
@@ -372,19 +373,14 @@
       <el-tabs v-model="ciPreviewTab">
         <el-tab-pane label="GET" name="get">
           <el-input :model-value="ciGetURL" type="textarea" :rows="4" readonly />
-          <div style="margin-top: 10px; text-align: right;">
-            <el-button type="primary" @click="copyToClipboard(ciGetURL)">复制</el-button>
-          </div>
         </el-tab-pane>
         <el-tab-pane label="POST(JSON)" name="post">
           <el-input :model-value="ciPostCurl" type="textarea" :rows="8" readonly />
-          <div style="margin-top: 10px; text-align: right;">
-            <el-button type="primary" @click="copyToClipboard(ciPostCurl)">复制</el-button>
-          </div>
         </el-tab-pane>
       </el-tabs>
       <template #footer>
         <div class="dialog-footer">
+          <el-button type="primary" @click="copyToClipboard(ciPreviewTab === 'get' ? ciGetURL : ciPostCurl)">复制</el-button>
           <el-button @click="ciDialogVisible = false">关闭</el-button>
         </div>
       </template>
