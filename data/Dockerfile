@@ -3,7 +3,6 @@ WORKDIR /go/src/yangfan
 
 COPY . .
 ENV GO111MODULE=on
-ENV GOPROXY=https://goproxy.cn
 
 RUN go build -o ./data/data-warehouse ./data
 
