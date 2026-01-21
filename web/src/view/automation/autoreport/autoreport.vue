@@ -524,7 +524,23 @@ const openDetailShow = () => {
 
 
 // 打开详情
-const getDetails = (row) => {
+const getDetails = async (row) => {
+  if (row.status === 2 && row.progress && row.progress.total_cases === 0) {
+    const res = await findAutoReport({ ID: row.ID })
+    if (res.code === 0) {
+      const report = res.data
+      if (report.details && report.details.length > 0 && report.details[0].records && report.details[0].records.length > 0) {
+        const record = report.details[0].records[0]
+         if (['task', 'case', 'step'].includes(record.step_type) && record.attachments) {
+           ElMessageBox.alert(record.attachments, '错误信息', {
+             confirmButtonText: '确定',
+             type: 'error'
+           })
+           return
+         }
+      }
+    }
+  }
   router.push({
     name: 'auto-report-detail',
     params: {

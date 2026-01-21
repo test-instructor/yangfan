@@ -97,6 +97,43 @@ func (r *runCase) LoadCase() (err error) {
 
 	// Load Case Steps - 加载用例关联的步骤
 	caseStepList := caseSort(uint(r.runCaseReq.CaseID))
+	if len(caseStepList) == 0 {
+		r.reportOperation = &ReportOperation{}
+		if r.runCaseReq.ReportID != 0 {
+			_ = r.reportOperation.LoadReport(r.runCaseReq.ReportID)
+			if r.reportOperation.report != nil {
+				totals := ReportProgressTotals{
+					TotalCases: 0,
+					TotalSteps: 0,
+					TotalApis:  0,
+				}
+				progressID := initReportProgress(r.reportOperation.report.ID, totals)
+				if progressID != 0 {
+					r.reportOperation.report.ProgressID = &progressID
+				}
+				errMsg := "运行失败，请添加步骤后再运行"
+				failStatus := int64(2)
+				success := false
+				r.reportOperation.report.Status = &failStatus
+				r.reportOperation.report.Success = &success
+				detail := automation.AutoReportDetail{
+					Name:    "Case Execution Error",
+					Success: false,
+					Records: []automation.AutoReportRecord{
+						{
+							Name:        "Load Case",
+							StepType:    "case",
+							Success:     false,
+							Attachments: errMsg,
+						},
+					},
+				}
+				r.reportOperation.report.Details = []automation.AutoReportDetail{detail}
+				r.reportOperation.UpdateReport(r.reportOperation.report)
+			}
+		}
+		return errors.New("运行失败，请添加步骤后再运行")
+	}
 	for _, caseStep := range caseStepList {
 		var autoCaseStep automation.AutoCaseStep
 		err := global.GVA_DB.Model(&automation.AutoCaseStep{}).

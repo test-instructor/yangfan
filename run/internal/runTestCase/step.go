@@ -108,7 +108,51 @@ func (r *runStep) LoadCase() (err error) {
 		return errors.New("转换步骤失败")
 	}
 	if mainStep == nil {
-		return errors.New("运行失败，请添加用例后再运行")
+		r.reportOperation = &ReportOperation{}
+		// 加载已存在的报告并更新状态为运行中
+		if r.runCaseReq.ReportID != 0 {
+			if err := r.reportOperation.LoadReport(r.runCaseReq.ReportID); err != nil {
+				global.GVA_LOG.Error("加载报告失败", zap.Uint("report_id", r.runCaseReq.ReportID), zap.Error(err))
+			}
+		}
+		if r.reportOperation.report != nil {
+			r.reportOperation.report.EnvName = envName
+			hostname, _ := os.Hostname()
+			r.reportOperation.report.Hostname = &hostname
+			if r.reportOperation.report.NodeName == nil && r.runCaseReq.NodeName != "" {
+				v := r.runCaseReq.NodeName
+				r.reportOperation.report.NodeName = &v
+			}
+			totals := ReportProgressTotals{
+				TotalCases: 0,
+				TotalSteps: 0,
+				TotalApis:  0,
+			}
+			progressID := initReportProgress(r.reportOperation.report.ID, totals)
+			if progressID != 0 {
+				r.reportOperation.report.ProgressID = &progressID
+			}
+			errMsg := "运行失败，请添加接口后再运行"
+			failStatus := int64(2)
+			success := false
+			r.reportOperation.report.Status = &failStatus
+			r.reportOperation.report.Success = &success
+			detail := automation.AutoReportDetail{
+				Name:    "Step Execution Error",
+				Success: false,
+				Records: []automation.AutoReportRecord{
+					{
+						Name:        "Load Step",
+						StepType:    "step",
+						Success:     false,
+						Attachments: errMsg,
+					},
+				},
+			}
+			r.reportOperation.report.Details = []automation.AutoReportDetail{detail}
+			r.reportOperation.UpdateReport(r.reportOperation.report)
+		}
+		return errors.New("运行失败，请添加接口后再运行")
 	}
 	steps = append(steps, mainStep)
 

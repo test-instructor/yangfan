@@ -54,7 +54,41 @@ func (r *runTask) LoadCase() (err error) {
 	// yf_timer_task_case_list.task_id -> TimerTask.ID
 	taskCaseList := taskSort(uint(r.CaseID))
 	if len(taskCaseList) == 0 {
-		return fmt.Errorf("定时任务未关联任何用例（task_id=%d）", r.runCaseReq.CaseID)
+		r.reportOperation = &ReportOperation{}
+		if r.runCaseReq.ReportID != 0 {
+			_ = r.reportOperation.LoadReport(r.runCaseReq.ReportID)
+			if r.reportOperation.report != nil {
+				totals := ReportProgressTotals{
+					TotalCases: 0,
+					TotalSteps: 0,
+					TotalApis:  0,
+				}
+				progressID := initReportProgress(r.reportOperation.report.ID, totals)
+				if progressID != 0 {
+					r.reportOperation.report.ProgressID = &progressID
+				}
+				errMsg := fmt.Sprintf("运行失败，请添加用例后再运行")
+				failStatus := int64(2)
+				success := false
+				r.reportOperation.report.Status = &failStatus
+				r.reportOperation.report.Success = &success
+				detail := automation.AutoReportDetail{
+					Name:    "Task Execution Error",
+					Success: false,
+					Records: []automation.AutoReportRecord{
+						{
+							Name:        "Load Case",
+							StepType:    "task",
+							Success:     false,
+							Attachments: errMsg,
+						},
+					},
+				}
+				r.reportOperation.report.Details = []automation.AutoReportDetail{detail}
+				r.reportOperation.UpdateReport(r.reportOperation.report)
+			}
+		}
+		return fmt.Errorf("运行失败，请添加用例后再运行")
 	}
 
 	debugTalkStarted := false
