@@ -1,1 +1,0 @@
-demo file used for testing load_ws_message function
