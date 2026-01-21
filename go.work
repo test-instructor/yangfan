@@ -2,9 +2,7 @@ go 1.23.9
 
 use (
 	./data
-	./docs/grpcdemo
 	./httprunner
-	./parsing
 	./server
 	./run
 )
