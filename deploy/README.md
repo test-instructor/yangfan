@@ -17,9 +17,9 @@
 
 使用文档：
 
-- 本地调试：[本地调试.md](file:///Users/taylor/Documents/yangfan/yangfan/docs/使用文档/本地调试.md)
-- 服务端部署：[服务端部署.md](file:///Users/taylor/Documents/yangfan/yangfan/docs/使用文档/服务端部署.md)
-- 依赖服务清单：[项目前置依赖服务清单.md](file:///Users/taylor/Documents/yangfan/yangfan/docs/使用文档/项目前置依赖服务清单.md)
+- 本地调试：[本地调试.md](../docs/使用文档/本地调试.md)
+- 服务端部署：[服务端部署.md](../docs/使用文档/服务端部署.md)
+- 依赖服务清单：[项目前置依赖服务清单.md](../docs/使用文档/项目前置依赖服务清单.md)
 
 
 * 前端：修改对应`docker-compose`文件中的`ENV_VITE_FS_APP_ID`、`ENV_VITE_FS_LOGIN`

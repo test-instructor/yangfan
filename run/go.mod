@@ -7,10 +7,11 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/pkg/errors v0.9.1
 	github.com/rabbitmq/amqp091-go v1.10.0
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.33.0
 	github.com/stretchr/testify v1.10.0
 	github.com/test-instructor/yangfan/httprunner v0.0.0-20251121115157-32766ff2ceab
-	github.com/test-instructor/yangfan/server/v2 v2.0.0-20251121115157-32766ff2ceab
+	github.com/test-instructor/yangfan/server/v2 v2.0.0-20260122013653-21300b055d49
 	go.uber.org/zap v1.27.1
 	gorm.io/datatypes v1.2.5
 	gorm.io/gorm v1.25.12
@@ -36,6 +37,7 @@ require (
 	github.com/bodgit/plumbing v1.3.0 // indirect
 	github.com/bodgit/sevenzip v1.6.0 // indirect
 	github.com/bodgit/windows v1.0.1 // indirect
+	github.com/bwmarrin/snowflake v0.3.0 // indirect
 	github.com/bytedance/sonic v1.13.3 // indirect
 	github.com/bytedance/sonic/loader v0.2.4 // indirect
 	github.com/casbin/casbin/v2 v2.103.0 // indirect
@@ -133,7 +135,6 @@ require (
 	github.com/klauspost/pgzip v1.2.6 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lingcetech/funplugin v0.5.9 // indirect
-	github.com/lingcetech/lingce/server v0.0.0-20251229142412-6d96ccb81d3e // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20240909124753-873cd0166683 // indirect
 	github.com/magiconair/properties v1.8.9 // indirect
@@ -184,7 +185,6 @@ require (
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.4 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
-	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect

@@ -44,3 +44,4 @@ deploy/docker/logs
 /deploy/docker-compose/redis/
 /deploy/docker-compose/mysql/
 /examples/
+/httprunner/python/code/.debugtalk_gen.py

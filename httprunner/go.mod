@@ -31,7 +31,6 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/json-iterator/go v1.1.12
 	github.com/lingcetech/funplugin v0.5.9
-	github.com/lingcetech/lingce/server v0.0.0-20251229142412-6d96ccb81d3e
 	github.com/maja42/goval v1.2.1
 	github.com/mark3labs/mcp-go v0.32.0
 	github.com/mitchellh/mapstructure v1.5.0
@@ -40,11 +39,14 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.10.0
+	github.com/test-instructor/yangfan/server/v2 v2.0.0-20260122013653-21300b055d49
 	github.com/volcengine/volcengine-go-sdk v1.1.16
 	go.uber.org/zap v1.27.1
 	golang.org/x/net v0.41.0
 	golang.org/x/term v0.32.0
 	golang.org/x/text v0.26.0
+	google.golang.org/grpc v1.71.0
+	google.golang.org/protobuf v1.36.6
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -178,8 +180,6 @@ require (
 	golang.org/x/tools v0.34.0 // indirect
 	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250313205543-e70fdf4c4cb4 // indirect
-	google.golang.org/grpc v1.71.0 // indirect
-	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gorm.io/gorm v1.25.12 // indirect
 	gvisor.dev/gvisor v0.0.0-20240405191320-0878b34101b5 // indirect
