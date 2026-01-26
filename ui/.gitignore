@@ -3,3 +3,4 @@ node_modules
 frontend/dist
 /build/
 /frontend/package.json.md5
+logs

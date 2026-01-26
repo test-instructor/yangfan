@@ -113,3 +113,38 @@ func (s *PlatformService) SetUserAuthority(ctx context.Context, authorityId uint
 	}
 	return s.GetUserInfo(ctx)
 }
+
+func (s *PlatformService) SetSelfInfo(ctx context.Context, info map[string]any) (map[string]any, error) {
+	headers, body, err := s.client.Do(ctx, http.MethodPut, "/api/user/setSelfInfo", info, nil)
+	_ = headers
+	if err != nil {
+		return nil, err
+	}
+	r, err := platformclient.DecodeAPIResponse[map[string]any](body)
+	if err != nil {
+		return nil, err
+	}
+	if r.Code != 0 {
+		return nil, errors.New(r.Msg)
+	}
+	return r.Data, nil
+}
+
+func (s *PlatformService) ChangePassword(ctx context.Context, password string, newPassword string) (map[string]any, error) {
+	headers, body, err := s.client.Do(ctx, http.MethodPost, "/api/user/changePassword", map[string]any{
+		"password":    password,
+		"newPassword": newPassword,
+	}, nil)
+	_ = headers
+	if err != nil {
+		return nil, err
+	}
+	r, err := platformclient.DecodeAPIResponse[map[string]any](body)
+	if err != nil {
+		return nil, err
+	}
+	if r.Code != 0 {
+		return nil, errors.New(r.Msg)
+	}
+	return r.Data, nil
+}

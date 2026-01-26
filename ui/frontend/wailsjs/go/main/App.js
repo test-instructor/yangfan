@@ -6,6 +6,10 @@ export function Captcha() {
   return window['go']['main']['App']['Captcha']();
 }
 
+export function ChangePassword(arg1, arg2) {
+  return window['go']['main']['App']['ChangePassword'](arg1, arg2);
+}
+
 export function ClearAuth() {
   return window['go']['main']['App']['ClearAuth']();
 }
@@ -44,6 +48,10 @@ export function SetBaseURL(arg1) {
 
 export function SetLogConfig(arg1, arg2, arg3) {
   return window['go']['main']['App']['SetLogConfig'](arg1, arg2, arg3);
+}
+
+export function SetSelfInfo(arg1) {
+  return window['go']['main']['App']['SetSelfInfo'](arg1);
 }
 
 export function SetUserAuthority(arg1, arg2) {

@@ -3,6 +3,8 @@
 
 export function Captcha():Promise<Record<string, any>>;
 
+export function ChangePassword(arg1:string,arg2:string):Promise<Record<string, any>>;
+
 export function ClearAuth():Promise<void>;
 
 export function GetBaseURL():Promise<string|boolean>;
@@ -22,5 +24,7 @@ export function RunTestCase(arg1:string):Promise<string>;
 export function SetBaseURL(arg1:string):Promise<void>;
 
 export function SetLogConfig(arg1:string,arg2:string,arg3:number):Promise<void>;
+
+export function SetSelfInfo(arg1:Record<string, any>):Promise<Record<string, any>>;
 
 export function SetUserAuthority(arg1:number,arg2:number):Promise<Record<string, any>>;

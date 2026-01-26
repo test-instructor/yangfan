@@ -3,8 +3,14 @@
     <a-layout-sider collapsible breakpoint="xl">
       <div class="logo">扬帆</div>
       <a-menu :selected-keys="[activeKey]" @menu-item-click="onMenuClick">
-        <a-menu-item key="home">Dashboard</a-menu-item>
-        <a-menu-item key="settings">Settings</a-menu-item>
+        <a-menu-item key="home">
+          <template #icon><IconHome /></template>
+          Dashboard
+        </a-menu-item>
+        <a-menu-item key="settings">
+          <template #icon><IconSettings /></template>
+          Settings
+        </a-menu-item>
       </a-menu>
     </a-layout-sider>
     <a-layout>
@@ -33,17 +39,31 @@
               {{ r.authorityName }}
             </a-option>
           </a-select>
+
+          <a-dropdown @select="handleUserCommand">
+            <div class="user-trigger">
+              <a-avatar :size="32" style="margin-right: 8px; background-color: #3370ff">
+                <img v-if="userInfo?.headerImg" :src="userInfo.headerImg" />
+                <IconUser v-else />
+              </a-avatar>
+              <span class="username">{{ userInfo?.nickName || userInfo?.userName || 'User' }}</span>
+              <IconDown />
+            </div>
+            <template #content>
+              <a-doption value="person">
+                <template #icon><IconUser /></template>
+                个人信息
+              </a-doption>
+              <a-doption value="logout">
+                <template #icon><IconPoweroff /></template>
+                退出登录
+              </a-doption>
+            </template>
+          </a-dropdown>
         </a-space>
       </a-layout-header>
       <a-layout-content class="content">
-        <a-card>
-          <template #title>当前授权</template>
-          <a-space direction="vertical" fill>
-            <div>用户：{{ userInfo?.userName || '-' }}</div>
-            <div>项目：{{ currentProject?.name || '-' }}</div>
-            <div>角色：{{ currentAuthority?.authorityName || '-' }}</div>
-          </a-space>
-        </a-card>
+        <router-view :user-info="userInfo" :embedded="true" />
       </a-layout-content>
     </a-layout>
   </a-layout>
@@ -51,12 +71,24 @@
 
 <script setup>
 import { Message } from '@arco-design/web-vue'
-import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { getUserInfo as getUserInfoApi, setUserAuthority as setUserAuthorityApi } from '../services/appBridge'
+import { IconHome, IconSettings, IconUser, IconPoweroff, IconDown } from '@arco-design/web-vue/es/icon'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { getUserInfo as getUserInfoApi, setUserAuthority as setUserAuthorityApi, clearAuth } from '../services/appBridge'
+import SettingsPage from './SettingsPage.vue'
 
 const router = useRouter()
+const route = useRoute()
 const activeKey = ref('home')
+
+// Sync menu with route changes
+watch(() => route.name, (newVal) => {
+  if (newVal === 'settings') {
+    activeKey.value = 'settings'
+  } else {
+    activeKey.value = 'home'
+  }
+})
 
 const userInfo = ref(null)
 const selectedProjectId = ref(undefined)
@@ -114,13 +146,35 @@ const onSwitch = async () => {
 
 const onMenuClick = async (key) => {
   activeKey.value = key
-  if (key === 'settings') {
+  if (key === 'home') {
+    await router.push({ name: 'home' })
+  } else if (key === 'settings') {
     await router.push({ name: 'settings' })
+  }
+}
+
+const handleUserCommand = async (val) => {
+  if (val === 'person') {
+    await router.push({ name: 'person' })
+  } else if (val === 'logout') {
+    try {
+      await clearAuth()
+      Message.success('已退出登录')
+      await router.replace({ name: 'login' })
+    } catch (e) {
+      Message.error('退出登录失败')
+    }
   }
 }
 
 onMounted(async () => {
   await loadUserInfo()
+  // Sync activeKey with current route
+  if (route.name === 'settings') {
+    activeKey.value = 'settings'
+  } else {
+    activeKey.value = 'home'
+  }
 })
 </script>
 
@@ -153,5 +207,18 @@ onMounted(async () => {
 }
 .content {
   padding: 24px;
+  height: calc(100vh - 64px); /* Subtract header height */
+  overflow: auto;
+}
+.user-trigger {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 0 8px;
+  height: 100%;
+}
+.user-trigger:hover {
+  background-color: var(--color-fill-2);
+  border-radius: 4px;
 }
 </style>

@@ -145,3 +145,17 @@ func (a *App) SetUserAuthority(authorityId uint, projectId uint) (map[string]any
 	}
 	return a.svc.SetUserAuthority(a.ctx, authorityId, projectId)
 }
+
+func (a *App) SetSelfInfo(info map[string]any) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.SetSelfInfo(a.ctx, info)
+}
+
+func (a *App) ChangePassword(password string, newPassword string) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.ChangePassword(a.ctx, password, newPassword)
+}

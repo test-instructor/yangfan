@@ -53,3 +53,11 @@ export const getLogConfig = async () => {
 export const setLogConfig = async ({ level, prefix, retention }) => {
   return await callApp('SetLogConfig', level, prefix, retention)
 }
+
+export const setSelfInfo = async (info) => {
+  return await callApp('SetSelfInfo', info)
+}
+
+export const changePassword = async ({ password, newPassword }) => {
+  return await callApp('ChangePassword', password, newPassword)
+}
