@@ -17,6 +17,7 @@
             <img v-if="form.picPath" :src="form.picPath" alt="captcha" />
           </div>
         </a-form-item>
+        
         <a-space>
           <a-button type="primary" :loading="submitting" @click="submit">登录</a-button>
           <a-button @click="goSettings">设置域名</a-button>
@@ -46,13 +47,15 @@ const form = reactive({
 
 const refreshCaptcha = async () => {
   try {
-    const res = await captchaApi()
+    const res = (await captchaApi()) || {}
+    
     form.captcha = ''
     form.captchaId = res.captchaId || ''
     form.picPath = res.picPath || ''
     form.openCaptcha = Boolean(res.openCaptcha)
   } catch (e) {
-    Message.error(e?.message || '获取验证码失败')
+    const errMsg = e?.message || '获取验证码失败'
+    Message.error(errMsg)
   }
 }
 

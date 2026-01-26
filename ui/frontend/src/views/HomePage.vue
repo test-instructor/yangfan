@@ -1,7 +1,7 @@
 <template>
   <a-layout class="layout">
     <a-layout-sider collapsible breakpoint="xl">
-      <div class="logo">Yangfan UI</div>
+      <div class="logo">扬帆</div>
       <a-menu :selected-keys="[activeKey]" @menu-item-click="onMenuClick">
         <a-menu-item key="home">Dashboard</a-menu-item>
         <a-menu-item key="settings">Settings</a-menu-item>

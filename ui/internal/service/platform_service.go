@@ -22,7 +22,11 @@ func NewPlatformService(client *platformclient.Client, authManager *auth.Manager
 }
 
 func (s *PlatformService) Captcha(ctx context.Context) (map[string]any, error) {
-	headers, body, err := s.client.Do(ctx, http.MethodPost, "/base/captcha", nil, nil)
+	// 尝试 /api/base/captcha (兼容 curl 示例中的路径)
+	// 如果你的后端配置了 system.router-prefix: "/api"，则此处应为 /api/base/captcha
+	// 如果后端是默认 ""，但通过 nginx 代理了 /api，则也需要带 /api
+	// 这里根据用户 curl，明确是 /api/base/captcha
+	headers, body, err := s.client.Do(ctx, http.MethodPost, "/api/base/captcha", nil, nil)
 	_ = headers
 	if err != nil {
 		return nil, err
@@ -34,11 +38,14 @@ func (s *PlatformService) Captcha(ctx context.Context) (map[string]any, error) {
 	if r.Code != 0 {
 		return nil, errors.New(r.Msg)
 	}
+	if r.Data == nil {
+		return map[string]any{}, nil
+	}
 	return r.Data, nil
 }
 
 func (s *PlatformService) Login(ctx context.Context, username string, password string, captcha string, captchaId string, node string) (map[string]any, error) {
-	headers, body, err := s.client.Do(ctx, http.MethodPost, "/base/login", map[string]any{
+	headers, body, err := s.client.Do(ctx, http.MethodPost, "/api/base/login", map[string]any{
 		"username":  username,
 		"password":  password,
 		"captcha":   captcha,
@@ -68,7 +75,7 @@ func (s *PlatformService) Login(ctx context.Context, username string, password s
 }
 
 func (s *PlatformService) GetUserInfo(ctx context.Context) (map[string]any, error) {
-	headers, body, err := s.client.Do(ctx, http.MethodGet, "/user/getUserInfo", nil, nil)
+	headers, body, err := s.client.Do(ctx, http.MethodGet, "/api/user/getUserInfo", nil, nil)
 	_ = headers
 	if err != nil {
 		return nil, err
@@ -87,7 +94,7 @@ func (s *PlatformService) GetUserInfo(ctx context.Context) (map[string]any, erro
 }
 
 func (s *PlatformService) SetUserAuthority(ctx context.Context, authorityId uint, projectId uint) (map[string]any, error) {
-	headers, body, err := s.client.Do(ctx, http.MethodPost, "/user/setUserAuthority", map[string]any{
+	headers, body, err := s.client.Do(ctx, http.MethodPost, "/api/user/setUserAuthority", map[string]any{
 		"authorityId": authorityId,
 		"projectId":   projectId,
 	}, nil)

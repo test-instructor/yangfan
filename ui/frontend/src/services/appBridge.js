@@ -30,7 +30,8 @@ export const hasToken = async () => {
 }
 
 export const captcha = async () => {
-  return await callApp('Captcha')
+  const res = await callApp('Captcha')
+  return res || {}
 }
 
 export const login = async ({ username, password, captcha, captchaId }) => {

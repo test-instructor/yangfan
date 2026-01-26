@@ -74,7 +74,11 @@ func (a *App) Captcha() (map[string]any, error) {
 	if a.svc == nil {
 		return nil, fmt.Errorf("service 未初始化")
 	}
-	return a.svc.Captcha(a.ctx)
+	res, err := a.svc.Captcha(a.ctx)
+	if res == nil && err == nil {
+		return map[string]any{}, nil
+	}
+	return res, err
 }
 
 func (a *App) Login(username string, password string, captcha string, captchaId string) (map[string]any, error) {

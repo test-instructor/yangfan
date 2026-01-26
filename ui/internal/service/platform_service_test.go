@@ -17,7 +17,7 @@ import (
 func TestPlatformService_LoginWritesNodeAndStoresToken(t *testing.T) {
 	var gotNode string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/base/login" {
+		if r.URL.Path != "/api/base/login" {
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
@@ -83,7 +83,7 @@ func TestPlatformService_SetUserAuthorityUpdatesTokenFromHeaders(t *testing.T) {
 	var gotTokenOnGet string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case "/user/setUserAuthority":
+		case "/api/user/setUserAuthority":
 			w.Header().Set("new-token", "t2")
 			w.Header().Set("new-expires-at", "999")
 			_ = json.NewEncoder(w).Encode(map[string]any{
@@ -91,7 +91,7 @@ func TestPlatformService_SetUserAuthorityUpdatesTokenFromHeaders(t *testing.T) {
 				"data": map[string]any{},
 				"msg":  "ok",
 			})
-		case "/user/getUserInfo":
+		case "/api/user/getUserInfo":
 			gotTokenOnGet = r.Header.Get("x-token")
 			_ = json.NewEncoder(w).Encode(map[string]any{
 				"code": 0,
