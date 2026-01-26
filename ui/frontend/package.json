@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@arco-design/web-vue": "^2.57.0",
-    "vue": "^3.2.37"
+    "vue": "^3.2.37",
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^3.0.3",

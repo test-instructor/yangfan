@@ -19,4 +19,5 @@ type BaseClaims struct {
 	NickName    string
 	AuthorityId uint
 	ProjectId   uint
+	Node        string `json:"node"`
 }

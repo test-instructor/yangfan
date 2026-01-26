@@ -36,6 +36,10 @@ func (b *BaseApi) Login(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
+	node := l.Node
+	if node == "" {
+		node = c.GetHeader("x-node")
+	}
 
 	key := c.ClientIP()
 	// 判断验证码是否开启
@@ -70,12 +74,12 @@ func (b *BaseApi) Login(c *gin.Context) {
 		response.FailWithMessage("用户被禁止登录", c)
 		return
 	}
-	b.TokenNext(c, *user)
+	b.TokenNext(c, *user, node)
 }
 
 // TokenNext 登录以后签发jwt
-func (b *BaseApi) TokenNext(c *gin.Context, user system.SysUser) {
-	token, claims, err := utils.LoginToken(&user)
+func (b *BaseApi) TokenNext(c *gin.Context, user system.SysUser, node string) {
+	token, claims, err := utils.LoginToken(&user, node)
 	if err != nil {
 		global.GVA_LOG.Error("获取token失败!", zap.Error(err))
 		response.FailWithMessage("获取token失败", c)
