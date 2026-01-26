@@ -45,3 +45,11 @@ export const getUserInfo = async () => {
 export const setUserAuthority = async ({ authorityId, projectId }) => {
   return await callApp('SetUserAuthority', authorityId, projectId)
 }
+
+export const getLogConfig = async () => {
+  return await callApp('GetLogConfig')
+}
+
+export const setLogConfig = async ({ level, prefix, retention }) => {
+  return await callApp('SetLogConfig', level, prefix, retention)
+}

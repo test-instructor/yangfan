@@ -3,15 +3,26 @@ package main
 import (
 	"embed"
 
+	"yangfan-ui/internal/logger"
+
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"go.uber.org/zap"
 )
 
 //go:embed all:frontend/dist
 var assets embed.FS
 
 func main() {
+	// Initialize logger with defaults (will be reconfigured in app.startup)
+	logger.Setup(logger.Config{
+		Level:     "info",
+		Prefix:    "[ https://github.com/test-instructor/yangfan/ui ]",
+		Retention: 30,
+	})
+	logger.Info("Starting application...")
+
 	// Create an instance of the app structure
 	app := NewApp()
 
@@ -31,6 +42,6 @@ func main() {
 	})
 
 	if err != nil {
-		println("Error:", err.Error())
+		logger.Error("Application crashed", zap.Error(err))
 	}
 }

@@ -11,9 +11,12 @@ import (
 )
 
 type Config struct {
-	BaseURL   string `json:"baseURL"`
-	Token     string `json:"token"`
-	ExpiresAt int64  `json:"expiresAt"`
+	BaseURL      string `json:"baseURL"`
+	Token        string `json:"token"`
+	ExpiresAt    int64  `json:"expiresAt"`
+	LogLevel     string `json:"logLevel"`     // debug, info, warn, error, dpanic, panic, fatal
+	LogPrefix    string `json:"logPrefix"`    // e.g. [ https://github.com/test-instructor/yangfan/ui ]
+	LogRetention int    `json:"logRetention"` // days
 }
 
 type Store struct {
@@ -46,13 +49,28 @@ func (s *Store) load() error {
 	defer s.mu.Unlock()
 	b, err := os.ReadFile(s.path)
 	if err != nil {
-		return err
+		// Default values if file not found
+		s.cfg = Config{
+			LogLevel:     "info",
+			LogPrefix:    "[ https://github.com/test-instructor/yangfan/ui ]",
+			LogRetention: 30,
+		}
+		return nil // treat as no error, use defaults
 	}
 	var cfg Config
 	if err := json.Unmarshal(b, &cfg); err != nil {
 		return err
 	}
 	cfg.BaseURL = normalizeBaseURL(cfg.BaseURL)
+	if cfg.LogLevel == "" {
+		cfg.LogLevel = "info"
+	}
+	if cfg.LogPrefix == "" {
+		cfg.LogPrefix = "[ https://github.com/test-instructor/yangfan/ui ]"
+	}
+	if cfg.LogRetention <= 0 {
+		cfg.LogRetention = 30
+	}
 	s.cfg = cfg
 	return nil
 }
@@ -103,6 +121,15 @@ func (s *Store) ClearAuth() error {
 	defer s.mu.Unlock()
 	s.cfg.Token = ""
 	s.cfg.ExpiresAt = 0
+	return s.saveLocked()
+}
+
+func (s *Store) SetLogConfig(level string, prefix string, retention int) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.cfg.LogLevel = level
+	s.cfg.LogPrefix = prefix
+	s.cfg.LogRetention = retention
 	return s.saveLocked()
 }
 

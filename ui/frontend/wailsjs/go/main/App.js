@@ -14,6 +14,10 @@ export function GetBaseURL() {
   return window['go']['main']['App']['GetBaseURL']();
 }
 
+export function GetLogConfig() {
+  return window['go']['main']['App']['GetLogConfig']();
+}
+
 export function GetUserInfo() {
   return window['go']['main']['App']['GetUserInfo']();
 }
@@ -36,6 +40,10 @@ export function RunTestCase(arg1) {
 
 export function SetBaseURL(arg1) {
   return window['go']['main']['App']['SetBaseURL'](arg1);
+}
+
+export function SetLogConfig(arg1, arg2, arg3) {
+  return window['go']['main']['App']['SetLogConfig'](arg1, arg2, arg3);
 }
 
 export function SetUserAuthority(arg1, arg2) {

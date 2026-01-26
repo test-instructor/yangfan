@@ -7,6 +7,8 @@ export function ClearAuth():Promise<void>;
 
 export function GetBaseURL():Promise<string|boolean>;
 
+export function GetLogConfig():Promise<Record<string, any>>;
+
 export function GetUserInfo():Promise<Record<string, any>>;
 
 export function Greet(arg1:string):Promise<string>;
@@ -18,5 +20,7 @@ export function Login(arg1:string,arg2:string,arg3:string,arg4:string):Promise<R
 export function RunTestCase(arg1:string):Promise<string>;
 
 export function SetBaseURL(arg1:string):Promise<void>;
+
+export function SetLogConfig(arg1:string,arg2:string,arg3:number):Promise<void>;
 
 export function SetUserAuthority(arg1:number,arg2:number):Promise<Record<string, any>>;
