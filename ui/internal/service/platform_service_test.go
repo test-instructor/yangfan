@@ -11,13 +11,18 @@ import (
 
 	"yangfan-ui/internal/auth"
 	"yangfan-ui/internal/config"
+	"yangfan-ui/internal/platformapi"
 	"yangfan-ui/internal/platformclient"
 )
 
 func TestPlatformService_LoginWritesNodeAndStoresToken(t *testing.T) {
 	var gotNode string
+	loginSpec, err := platformapi.GetSpec(platformapi.EndpointLogin)
+	if err != nil {
+		t.Fatalf("GetSpec login: %v", err)
+	}
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/api/base/login" {
+		if r.URL.Path != loginSpec.Path {
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
@@ -81,9 +86,17 @@ func TestPlatformService_LoginWritesNodeAndStoresToken(t *testing.T) {
 
 func TestPlatformService_SetUserAuthorityUpdatesTokenFromHeaders(t *testing.T) {
 	var gotTokenOnGet string
+	setAuthSpec, err := platformapi.GetSpec(platformapi.EndpointSetAuth)
+	if err != nil {
+		t.Fatalf("GetSpec setAuth: %v", err)
+	}
+	userInfoSpec, err := platformapi.GetSpec(platformapi.EndpointUserInfo)
+	if err != nil {
+		t.Fatalf("GetSpec userInfo: %v", err)
+	}
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case "/api/user/setUserAuthority":
+		case setAuthSpec.Path:
 			w.Header().Set("new-token", "t2")
 			w.Header().Set("new-expires-at", "999")
 			_ = json.NewEncoder(w).Encode(map[string]any{
@@ -91,7 +104,7 @@ func TestPlatformService_SetUserAuthorityUpdatesTokenFromHeaders(t *testing.T) {
 				"data": map[string]any{},
 				"msg":  "ok",
 			})
-		case "/api/user/getUserInfo":
+		case userInfoSpec.Path:
 			gotTokenOnGet = r.Header.Get("x-token")
 			_ = json.NewEncoder(w).Encode(map[string]any{
 				"code": 0,

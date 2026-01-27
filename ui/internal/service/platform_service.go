@@ -2,16 +2,25 @@ package service
 
 import (
 	"context"
-	"errors"
-	"net/http"
 
 	"yangfan-ui/internal/auth"
+	"yangfan-ui/internal/platformapi"
 	"yangfan-ui/internal/platformclient"
 )
 
 type PlatformService struct {
 	client *platformclient.Client
 	auth   *auth.Manager
+}
+
+type loginData struct {
+	User      map[string]any `json:"user"`
+	Token     string         `json:"token"`
+	ExpiresAt int64          `json:"expiresAt"`
+}
+
+type userInfoData struct {
+	UserInfo map[string]any `json:"userInfo"`
 }
 
 func NewPlatformService(client *platformclient.Client, authManager *auth.Manager) *PlatformService {
@@ -22,79 +31,43 @@ func NewPlatformService(client *platformclient.Client, authManager *auth.Manager
 }
 
 func (s *PlatformService) Captcha(ctx context.Context) (map[string]any, error) {
-	// 尝试 /api/base/captcha (兼容 curl 示例中的路径)
-	// 如果你的后端配置了 system.router-prefix: "/api"，则此处应为 /api/base/captcha
-	// 如果后端是默认 ""，但通过 nginx 代理了 /api，则也需要带 /api
-	// 这里根据用户 curl，明确是 /api/base/captcha
-	headers, body, err := s.client.Do(ctx, http.MethodPost, "/api/base/captcha", nil, nil)
-	_ = headers
+	_, data, err := platformapi.CallAndDecodeData[map[string]any](ctx, s.client, platformapi.EndpointCaptcha, nil, nil)
 	if err != nil {
 		return nil, err
 	}
-	r, err := platformclient.DecodeAPIResponse[map[string]any](body)
-	if err != nil {
-		return nil, err
-	}
-	if r.Code != 0 {
-		return nil, errors.New(r.Msg)
-	}
-	if r.Data == nil {
+	if data == nil {
 		return map[string]any{}, nil
 	}
-	return r.Data, nil
+	return data, nil
 }
 
 func (s *PlatformService) Login(ctx context.Context, username string, password string, captcha string, captchaId string, node string) (map[string]any, error) {
-	headers, body, err := s.client.Do(ctx, http.MethodPost, "/api/base/login", map[string]any{
+	_, data, err := platformapi.CallAndDecodeData[loginData](ctx, s.client, platformapi.EndpointLogin, map[string]any{
 		"username":  username,
 		"password":  password,
 		"captcha":   captcha,
 		"captchaId": captchaId,
 		"node":      node,
 	}, nil)
-	_ = headers
 	if err != nil {
 		return nil, err
 	}
-	type loginData struct {
-		User      map[string]any `json:"user"`
-		Token     string         `json:"token"`
-		ExpiresAt int64          `json:"expiresAt"`
-	}
-	r, err := platformclient.DecodeAPIResponse[loginData](body)
-	if err != nil {
+	if err := s.auth.Set(data.Token, data.ExpiresAt); err != nil {
 		return nil, err
 	}
-	if r.Code != 0 {
-		return nil, errors.New(r.Msg)
-	}
-	if err := s.auth.Set(r.Data.Token, r.Data.ExpiresAt); err != nil {
-		return nil, err
-	}
-	return r.Data.User, nil
+	return data.User, nil
 }
 
 func (s *PlatformService) GetUserInfo(ctx context.Context) (map[string]any, error) {
-	headers, body, err := s.client.Do(ctx, http.MethodGet, "/api/user/getUserInfo", nil, nil)
-	_ = headers
+	_, data, err := platformapi.CallAndDecodeData[userInfoData](ctx, s.client, platformapi.EndpointUserInfo, nil, nil)
 	if err != nil {
 		return nil, err
 	}
-	type userInfoData struct {
-		UserInfo map[string]any `json:"userInfo"`
-	}
-	r, err := platformclient.DecodeAPIResponse[userInfoData](body)
-	if err != nil {
-		return nil, err
-	}
-	if r.Code != 0 {
-		return nil, errors.New(r.Msg)
-	}
-	return r.Data.UserInfo, nil
+	return data.UserInfo, nil
 }
 
 func (s *PlatformService) SetUserAuthority(ctx context.Context, authorityId uint, projectId uint) (map[string]any, error) {
-	headers, body, err := s.client.Do(ctx, http.MethodPost, "/api/user/setUserAuthority", map[string]any{
+	headers, _, err := platformapi.CallAndDecodeData[map[string]any](ctx, s.client, platformapi.EndpointSetAuth, map[string]any{
 		"authorityId": authorityId,
 		"projectId":   projectId,
 	}, nil)
@@ -104,47 +77,24 @@ func (s *PlatformService) SetUserAuthority(ctx context.Context, authorityId uint
 	if err != nil {
 		return nil, err
 	}
-	r, err := platformclient.DecodeAPIResponse[map[string]any](body)
-	if err != nil {
-		return nil, err
-	}
-	if r.Code != 0 {
-		return nil, errors.New(r.Msg)
-	}
 	return s.GetUserInfo(ctx)
 }
 
 func (s *PlatformService) SetSelfInfo(ctx context.Context, info map[string]any) (map[string]any, error) {
-	headers, body, err := s.client.Do(ctx, http.MethodPut, "/api/user/setSelfInfo", info, nil)
-	_ = headers
+	_, data, err := platformapi.CallAndDecodeData[map[string]any](ctx, s.client, platformapi.EndpointSetSelf, info, nil)
 	if err != nil {
 		return nil, err
 	}
-	r, err := platformclient.DecodeAPIResponse[map[string]any](body)
-	if err != nil {
-		return nil, err
-	}
-	if r.Code != 0 {
-		return nil, errors.New(r.Msg)
-	}
-	return r.Data, nil
+	return data, nil
 }
 
 func (s *PlatformService) ChangePassword(ctx context.Context, password string, newPassword string) (map[string]any, error) {
-	headers, body, err := s.client.Do(ctx, http.MethodPost, "/api/user/changePassword", map[string]any{
+	_, data, err := platformapi.CallAndDecodeData[map[string]any](ctx, s.client, platformapi.EndpointChangePwd, map[string]any{
 		"password":    password,
 		"newPassword": newPassword,
 	}, nil)
-	_ = headers
 	if err != nil {
 		return nil, err
 	}
-	r, err := platformclient.DecodeAPIResponse[map[string]any](body)
-	if err != nil {
-		return nil, err
-	}
-	if r.Code != 0 {
-		return nil, errors.New(r.Msg)
-	}
-	return r.Data, nil
+	return data, nil
 }

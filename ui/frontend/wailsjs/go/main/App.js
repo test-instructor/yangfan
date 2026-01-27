@@ -10,6 +10,10 @@ export function ChangePassword(arg1, arg2) {
   return window['go']['main']['App']['ChangePassword'](arg1, arg2);
 }
 
+export function CheckBaseURLConnectivity(arg1) {
+  return window['go']['main']['App']['CheckBaseURLConnectivity'](arg1);
+}
+
 export function ClearAuth() {
   return window['go']['main']['App']['ClearAuth']();
 }

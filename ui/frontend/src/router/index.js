@@ -1,26 +1,11 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { hasToken } from '../services/appBridge'
-import SettingsPage from '../views/SettingsPage.vue'
-import PersonPage from '../views/PersonPage.vue'
-import LoginPage from '../views/LoginPage.vue'
-import HomePage from '../views/HomePage.vue'
-import DashboardPage from '../views/DashboardPage.vue'
+import { mainRoutes } from './modules/main'
+import { authRoutes } from './modules/auth'
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes: [
-    { 
-      path: '/', 
-      component: HomePage,
-      children: [
-        { path: '', redirect: 'home' },
-        { path: 'home', name: 'home', component: DashboardPage },
-        { path: 'settings', name: 'settings', component: SettingsPage },
-        { path: 'person', name: 'person', component: PersonPage }
-      ]
-    },
-    { path: '/login', name: 'login', component: LoginPage }
-  ]
+  routes: [...mainRoutes, ...authRoutes]
 })
 
 router.beforeEach(async (to) => {

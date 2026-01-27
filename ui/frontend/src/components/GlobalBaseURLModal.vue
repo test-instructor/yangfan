@@ -33,7 +33,7 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { Message } from '@arco-design/web-vue'
-import { setBaseURL, clearAuth } from '../services/appBridge'
+import { checkBaseURLConnectivity, setBaseURL, clearAuth } from '../services/appBridge'
 
 const props = defineProps({
   visible: {
@@ -57,25 +57,14 @@ const save = async () => {
 
   saving.value = true
   try {
-    let url = form.baseURL.trim()
-    if (url.endsWith('/')) {
-      url = url.slice(0, -1)
-    }
-
-    // Health check
-    try {
-      const healthRes = await fetch(`${url}/api/health`)
-      const healthText = await healthRes.text()
-      if (!healthRes.ok || (healthText !== 'ok' && !healthText.includes('ok'))) {
-        throw new Error('Health check failed')
-      }
-    } catch (err) {
-      throw new Error('域名连通性检查失败，请检查域名是否正确')
-    }
-
-    await setBaseURL(url)
+    const res = await checkBaseURLConnectivity(form.baseURL)
+    const normalized = res?.baseURL || ''
+    await setBaseURL(normalized || form.baseURL)
     // Clear auth just in case, though this is fresh setup
     await clearAuth()
+    if (normalized) {
+      form.baseURL = normalized
+    }
     
     Message.success('配置成功')
     emit('success')

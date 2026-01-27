@@ -47,3 +47,4 @@ const currentAuthority = computed(() => {
   width: 100%;
 }
 </style>
+

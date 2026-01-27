@@ -5,6 +5,8 @@ export function Captcha():Promise<Record<string, any>>;
 
 export function ChangePassword(arg1:string,arg2:string):Promise<Record<string, any>>;
 
+export function CheckBaseURLConnectivity(arg1:string):Promise<Record<string, any>>;
+
 export function ClearAuth():Promise<void>;
 
 export function GetBaseURL():Promise<string|boolean>;

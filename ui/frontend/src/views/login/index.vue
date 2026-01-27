@@ -11,13 +11,12 @@
         <a-form-item v-if="form.openCaptcha" field="captcha" label="验证码">
           <div class="captcha-row">
             <a-input v-model="form.captcha" />
-            <a-button class="captcha-btn" @click="refreshCaptcha">刷新</a-button>
           </div>
-          <div class="captcha-img" @click="refreshCaptcha">
+          <div class="captcha-img" @click="refreshCaptcha" style="margin-left: 50px">
             <img v-if="form.picPath" :src="form.picPath" alt="captcha" />
           </div>
         </a-form-item>
-        
+
         <a-space>
           <a-button type="primary" :loading="submitting" @click="submit">登录</a-button>
           <a-button @click="openSettings">设置域名</a-button>
@@ -39,7 +38,14 @@
 import { Message } from '@arco-design/web-vue'
 import { reactive, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { captcha as captchaApi, login as loginApi, getBaseURL, setBaseURL, clearAuth } from '../services/appBridge'
+import {
+  captcha as captchaApi,
+  login as loginApi,
+  getBaseURL,
+  checkBaseURLConnectivity,
+  setBaseURL,
+  clearAuth
+} from '../../services/appBridge'
 
 const router = useRouter()
 const submitting = ref(false)
@@ -63,7 +69,7 @@ const form = reactive({
 const refreshCaptcha = async () => {
   try {
     const res = (await captchaApi()) || {}
-    
+
     form.captcha = ''
     form.captchaId = res.captchaId || ''
     form.picPath = res.picPath || ''
@@ -112,38 +118,30 @@ const saveSettings = async () => {
 
   savingSettings.value = true
   try {
-    let url = settingsForm.baseURL
-    if (url.endsWith('/')) {
-      url = url.slice(0, -1)
+    const normalizedInput = String(settingsForm.baseURL || '').trim().replace(/\/+$/, '')
+    const isBaseURLChanged = normalizedInput !== originalBaseURL.value
+
+    let normalized = normalizedInput
+    if (isBaseURLChanged && normalizedInput) {
+      const res = await checkBaseURLConnectivity(settingsForm.baseURL)
+      normalized = res?.baseURL || normalizedInput
     }
 
-    // Only check health if BaseURL changed
-    const isBaseURLChanged = url !== originalBaseURL.value
-
-    if (isBaseURLChanged) {
-      try {
-        const healthRes = await fetch(`${url}/api/health`)
-        const healthText = await healthRes.text()
-        if (!healthRes.ok || (healthText !== 'ok' && !healthText.includes('ok'))) {
-          throw new Error('Health check failed')
-        }
-      } catch (err) {
-        throw new Error('域名连通性检查失败，请检查域名是否正确')
-      }
+    if (normalized) {
+      await setBaseURL(normalized)
+      settingsForm.baseURL = normalized
+    } else {
+      await setBaseURL(settingsForm.baseURL)
     }
 
-    await setBaseURL(url)
-    
     if (isBaseURLChanged) {
       await clearAuth()
     }
-    
+
     Message.success('保存成功')
     showSettingsModal.value = false
-    
-    // Refresh captcha with new domain
+
     await refreshCaptcha()
-    
   } catch (e) {
     Message.error(e?.message || '保存失败')
   } finally {
@@ -195,3 +193,4 @@ onMounted(async () => {
   object-fit: contain;
 }
 </style>
+

@@ -88,6 +88,9 @@ func Routers() *gin.Engine {
 		PublicGroup.GET("/health", func(c *gin.Context) {
 			c.JSON(http.StatusOK, "ok")
 		})
+		PublicGroup.GET("/health/yangfan/server", func(c *gin.Context) {
+			c.JSON(http.StatusOK, "ok")
+		})
 	}
 	{
 		systemRouter.InitBaseRouter(PublicGroup) // 注册基础功能路由 不做鉴权

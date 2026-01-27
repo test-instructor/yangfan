@@ -1,7 +1,9 @@
 <template>
   <a-layout class="layout">
-    <a-layout-sider collapsible breakpoint="xl">
-      <div class="logo">扬帆</div>
+    <a-layout-sider collapsible breakpoint="xl" class="sider">
+      <div class="logo">
+        <div class="logo-text">扬帆测试平台</div>
+      </div>
       <a-menu :selected-keys="[activeKey]" @menu-item-click="onMenuClick">
         <a-menu-item key="home">
           <template #icon><IconHome /></template>
@@ -16,51 +18,68 @@
     <a-layout>
       <a-layout-header class="header">
         <a-space>
-          <div class="title">Yangfan Automation Client</div>
-        </a-space>
-        <a-space>
-          <a-select
-            v-model="selectedProjectId"
-            placeholder="选择项目"
-            style="width: 200px"
-            @change="onSwitch"
-          >
-            <a-option v-for="p in projectList" :key="p.id" :value="p.id">
-              {{ p.name }}
-            </a-option>
-          </a-select>
-          <a-select
-            v-model="selectedAuthorityId"
-            placeholder="选择角色"
-            style="width: 200px"
-            @change="onSwitch"
-          >
-            <a-option v-for="r in authorityList" :key="r.authorityId" :value="r.authorityId">
-              {{ r.authorityName }}
-            </a-option>
-          </a-select>
 
-          <a-dropdown @select="handleUserCommand">
-            <div class="user-trigger">
-              <a-avatar :size="32" style="margin-right: 8px; background-color: #3370ff">
+
+        </a-space>
+        <ul class="right-side">
+          <li>
+            <a-tooltip content="语言">
+              <a-button class="nav-btn" type="outline" :shape="'circle'">
+                <template #icon>
+                  <IconLanguage />
+                </template>
+              </a-button>
+            </a-tooltip>
+          </li>
+          <li>
+            <a-tooltip :content="theme === 'light' ? '点击切换为暗黑模式' : '点击切换为亮色模式'">
+              <a-button class="nav-btn" type="outline" :shape="'circle'" @click="toggleTheme">
+                <template #icon>
+                  <IconMoon v-if="theme === 'dark'" />
+                  <IconSun v-else />
+                </template>
+              </a-button>
+            </a-tooltip>
+          </li>
+          <li>
+            <a-tooltip content="消息通知">
+              <div class="message-box-trigger">
+                <a-badge :count="9" dot>
+                  <a-button class="nav-btn" type="outline" :shape="'circle'">
+                    <template #icon>
+                      <IconNotification />
+                    </template>
+                  </a-button>
+                </a-badge>
+              </div>
+            </a-tooltip>
+          </li>
+          <li>
+            <a-dropdown @select="handleUserCommand">
+              <a-avatar
+                :size="32"
+                :style="{ marginRight: '8px', cursor: 'pointer' }"
+              >
                 <img v-if="userInfo?.headerImg" :src="userInfo.headerImg" />
                 <IconUser v-else />
               </a-avatar>
-              <span class="username">{{ userInfo?.nickName || userInfo?.userName || 'User' }}</span>
-              <IconDown />
-            </div>
-            <template #content>
-              <a-doption value="person">
-                <template #icon><IconUser /></template>
-                个人信息
-              </a-doption>
-              <a-doption value="logout">
-                <template #icon><IconPoweroff /></template>
-                退出登录
-              </a-doption>
-            </template>
-          </a-dropdown>
-        </a-space>
+              <template #content>
+                <a-doption value="person">
+                  <template #icon><IconUser /></template>
+                  个人信息
+                </a-doption>
+                <a-doption value="settings">
+                  <template #icon><IconSettings /></template>
+                  用户设置
+                </a-doption>
+                <a-doption value="logout">
+                  <template #icon><IconPoweroff /></template>
+                  退出登录
+                </a-doption>
+              </template>
+            </a-dropdown>
+          </li>
+        </ul>
       </a-layout-header>
       <a-layout-content class="content">
         <router-view :user-info="userInfo" :embedded="true" />
@@ -71,17 +90,33 @@
 
 <script setup>
 import { Message } from '@arco-design/web-vue'
-import { IconHome, IconSettings, IconUser, IconPoweroff, IconDown } from '@arco-design/web-vue/es/icon'
+import {
+  IconHome,
+  IconSettings,
+  IconUser,
+  IconPoweroff,
+  IconDown,
+  IconMoon,
+  IconSun,
+  IconSearch,
+  IconLanguage,
+  IconNotification,
+} from '@arco-design/web-vue/es/icon'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { getUserInfo as getUserInfoApi, setUserAuthority as setUserAuthorityApi, clearAuth } from '../services/appBridge'
-import SettingsPage from './SettingsPage.vue'
+import { getUserInfo as getUserInfoApi, setUserAuthority as setUserAuthorityApi, clearAuth } from '../../services/appBridge'
+import { getStoredTheme, setTheme, ThemeMode } from '../../utils/theme'
 
 const router = useRouter()
 const route = useRoute()
 const activeKey = ref('home')
+const theme = ref(getStoredTheme())
 
-// Sync menu with route changes
+const toggleTheme = () => {
+  theme.value = theme.value === ThemeMode.dark ? ThemeMode.light : ThemeMode.dark
+  setTheme(theme.value)
+}
+
 watch(() => route.name, (newVal) => {
   if (newVal === 'settings') {
     activeKey.value = 'settings'
@@ -103,14 +138,6 @@ const projectList = computed(() => {
 const authorityList = computed(() => {
   const list = userInfo.value?.authorities
   return Array.isArray(list) ? list : []
-})
-
-const currentProject = computed(() => {
-  return projectList.value.find((p) => p.id === selectedProjectId.value)
-})
-
-const currentAuthority = computed(() => {
-  return authorityList.value.find((r) => r.authorityId === selectedAuthorityId.value)
 })
 
 const loadUserInfo = async () => {
@@ -164,12 +191,13 @@ const handleUserCommand = async (val) => {
     } catch (e) {
       Message.error('退出登录失败')
     }
+  } else if (val === 'settings') {
+     await router.push({ name: 'settings' })
   }
 }
 
 onMounted(async () => {
   await loadUserInfo()
-  // Sync activeKey with current route
   if (route.name === 'settings') {
     activeKey.value = 'settings'
   } else {
@@ -183,51 +211,60 @@ onMounted(async () => {
   height: 100vh;
   width: 100vw;
 }
+.sider {
+  background: var(--color-bg-1);
+  border-right: 1px solid var(--color-border);
+}
+.sider :deep(.arco-layout-sider-trigger) {
+  border-right: 1px solid var(--color-border);
+}
 .logo {
   height: 32px;
   margin: 16px;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--color-fill-2);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--color-text-1);
   font-weight: bold;
+  border-radius: 4px;
+}
+.logo-text {
+  margin-left: 8px;
+  color: var(--color-text-1);
+  font-size: 16px;
 }
 .header {
-  padding: 0 16px;
-  background: var(--color-bg-2);
+  padding: 0 20px;
+  background: var(--color-bg-1);
   border-bottom: 1px solid var(--color-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  height: 60px;
+}
+.right-side {
+  display: flex;
+  padding-left: 20px;
+  list-style: none;
+}
+.right-side li {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+}
+.nav-btn {
+  border-color: rgb(var(--gray-2));
+  color: rgb(var(--gray-8));
+  font-size: 16px;
 }
 .title {
   font-weight: 600;
 }
 .content {
   padding: 24px;
-  height: calc(100vh - 64px); /* Subtract header height */
+  height: calc(100vh - 64px);
   overflow: auto;
-}
-.user-trigger {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  padding: 0 8px;
-  height: 100%;
-}
-.user-trigger .username {
-  color: #000;
-  margin-right: 8px;
-  font-weight: 500;
-}
-.user-trigger .arco-icon-down {
-  color: #000;
-  font-size: 12px;
-}
-.user-trigger:hover {
-  background-color: var(--color-fill-2);
-  border-radius: 4px;
+  background: var(--color-bg-2);
 }
 </style>

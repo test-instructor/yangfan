@@ -7,6 +7,12 @@
             <a-form-item field="baseURL" label="扬帆自动化测试平台域名（BaseURL）">
               <a-input v-model="form.baseURL" placeholder="https://xx.demo.com" />
             </a-form-item>
+            <a-form-item field="theme" label="主题">
+              <a-radio-group v-model="form.theme" type="button" @change="onThemeChange">
+                <a-radio value="light">亮色</a-radio>
+                <a-radio value="dark">暗黑</a-radio>
+              </a-radio-group>
+            </a-form-item>
           </a-form>
         </a-tab-pane>
 
@@ -45,7 +51,15 @@
 import { Modal, Message } from '@arco-design/web-vue'
 import { reactive, ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getBaseURL, setBaseURL, getLogConfig, setLogConfig, clearAuth } from '../services/appBridge'
+import { getStoredTheme, setTheme } from '../../utils/theme'
+import {
+  getBaseURL,
+  checkBaseURLConnectivity,
+  setBaseURL,
+  getLogConfig,
+  setLogConfig,
+  clearAuth
+} from '../../services/appBridge'
 
 const props = defineProps({
   embedded: {
@@ -59,6 +73,7 @@ const router = useRouter()
 
 const form = reactive({
   baseURL: '',
+  theme: 'light',
   logLevel: 'info',
   logPrefix: '[ https://github.com/test-instructor/yangfan/ui ]',
   logRetention: 30
@@ -71,7 +86,8 @@ const load = async () => {
     const { baseURL } = await getBaseURL()
     form.baseURL = baseURL
     originalBaseURL.value = baseURL
-    
+    form.theme = getStoredTheme()
+
     const logCfg = await getLogConfig()
     if (logCfg) {
       form.logLevel = logCfg.logLevel || 'info'
@@ -83,30 +99,29 @@ const load = async () => {
   }
 }
 
+const onThemeChange = (val) => {
+  const next = typeof val === 'string' ? val : form.theme
+  setTheme(next)
+}
+
 const save = async () => {
   saving.value = true
   try {
-    let url = form.baseURL
-    if (url.endsWith('/')) {
-      url = url.slice(0, -1)
-    }
-    
-    // Only check health if BaseURL changed
-    const isBaseURLChanged = form.baseURL !== originalBaseURL.value
-    
-    if (isBaseURLChanged) {
-        try {
-        const healthRes = await fetch(`${url}/api/health`)
-        const healthText = await healthRes.text()
-        if (!healthRes.ok || (healthText !== 'ok' && !healthText.includes('ok'))) {
-            throw new Error('Health check failed')
-        }
-        } catch (err) {
-        throw new Error('域名连通性检查失败，请检查域名是否正确')
-        }
+    const normalizedInput = String(form.baseURL || '').trim().replace(/\/+$/, '')
+    const isBaseURLChanged = normalizedInput !== originalBaseURL.value
+
+    let normalized = normalizedInput
+    if (isBaseURLChanged && normalizedInput) {
+      const res = await checkBaseURLConnectivity(form.baseURL)
+      normalized = res?.baseURL || normalizedInput
     }
 
-    await setBaseURL(form.baseURL)
+    if (normalized) {
+      await setBaseURL(normalized)
+      form.baseURL = normalized
+    } else {
+      await setBaseURL(form.baseURL)
+    }
     await setLogConfig({
       level: form.logLevel,
       prefix: form.logPrefix,
@@ -114,32 +129,27 @@ const save = async () => {
     })
 
     if (isBaseURLChanged) {
-        await clearAuth()
-        Message.success('保存成功，域名已修改，请重新登录')
-        if (props.embedded) {
-             await router.replace({ name: 'login' })
-        } else {
-            // Standalone mode usually wants to go to login anyway
-             await router.replace({ name: 'login' })
-        }
+      await clearAuth()
+      Message.success('保存成功，域名已修改，请重新登录')
+      if (props.embedded) {
+        await router.replace({ name: 'login' })
+      } else {
+        await router.replace({ name: 'login' })
+      }
     } else {
-        Message.success('保存成功')
-        if (!props.embedded) {
-            // If standalone (e.g. from login page), go back to login
-             await router.replace({ name: 'login' })
-        }
+      Message.success('保存成功')
+      if (!props.embedded) {
+        await router.replace({ name: 'login' })
+      }
     }
-    
-    // Update originalBaseURL
-    originalBaseURL.value = form.baseURL
 
+    originalBaseURL.value = form.baseURL
   } catch (e) {
     Message.error(e?.message || '保存失败')
   } finally {
     saving.value = false
   }
 }
-
 
 const goLogin = async () => {
   await router.push({ name: 'login' })

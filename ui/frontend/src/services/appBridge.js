@@ -21,6 +21,14 @@ export const setBaseURL = async (baseURL) => {
   return await callApp('SetBaseURL', baseURL)
 }
 
+export const checkBaseURLConnectivity = async (baseURL) => {
+  const res = await callApp('CheckBaseURLConnectivity', baseURL)
+  if (res && typeof res === 'object') {
+    return { ok: Boolean(res.ok), baseURL: res.baseURL || '', ...res }
+  }
+  return { ok: Boolean(res), baseURL: '' }
+}
+
 export const clearAuth = async () => {
   return await callApp('ClearAuth')
 }
