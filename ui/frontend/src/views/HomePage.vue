@@ -217,6 +217,15 @@ onMounted(async () => {
   padding: 0 8px;
   height: 100%;
 }
+.user-trigger .username {
+  color: #000;
+  margin-right: 8px;
+  font-weight: 500;
+}
+.user-trigger .arco-icon-down {
+  color: #000;
+  font-size: 12px;
+}
 .user-trigger:hover {
   background-color: var(--color-fill-2);
   border-radius: 4px;
