@@ -1,8 +1,9 @@
 <template>
   <a-layout class="layout">
-    <a-layout-sider collapsible breakpoint="xl" class="sider">
+    <a-layout-sider collapsible breakpoint="xl" class="sider" v-model:collapsed="collapsed">
       <div class="logo">
-        <div class="logo-text">扬帆测试平台</div>
+        <img :src="logo" alt="logo" class="logo-img" />
+        <div class="logo-text" v-if="!collapsed">扬帆测试平台</div>
       </div>
       <a-menu :selected-keys="[activeKey]" @menu-item-click="onMenuClick">
         <a-menu-item key="home">
@@ -18,10 +19,58 @@
     <a-layout>
       <a-layout-header class="header">
         <a-space>
-
-
+          <a-breadcrumb :style="{ margin: '16px 0' }">
+            <a-breadcrumb-item>
+              <IconHome />
+            </a-breadcrumb-item>
+            <a-breadcrumb-item v-for="(item, index) in breadcrumbs" :key="index">
+              {{ item.meta?.title || item.name }}
+            </a-breadcrumb-item>
+          </a-breadcrumb>
         </a-space>
         <ul class="right-side">
+          <li>
+            <a-dropdown @select="handleProjectSwitch">
+              <a-button class="nav-btn" type="text">
+                <template #icon>
+                  <IconApps />
+                </template>
+                {{ currentProjectName || '选择项目' }}
+                <IconDown class="icon-down" />
+              </a-button>
+              <template #content>
+                <a-doption
+                  v-for="p in projectList"
+                  :key="p.id"
+                  :value="p.id"
+                  :active="p.id === selectedProjectId"
+                >
+                  {{ p.name }}
+                </a-doption>
+              </template>
+            </a-dropdown>
+          </li>
+          <li>
+            <a-dropdown @select="handleAuthoritySwitch">
+              <a-button class="nav-btn" type="text">
+                <template #icon>
+                  <IconUserGroup />
+                </template>
+                {{ currentAuthorityName || '选择角色' }}
+                <IconDown class="icon-down" />
+              </a-button>
+              <template #content>
+                <a-doption
+                  v-for="r in authorityList"
+                  :key="r.authorityId"
+                  :value="r.authorityId"
+                  :active="r.authorityId === selectedAuthorityId"
+                >
+                  {{ r.authorityName }}
+                </a-doption>
+              </template>
+            </a-dropdown>
+          </li>
           <li>
             <a-tooltip content="语言">
               <a-button class="nav-btn" type="outline" :shape="'circle'">
@@ -101,16 +150,24 @@ import {
   IconSearch,
   IconLanguage,
   IconNotification,
+  IconApps,
+  IconUserGroup
 } from '@arco-design/web-vue/es/icon'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getUserInfo as getUserInfoApi, setUserAuthority as setUserAuthorityApi, clearAuth } from '../../services/appBridge'
 import { getStoredTheme, setTheme, ThemeMode } from '../../utils/theme'
+import logo from '../../assets/images/logo-universal.png'
 
 const router = useRouter()
 const route = useRoute()
 const activeKey = ref('home')
 const theme = ref(getStoredTheme())
+const collapsed = ref(false)
+
+const breadcrumbs = computed(() => {
+  return route.matched.filter((item) => item.meta?.title || (item.name && item.name !== 'index'))
+})
 
 const toggleTheme = () => {
   theme.value = theme.value === ThemeMode.dark ? ThemeMode.light : ThemeMode.dark
@@ -140,6 +197,18 @@ const authorityList = computed(() => {
   return Array.isArray(list) ? list : []
 })
 
+const currentProjectName = computed(() => {
+  if (!selectedProjectId.value) return ''
+  const p = projectList.value.find(item => item.id === selectedProjectId.value)
+  return p ? p.name : ''
+})
+
+const currentAuthorityName = computed(() => {
+  if (!selectedAuthorityId.value) return ''
+  const r = authorityList.value.find(item => item.authorityId === selectedAuthorityId.value)
+  return r ? r.authorityName : ''
+})
+
 const loadUserInfo = async () => {
   try {
     userInfo.value = await getUserInfoApi()
@@ -151,7 +220,7 @@ const loadUserInfo = async () => {
   }
 }
 
-const onSwitch = async () => {
+const switchContext = async () => {
   if (switching.value) return
   if (!selectedAuthorityId.value || !selectedProjectId.value) return
   switching.value = true
@@ -169,6 +238,18 @@ const onSwitch = async () => {
   } finally {
     switching.value = false
   }
+}
+
+const handleProjectSwitch = async (val) => {
+  if (val === selectedProjectId.value) return
+  selectedProjectId.value = val
+  await switchContext()
+}
+
+const handleAuthoritySwitch = async (val) => {
+  if (val === selectedAuthorityId.value) return
+  selectedAuthorityId.value = val
+  await switchContext()
 }
 
 const onMenuClick = async (key) => {
@@ -233,6 +314,11 @@ onMounted(async () => {
   margin-left: 8px;
   color: var(--color-text-1);
   font-size: 16px;
+  white-space: nowrap;
+}
+.logo-img {
+  width: 32px;
+  height: 32px;
 }
 .header {
   padding: 0 20px;
@@ -266,5 +352,10 @@ onMounted(async () => {
   height: calc(100vh - 64px);
   overflow: auto;
   background: var(--color-bg-2);
+}
+.icon-down {
+  margin-left: 4px;
+  font-size: 12px;
+  color: var(--color-text-3);
 }
 </style>
