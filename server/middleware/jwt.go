@@ -62,7 +62,7 @@ func JWTAuth() gin.HandlerFunc {
 			utils.SetToken(c, newToken, int(dr.Seconds()))
 			if global.GVA_CONFIG.System.UseMultipoint {
 				// 记录新的活跃jwt
-				_ = utils.SetRedisJWT(newToken, newClaims.Username)
+				_ = utils.SetRedisJWT(newToken, newClaims.Username, newClaims.Source)
 			}
 		}
 		c.Next()

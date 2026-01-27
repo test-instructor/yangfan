@@ -74,12 +74,12 @@ func (b *BaseApi) Login(c *gin.Context) {
 		response.FailWithMessage("用户被禁止登录", c)
 		return
 	}
-	b.TokenNext(c, *user, node)
+	b.TokenNext(c, *user, node, l.Source)
 }
 
 // TokenNext 登录以后签发jwt
-func (b *BaseApi) TokenNext(c *gin.Context, user system.SysUser, node string) {
-	token, claims, err := utils.LoginToken(&user, node)
+func (b *BaseApi) TokenNext(c *gin.Context, user system.SysUser, node string, source string) {
+	token, claims, err := utils.LoginToken(&user, node, source)
 	if err != nil {
 		global.GVA_LOG.Error("获取token失败!", zap.Error(err))
 		response.FailWithMessage("获取token失败", c)
@@ -95,8 +95,8 @@ func (b *BaseApi) TokenNext(c *gin.Context, user system.SysUser, node string) {
 		return
 	}
 
-	if jwtStr, err := jwtService.GetRedisJWT(user.Username); err == redis.Nil {
-		if err := utils.SetRedisJWT(token, user.Username); err != nil {
+	if jwtStr, err := jwtService.GetRedisJWT(user.Username, source); err == redis.Nil {
+		if err := utils.SetRedisJWT(token, user.Username, source); err != nil {
 			global.GVA_LOG.Error("设置登录状态失败!", zap.Error(err))
 			response.FailWithMessage("设置登录状态失败", c)
 			return
@@ -117,7 +117,7 @@ func (b *BaseApi) TokenNext(c *gin.Context, user system.SysUser, node string) {
 			response.FailWithMessage("jwt作废失败", c)
 			return
 		}
-		if err := utils.SetRedisJWT(token, user.GetUsername()); err != nil {
+		if err := utils.SetRedisJWT(token, user.GetUsername(), source); err != nil {
 			response.FailWithMessage("设置登录状态失败", c)
 			return
 		}
@@ -252,13 +252,14 @@ func (b *BaseApi) SetUserAuthority(c *gin.Context) {
 		return
 	}
 	userID := utils.GetUserID(c)
-	err = userService.SetUserAuthority(userID, sua.AuthorityId, sua.ProjectId)
+	claims := utils.GetUserInfo(c)
+	source := claims.Source
+	err = userService.SetUserAuthority(userID, sua.AuthorityId, sua.ProjectId, source)
 	if err != nil {
 		global.GVA_LOG.Error("修改失败!", zap.Error(err))
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	claims := utils.GetUserInfo(c)
 	claims.AuthorityId = sua.AuthorityId
 	claims.ProjectId = sua.ProjectId
 	token, err := utils.NewJWT().CreateToken(*claims)
@@ -458,6 +459,21 @@ func (b *BaseApi) GetUserInfo(c *gin.Context) {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 		return
+	}
+	claims := utils.GetUserInfo(c)
+	if claims != nil && claims.Source == "ui" {
+		if ReqUser.UiAuthorityId != 0 {
+			ReqUser.AuthorityId = ReqUser.UiAuthorityId
+			for _, auth := range ReqUser.Authorities {
+				if auth.AuthorityId == ReqUser.UiAuthorityId {
+					ReqUser.Authority = auth
+					break
+				}
+			}
+		}
+		if ReqUser.UiProjectId != 0 {
+			ReqUser.ProjectID = ReqUser.UiProjectId
+		}
 	}
 	response.OkWithDetailed(gin.H{"userInfo": ReqUser}, "获取成功", c)
 }

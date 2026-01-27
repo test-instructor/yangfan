@@ -151,7 +151,7 @@ func (userService *UserService) GetUserInfoList(info systemReq.GetUserList) (lis
 //@param: uuid uuid.UUID, authorityId string
 //@return: err error
 
-func (userService *UserService) SetUserAuthority(id uint, authorityId uint, projectId uint) (err error) {
+func (userService *UserService) SetUserAuthority(id uint, authorityId uint, projectId uint, source string) (err error) {
 
 	assignErr := global.GVA_DB.Where("sys_user_id = ? AND sys_authority_authority_id = ?", id, authorityId).First(&system.SysUserAuthority{}).Error
 	if errors.Is(assignErr, gorm.ErrRecordNotFound) {
@@ -193,10 +193,16 @@ func (userService *UserService) SetUserAuthority(id uint, authorityId uint, proj
 		return errors.New("找不到默认路由,无法切换本角色")
 	}
 
-	err = global.GVA_DB.Model(&system.SysUser{}).Where("id = ?", id).Updates(map[string]interface{}{
-		"authority_id": authorityId,
-		"project_id":   projectId,
-	}).Error
+	updates := map[string]interface{}{}
+	if source == "ui" {
+		updates["ui_authority_id"] = authorityId
+		updates["ui_project_id"] = projectId
+	} else {
+		updates["authority_id"] = authorityId
+		updates["project_id"] = projectId
+	}
+
+	err = global.GVA_DB.Model(&system.SysUser{}).Where("id = ?", id).Updates(updates).Error
 	return err
 }
 

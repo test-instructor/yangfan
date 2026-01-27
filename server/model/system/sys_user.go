@@ -34,6 +34,8 @@ type SysUser struct {
 	OriginSetting common.JSONMap           `json:"originSetting" form:"originSetting" gorm:"type:text;default:null;column:origin_setting;comment:配置;"` //配置
 	ProjectList   []map[string]interface{} `json:"projectList" gorm:"-"`
 	ProjectID     uint                     `json:"projectId" gorm:"project_id"`
+	UiAuthorityId uint                     `json:"uiAuthorityId" gorm:"default:888;comment:UI用户角色ID"` // UI用户角色ID
+	UiProjectId   uint                     `json:"uiProjectId" gorm:"ui_project_id"`                  // UI项目ID
 }
 
 func (SysUser) TableName() string {

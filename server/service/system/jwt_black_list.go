@@ -34,8 +34,12 @@ func (jwtService *JwtService) JsonInBlacklist(jwtList system.JwtBlacklist) (err 
 //@param: userName string
 //@return: redisJWT string, err error
 
-func (jwtService *JwtService) GetRedisJWT(userName string) (redisJWT string, err error) {
-	redisJWT, err = global.GVA_REDIS.Get(context.Background(), userName).Result()
+func (jwtService *JwtService) GetRedisJWT(userName string, source string) (redisJWT string, err error) {
+	key := userName
+	if source != "" {
+		key = userName + ":" + source
+	}
+	redisJWT, err = global.GVA_REDIS.Get(context.Background(), key).Result()
 	return redisJWT, err
 }
 

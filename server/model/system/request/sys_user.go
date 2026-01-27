@@ -25,6 +25,7 @@ type Login struct {
 	Captcha   string `json:"captcha"`   // 验证码
 	CaptchaId string `json:"captchaId"` // 验证码ID
 	Node      string `json:"node"`      // 登录来源标记（可选），例如 ui-node
+	Source    string `json:"source"`    // 登录来源 web/ui
 }
 
 // ChangePasswordReq Modify password structure

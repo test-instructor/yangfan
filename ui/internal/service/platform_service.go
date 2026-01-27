@@ -48,6 +48,7 @@ func (s *PlatformService) Login(ctx context.Context, username string, password s
 		"captcha":   captcha,
 		"captchaId": captchaId,
 		"node":      node,
+		"source":    "ui",
 	}, nil)
 	if err != nil {
 		return nil, err

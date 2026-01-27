@@ -134,16 +134,31 @@ func GetUserName(c *gin.Context) string {
 	}
 }
 
-func LoginToken(user system.Login, node string) (token string, claims systemReq.CustomClaims, err error) {
+func LoginToken(user system.Login, node string, source string) (token string, claims systemReq.CustomClaims, err error) {
 	j := NewJWT()
+	authorityId := user.GetAuthorityId()
+	projectId := user.GetProjectID()
+
+	if source == "ui" {
+		if u, ok := user.(*system.SysUser); ok {
+			if u.UiAuthorityId != 0 {
+				authorityId = u.UiAuthorityId
+			}
+			if u.UiProjectId != 0 {
+				projectId = u.UiProjectId
+			}
+		}
+	}
+
 	claims = j.CreateClaims(systemReq.BaseClaims{
 		UUID:        user.GetUUID(),
 		ID:          user.GetUserId(),
 		NickName:    user.GetNickname(),
 		Username:    user.GetUsername(),
-		AuthorityId: user.GetAuthorityId(),
-		ProjectId:   user.GetProjectID(),
+		AuthorityId: authorityId,
+		ProjectId:   projectId,
 		Node:        node,
+		Source:      source,
 	})
 	token, err = j.CreateToken(claims)
 	return
