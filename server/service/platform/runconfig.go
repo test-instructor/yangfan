@@ -79,6 +79,21 @@ func (rcService *RunConfigService) GetRunConfigInfoList(ctx context.Context, inf
 	if info.Name != nil && *info.Name != "" {
 		db = db.Where("name LIKE ?", "%"+*info.Name+"%")
 	}
+
+	switch info.Type {
+	case "android":
+		db = db.Where("android_device_options_id IS NOT NULL").Preload("AndroidDeviceOptions")
+	case "ios":
+		db = db.Where("ios_device_options_id IS NOT NULL").Preload("IOSDeviceOptions")
+	case "harmony":
+		db = db.Where("harmony_device_options_id IS NOT NULL").Preload("HarmonyDeviceOptions")
+	case "browser":
+		db = db.Where("browser_device_options_id IS NOT NULL").Preload("BrowserDeviceOptions")
+	default:
+		// 默认为接口自动化，不包含任何设备配置
+		db = db.Where("android_device_options_id IS NULL AND ios_device_options_id IS NULL AND harmony_device_options_id IS NULL AND browser_device_options_id IS NULL")
+	}
+
 	err = db.Count(&total).Error
 	if err != nil {
 		return

@@ -9,6 +9,7 @@ import (
 type RunConfigSearch struct {
 	CreatedAtRange []time.Time `json:"createdAtRange" form:"createdAtRange[]"`
 	Name           *string     `json:"name" form:"name"`
+	Type           string      `json:"type" form:"type"`
 	ProjectId      int64       `json:"projectId" form:"projectId"`
 	request.PageInfo
 }

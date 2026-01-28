@@ -10,6 +10,7 @@ import (
 type RunConfig struct {
 	global.GVA_MODEL
 	Name               string            `json:"name" form:"name" mapstructure:"name" gorm:"comment:配置名称;column:name;" binding:"required"`                              //名称
+	Type               string            `json:"type" form:"type" gorm:"-"`                                                                                             //类型
 	BaseUrl            string            `json:"base_url" form:"base_url" mapstructure:"base_url" gorm:"comment:默认域名;column:base_url;"`                                 //域名
 	Variables          datatypes.JSONMap `json:"variables" form:"variables" mapstructure:"variables" gorm:"comment:变量;column:variables;" swaggertype:"object"`          //变量
 	Headers            datatypes.JSONMap `json:"headers" form:"headers" mapstructure:"headers" gorm:"comment:请求头;column:headers;" swaggertype:"object"`                 //请求头

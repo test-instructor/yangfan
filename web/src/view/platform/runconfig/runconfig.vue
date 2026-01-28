@@ -123,13 +123,13 @@
             v-model="formData.name"
             :clearable="false"
             placeholder="请输入名称"
-            style="width: 300px"
+            style="width: 100%"
           >
             <template #prepend>名称</template>
           </el-input>
         </el-form-item>
 
-        <el-form-item prop="base_url" class="form-item-width">
+        <el-form-item v-if="currentPlatform === 'api'" prop="base_url" class="form-item-width">
           <el-input
             v-model="formData.base_url"
             :clearable="false"
@@ -138,6 +138,21 @@
           >
             <template #prepend>域名</template>
           </el-input>
+        </el-form-item>
+
+        <el-form-item v-else label="设备:" class="form-item-width">
+          <el-select v-if="currentPlatform === 'android'" v-model="formData.androidDeviceOptionsId" placeholder="请选择安卓设备" clearable style="width: 100%">
+            <el-option v-for="item in deviceOptions" :key="item.ID" :label="item.name || item.serial" :value="item.ID" />
+          </el-select>
+          <el-select v-if="currentPlatform === 'ios'" v-model="formData.iosDeviceOptionsId" placeholder="请选择iOS设备" clearable style="width: 100%">
+             <el-option v-for="item in deviceOptions" :key="item.ID" :label="item.name || item.udid" :value="item.ID" />
+          </el-select>
+          <el-select v-if="currentPlatform === 'harmony'" v-model="formData.harmonyDeviceOptionsId" placeholder="请选择鸿蒙设备" clearable style="width: 100%">
+             <el-option v-for="item in deviceOptions" :key="item.ID" :label="item.name || item.connectKey" :value="item.ID" />
+          </el-select>
+           <el-select v-if="currentPlatform === 'browser'" v-model="formData.browserDeviceOptionsId" placeholder="请选择浏览器" clearable style="width: 100%">
+             <el-option v-for="item in deviceOptions" :key="item.ID" :label="item.browserId" :value="item.ID" />
+          </el-select>
         </el-form-item>
 
         <el-form-item label="超时:" prop="timeout" class="form-item-width">
@@ -235,6 +250,11 @@
     findRunConfig,
     getRunConfigList
   } from '@/api/platform/runconfig'
+  import { getAndroidDeviceOptionsList } from '@/api/platform/androidDeviceOptions'
+  import { getIOSDeviceOptionsList } from '@/api/platform/iosOptions'
+  import { getHarmonyDeviceOptionsList } from '@/api/platform/harmonyDeviceOption'
+  import { getBrowserDeviceOptionsList } from '@/api/platform/browserDeviceConfig'
+
   import ParameterTable from '@/components/platform/parameterTable/index.vue'
   // 全量引入格式化工具 请按需保留
   import {
@@ -247,8 +267,9 @@
     onDownloadFile
   } from '@/utils/format'
   import { ElMessage, ElMessageBox } from 'element-plus'
-  import { ref, reactive } from 'vue'
+  import { ref, reactive, computed, watch } from 'vue'
   import { useAppStore } from '@/pinia'
+  import { useRoute } from 'vue-router'
   // 页面组件
   import PythonFuncSelector from '@/components/platform/button/PythonFuncSelector.vue'
   import EnvSelector from '@/components/platform/button/EnvDetail.vue'
@@ -267,6 +288,9 @@
   // 提交按钮loading
   const btnLoading = ref(false)
   const appStore = useAppStore()
+  const route = useRoute()
+  const currentPlatform = computed(() => route.query.type || 'api')
+  const deviceOptions = ref([])
 
   // 控制更多查询条件显示/隐藏状态
   const showAllQuery = ref(false)
@@ -274,6 +298,7 @@
   // 自动化生成的字典（可能为空）以及字段
   const formData = ref({
     name: '',
+    type: '',
     base_url: '',
     variables: {},
     headers: {},
@@ -290,7 +315,11 @@
     preparatorySteps: undefined,
     setup_case_id: null,
     report_id: undefined,
-    retry: undefined
+    retry: undefined,
+    androidDeviceOptionsId: null,
+    iosDeviceOptionsId: null,
+    harmonyDeviceOptionsId: null,
+    browserDeviceOptionsId: null
   })
 
 
@@ -353,7 +382,7 @@
 
   // 查询
   const getTableData = async () => {
-    const table = await getRunConfigList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    const table = await getRunConfigList({ page: page.value, pageSize: pageSize.value,type: currentPlatform.value, ...searchInfo.value })
     if (table.code === 0) {
       tableData.value = table.data.list
       total.value = table.data.total
@@ -434,7 +463,31 @@
     type.value = 'update'
     if (res.code === 0) {
       formData.value = res.data
+      headers.value = res.data.header_temp || []
+      variables.value = res.data.variable_temp || []
       dialogFormVisible.value = true
+      
+      // 如果是UI自动化，获取设备列表
+      if (currentPlatform.value !== 'api') {
+        let listRes
+        switch (currentPlatform.value) {
+          case 'android':
+            listRes = await getAndroidDeviceOptionsList({ page: 1, pageSize: 999 })
+            break
+          case 'ios':
+            listRes = await getIOSDeviceOptionsList({ page: 1, pageSize: 999 })
+            break
+          case 'harmony':
+            listRes = await getHarmonyDeviceOptionsList({ page: 1, pageSize: 999 })
+            break
+          case 'browser':
+            listRes = await getBrowserDeviceOptionsList({ page: 1, pageSize: 999 })
+            break
+        }
+        if (listRes && listRes.code === 0) {
+          deviceOptions.value = listRes.data.list
+        }
+      }
     }
   }
 
@@ -458,9 +511,31 @@
   const dialogFormVisible = ref(false)
 
   // 打开弹窗
-  const openDialog = () => {
+  const openDialog = async () => {
     type.value = 'create'
     dialogFormVisible.value = true
+
+    // 如果是UI自动化，获取设备列表
+    if (currentPlatform.value !== 'api') {
+      let res
+      switch (currentPlatform.value) {
+        case 'android':
+          res = await getAndroidDeviceOptionsList({ page: 1, pageSize: 999 })
+          break
+        case 'ios':
+          res = await getIOSDeviceOptionsList({ page: 1, pageSize: 999 })
+          break
+        case 'harmony':
+          res = await getHarmonyDeviceOptionsList({ page: 1, pageSize: 999 })
+          break
+        case 'browser':
+          res = await getBrowserDeviceOptionsList({ page: 1, pageSize: 999 })
+          break
+      }
+      if (res && res.code === 0) {
+        deviceOptions.value = res.data.list
+      }
+    }
   }
 
   // 关闭弹窗
@@ -544,6 +619,9 @@
     } else {
       formData.value.data_warehouse = {}
     }
+    
+    // 设置类型
+    formData.value.type = currentPlatform.value
 
     btnLoading.value = true
     elFormRef.value?.validate(async (valid) => {
