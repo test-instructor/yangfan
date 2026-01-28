@@ -73,6 +73,8 @@
   "/src/view/platform/env/envForm.vue": "EnvForm",
   "/src/view/platform/envdetail/envdetail.vue": "EnvDetail",
   "/src/view/platform/envdetail/envdetailForm.vue": "EnvDetailForm",
+  "/src/view/platform/llmModelService/llmModelService.vue": "LLMModelConfig",
+  "/src/view/platform/llmModelService/llmModelServiceForm.vue": "LLMModelConfigForm",
   "/src/view/platform/pc/pc.vue": "Pc",
   "/src/view/platform/pc/pc3.vue": "Pc3",
   "/src/view/platform/pc/pcForm.vue": "PythonCodeForm",

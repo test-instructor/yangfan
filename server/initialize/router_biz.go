@@ -41,7 +41,8 @@ func initBizRouter(routers ...*gin.RouterGroup) {
 		platformRouter.InitCategoryMenuRouter(privateGroup, publicGroup)
 		platformRouter.InitRunnerNodeRouter(privateGroup, publicGroup)
 		platformRouter.InitRunnerRouter(privateGroup, publicGroup)
-		platformRouter.InitOpenRunnerRouter(openGroup)
+		platformRouter.InitOpenRunnerRouter(openGroup) // 占位方法，保证文件可以正确加载，避免go空变量检测报错，请勿删除。
+		platformRouter.InitLLMModelConfigRouter(privateGroup, publicGroup)
 	}
 	{
 		automationRouter := router.RouterGroupApp.Automation
@@ -57,5 +58,3 @@ func initBizRouter(routers ...*gin.RouterGroup) {
 		datawarehouseRouter.InitDataCategoryManagementRouter(privateGroup, publicGroup)
 	}
 }
-
-// 占位方法，保证文件可以正确加载，避免go空变量检测报错，请勿删除。

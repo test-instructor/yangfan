@@ -47,7 +47,7 @@ const showLoading = (
           isLoadingVisible = false
           activeAxios = 0 // 重置计数器
         }
-      }, 30000)
+      }, 300000)
     }
   }, 400)
 }

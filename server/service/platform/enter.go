@@ -11,4 +11,5 @@ type ServiceGroup struct {
 	CategoryMenuService
 	RunnerNodeService
 	RunnerService
+	LLMModelConfigService
 }
