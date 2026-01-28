@@ -14,6 +14,11 @@ type AutoStep struct {
 	Request   *Request `json:"request,omitempty" form:"request;comment:http接口" mapstructure:"request"`
 	RequestID uint     `json:"request_id,omitempty" gorm:"comment:http请求"`
 
+	Android *MobileStep `json:"android,omitempty" gorm:"column:android;type:json;serializer:json"`
+	IOS     *MobileStep `json:"ios,omitempty" gorm:"column:ios;type:json;serializer:json"`
+	Harmony *MobileStep `json:"harmony,omitempty" gorm:"column:harmony;type:json;serializer:json"`
+	Browser *MobileStep `json:"browser,omitempty" gorm:"column:browser;type:json;serializer:json"`
+
 	ProjectId int64 `json:"projectId" form:"projectId" gorm:"column:project_id;"` //项目信息
 	Menu      int64 `json:"menu" form:"menu" gorm:"column:menu;"`
 	ParentId  uint  `json:"parentId" form:"parentId" gorm:"column:parent_id;"`

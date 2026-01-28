@@ -29,6 +29,18 @@ type RunConfig struct {
 	ReportID           int64             `json:"report_id" form:"report_id" gorm:"-"`                                                                  //报告ID
 	Retry              int               `json:"retry" form:"retry" gorm:"comment:重试次数;column:retry;"`                                                 //重试次数
 	ProjectId          int64             `json:"projectId" form:"projectId" gorm:"column:project_id;"`
+
+	AndroidDeviceOptionsID *uint                 `json:"androidDeviceOptionsId" form:"androidDeviceOptionsId" gorm:"column:android_device_options_id;"`
+	AndroidDeviceOptions   *AndroidDeviceOptions `json:"androidDeviceOptions" form:"androidDeviceOptions" gorm:"foreignKey:AndroidDeviceOptionsID;"`
+
+	IOSDeviceOptionsID *uint             `json:"iosDeviceOptionsId" form:"iosDeviceOptionsId" gorm:"column:ios_device_options_id;"`
+	IOSDeviceOptions   *IOSDeviceOptions `json:"iosDeviceOptions" form:"iosDeviceOptions" gorm:"foreignKey:IOSDeviceOptionsID;"`
+
+	HarmonyDeviceOptionsID *uint                 `json:"harmonyDeviceOptionsId" form:"harmonyDeviceOptionsId" gorm:"column:harmony_device_options_id;"`
+	HarmonyDeviceOptions   *HarmonyDeviceOptions `json:"harmonyDeviceOptions" form:"harmonyDeviceOptions" gorm:"foreignKey:HarmonyDeviceOptionsID;"`
+
+	BrowserDeviceOptionsID *uint                 `json:"browserDeviceOptionsId" form:"browserDeviceOptionsId" gorm:"column:browser_device_options_id;"`
+	BrowserDeviceOptions   *BrowserDeviceOptions `json:"browserDeviceOptions" form:"browserDeviceOptions" gorm:"foreignKey:BrowserDeviceOptionsID;"`
 }
 
 // TableName 运行配置 RunConfig自定义表名 run_configs

@@ -65,6 +65,10 @@ func getAutoCaseStepHrp(stepId uint) (*HrpCaseStep, error) {
 func getRunConfig(id uint) (config *platform.RunConfig, err error) {
 	apiConfig := platform.RunConfig{GVA_MODEL: global.GVA_MODEL{ID: id}}
 	err = global.GVA_DB.Model(&platform.RunConfig{}).
+		Preload("AndroidDeviceOptions").
+		Preload("IOSDeviceOptions").
+		Preload("HarmonyDeviceOptions").
+		Preload("BrowserDeviceOptions").
 		First(&apiConfig).Error
 	if err != nil {
 		return nil, errors.New("获取配置失败")

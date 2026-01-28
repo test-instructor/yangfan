@@ -99,6 +99,9 @@ func convertConfigToTConfig(config *platform.RunConfig, environs map[string]stri
 		tConfig.ConfigRetry = config.Retry
 	}
 
+	// 注入 UI 设备配置
+	appendUIConfigToTConfig(tConfig, config)
+
 	return tConfig
 }
 
@@ -376,6 +379,20 @@ func convertAutoStepToIStep(autoStep *automation.AutoStep, projectID int64, envI
 	}
 
 	stepConfig := convertStepConfigToHrpStepConfig(&autoStep.StepConfig, projectID, envID)
+
+	if autoStep.Android != nil {
+		return convertMobileStepToHrpStep(autoStep.Android, "android", stepConfig)
+	}
+	if autoStep.IOS != nil {
+		return convertMobileStepToHrpStep(autoStep.IOS, "ios", stepConfig)
+	}
+	if autoStep.Harmony != nil {
+		return convertMobileStepToHrpStep(autoStep.Harmony, "harmony", stepConfig)
+	}
+	if autoStep.Browser != nil {
+		return convertMobileStepToHrpStep(autoStep.Browser, "browser", stepConfig)
+	}
+
 	hrpRequest := convertRequestToHrpRequest(autoStep.Request)
 
 	if hrpRequest == nil {
