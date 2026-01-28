@@ -4,8 +4,17 @@
     <div class="gva-form-box">
       <el-form :model="formData" ref="elFormRef" label-position="right" :rules="rule" label-width="80px">
         <el-form-item label="步骤名称:" prop="name">
-    <el-input v-model="formData.name" :clearable="false" placeholder="请输入步骤名称" />
-</el-form-item>
+          <el-input v-model="formData.name" :clearable="false" placeholder="请输入步骤名称" />
+        </el-form-item>
+
+        <!-- UI 动作列表 -->
+        <el-form-item v-if="isUIStep" label="动作列表:" prop="actions">
+           <MobileActionList v-if="currentPlatform === 'android'" v-model="formData.android.actions" />
+           <MobileActionList v-if="currentPlatform === 'ios'" v-model="formData.ios.actions" />
+           <MobileActionList v-if="currentPlatform === 'harmony'" v-model="formData.harmony.actions" />
+           <MobileActionList v-if="currentPlatform === 'browser'" v-model="formData.browser.actions" />
+        </el-form-item>
+
         <el-form-item label="变量:" prop="variables">
 </el-form-item>
         <el-form-item label="参数:" prop="parameters">
@@ -54,9 +63,11 @@ defineOptions({
 import { getDictFunc } from '@/utils/format'
 import { useRoute, useRouter } from "vue-router"
 import { ElMessage } from 'element-plus'
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 // 数组控制组件
 import ArrayCtrl from '@/components/arrayCtrl/arrayCtrl.vue'
+// 引入 MobileActionList
+import MobileActionList from '@/components/platform/mobile/ActionList.vue'
 
 
 const route = useRoute()
@@ -77,7 +88,25 @@ const formData = ref({
             export: [],
             loops: 0,
             ignore_popup: false,
+            // UI 步骤相关字段
+            android: { actions: [] },
+            ios: { actions: [] },
+            harmony: { actions: [] },
+            browser: { actions: [] }
         })
+        
+// 计算当前 UI 平台类型
+const currentPlatform = computed(() => {
+    // 从路由 meta 或 query 获取类型，默认为 'api'
+    // 假设路由 meta: { type: 'android' }
+    return route.meta?.type || 'api' 
+})
+
+// 计算是否为 UI 步骤
+const isUIStep = computed(() => {
+    return ['android', 'ios', 'harmony', 'browser'].includes(currentPlatform.value)
+})
+
 // 验证规则
 const rule = reactive({
                name : [{
@@ -96,6 +125,12 @@ const init = async () => {
       const res = await findAutoStep({ ID: route.query.id })
       if (res.code === 0) {
         formData.value = res.data
+        // 确保 UI 对象存在，避免报错
+        if (!formData.value.android) formData.value.android = { actions: [] }
+        if (!formData.value.ios) formData.value.ios = { actions: [] }
+        if (!formData.value.harmony) formData.value.harmony = { actions: [] }
+        if (!formData.value.browser) formData.value.browser = { actions: [] }
+        
         type.value = 'update'
       }
     } else {

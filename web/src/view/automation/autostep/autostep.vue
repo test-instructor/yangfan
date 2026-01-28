@@ -5,7 +5,7 @@
       <div class="panel-content">
         <div class="menu-container custom-scrollbar">
           <ApiMenu
-            menutype="1"
+            :menutype="currentMenuType"
             @getTreeID="handleMenuClick"
           />
         </div>
@@ -94,8 +94,19 @@
                     <span class="block-summary-description">{{ scope.row.name }}</span>
                   </div>
 
+                  <!-- UI 动作展示 -->
+                  <div v-else-if="scope.row[currentPlatform]" class="block block_post">
+                      <span class="block-method block_method_color block_method_post">
+                          {{ currentPlatform.toUpperCase() }}
+                      </span>
+                      <span class="block-summary-description" style="margin-left: 10px;">{{ scope.row.name }}</span>
+                      <span class="block-method block_url" style="margin-left: 10px; color: #999;">
+                          {{ (scope.row[currentPlatform].actions || []).length }} Actions
+                      </span>
+                  </div>
+
                   <!-- Grpc 接口展示 -->
-                  <div v-if="scope.row.gRPC" class="block" :class="`block_put`">
+                  <div v-else-if="scope.row.gRPC" class="block" :class="`block_put`">
                     <span
                       class="block-method block_method_color"
                       :class="`block_method_put`"
@@ -253,10 +264,31 @@
   } from '@/utils/format'
   import Runner from '@/components/platform/Runner.vue'
   import { ElMessage, ElMessageBox } from 'element-plus'
-  import { ref, reactive } from 'vue'
+  import { ref, reactive, computed } from 'vue'
   import { useAppStore } from '@/pinia'
   import CurlImport from '@/components/curlImport/index.vue'
+  import { useRoute } from 'vue-router'
 
+  const route = useRoute()
+  const appStore = useAppStore()
+
+  // 计算当前平台类型（默认为 api）
+  const currentPlatform = computed(() => route.meta?.type || 'api')
+  
+  // 计算当前 MenuType（默认为 1）
+  const currentMenuType = computed(() => {
+      // 优先使用 meta 定义的 menuType
+      if (route.meta?.menuType) return String(route.meta.menuType)
+      // 否则根据 type 推断
+      const typeMap = {
+          'api': '1',
+          'android': '100',
+          'ios': '200',
+          'harmony': '300',
+          'browser': '400'
+      }
+      return typeMap[currentPlatform.value] || '1'
+  })
 
   defineOptions({
     name: 'AutoStep'
@@ -264,7 +296,7 @@
 
   // 提交按钮loading
   const btnLoading = ref(false)
-  const appStore = useAppStore()
+  // appStore 已在上方定义，此处移除重复声明
 
   // CURL 导入相关
   const curlImportRef = ref(null)
