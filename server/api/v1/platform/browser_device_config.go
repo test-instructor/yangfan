@@ -12,13 +12,13 @@ import (
 
 type BrowserDeviceOptionsApi struct{}
 
-// CreateBrowserDeviceOptions 创建浏览器设备选项
+// CreateBrowserDeviceOptions 创建浏览器设备
 // @Tags BrowserDeviceOptions
-// @Summary 创建浏览器设备选项
+// @Summary 创建浏览器设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data body platform.BrowserDeviceOptions true "创建浏览器设备选项"
+// @Param data body platform.BrowserDeviceOptions true "创建浏览器设备"
 // @Success 200 {object} response.Response{msg=string} "创建成功"
 // @Router /bdo/createBrowserDeviceOptions [post]
 func (bdoApi *BrowserDeviceOptionsApi) CreateBrowserDeviceOptions(c *gin.Context) {
@@ -40,13 +40,13 @@ func (bdoApi *BrowserDeviceOptionsApi) CreateBrowserDeviceOptions(c *gin.Context
 	response.OkWithMessage("创建成功", c)
 }
 
-// DeleteBrowserDeviceOptions 删除浏览器设备选项
+// DeleteBrowserDeviceOptions 删除浏览器设备
 // @Tags BrowserDeviceOptions
-// @Summary 删除浏览器设备选项
+// @Summary 删除浏览器设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data body platform.BrowserDeviceOptions true "删除浏览器设备选项"
+// @Param data body platform.BrowserDeviceOptions true "删除浏览器设备"
 // @Success 200 {object} response.Response{msg=string} "删除成功"
 // @Router /bdo/deleteBrowserDeviceOptions [delete]
 func (bdoApi *BrowserDeviceOptionsApi) DeleteBrowserDeviceOptions(c *gin.Context) {
@@ -64,9 +64,9 @@ func (bdoApi *BrowserDeviceOptionsApi) DeleteBrowserDeviceOptions(c *gin.Context
 	response.OkWithMessage("删除成功", c)
 }
 
-// DeleteBrowserDeviceOptionsByIds 批量删除浏览器设备选项
+// DeleteBrowserDeviceOptionsByIds 批量删除浏览器设备
 // @Tags BrowserDeviceOptions
-// @Summary 批量删除浏览器设备选项
+// @Summary 批量删除浏览器设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
@@ -86,13 +86,13 @@ func (bdoApi *BrowserDeviceOptionsApi) DeleteBrowserDeviceOptionsByIds(c *gin.Co
 	response.OkWithMessage("批量删除成功", c)
 }
 
-// UpdateBrowserDeviceOptions 更新浏览器设备选项
+// UpdateBrowserDeviceOptions 更新浏览器设备
 // @Tags BrowserDeviceOptions
-// @Summary 更新浏览器设备选项
+// @Summary 更新浏览器设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data body platform.BrowserDeviceOptions true "更新浏览器设备选项"
+// @Param data body platform.BrowserDeviceOptions true "更新浏览器设备"
 // @Success 200 {object} response.Response{msg=string} "更新成功"
 // @Router /bdo/updateBrowserDeviceOptions [put]
 func (bdoApi *BrowserDeviceOptionsApi) UpdateBrowserDeviceOptions(c *gin.Context) {
@@ -115,13 +115,13 @@ func (bdoApi *BrowserDeviceOptionsApi) UpdateBrowserDeviceOptions(c *gin.Context
 	response.OkWithMessage("更新成功", c)
 }
 
-// FindBrowserDeviceOptions 用id查询浏览器设备选项
+// FindBrowserDeviceOptions 用id查询浏览器设备
 // @Tags BrowserDeviceOptions
-// @Summary 用id查询浏览器设备选项
+// @Summary 用id查询浏览器设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param ID query uint true "用id查询浏览器设备选项"
+// @Param ID query uint true "用id查询浏览器设备"
 // @Success 200 {object} response.Response{data=platform.BrowserDeviceOptions,msg=string} "查询成功"
 // @Router /bdo/findBrowserDeviceOptions [get]
 func (bdoApi *BrowserDeviceOptionsApi) FindBrowserDeviceOptions(c *gin.Context) {
@@ -138,13 +138,13 @@ func (bdoApi *BrowserDeviceOptionsApi) FindBrowserDeviceOptions(c *gin.Context) 
 	response.OkWithData(rebdo, c)
 }
 
-// GetBrowserDeviceOptionsList 分页获取浏览器设备选项列表
+// GetBrowserDeviceOptionsList 分页获取浏览器设备列表
 // @Tags BrowserDeviceOptions
-// @Summary 分页获取浏览器设备选项列表
+// @Summary 分页获取浏览器设备列表
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data query platformReq.BrowserDeviceOptionsSearch true "分页获取浏览器设备选项列表"
+// @Param data query platformReq.BrowserDeviceOptionsSearch true "分页获取浏览器设备列表"
 // @Success 200 {object} response.Response{data=response.PageResult,msg=string} "获取成功"
 // @Router /bdo/getBrowserDeviceOptionsList [get]
 func (bdoApi *BrowserDeviceOptionsApi) GetBrowserDeviceOptionsList(c *gin.Context) {
@@ -171,9 +171,9 @@ func (bdoApi *BrowserDeviceOptionsApi) GetBrowserDeviceOptionsList(c *gin.Contex
 	}, "获取成功", c)
 }
 
-// GetBrowserDeviceOptionsPublic 不需要鉴权的浏览器设备选项接口
+// GetBrowserDeviceOptionsPublic 不需要鉴权的浏览器设备接口
 // @Tags BrowserDeviceOptions
-// @Summary 不需要鉴权的浏览器设备选项接口
+// @Summary 不需要鉴权的浏览器设备接口
 // @Accept application/json
 // @Produce application/json
 // @Success 200 {object} response.Response{data=object,msg=string} "获取成功"
@@ -186,6 +186,6 @@ func (bdoApi *BrowserDeviceOptionsApi) GetBrowserDeviceOptionsPublic(c *gin.Cont
 	// 示例为返回了一个固定的消息接口，一般本接口用于C端服务，需要自己实现业务逻辑
 	bdoService.GetBrowserDeviceOptionsPublic(ctx)
 	response.OkWithDetailed(gin.H{
-		"info": "不需要鉴权的浏览器设备选项接口信息",
+		"info": "不需要鉴权的浏览器设备接口信息",
 	}, "获取成功", c)
 }

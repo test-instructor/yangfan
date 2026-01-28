@@ -5,7 +5,7 @@ import (
 	"github.com/test-instructor/yangfan/server/v2/global"
 )
 
-// 设备选项 结构体  HarmonyDeviceOptions
+// 鸿蒙设备 结构体  HarmonyDeviceOptions
 type HarmonyDeviceOptions struct {
 	global.GVA_MODEL
 	Name        *string `json:"name" form:"name" gorm:"column:name;" binding:"required"`                                 //设备名称
@@ -16,7 +16,7 @@ type HarmonyDeviceOptions struct {
 	ProjectId int64 `json:"projectId" form:"projectId" gorm:"column:project_id;"` //项目信息
 }
 
-// TableName 设备选项 HarmonyDeviceOptions自定义表名 harmony_device_options
+// TableName 鸿蒙设备 HarmonyDeviceOptions自定义表名 harmony_device_options
 func (HarmonyDeviceOptions) TableName() string {
 	return "lc_harmony_device_options"
 }

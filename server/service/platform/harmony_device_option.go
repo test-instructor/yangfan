@@ -10,14 +10,14 @@ import (
 
 type HarmonyDeviceOptionsService struct{}
 
-// CreateHarmonyDeviceOptions 创建设备选项记录
+// CreateHarmonyDeviceOptions 创建鸿蒙设备记录
 // Author [yourname](https://github.com/yourname)
 func (hdoService *HarmonyDeviceOptionsService) CreateHarmonyDeviceOptions(ctx context.Context, hdo *platform.HarmonyDeviceOptions) (err error) {
 	err = global.GVA_DB.Create(hdo).Error
 	return err
 }
 
-// DeleteHarmonyDeviceOptions 删除设备选项记录
+// DeleteHarmonyDeviceOptions 删除鸿蒙设备记录
 // Author [yourname](https://github.com/yourname)
 func (hdoService *HarmonyDeviceOptionsService) DeleteHarmonyDeviceOptions(ctx context.Context, ID string, projectId int64) (err error) {
 	var hdo platform.HarmonyDeviceOptions
@@ -32,14 +32,14 @@ func (hdoService *HarmonyDeviceOptionsService) DeleteHarmonyDeviceOptions(ctx co
 	return err
 }
 
-// DeleteHarmonyDeviceOptionsByIds 批量删除设备选项记录
+// DeleteHarmonyDeviceOptionsByIds 批量删除鸿蒙设备记录
 // Author [yourname](https://github.com/yourname)
 func (hdoService *HarmonyDeviceOptionsService) DeleteHarmonyDeviceOptionsByIds(ctx context.Context, IDs []string) (err error) {
 	err = global.GVA_DB.Delete(&[]platform.HarmonyDeviceOptions{}, "id in ?", IDs).Error
 	return err
 }
 
-// UpdateHarmonyDeviceOptions 更新设备选项记录
+// UpdateHarmonyDeviceOptions 更新鸿蒙设备记录
 // Author [yourname](https://github.com/yourname)
 func (hdoService *HarmonyDeviceOptionsService) UpdateHarmonyDeviceOptions(ctx context.Context, hdo platform.HarmonyDeviceOptions, projectId int64) (err error) {
 	var oldHarmonyDeviceOptions platform.HarmonyDeviceOptions
@@ -55,14 +55,14 @@ func (hdoService *HarmonyDeviceOptionsService) UpdateHarmonyDeviceOptions(ctx co
 	return err
 }
 
-// GetHarmonyDeviceOptions 根据ID获取设备选项记录
+// GetHarmonyDeviceOptions 根据ID获取鸿蒙设备记录
 // Author [yourname](https://github.com/yourname)
 func (hdoService *HarmonyDeviceOptionsService) GetHarmonyDeviceOptions(ctx context.Context, ID string) (hdo platform.HarmonyDeviceOptions, err error) {
 	err = global.GVA_DB.Where("id = ?", ID).First(&hdo).Error
 	return
 }
 
-// GetHarmonyDeviceOptionsInfoList 分页获取设备选项记录
+// GetHarmonyDeviceOptionsInfoList 分页获取鸿蒙设备记录
 // Author [yourname](https://github.com/yourname)
 func (hdoService *HarmonyDeviceOptionsService) GetHarmonyDeviceOptionsInfoList(ctx context.Context, info platformReq.HarmonyDeviceOptionsSearch) (list []platform.HarmonyDeviceOptions, total int64, err error) {
 	limit := info.PageSize

@@ -10,14 +10,14 @@ import (
 
 type IOSDeviceOptionsService struct{}
 
-// CreateIOSDeviceOptions 创建iOS设备选项记录
+// CreateIOSDeviceOptions 创建iOS设备记录
 // Author [yourname](https://github.com/yourname)
 func (idoService *IOSDeviceOptionsService) CreateIOSDeviceOptions(ctx context.Context, ido *platform.IOSDeviceOptions) (err error) {
 	err = global.GVA_DB.Create(ido).Error
 	return err
 }
 
-// DeleteIOSDeviceOptions 删除iOS设备选项记录
+// DeleteIOSDeviceOptions 删除iOS设备记录
 // Author [yourname](https://github.com/yourname)
 func (idoService *IOSDeviceOptionsService) DeleteIOSDeviceOptions(ctx context.Context, ID string, projectId int64) (err error) {
 	var ido platform.IOSDeviceOptions
@@ -32,14 +32,14 @@ func (idoService *IOSDeviceOptionsService) DeleteIOSDeviceOptions(ctx context.Co
 	return err
 }
 
-// DeleteIOSDeviceOptionsByIds 批量删除iOS设备选项记录
+// DeleteIOSDeviceOptionsByIds 批量删除iOS设备记录
 // Author [yourname](https://github.com/yourname)
 func (idoService *IOSDeviceOptionsService) DeleteIOSDeviceOptionsByIds(ctx context.Context, IDs []string) (err error) {
 	err = global.GVA_DB.Delete(&[]platform.IOSDeviceOptions{}, "id in ?", IDs).Error
 	return err
 }
 
-// UpdateIOSDeviceOptions 更新iOS设备选项记录
+// UpdateIOSDeviceOptions 更新iOS设备记录
 // Author [yourname](https://github.com/yourname)
 func (idoService *IOSDeviceOptionsService) UpdateIOSDeviceOptions(ctx context.Context, ido platform.IOSDeviceOptions, projectId int64) (err error) {
 	var oldIOSDeviceOptions platform.IOSDeviceOptions
@@ -55,14 +55,14 @@ func (idoService *IOSDeviceOptionsService) UpdateIOSDeviceOptions(ctx context.Co
 	return err
 }
 
-// GetIOSDeviceOptions 根据ID获取iOS设备选项记录
+// GetIOSDeviceOptions 根据ID获取iOS设备记录
 // Author [yourname](https://github.com/yourname)
 func (idoService *IOSDeviceOptionsService) GetIOSDeviceOptions(ctx context.Context, ID string) (ido platform.IOSDeviceOptions, err error) {
 	err = global.GVA_DB.Where("id = ?", ID).First(&ido).Error
 	return
 }
 
-// GetIOSDeviceOptionsInfoList 分页获取iOS设备选项记录
+// GetIOSDeviceOptionsInfoList 分页获取iOS设备记录
 // Author [yourname](https://github.com/yourname)
 func (idoService *IOSDeviceOptionsService) GetIOSDeviceOptionsInfoList(ctx context.Context, info platformReq.IOSDeviceOptionsSearch) (list []platform.IOSDeviceOptions, total int64, err error) {
 	limit := info.PageSize

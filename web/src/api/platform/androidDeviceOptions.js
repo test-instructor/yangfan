@@ -3,11 +3,11 @@ import { useUserStore } from '@/pinia/modules/user'
 const userStore = useUserStore()
 const projectId = userStore.userInfo.projectId
 // @Tags AndroidDeviceOptions
-// @Summary 创建设备选项
+// @Summary 创建安卓设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data body model.AndroidDeviceOptions true "创建设备选项"
+// @Param data body model.AndroidDeviceOptions true "创建安卓设备"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"创建成功"}"
 // @Router /ado/createAndroidDeviceOptions [post]
 export const createAndroidDeviceOptions = (data) => {
@@ -20,11 +20,11 @@ export const createAndroidDeviceOptions = (data) => {
 }
 
 // @Tags AndroidDeviceOptions
-// @Summary 删除设备选项
+// @Summary 删除安卓设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data body model.AndroidDeviceOptions true "删除设备选项"
+// @Param data body model.AndroidDeviceOptions true "删除安卓设备"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
 // @Router /ado/deleteAndroidDeviceOptions [delete]
 export const deleteAndroidDeviceOptions = (params) => {
@@ -37,11 +37,11 @@ export const deleteAndroidDeviceOptions = (params) => {
 }
 
 // @Tags AndroidDeviceOptions
-// @Summary 批量删除设备选项
+// @Summary 批量删除安卓设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data body request.IdsReq true "批量删除设备选项"
+// @Param data body request.IdsReq true "批量删除安卓设备"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
 // @Router /ado/deleteAndroidDeviceOptions [delete]
 export const deleteAndroidDeviceOptionsByIds = (params) => {
@@ -54,11 +54,11 @@ export const deleteAndroidDeviceOptionsByIds = (params) => {
 }
 
 // @Tags AndroidDeviceOptions
-// @Summary 更新设备选项
+// @Summary 更新安卓设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data body model.AndroidDeviceOptions true "更新设备选项"
+// @Param data body model.AndroidDeviceOptions true "更新安卓设备"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
 // @Router /ado/updateAndroidDeviceOptions [put]
 export const updateAndroidDeviceOptions = (data) => {
@@ -71,11 +71,11 @@ export const updateAndroidDeviceOptions = (data) => {
 }
 
 // @Tags AndroidDeviceOptions
-// @Summary 用id查询设备选项
+// @Summary 用id查询安卓设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data query model.AndroidDeviceOptions true "用id查询设备选项"
+// @Param data query model.AndroidDeviceOptions true "用id查询安卓设备"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
 // @Router /ado/findAndroidDeviceOptions [get]
 export const findAndroidDeviceOptions = (params) => {
@@ -88,11 +88,11 @@ export const findAndroidDeviceOptions = (params) => {
 }
 
 // @Tags AndroidDeviceOptions
-// @Summary 分页获取设备选项列表
+// @Summary 分页获取安卓设备列表
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data query request.PageInfo true "分页获取设备选项列表"
+// @Param data query request.PageInfo true "分页获取安卓设备列表"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /ado/getAndroidDeviceOptionsList [get]
 export const getAndroidDeviceOptionsList = (params) => {
@@ -105,10 +105,10 @@ export const getAndroidDeviceOptionsList = (params) => {
 }
 
 // @Tags AndroidDeviceOptions
-// @Summary 不需要鉴权的设备选项接口
+// @Summary 不需要鉴权的安卓设备接口
 // @Accept application/json
 // @Produce application/json
-// @Param data query platformReq.AndroidDeviceOptionsSearch true "分页获取设备选项列表"
+// @Param data query platformReq.AndroidDeviceOptionsSearch true "分页获取安卓设备列表"
 // @Success 200 {object} response.Response{data=object,msg=string} "获取成功"
 // @Router /ado/getAndroidDeviceOptionsPublic [get]
 export const getAndroidDeviceOptionsPublic = () => {

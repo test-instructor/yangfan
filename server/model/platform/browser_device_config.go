@@ -5,7 +5,7 @@ import (
 	"github.com/test-instructor/yangfan/server/v2/global"
 )
 
-// 浏览器设备选项 结构体  BrowserDeviceOptions
+// 浏览器设备 结构体  BrowserDeviceOptions
 type BrowserDeviceOptions struct {
 	global.GVA_MODEL
 	BrowserID   *string `json:"browserId" form:"browserId" gorm:"comment:浏览器标识ID;column:browser_id;size:255;"`    //浏览器标识
@@ -17,7 +17,7 @@ type BrowserDeviceOptions struct {
 	ProjectId int64 `json:"projectId" form:"projectId" gorm:"column:project_id;"` //项目信息
 }
 
-// TableName 浏览器设备选项 BrowserDeviceOptions自定义表名 browser_device_options
+// TableName 浏览器设备 BrowserDeviceOptions自定义表名 browser_device_options
 func (BrowserDeviceOptions) TableName() string {
 	return "lc_browser_device_options"
 }

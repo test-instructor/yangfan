@@ -12,13 +12,13 @@ import (
 
 type HarmonyDeviceOptionsApi struct{}
 
-// CreateHarmonyDeviceOptions 创建设备选项
+// CreateHarmonyDeviceOptions 创建鸿蒙设备
 // @Tags HarmonyDeviceOptions
-// @Summary 创建设备选项
+// @Summary 创建鸿蒙设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data body platform.HarmonyDeviceOptions true "创建设备选项"
+// @Param data body platform.HarmonyDeviceOptions true "创建鸿蒙设备"
 // @Success 200 {object} response.Response{msg=string} "创建成功"
 // @Router /hdo/createHarmonyDeviceOptions [post]
 func (hdoApi *HarmonyDeviceOptionsApi) CreateHarmonyDeviceOptions(c *gin.Context) {
@@ -40,13 +40,13 @@ func (hdoApi *HarmonyDeviceOptionsApi) CreateHarmonyDeviceOptions(c *gin.Context
 	response.OkWithMessage("创建成功", c)
 }
 
-// DeleteHarmonyDeviceOptions 删除设备选项
+// DeleteHarmonyDeviceOptions 删除鸿蒙设备
 // @Tags HarmonyDeviceOptions
-// @Summary 删除设备选项
+// @Summary 删除鸿蒙设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data body platform.HarmonyDeviceOptions true "删除设备选项"
+// @Param data body platform.HarmonyDeviceOptions true "删除鸿蒙设备"
 // @Success 200 {object} response.Response{msg=string} "删除成功"
 // @Router /hdo/deleteHarmonyDeviceOptions [delete]
 func (hdoApi *HarmonyDeviceOptionsApi) DeleteHarmonyDeviceOptions(c *gin.Context) {
@@ -64,9 +64,9 @@ func (hdoApi *HarmonyDeviceOptionsApi) DeleteHarmonyDeviceOptions(c *gin.Context
 	response.OkWithMessage("删除成功", c)
 }
 
-// DeleteHarmonyDeviceOptionsByIds 批量删除设备选项
+// DeleteHarmonyDeviceOptionsByIds 批量删除鸿蒙设备
 // @Tags HarmonyDeviceOptions
-// @Summary 批量删除设备选项
+// @Summary 批量删除鸿蒙设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
@@ -86,13 +86,13 @@ func (hdoApi *HarmonyDeviceOptionsApi) DeleteHarmonyDeviceOptionsByIds(c *gin.Co
 	response.OkWithMessage("批量删除成功", c)
 }
 
-// UpdateHarmonyDeviceOptions 更新设备选项
+// UpdateHarmonyDeviceOptions 更新鸿蒙设备
 // @Tags HarmonyDeviceOptions
-// @Summary 更新设备选项
+// @Summary 更新鸿蒙设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data body platform.HarmonyDeviceOptions true "更新设备选项"
+// @Param data body platform.HarmonyDeviceOptions true "更新鸿蒙设备"
 // @Success 200 {object} response.Response{msg=string} "更新成功"
 // @Router /hdo/updateHarmonyDeviceOptions [put]
 func (hdoApi *HarmonyDeviceOptionsApi) UpdateHarmonyDeviceOptions(c *gin.Context) {
@@ -115,13 +115,13 @@ func (hdoApi *HarmonyDeviceOptionsApi) UpdateHarmonyDeviceOptions(c *gin.Context
 	response.OkWithMessage("更新成功", c)
 }
 
-// FindHarmonyDeviceOptions 用id查询设备选项
+// FindHarmonyDeviceOptions 用id查询鸿蒙设备
 // @Tags HarmonyDeviceOptions
-// @Summary 用id查询设备选项
+// @Summary 用id查询鸿蒙设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param ID query uint true "用id查询设备选项"
+// @Param ID query uint true "用id查询鸿蒙设备"
 // @Success 200 {object} response.Response{data=platform.HarmonyDeviceOptions,msg=string} "查询成功"
 // @Router /hdo/findHarmonyDeviceOptions [get]
 func (hdoApi *HarmonyDeviceOptionsApi) FindHarmonyDeviceOptions(c *gin.Context) {
@@ -138,13 +138,13 @@ func (hdoApi *HarmonyDeviceOptionsApi) FindHarmonyDeviceOptions(c *gin.Context) 
 	response.OkWithData(rehdo, c)
 }
 
-// GetHarmonyDeviceOptionsList 分页获取设备选项列表
+// GetHarmonyDeviceOptionsList 分页获取鸿蒙设备列表
 // @Tags HarmonyDeviceOptions
-// @Summary 分页获取设备选项列表
+// @Summary 分页获取鸿蒙设备列表
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data query platformReq.HarmonyDeviceOptionsSearch true "分页获取设备选项列表"
+// @Param data query platformReq.HarmonyDeviceOptionsSearch true "分页获取鸿蒙设备列表"
 // @Success 200 {object} response.Response{data=response.PageResult,msg=string} "获取成功"
 // @Router /hdo/getHarmonyDeviceOptionsList [get]
 func (hdoApi *HarmonyDeviceOptionsApi) GetHarmonyDeviceOptionsList(c *gin.Context) {
@@ -171,9 +171,9 @@ func (hdoApi *HarmonyDeviceOptionsApi) GetHarmonyDeviceOptionsList(c *gin.Contex
 	}, "获取成功", c)
 }
 
-// GetHarmonyDeviceOptionsPublic 不需要鉴权的设备选项接口
+// GetHarmonyDeviceOptionsPublic 不需要鉴权的鸿蒙设备接口
 // @Tags HarmonyDeviceOptions
-// @Summary 不需要鉴权的设备选项接口
+// @Summary 不需要鉴权的鸿蒙设备接口
 // @Accept application/json
 // @Produce application/json
 // @Success 200 {object} response.Response{data=object,msg=string} "获取成功"
@@ -186,6 +186,6 @@ func (hdoApi *HarmonyDeviceOptionsApi) GetHarmonyDeviceOptionsPublic(c *gin.Cont
 	// 示例为返回了一个固定的消息接口，一般本接口用于C端服务，需要自己实现业务逻辑
 	hdoService.GetHarmonyDeviceOptionsPublic(ctx)
 	response.OkWithDetailed(gin.H{
-		"info": "不需要鉴权的设备选项接口信息",
+		"info": "不需要鉴权的鸿蒙设备接口信息",
 	}, "获取成功", c)
 }

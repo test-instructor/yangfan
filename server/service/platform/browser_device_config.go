@@ -10,14 +10,14 @@ import (
 
 type BrowserDeviceOptionsService struct{}
 
-// CreateBrowserDeviceOptions 创建浏览器设备选项记录
+// CreateBrowserDeviceOptions 创建浏览器设备记录
 // Author [yourname](https://github.com/yourname)
 func (bdoService *BrowserDeviceOptionsService) CreateBrowserDeviceOptions(ctx context.Context, bdo *platform.BrowserDeviceOptions) (err error) {
 	err = global.GVA_DB.Create(bdo).Error
 	return err
 }
 
-// DeleteBrowserDeviceOptions 删除浏览器设备选项记录
+// DeleteBrowserDeviceOptions 删除浏览器设备记录
 // Author [yourname](https://github.com/yourname)
 func (bdoService *BrowserDeviceOptionsService) DeleteBrowserDeviceOptions(ctx context.Context, ID string, projectId int64) (err error) {
 	var bdo platform.BrowserDeviceOptions
@@ -32,14 +32,14 @@ func (bdoService *BrowserDeviceOptionsService) DeleteBrowserDeviceOptions(ctx co
 	return err
 }
 
-// DeleteBrowserDeviceOptionsByIds 批量删除浏览器设备选项记录
+// DeleteBrowserDeviceOptionsByIds 批量删除浏览器设备记录
 // Author [yourname](https://github.com/yourname)
 func (bdoService *BrowserDeviceOptionsService) DeleteBrowserDeviceOptionsByIds(ctx context.Context, IDs []string) (err error) {
 	err = global.GVA_DB.Delete(&[]platform.BrowserDeviceOptions{}, "id in ?", IDs).Error
 	return err
 }
 
-// UpdateBrowserDeviceOptions 更新浏览器设备选项记录
+// UpdateBrowserDeviceOptions 更新浏览器设备记录
 // Author [yourname](https://github.com/yourname)
 func (bdoService *BrowserDeviceOptionsService) UpdateBrowserDeviceOptions(ctx context.Context, bdo platform.BrowserDeviceOptions, projectId int64) (err error) {
 	var oldBrowserDeviceOptions platform.BrowserDeviceOptions
@@ -55,14 +55,14 @@ func (bdoService *BrowserDeviceOptionsService) UpdateBrowserDeviceOptions(ctx co
 	return err
 }
 
-// GetBrowserDeviceOptions 根据ID获取浏览器设备选项记录
+// GetBrowserDeviceOptions 根据ID获取浏览器设备记录
 // Author [yourname](https://github.com/yourname)
 func (bdoService *BrowserDeviceOptionsService) GetBrowserDeviceOptions(ctx context.Context, ID string) (bdo platform.BrowserDeviceOptions, err error) {
 	err = global.GVA_DB.Where("id = ?", ID).First(&bdo).Error
 	return
 }
 
-// GetBrowserDeviceOptionsInfoList 分页获取浏览器设备选项记录
+// GetBrowserDeviceOptionsInfoList 分页获取浏览器设备记录
 // Author [yourname](https://github.com/yourname)
 func (bdoService *BrowserDeviceOptionsService) GetBrowserDeviceOptionsInfoList(ctx context.Context, info platformReq.BrowserDeviceOptionsSearch) (list []platform.BrowserDeviceOptions, total int64, err error) {
 	limit := info.PageSize

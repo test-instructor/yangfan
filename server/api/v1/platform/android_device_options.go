@@ -12,13 +12,13 @@ import (
 
 type AndroidDeviceOptionsApi struct{}
 
-// CreateAndroidDeviceOptions 创建设备选项
+// CreateAndroidDeviceOptions 创建安卓设备
 // @Tags AndroidDeviceOptions
-// @Summary 创建设备选项
+// @Summary 创建安卓设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data body platform.AndroidDeviceOptions true "创建设备选项"
+// @Param data body platform.AndroidDeviceOptions true "创建安卓设备"
 // @Success 200 {object} response.Response{msg=string} "创建成功"
 // @Router /ado/createAndroidDeviceOptions [post]
 func (adoApi *AndroidDeviceOptionsApi) CreateAndroidDeviceOptions(c *gin.Context) {
@@ -40,13 +40,13 @@ func (adoApi *AndroidDeviceOptionsApi) CreateAndroidDeviceOptions(c *gin.Context
 	response.OkWithMessage("创建成功", c)
 }
 
-// DeleteAndroidDeviceOptions 删除设备选项
+// DeleteAndroidDeviceOptions 删除安卓设备
 // @Tags AndroidDeviceOptions
-// @Summary 删除设备选项
+// @Summary 删除安卓设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data body platform.AndroidDeviceOptions true "删除设备选项"
+// @Param data body platform.AndroidDeviceOptions true "删除安卓设备"
 // @Success 200 {object} response.Response{msg=string} "删除成功"
 // @Router /ado/deleteAndroidDeviceOptions [delete]
 func (adoApi *AndroidDeviceOptionsApi) DeleteAndroidDeviceOptions(c *gin.Context) {
@@ -64,9 +64,9 @@ func (adoApi *AndroidDeviceOptionsApi) DeleteAndroidDeviceOptions(c *gin.Context
 	response.OkWithMessage("删除成功", c)
 }
 
-// DeleteAndroidDeviceOptionsByIds 批量删除设备选项
+// DeleteAndroidDeviceOptionsByIds 批量删除安卓设备
 // @Tags AndroidDeviceOptions
-// @Summary 批量删除设备选项
+// @Summary 批量删除安卓设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
@@ -86,13 +86,13 @@ func (adoApi *AndroidDeviceOptionsApi) DeleteAndroidDeviceOptionsByIds(c *gin.Co
 	response.OkWithMessage("批量删除成功", c)
 }
 
-// UpdateAndroidDeviceOptions 更新设备选项
+// UpdateAndroidDeviceOptions 更新安卓设备
 // @Tags AndroidDeviceOptions
-// @Summary 更新设备选项
+// @Summary 更新安卓设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data body platform.AndroidDeviceOptions true "更新设备选项"
+// @Param data body platform.AndroidDeviceOptions true "更新安卓设备"
 // @Success 200 {object} response.Response{msg=string} "更新成功"
 // @Router /ado/updateAndroidDeviceOptions [put]
 func (adoApi *AndroidDeviceOptionsApi) UpdateAndroidDeviceOptions(c *gin.Context) {
@@ -115,13 +115,13 @@ func (adoApi *AndroidDeviceOptionsApi) UpdateAndroidDeviceOptions(c *gin.Context
 	response.OkWithMessage("更新成功", c)
 }
 
-// FindAndroidDeviceOptions 用id查询设备选项
+// FindAndroidDeviceOptions 用id查询安卓设备
 // @Tags AndroidDeviceOptions
-// @Summary 用id查询设备选项
+// @Summary 用id查询安卓设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param ID query uint true "用id查询设备选项"
+// @Param ID query uint true "用id查询安卓设备"
 // @Success 200 {object} response.Response{data=platform.AndroidDeviceOptions,msg=string} "查询成功"
 // @Router /ado/findAndroidDeviceOptions [get]
 func (adoApi *AndroidDeviceOptionsApi) FindAndroidDeviceOptions(c *gin.Context) {
@@ -138,13 +138,13 @@ func (adoApi *AndroidDeviceOptionsApi) FindAndroidDeviceOptions(c *gin.Context) 
 	response.OkWithData(reado, c)
 }
 
-// GetAndroidDeviceOptionsList 分页获取设备选项列表
+// GetAndroidDeviceOptionsList 分页获取安卓设备列表
 // @Tags AndroidDeviceOptions
-// @Summary 分页获取设备选项列表
+// @Summary 分页获取安卓设备列表
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data query platformReq.AndroidDeviceOptionsSearch true "分页获取设备选项列表"
+// @Param data query platformReq.AndroidDeviceOptionsSearch true "分页获取安卓设备列表"
 // @Success 200 {object} response.Response{data=response.PageResult,msg=string} "获取成功"
 // @Router /ado/getAndroidDeviceOptionsList [get]
 func (adoApi *AndroidDeviceOptionsApi) GetAndroidDeviceOptionsList(c *gin.Context) {
@@ -171,9 +171,9 @@ func (adoApi *AndroidDeviceOptionsApi) GetAndroidDeviceOptionsList(c *gin.Contex
 	}, "获取成功", c)
 }
 
-// GetAndroidDeviceOptionsPublic 不需要鉴权的设备选项接口
+// GetAndroidDeviceOptionsPublic 不需要鉴权的安卓设备接口
 // @Tags AndroidDeviceOptions
-// @Summary 不需要鉴权的设备选项接口
+// @Summary 不需要鉴权的安卓设备接口
 // @Accept application/json
 // @Produce application/json
 // @Success 200 {object} response.Response{data=object,msg=string} "获取成功"
@@ -186,6 +186,6 @@ func (adoApi *AndroidDeviceOptionsApi) GetAndroidDeviceOptionsPublic(c *gin.Cont
 	// 示例为返回了一个固定的消息接口，一般本接口用于C端服务，需要自己实现业务逻辑
 	adoService.GetAndroidDeviceOptionsPublic(ctx)
 	response.OkWithDetailed(gin.H{
-		"info": "不需要鉴权的设备选项接口信息",
+		"info": "不需要鉴权的安卓设备接口信息",
 	}, "获取成功", c)
 }

@@ -10,14 +10,14 @@ import (
 
 type AndroidDeviceOptionsService struct{}
 
-// CreateAndroidDeviceOptions 创建设备选项记录
+// CreateAndroidDeviceOptions 创建安卓设备记录
 // Author [yourname](https://github.com/yourname)
 func (adoService *AndroidDeviceOptionsService) CreateAndroidDeviceOptions(ctx context.Context, ado *platform.AndroidDeviceOptions) (err error) {
 	err = global.GVA_DB.Create(ado).Error
 	return err
 }
 
-// DeleteAndroidDeviceOptions 删除设备选项记录
+// DeleteAndroidDeviceOptions 删除安卓设备记录
 // Author [yourname](https://github.com/yourname)
 func (adoService *AndroidDeviceOptionsService) DeleteAndroidDeviceOptions(ctx context.Context, ID string, projectId int64) (err error) {
 	var ado platform.AndroidDeviceOptions
@@ -32,14 +32,14 @@ func (adoService *AndroidDeviceOptionsService) DeleteAndroidDeviceOptions(ctx co
 	return err
 }
 
-// DeleteAndroidDeviceOptionsByIds 批量删除设备选项记录
+// DeleteAndroidDeviceOptionsByIds 批量删除安卓设备记录
 // Author [yourname](https://github.com/yourname)
 func (adoService *AndroidDeviceOptionsService) DeleteAndroidDeviceOptionsByIds(ctx context.Context, IDs []string) (err error) {
 	err = global.GVA_DB.Delete(&[]platform.AndroidDeviceOptions{}, "id in ?", IDs).Error
 	return err
 }
 
-// UpdateAndroidDeviceOptions 更新设备选项记录
+// UpdateAndroidDeviceOptions 更新安卓设备记录
 // Author [yourname](https://github.com/yourname)
 func (adoService *AndroidDeviceOptionsService) UpdateAndroidDeviceOptions(ctx context.Context, ado platform.AndroidDeviceOptions, projectId int64) (err error) {
 	var oldAndroidDeviceOptions platform.AndroidDeviceOptions
@@ -55,14 +55,14 @@ func (adoService *AndroidDeviceOptionsService) UpdateAndroidDeviceOptions(ctx co
 	return err
 }
 
-// GetAndroidDeviceOptions 根据ID获取设备选项记录
+// GetAndroidDeviceOptions 根据ID获取安卓设备记录
 // Author [yourname](https://github.com/yourname)
 func (adoService *AndroidDeviceOptionsService) GetAndroidDeviceOptions(ctx context.Context, ID string) (ado platform.AndroidDeviceOptions, err error) {
 	err = global.GVA_DB.Where("id = ?", ID).First(&ado).Error
 	return
 }
 
-// GetAndroidDeviceOptionsInfoList 分页获取设备选项记录
+// GetAndroidDeviceOptionsInfoList 分页获取安卓设备记录
 // Author [yourname](https://github.com/yourname)
 func (adoService *AndroidDeviceOptionsService) GetAndroidDeviceOptionsInfoList(ctx context.Context, info platformReq.AndroidDeviceOptionsSearch) (list []platform.AndroidDeviceOptions, total int64, err error) {
 	limit := info.PageSize

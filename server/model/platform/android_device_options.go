@@ -5,7 +5,7 @@ import (
 	"github.com/test-instructor/yangfan/server/v2/global"
 )
 
-// 设备选项 结构体  AndroidDeviceOptions
+// 安卓设备 结构体  AndroidDeviceOptions
 type AndroidDeviceOptions struct {
 	global.GVA_MODEL
 	Name                      *string `json:"name" form:"name" gorm:"column:name;"`                                                                                                      //设备名称
@@ -24,7 +24,7 @@ type AndroidDeviceOptions struct {
 	ProjectId int64 `json:"projectId" form:"projectId" gorm:"column:project_id;"` //项目信息
 }
 
-// TableName 设备选项 AndroidDeviceOptions自定义表名 android_device_options
+// TableName 安卓设备 AndroidDeviceOptions自定义表名 android_device_options
 func (AndroidDeviceOptions) TableName() string {
 	return "lc_android_device_options"
 }

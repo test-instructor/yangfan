@@ -12,13 +12,13 @@ import (
 
 type IOSDeviceOptionsApi struct{}
 
-// CreateIOSDeviceOptions 创建iOS设备选项
+// CreateIOSDeviceOptions 创建iOS设备
 // @Tags IOSDeviceOptions
-// @Summary 创建iOS设备选项
+// @Summary 创建iOS设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data body platform.IOSDeviceOptions true "创建iOS设备选项"
+// @Param data body platform.IOSDeviceOptions true "创建iOS设备"
 // @Success 200 {object} response.Response{msg=string} "创建成功"
 // @Router /ido/createIOSDeviceOptions [post]
 func (idoApi *IOSDeviceOptionsApi) CreateIOSDeviceOptions(c *gin.Context) {
@@ -40,13 +40,13 @@ func (idoApi *IOSDeviceOptionsApi) CreateIOSDeviceOptions(c *gin.Context) {
 	response.OkWithMessage("创建成功", c)
 }
 
-// DeleteIOSDeviceOptions 删除iOS设备选项
+// DeleteIOSDeviceOptions 删除iOS设备
 // @Tags IOSDeviceOptions
-// @Summary 删除iOS设备选项
+// @Summary 删除iOS设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data body platform.IOSDeviceOptions true "删除iOS设备选项"
+// @Param data body platform.IOSDeviceOptions true "删除iOS设备"
 // @Success 200 {object} response.Response{msg=string} "删除成功"
 // @Router /ido/deleteIOSDeviceOptions [delete]
 func (idoApi *IOSDeviceOptionsApi) DeleteIOSDeviceOptions(c *gin.Context) {
@@ -64,9 +64,9 @@ func (idoApi *IOSDeviceOptionsApi) DeleteIOSDeviceOptions(c *gin.Context) {
 	response.OkWithMessage("删除成功", c)
 }
 
-// DeleteIOSDeviceOptionsByIds 批量删除iOS设备选项
+// DeleteIOSDeviceOptionsByIds 批量删除iOS设备
 // @Tags IOSDeviceOptions
-// @Summary 批量删除iOS设备选项
+// @Summary 批量删除iOS设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
@@ -86,13 +86,13 @@ func (idoApi *IOSDeviceOptionsApi) DeleteIOSDeviceOptionsByIds(c *gin.Context) {
 	response.OkWithMessage("批量删除成功", c)
 }
 
-// UpdateIOSDeviceOptions 更新iOS设备选项
+// UpdateIOSDeviceOptions 更新iOS设备
 // @Tags IOSDeviceOptions
-// @Summary 更新iOS设备选项
+// @Summary 更新iOS设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data body platform.IOSDeviceOptions true "更新iOS设备选项"
+// @Param data body platform.IOSDeviceOptions true "更新iOS设备"
 // @Success 200 {object} response.Response{msg=string} "更新成功"
 // @Router /ido/updateIOSDeviceOptions [put]
 func (idoApi *IOSDeviceOptionsApi) UpdateIOSDeviceOptions(c *gin.Context) {
@@ -115,13 +115,13 @@ func (idoApi *IOSDeviceOptionsApi) UpdateIOSDeviceOptions(c *gin.Context) {
 	response.OkWithMessage("更新成功", c)
 }
 
-// FindIOSDeviceOptions 用id查询iOS设备选项
+// FindIOSDeviceOptions 用id查询iOS设备
 // @Tags IOSDeviceOptions
-// @Summary 用id查询iOS设备选项
+// @Summary 用id查询iOS设备
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param ID query uint true "用id查询iOS设备选项"
+// @Param ID query uint true "用id查询iOS设备"
 // @Success 200 {object} response.Response{data=platform.IOSDeviceOptions,msg=string} "查询成功"
 // @Router /ido/findIOSDeviceOptions [get]
 func (idoApi *IOSDeviceOptionsApi) FindIOSDeviceOptions(c *gin.Context) {
@@ -138,13 +138,13 @@ func (idoApi *IOSDeviceOptionsApi) FindIOSDeviceOptions(c *gin.Context) {
 	response.OkWithData(reido, c)
 }
 
-// GetIOSDeviceOptionsList 分页获取iOS设备选项列表
+// GetIOSDeviceOptionsList 分页获取iOS设备列表
 // @Tags IOSDeviceOptions
-// @Summary 分页获取iOS设备选项列表
+// @Summary 分页获取iOS设备列表
 // @Security ApiKeyAuth
 // @Accept application/json
 // @Produce application/json
-// @Param data query platformReq.IOSDeviceOptionsSearch true "分页获取iOS设备选项列表"
+// @Param data query platformReq.IOSDeviceOptionsSearch true "分页获取iOS设备列表"
 // @Success 200 {object} response.Response{data=response.PageResult,msg=string} "获取成功"
 // @Router /ido/getIOSDeviceOptionsList [get]
 func (idoApi *IOSDeviceOptionsApi) GetIOSDeviceOptionsList(c *gin.Context) {
@@ -171,9 +171,9 @@ func (idoApi *IOSDeviceOptionsApi) GetIOSDeviceOptionsList(c *gin.Context) {
 	}, "获取成功", c)
 }
 
-// GetIOSDeviceOptionsPublic 不需要鉴权的iOS设备选项接口
+// GetIOSDeviceOptionsPublic 不需要鉴权的iOS设备接口
 // @Tags IOSDeviceOptions
-// @Summary 不需要鉴权的iOS设备选项接口
+// @Summary 不需要鉴权的iOS设备接口
 // @Accept application/json
 // @Produce application/json
 // @Success 200 {object} response.Response{data=object,msg=string} "获取成功"
@@ -186,6 +186,6 @@ func (idoApi *IOSDeviceOptionsApi) GetIOSDeviceOptionsPublic(c *gin.Context) {
 	// 示例为返回了一个固定的消息接口，一般本接口用于C端服务，需要自己实现业务逻辑
 	idoService.GetIOSDeviceOptionsPublic(ctx)
 	response.OkWithDetailed(gin.H{
-		"info": "不需要鉴权的iOS设备选项接口信息",
+		"info": "不需要鉴权的iOS设备接口信息",
 	}, "获取成功", c)
 }

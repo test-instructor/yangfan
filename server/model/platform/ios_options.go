@@ -5,7 +5,7 @@ import (
 	"github.com/test-instructor/yangfan/server/v2/global"
 )
 
-// iOS设备选项 结构体  IOSDeviceOptions
+// iOS设备 结构体  IOSDeviceOptions
 type IOSDeviceOptions struct {
 	global.GVA_MODEL
 	Name                       *string `json:"name" form:"name" gorm:"column:name;" binding:"required"`                                                                                       //设备名称
@@ -23,7 +23,7 @@ type IOSDeviceOptions struct {
 	ProjectId int64 `json:"projectId" form:"projectId" gorm:"column:project_id;"` //项目信息
 }
 
-// TableName iOS设备选项 IOSDeviceOptions自定义表名 ios_device_options
+// TableName iOS设备 IOSDeviceOptions自定义表名 ios_device_options
 func (IOSDeviceOptions) TableName() string {
 	return "lc_ios_device_options"
 }

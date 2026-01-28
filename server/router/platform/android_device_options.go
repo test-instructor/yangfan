@@ -7,22 +7,22 @@ import (
 
 type AndroidDeviceOptionsRouter struct{}
 
-// InitAndroidDeviceOptionsRouter 初始化 设备选项 路由信息
+// InitAndroidDeviceOptionsRouter 初始化 安卓设备 路由信息
 func (s *AndroidDeviceOptionsRouter) InitAndroidDeviceOptionsRouter(Router *gin.RouterGroup, PublicRouter *gin.RouterGroup) {
 	adoRouter := Router.Group("ado").Use(middleware.OperationRecord())
 	adoRouterWithoutRecord := Router.Group("ado")
 	adoRouterWithoutAuth := PublicRouter.Group("ado")
 	{
-		adoRouter.POST("createAndroidDeviceOptions", adoApi.CreateAndroidDeviceOptions)             // 新建设备选项
-		adoRouter.DELETE("deleteAndroidDeviceOptions", adoApi.DeleteAndroidDeviceOptions)           // 删除设备选项
-		adoRouter.DELETE("deleteAndroidDeviceOptionsByIds", adoApi.DeleteAndroidDeviceOptionsByIds) // 批量删除设备选项
-		adoRouter.PUT("updateAndroidDeviceOptions", adoApi.UpdateAndroidDeviceOptions)              // 更新设备选项
+		adoRouter.POST("createAndroidDeviceOptions", adoApi.CreateAndroidDeviceOptions)             // 新建安卓设备
+		adoRouter.DELETE("deleteAndroidDeviceOptions", adoApi.DeleteAndroidDeviceOptions)           // 删除安卓设备
+		adoRouter.DELETE("deleteAndroidDeviceOptionsByIds", adoApi.DeleteAndroidDeviceOptionsByIds) // 批量删除安卓设备
+		adoRouter.PUT("updateAndroidDeviceOptions", adoApi.UpdateAndroidDeviceOptions)              // 更新安卓设备
 	}
 	{
-		adoRouterWithoutRecord.GET("findAndroidDeviceOptions", adoApi.FindAndroidDeviceOptions)       // 根据ID获取设备选项
-		adoRouterWithoutRecord.GET("getAndroidDeviceOptionsList", adoApi.GetAndroidDeviceOptionsList) // 获取设备选项列表
+		adoRouterWithoutRecord.GET("findAndroidDeviceOptions", adoApi.FindAndroidDeviceOptions)       // 根据ID获取安卓设备
+		adoRouterWithoutRecord.GET("getAndroidDeviceOptionsList", adoApi.GetAndroidDeviceOptionsList) // 获取安卓设备列表
 	}
 	{
-		adoRouterWithoutAuth.GET("getAndroidDeviceOptionsPublic", adoApi.GetAndroidDeviceOptionsPublic) // 设备选项开放接口
+		adoRouterWithoutAuth.GET("getAndroidDeviceOptionsPublic", adoApi.GetAndroidDeviceOptionsPublic) // 安卓设备开放接口
 	}
 }
