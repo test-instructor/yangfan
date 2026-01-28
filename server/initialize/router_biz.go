@@ -45,7 +45,7 @@ func initBizRouter(routers ...*gin.RouterGroup) {
 		platformRouter.InitLLMModelConfigRouter(privateGroup, publicGroup)
 		platformRouter.InitAndroidDeviceOptionsRouter(privateGroup, publicGroup)
 		platformRouter.InitIOSDeviceOptionsRouter(privateGroup, publicGroup)
-		platformRouter.InitHarmonyDeviceOptionsRouter(privateGroup, publicGroup) // 占位方法，保证文件可以正确加载，避免go空变量检测报错，请勿删除。
+		platformRouter.InitHarmonyDeviceOptionsRouter(privateGroup, publicGroup)
 		platformRouter.InitBrowserDeviceOptionsRouter(privateGroup, publicGroup)
 	}
 	{
@@ -62,3 +62,5 @@ func initBizRouter(routers ...*gin.RouterGroup) {
 		datawarehouseRouter.InitDataCategoryManagementRouter(privateGroup, publicGroup)
 	}
 }
+
+// 占位方法，保证文件可以正确加载，避免go空变量检测报错，请勿删除。

@@ -32,7 +32,7 @@
                 />
               </el-form-item>
 
-              <el-form-item label="接口名称" prop="name" class="search-item">
+              <el-form-item :label="currentPlatform === 'api' ? '接口名称' : '步骤名称'" prop="name" class="search-item">
                 <el-input v-model="searchInfo.name" placeholder="搜索条件" clearable prefix-icon="Search" />
               </el-form-item>
 
@@ -48,7 +48,7 @@
           </div>
           <div class="action-buttons">
             <el-button type="primary" icon="plus" @click="openDialog('create')">新增</el-button>
-            <el-button type="primary" icon="upload" @click="openCurlImport">导入CURL</el-button>
+            <el-button v-if="currentPlatform === 'api'" type="primary" icon="upload" @click="openCurlImport">导入CURL</el-button>
             <el-button icon="delete" :disabled="!multipleSelection.length" @click="onDelete">删除</el-button>
           </div>
           <div class="table-wrapper">
@@ -56,7 +56,7 @@
               ref="multipleTable"
               style="width: 100%"
               :show-header="false"
-              :data="tableData"
+              :data="filteredTableData"
               row-key="ID"
               @selection-change="handleSelectionChange"
               :cell-style="{ paddingTop: '4px', paddingBottom: '4px' }"
@@ -135,6 +135,11 @@
                     <Runner case_type="api" :case_id="scope.row.ID" style="margin-right: 10px;"/>
                     <el-button
                       type="text"
+                      class="table-button"
+                      @click="getDetails(scope.row)"
+                    >查看</el-button>
+                    <el-button
+                      type="text"
                       icon="edit"
                       class="table-button"
                       @click="updateAutoStepFunc(scope.row)"
@@ -191,48 +196,71 @@
                :close-on-press-escape="false"
                :close-on-click-modal="false"
                top="0"
-               :title="type === 'create' ? '新增接口' :type === 'update' ? '编辑接口' :'复制接口'"
+               :title="dialogTitle"
     >
       <stepForm
+        v-if="currentPlatform === 'api'"
         :menu="menuId"
         :formData="formData"
         :stepType="type"
+        @close="closeDialog"
+      />
+      <uiStepForm
+        v-else
+        :menu="menuId"
+        :formData="formData"
+        :stepType="type"
+        :platform="dialogPlatform"
         @close="closeDialog"
       />
     </el-dialog>
     <el-drawer destroy-on-close :size="appStore.drawerSize" v-model="detailShow" :show-close="true"
                :before-close="closeDetailShow" title="查看">
       <el-descriptions :column="1" border>
-        <el-descriptions-item label="接口名称">
+        <el-descriptions-item :label="detailPlatform === 'api' ? '接口名称' : '步骤名称'">
           {{ detailForm.name }}
         </el-descriptions-item>
-        <el-descriptions-item label="变量">
-          {{ detailForm.variables }}
-        </el-descriptions-item>
-        <el-descriptions-item label="参数">
-          {{ detailForm.parameters }}
-        </el-descriptions-item>
-        <el-descriptions-item label="设置钩子">
-          <ArrayCtrl v-model="detailForm.setup_hooks" />
-        </el-descriptions-item>
-        <el-descriptions-item label="清理钩子">
-          <ArrayCtrl v-model="detailForm.teardown_hooks" />
-        </el-descriptions-item>
-        <el-descriptions-item label="提取">
-          {{ detailForm.extract }}
-        </el-descriptions-item>
-        <el-descriptions-item label="验证器">
-          <ArrayCtrl v-model="detailForm.validate" />
-        </el-descriptions-item>
-        <el-descriptions-item label="步骤导出">
-          <ArrayCtrl v-model="detailForm.export" />
-        </el-descriptions-item>
-        <el-descriptions-item label="循环次数">
-          {{ detailForm.loops }}
-        </el-descriptions-item>
-        <el-descriptions-item label="忽略弹出窗口">
-          {{ detailForm.ignore_popup }}
-        </el-descriptions-item>
+
+        <template v-if="detailPlatform !== 'api'">
+          <el-descriptions-item label="设备">
+            <el-select v-model="detailDeviceSerial" :placeholder="detailDevicePlaceholder" disabled clearable filterable style="width: 420px">
+              <el-option v-for="item in deviceOptions" :key="item.ID" :label="getDeviceLabel(item)" :value="getDeviceValue(item)" />
+            </el-select>
+          </el-descriptions-item>
+          <el-descriptions-item label="动作数量">
+            {{ detailActionsCount }}
+          </el-descriptions-item>
+        </template>
+
+        <template v-else>
+          <el-descriptions-item label="变量">
+            {{ detailForm.variables }}
+          </el-descriptions-item>
+          <el-descriptions-item label="参数">
+            {{ detailForm.parameters }}
+          </el-descriptions-item>
+          <el-descriptions-item label="设置钩子">
+            <ArrayCtrl v-model="detailForm.setup_hooks" />
+          </el-descriptions-item>
+          <el-descriptions-item label="清理钩子">
+            <ArrayCtrl v-model="detailForm.teardown_hooks" />
+          </el-descriptions-item>
+          <el-descriptions-item label="提取">
+            {{ detailForm.extract }}
+          </el-descriptions-item>
+          <el-descriptions-item label="验证器">
+            <ArrayCtrl v-model="detailForm.validate" />
+          </el-descriptions-item>
+          <el-descriptions-item label="步骤导出">
+            <ArrayCtrl v-model="detailForm.export" />
+          </el-descriptions-item>
+          <el-descriptions-item label="循环次数">
+            {{ detailForm.loops }}
+          </el-descriptions-item>
+          <el-descriptions-item label="忽略弹出窗口">
+            {{ detailForm.ignore_popup }}
+          </el-descriptions-item>
+        </template>
       </el-descriptions>
     </el-drawer>
     <CurlImport ref="curlImportRef" @success="handleCurlSuccess" />
@@ -252,6 +280,7 @@
   import ArrayCtrl from '@/components/arrayCtrl/arrayCtrl.vue'
   import ApiMenu from '@/components/platform/menu/index.vue'
   import stepForm from '@/components/platform/step/index.vue'
+  import uiStepForm from '@/components/platform/step/ui.vue'
   // 全量引入格式化工具 请按需保留
   import {
     getDictFunc,
@@ -264,21 +293,57 @@
   } from '@/utils/format'
   import Runner from '@/components/platform/Runner.vue'
   import { ElMessage, ElMessageBox } from 'element-plus'
-  import { ref, reactive, computed } from 'vue'
+  import { ref, reactive, computed, watch } from 'vue'
   import { useAppStore } from '@/pinia'
   import CurlImport from '@/components/curlImport/index.vue'
   import { useRoute } from 'vue-router'
+  import { getAndroidDeviceOptionsList } from '@/api/platform/androidDeviceOptions'
+  import { getIOSDeviceOptionsList } from '@/api/platform/iosOptions'
+  import { getHarmonyDeviceOptionsList } from '@/api/platform/harmonyDeviceOption'
+  import { getBrowserDeviceOptionsList } from '@/api/platform/browserDeviceConfig'
 
   const route = useRoute()
   const appStore = useAppStore()
 
-  // 计算当前平台类型（默认为 api）
-  const currentPlatform = computed(() => route.meta?.type || 'api')
+  const normalizePlatform = (val) => {
+    const raw = String(val || '').trim().toLowerCase()
+    if (!raw) return 'api'
+    if (raw === 'web') return 'browser'
+    return raw
+  }
+
+  // 计算当前平台类型（优先 query.type，其次 meta.type，默认为 api）
+  const currentPlatform = computed(() => {
+    const hasQueryType = route.query?.type !== undefined && route.query?.type !== null && String(route.query.type).trim() !== ''
+    if (hasQueryType) return normalizePlatform(route.query.type)
+    return normalizePlatform(route.meta?.type) || 'api'
+  })
+
+  const isUIStep = computed(() => ['android', 'ios', 'harmony', 'browser'].includes(currentPlatform.value))
+
+  // 行为控制标记（弹窗内部需要增还是改）
+  const type = ref('')
+  const dialogPlatform = ref(currentPlatform.value)
+  const detailPlatform = ref(currentPlatform.value)
+
+  const detectStepPlatform = (data) => {
+    if (data?.request) return 'api'
+    for (const p of ['android', 'ios', 'harmony', 'browser']) {
+      if (data?.[p]) return p
+    }
+    return currentPlatform.value || 'api'
+  }
+
+  const dialogTitle = computed(() => {
+    const subject = dialogPlatform.value === 'api' ? '接口' : '步骤'
+    if (type.value === 'create') return `新增${subject}`
+    if (type.value === 'update') return `编辑${subject}`
+    return `复制${subject}`
+  })
   
   // 计算当前 MenuType（默认为 1）
   const currentMenuType = computed(() => {
-      // 优先使用 meta 定义的 menuType
-      if (route.meta?.menuType) return String(route.meta.menuType)
+      const hasQueryType = route.query?.type !== undefined && route.query?.type !== null && String(route.query.type).trim() !== ''
       // 否则根据 type 推断
       const typeMap = {
           'api': '1',
@@ -287,6 +352,8 @@
           'harmony': '300',
           'browser': '400'
       }
+      if (hasQueryType) return typeMap[currentPlatform.value] || '1'
+      if (route.meta?.menuType) return String(route.meta.menuType)
       return typeMap[currentPlatform.value] || '1'
   })
 
@@ -375,6 +442,13 @@
   const total = ref(0)
   const pageSize = ref(10)
   const tableData = ref([])
+  const filteredTableData = computed(() => {
+    const list = tableData.value || []
+    if (currentPlatform.value === 'api') {
+      return list.filter(item => item?.request || item?.gRPC)
+    }
+    return list.filter(item => item?.[currentPlatform.value])
+  })
   const searchInfo = ref({})
   // 排序
   const sortChange = ({ prop, order }) => {
@@ -497,15 +571,13 @@
     })
   }
 
-  // 行为控制标记（弹窗内部需要增还是改）
-  const type = ref('')
-
   // 更新行
   const updateAutoStepFunc = async (row) => {
     const res = await findAutoStep({ ID: row.ID })
     type.value = 'update'
     if (res.code === 0) {
       formData.value = res.data
+      dialogPlatform.value = detectStepPlatform(res.data)
       dialogFormVisible.value = true
     }
   }
@@ -515,9 +587,12 @@
     type.value = 'copy'
     if (res.code === 0) {
       formData.value = res.data
+      dialogPlatform.value = detectStepPlatform(res.data)
       formData.value.parentId = formData.value.ID
       formData.value.ID = 0
-      formData.value.request.ID = 0
+      if (formData.value.request) {
+        formData.value.request.ID = 0
+      }
       dialogFormVisible.value = true
     }
   }
@@ -544,6 +619,37 @@
   // 打开弹窗
   const openDialog = (v) => {
     type.value = v
+    dialogPlatform.value = currentPlatform.value
+    if (v === 'create') {
+      if (currentPlatform.value === 'api') {
+        formData.value = {
+          name: '',
+          loops: 0,
+          retry: 0,
+          request: {
+            method: '',
+            url: '',
+            header_temp: [],
+            headers: {},
+            param_temp: [],
+            params: {},
+            json: {},
+            data_warehouse: {}
+          },
+          parameters: {},
+          parameters_temp: {},
+          menu: 0
+        }
+      } else {
+        formData.value = {
+          name: '',
+          loops: 0,
+          retry: 0,
+          [currentPlatform.value]: { actions: [] },
+          menu: 0
+        }
+      }
+    }
     dialogFormVisible.value = true
   }
 
@@ -552,6 +658,7 @@
     getTableData()
     formData.value = {}
     dialogFormVisible.value = false
+    dialogPlatform.value = currentPlatform.value
 
   }
   // 弹窗确定
@@ -585,6 +692,100 @@
   }
 
   const detailForm = ref({})
+  const deviceOptions = ref([])
+  const detailDeviceSerial = ref('')
+  const isUIDetailStep = computed(() => ['android', 'ios', 'harmony', 'browser'].includes(detailPlatform.value))
+
+  const detailDevicePlaceholder = computed(() => {
+    switch (detailPlatform.value) {
+      case 'android':
+        return '请选择安卓设备'
+      case 'ios':
+        return '请选择iOS设备'
+      case 'harmony':
+        return '请选择鸿蒙设备'
+      case 'browser':
+        return '请选择浏览器'
+      default:
+        return '请选择设备'
+    }
+  })
+
+  const detailActionsCount = computed(() => {
+    if (!isUIDetailStep.value) return 0
+    const actions = detailForm.value?.[detailPlatform.value]?.actions || []
+    return Array.isArray(actions) ? actions.length : 0
+  })
+
+  const getDeviceLabel = (item) => {
+    if (!item) return ''
+    switch (detailPlatform.value) {
+      case 'android':
+        return item.name || item.serial || ''
+      case 'ios':
+        return item.name || item.udid || ''
+      case 'harmony':
+        return item.name || item.connectKey || ''
+      case 'browser':
+        return item.browserId || ''
+      default:
+        return item.name || ''
+    }
+  }
+
+  const getDeviceValue = (item) => {
+    if (!item) return ''
+    switch (detailPlatform.value) {
+      case 'android':
+        return item.serial || ''
+      case 'ios':
+        return item.udid || ''
+      case 'harmony':
+        return item.connectKey || ''
+      case 'browser':
+        return item.browserId || ''
+      default:
+        return ''
+    }
+  }
+
+  const fetchDeviceOptions = async (platform) => {
+    deviceOptions.value = []
+    if (!['android', 'ios', 'harmony', 'browser'].includes(platform)) return
+    let res
+    switch (platform) {
+      case 'android':
+        res = await getAndroidDeviceOptionsList({ page: 1, pageSize: 999 })
+        break
+      case 'ios':
+        res = await getIOSDeviceOptionsList({ page: 1, pageSize: 999 })
+        break
+      case 'harmony':
+        res = await getHarmonyDeviceOptionsList({ page: 1, pageSize: 999 })
+        break
+      case 'browser':
+        res = await getBrowserDeviceOptionsList({ page: 1, pageSize: 999 })
+        break
+    }
+    if (res?.code === 0) {
+      deviceOptions.value = res.data?.list || []
+    }
+  }
+
+  const extractDeviceSerialFromDetail = () => {
+    if (!isUIDetailStep.value) {
+      detailDeviceSerial.value = ''
+      return
+    }
+    const actions = detailForm.value?.[detailPlatform.value]?.actions || []
+    const serials = new Set(
+      (actions || [])
+        .map(a => a?.options?.serial)
+        .filter(v => typeof v === 'string' && v.trim() !== '')
+    )
+    if (serials.size === 1) detailDeviceSerial.value = Array.from(serials)[0]
+    else detailDeviceSerial.value = ''
+  }
 
   // 查看详情控制标记
   const detailShow = ref(false)
@@ -602,18 +803,35 @@
     const res = await findAutoStep({ ID: row.ID })
     if (res.code === 0) {
       detailForm.value = res.data
+      detailPlatform.value = detectStepPlatform(res.data)
+      await fetchDeviceOptions(detailPlatform.value)
+      extractDeviceSerialFromDetail()
       openDetailShow()
     }
   }
+
+  watch(detailPlatform, () => {
+    if (!detailShow.value) return
+    fetchDeviceOptions(detailPlatform.value).then(() => extractDeviceSerialFromDetail())
+  })
 
 
   // 关闭详情弹窗
   const closeDetailShow = () => {
     detailShow.value = false
     detailForm.value = {}
+    detailPlatform.value = currentPlatform.value
   }
 
   const menuId = ref(null)
+  watch(() => [currentPlatform.value, currentMenuType.value], () => {
+    menuId.value = null
+    delete searchInfo.value.menu
+    multipleSelection.value = []
+    page.value = 1
+    getTableData()
+  })
+
   const handleMenuClick = (id) => {
     menuId.value = id
     // 可以在这里添加根据菜单ID筛选表格数据的逻辑

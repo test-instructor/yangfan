@@ -53,9 +53,11 @@ func (asService *AutoStepService) UpdateAutoStep(ctx context.Context, as automat
 		return errors.New("没有该项目的操作权限")
 	}
 
-	err = global.GVA_DB.Model(&automation.Request{}).Where("id = ?", as.RequestID).Save(as.Request).Error
-	if err != nil {
-		return err
+	if as.RequestID != 0 && as.Request != nil {
+		err = global.GVA_DB.Model(&automation.Request{}).Where("id = ?", as.RequestID).Save(as.Request).Error
+		if err != nil {
+			return err
+		}
 	}
 	err = global.GVA_DB.Model(&automation.AutoStep{}).Where("id = ?", as.ID).Updates(&as).Error
 
