@@ -6,22 +6,88 @@
           <el-input v-model="formData.name" :clearable="false" placeholder="请输入步骤名称" />
         </el-form-item>
 
-        <el-form-item label="设备:" class="form-item-width">
-          <el-select v-model="deviceSerial" :placeholder="devicePlaceholder" clearable filterable style="width: 420px" @change="handleDeviceChange">
-            <el-option v-for="item in deviceOptions" :key="item.ID" :label="getDeviceLabel(item)" :value="getDeviceValue(item)" />
-          </el-select>
-          <el-button type="primary" plain style="margin-left: 10px" :disabled="!deviceSerial" @click="applyDeviceToAllActions">
-            应用到全部动作
-          </el-button>
-        </el-form-item>
+        <el-form-item>
+          <div style="height: 560px;width: 1200px">
+            <el-tabs v-model="activeTab">
+              <el-tab-pane label="动作列表" name="actions">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                  <span style="width: 64px; color: #606266;">设备</span>
+                  <el-select v-model="deviceSerial" :placeholder="devicePlaceholder" clearable filterable style="width: 420px" @change="handleDeviceChange">
+                    <el-option v-for="item in deviceOptions" :key="item.ID" :label="getDeviceLabel(item)" :value="getDeviceValue(item)" />
+                  </el-select>
+                  <el-button type="primary" plain :disabled="!deviceSerial" @click="applyDeviceToAllActions">
+                    应用到全部动作
+                  </el-button>
+                </div>
+                <MobileActionList v-model="actions" />
+              </el-tab-pane>
 
-        <el-form-item label="动作列表:">
-          <MobileActionList v-model="currentActions" />
+              <el-tab-pane label="跳过执行" name="skip">
+                <Validate
+                  :validate="formData?.skip_temp ?? []"
+                  :heights="500"
+                  idName="skip"
+                  @jsonData="handleJsonDataSkip"
+                />
+              </el-tab-pane>
+              <el-tab-pane label="变量" name="variables">
+                <Variables
+                  :variables="formData?.variables_temp ?? []"
+                  :heights="500"
+                  @variablesData="handleVariablesData"
+                />
+              </el-tab-pane>
+              <el-tab-pane label="参数提取" name="extract">
+                <Extractor
+                  :extract="formData?.extract_temp ?? []"
+                  :heights="500"
+                  idName="extract"
+                  @extractData="handleJsonDataExtract"
+                />
+              </el-tab-pane>
+              <el-tab-pane label="勾子(hook)" name="hook">
+                <Hook
+                  :setupHooks="formData?.setup_hooks ?? []"
+                  :teardownHooks="formData?.teardown_hooks ?? []"
+                  :heights="500"
+                  @setupHooksData="handleSetupHooksData"
+                  @teardownHooksData="handleTeardownHooksData"
+                />
+              </el-tab-pane>
+              <el-tab-pane label="断言" name="validate">
+                <Validate
+                  :validate="formData?.validators_temp ?? []"
+                  :heights="500"
+                  idName="validate"
+                  @jsonData="handleJsonDataValidate"
+                />
+              </el-tab-pane>
+              <el-tab-pane label="参数设置" name="parameters">
+                <ParameterTable
+                  :jsons="formData?.parameters ?? {}"
+                  :parametersTemp="formData?.parameters_temp ?? {}"
+                  @jsonData="handleJsonDataParameters"
+                  @tempData="(val) => formData.parameters_temp = val"
+                />
+              </el-tab-pane>
+              <el-tab-pane label="数据仓库" name="dataWarehouse">
+                <DataWarehouseConfig
+                  v-model="formData.data_warehouse_temp"
+                  :hideCount="true"
+                  :height="460"
+                />
+              </el-tab-pane>
+            </el-tabs>
+          </div>
         </el-form-item>
 
         <el-form-item>
           <el-button :loading="btnLoading" type="primary" @click="save">保存</el-button>
           <el-button type="primary" @click="cancel">取消</el-button>
+
+          <EnvSelector />
+          <PythonFuncSelector />
+          <DataWarehouseFieldSelector :current-type="dataWarehouseCurrentType" />
         </el-form-item>
       </el-form>
     </div>
@@ -30,13 +96,23 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { createAutoStep, updateAutoStep } from '@/api/automation/autostep'
 import MobileActionList from '@/components/platform/mobile/ActionList.vue'
+import Variables from '@/components/platform/variables/index.vue'
+import Extractor from '@/components/platform/extract/index.vue'
+import Validate from '@/components/platform/validate/index.vue'
+import Hook from '@/components/platform/hook/index.vue'
+import ParameterTable from '@/components/platform/parameterTable/index.vue'
+import DataWarehouseConfig from '@/components/platform/dataWarehouseConfig/index.vue'
+import EnvSelector from '@/components/platform/button/EnvDetail.vue'
+import PythonFuncSelector from '@/components/platform/button/PythonFuncSelector.vue'
+import DataWarehouseFieldSelector from '@/components/platform/button/DataWarehouseFieldSelector.vue'
 import { getAndroidDeviceOptionsList } from '@/api/platform/androidDeviceOptions'
 import { getIOSDeviceOptionsList } from '@/api/platform/iosOptions'
 import { getHarmonyDeviceOptionsList } from '@/api/platform/harmonyDeviceOption'
 import { getBrowserDeviceOptionsList } from '@/api/platform/browserDeviceConfig'
+import utils from '@/utils/dataTypeConverter.js'
 
 defineOptions({
   name: 'AutoStepUIForm'
@@ -65,6 +141,7 @@ const emit = defineEmits(['close'])
 
 const btnLoading = ref(false)
 const elFormRef = ref()
+const activeTab = ref('actions')
 
 const rule = {
   name: [{
@@ -82,6 +159,8 @@ const formData = ref({
   variables_temp: [],
   parameters: {},
   parameters_temp: {},
+  data_warehouse: {},
+  data_warehouse_temp: {},
   setup_hooks: [],
   teardown_hooks: [],
   extract: {},
@@ -97,6 +176,22 @@ const formData = ref({
 
 const deviceOptions = ref([])
 const deviceSerial = ref('')
+const actions = ref([])
+const variables = ref([])
+const skipData = ref([])
+const validateData = ref([])
+const extractorData = ref([])
+const setupHooksData = ref([])
+const teardownHooksData = ref([])
+const jsonErrorParameters = ref('')
+
+const deepClone = (obj) => {
+  try {
+    return structuredClone(obj)
+  } catch (e) {
+    return JSON.parse(JSON.stringify(obj || {}))
+  }
+}
 
 const devicePlaceholder = computed(() => {
   switch (props.platform) {
@@ -113,30 +208,14 @@ const devicePlaceholder = computed(() => {
   }
 })
 
-const ensurePlatformContainer = () => {
-  if (!formData.value[props.platform]) {
-    formData.value[props.platform] = { actions: [] }
-  }
-  if (!Array.isArray(formData.value[props.platform].actions)) {
-    formData.value[props.platform].actions = []
-  }
-}
-
-const currentActions = computed({
-  get() {
-    ensurePlatformContainer()
-    return formData.value[props.platform].actions
-  },
-  set(val) {
-    ensurePlatformContainer()
-    formData.value[props.platform].actions = val || []
-  }
+const dataWarehouseCurrentType = computed(() => {
+  return String(formData.value?.data_warehouse_temp?.type || formData.value?.data_warehouse?.type || '').trim()
 })
 
 const extractDeviceSerialFromActions = () => {
-  const actions = currentActions.value || []
+  const list = actions.value || []
   const serials = new Set(
-    actions
+    list
       .map(a => a?.options?.serial)
       .filter(v => typeof v === 'string' && v.trim() !== '')
   )
@@ -205,20 +284,20 @@ const getDeviceValue = (item) => {
 const applyDeviceToAllActions = () => {
   const serial = deviceSerial.value
   if (!serial) return
-  const actions = currentActions.value || []
-  const next = actions.map(a => {
+  const list = actions.value || []
+  const next = list.map(a => {
     const options = { ...(a?.options || {}) }
     options.platform = props.platform
     options.serial = serial
     return { ...a, options }
   })
-  currentActions.value = next
+  actions.value = next
 }
 
 const handleDeviceChange = () => {
   if (!deviceSerial.value) return
-  const actions = currentActions.value || []
-  const next = actions.map(a => {
+  const list = actions.value || []
+  const next = list.map(a => {
     const options = { ...(a?.options || {}) }
     if (!options.serial) {
       options.platform = props.platform
@@ -226,7 +305,117 @@ const handleDeviceChange = () => {
     }
     return { ...a, options }
   })
-  currentActions.value = next
+  actions.value = next
+}
+
+const handleVariablesData = (tableData) => {
+  variables.value = tableData
+}
+const handleJsonDataSkip = (tableData) => {
+  skipData.value = tableData
+}
+const handleJsonDataValidate = (tableData) => {
+  validateData.value = tableData
+}
+const handleJsonDataExtract = (tableData) => {
+  extractorData.value = tableData
+}
+const handleSetupHooksData = (tableData) => {
+  setupHooksData.value = tableData
+}
+const handleTeardownHooksData = (tableData) => {
+  teardownHooksData.value = tableData
+}
+const handleJsonDataParameters = (result) => {
+  if (!result.isValid) {
+    jsonErrorParameters.value = result.error.message
+  } else {
+    jsonErrorParameters.value = ''
+    formData.value.parameters = result.data
+  }
+}
+
+const messageBox = (message) => {
+  ElMessageBox.alert(
+    message,
+    '数据校验失败',
+    {
+      confirmButtonText: '确认',
+      type: 'error',
+      dangerouslyUseHTMLString: true,
+      center: true
+    }
+  )
+}
+
+const dataValidation = async () => {
+  const variablesData = utils.convertData(variables.value)
+  if (!variablesData.success) {
+    messageBox('数据处理失败字段:' + variablesData.errors.key + ',出现错误:' + variablesData.errors.error)
+    activeTab.value = 'variables'
+    return false
+  }
+  formData.value.variables_temp = variables.value
+  formData.value.variables = variablesData.data
+
+  const skipDataNew = utils.assertionData(skipData.value)
+  if (!skipDataNew.success) {
+    messageBox('数据处理失败字段:' + skipDataNew.errors.key + ',出现错误:' + skipDataNew.errors.error)
+    activeTab.value = 'skip'
+    return false
+  }
+  formData.value.skip = skipDataNew.data
+  formData.value.skip_temp = skipData.value
+
+  const validateDataNew = utils.assertionData(validateData.value)
+  if (!validateDataNew.success) {
+    messageBox('数据处理失败字段:' + validateDataNew.errors.key + ',出现错误:' + validateDataNew.errors.error)
+    activeTab.value = 'validate'
+    return false
+  }
+  formData.value.validate = validateDataNew.data
+  formData.value.validators_temp = validateData.value
+
+  const extractDataNew = utils.processData(extractorData.value)
+  if (!extractDataNew.success) {
+    messageBox('数据处理失败:' + extractDataNew.errors.join('、') + ',字段重复')
+    activeTab.value = 'extract'
+    return false
+  }
+  formData.value.extract = extractDataNew.data
+  formData.value.extract_temp = extractorData.value
+
+  if (jsonErrorParameters.value !== '') {
+    messageBox('参数设置数据处理失败:' + jsonErrorParameters.value)
+    activeTab.value = 'parameters'
+    return false
+  }
+
+  formData.value.setup_hooks = setupHooksData.value
+  formData.value.teardown_hooks = teardownHooksData.value
+
+  if (formData.value.data_warehouse_temp && Object.keys(formData.value.data_warehouse_temp).length > 0) {
+    formData.value.data_warehouse = formData.value.data_warehouse_temp
+  } else {
+    formData.value.data_warehouse = {}
+  }
+
+  const dwConfig = formData.value.data_warehouse_temp
+  if (dwConfig && dwConfig.filter && dwConfig.filter.groups) {
+    for (const group of dwConfig.filter.groups) {
+      if (group.conditions) {
+        for (const cond of group.conditions) {
+          if (!cond.field || String(cond.field).trim() === '') {
+            messageBox('数据仓库配置中有未选择字段的筛选条件')
+            activeTab.value = 'dataWarehouse'
+            return false
+          }
+        }
+      }
+    }
+  }
+
+  return true
 }
 
 const normalizePayload = () => {
@@ -242,12 +431,13 @@ const normalizePayload = () => {
   payload.request = null
   payload.request_id = 0
   payload.type = 1
-  ensurePlatformContainer()
-  payload[props.platform] = { actions: currentActions.value || [] }
+  payload[props.platform] = { actions: actions.value || [] }
   return payload
 }
 
 const save = async () => {
+  const validation = await dataValidation()
+  if (!validation) return
   btnLoading.value = true
   elFormRef.value?.validate(async (valid) => {
     if (!valid) return btnLoading.value = false
@@ -284,22 +474,42 @@ const cancel = () => {
   emit('close', { value: close })
 }
 
-watch(() => props.formData, (newVal) => {
-  if (newVal && Object.keys(newVal).length > 0) {
-    formData.value = { ...formData.value, ...newVal }
-    ensurePlatformContainer()
-    extractDeviceSerialFromActions()
+const syncFromProps = async () => {
+  const source = deepClone(props.formData || {})
+  formData.value = {
+    ...formData.value,
+    ...source
   }
-}, { immediate: true, deep: true })
 
-watch(() => props.platform, async () => {
-  ensurePlatformContainer()
+  if (!formData.value.data_warehouse) formData.value.data_warehouse = {}
+  if (!formData.value.data_warehouse_temp || Object.keys(formData.value.data_warehouse_temp || {}).length === 0) {
+    formData.value.data_warehouse_temp = formData.value.data_warehouse || {}
+  }
+
+  if (!formData.value[props.platform]) formData.value[props.platform] = { actions: [] }
+  actions.value = Array.isArray(formData.value?.[props.platform]?.actions) ? deepClone(formData.value[props.platform].actions) : []
+
+  variables.value = formData.value.variables_temp || []
+  skipData.value = formData.value.skip_temp || []
+  validateData.value = formData.value.validators_temp || []
+  extractorData.value = formData.value.extract_temp || []
+  setupHooksData.value = formData.value.setup_hooks || []
+  teardownHooksData.value = formData.value.teardown_hooks || []
+
   await fetchDeviceOptions()
   extractDeviceSerialFromActions()
+}
+
+watch(() => [props.formData, props.platform], () => {
+  syncFromProps()
 }, { immediate: true })
 
+watch(actions, (val) => {
+  if (!formData.value[props.platform]) formData.value[props.platform] = { actions: [] }
+  formData.value[props.platform].actions = val || []
+}, { deep: true })
+
 onMounted(async () => {
-  ensurePlatformContainer()
   await fetchDeviceOptions()
   extractDeviceSerialFromActions()
 })

@@ -135,21 +135,36 @@ const emit = defineEmits(['update:modelValue'])
 const localActions = ref([])
 const selectedIndices = ref([])
 const isSortMode = ref(false)
+let syncingFromParent = false
+
+const safeStringify = (val) => {
+  try {
+    return JSON.stringify(val ?? null)
+  } catch (e) {
+    return ''
+  }
+}
 
 // 初始化
 watch(() => props.modelValue, (newVal) => {
   // 简单深拷贝，避免直接修改 props，并确保每个 action 有唯一 id 用于 key
+  syncingFromParent = true
   localActions.value = (newVal || []).map((item, index) => ({
     ...item,
     id: item.id || Date.now() + index, // 确保有唯一 ID
     options: item.options || {}
   }))
+  Promise.resolve().then(() => {
+    syncingFromParent = false
+  })
 }, { immediate: true, deep: true })
 
 // 监听本地变化同步回父组件
 watch(localActions, (newVal) => {
+  if (syncingFromParent) return
   // 清理临时 ID
   const cleanData = newVal.map(({ id, ...rest }) => rest)
+  if (safeStringify(cleanData) === safeStringify(props.modelValue || [])) return
   emit('update:modelValue', cleanData)
 }, { deep: true })
 
