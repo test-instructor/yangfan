@@ -12,4 +12,8 @@ type ServiceGroup struct {
 	RunnerNodeService
 	RunnerService
 	LLMModelConfigService
+	AndroidDeviceOptionsService
+	IOSDeviceOptionsService
+	HarmonyDeviceOptionsService
+	BrowserDeviceOptionsService
 }

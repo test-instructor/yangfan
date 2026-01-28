@@ -16,6 +16,10 @@ type ApiGroup struct {
 	RunnerNodeApi
 	RunnerApi
 	LLMModelConfigApi
+	AndroidDeviceOptionsApi
+	IOSDeviceOptionsApi
+	HarmonyDeviceOptionsApi
+	BrowserDeviceOptionsApi
 }
 
 var (
@@ -30,4 +34,8 @@ var (
 	rnService        = service.ServiceGroupApp.PlatformServiceGroup.RunnerNodeService
 	runnerService    = service.ServiceGroupApp.PlatformServiceGroup.RunnerService
 	llmconfigService = service.ServiceGroupApp.PlatformServiceGroup.LLMModelConfigService
+	adoService       = service.ServiceGroupApp.PlatformServiceGroup.AndroidDeviceOptionsService
+	idoService       = service.ServiceGroupApp.PlatformServiceGroup.IOSDeviceOptionsService
+	hdoService       = service.ServiceGroupApp.PlatformServiceGroup.HarmonyDeviceOptionsService
+	bdoService       = service.ServiceGroupApp.PlatformServiceGroup.BrowserDeviceOptionsService
 )

@@ -17,6 +17,10 @@ type RouterGroup struct {
 	RunnerRouter
 	OpenRunnerRouter
 	LLMModelConfigRouter
+	AndroidDeviceOptionsRouter
+	IOSDeviceOptionsRouter
+	HarmonyDeviceOptionsRouter
+	BrowserDeviceOptionsRouter
 }
 
 var (
@@ -31,4 +35,8 @@ var (
 	rnApi        = api.ApiGroupApp.PlatformApiGroup.RunnerNodeApi
 	runnerApi    = api.ApiGroupApp.PlatformApiGroup.RunnerApi
 	llmconfigApi = api.ApiGroupApp.PlatformApiGroup.LLMModelConfigApi
+	adoApi       = api.ApiGroupApp.PlatformApiGroup.AndroidDeviceOptionsApi
+	idoApi       = api.ApiGroupApp.PlatformApiGroup.IOSDeviceOptionsApi
+	hdoApi       = api.ApiGroupApp.PlatformApiGroup.HarmonyDeviceOptionsApi
+	bdoApi       = api.ApiGroupApp.PlatformApiGroup.BrowserDeviceOptionsApi
 )
