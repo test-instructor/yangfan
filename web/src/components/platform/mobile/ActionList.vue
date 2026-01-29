@@ -60,7 +60,7 @@
             </template>
             
             <template v-else-if="['input', 'tap_ocr', 'tap_cv', 'app_launch', 'app_terminate', 'install_app', 'uninstall_app'].includes(row.method)">
-              <el-input v-model="row.params" placeholder="请输入内容/包名/路径" />
+              <el-input v-model="row.params" placeholder="请输入内容/包名/路径" style="flex: 1" />
             </template>
 
             <template v-else-if="['sleep'].includes(row.method)">
@@ -69,15 +69,15 @@
             </template>
 
             <template v-else-if="['swipe'].includes(row.method)">
-              <el-input-number v-model="row.options.from_x" :precision="2" placeholder="From X" controls-position="right" style="width: 80px" />
-              <el-input-number v-model="row.options.from_y" :precision="2" placeholder="From Y" controls-position="right" style="width: 80px" />
+              <el-input-number v-model="row.options.from_x" :precision="2" placeholder="From X" controls-position="right" style="width: 120px" />
+              <el-input-number v-model="row.options.from_y" :precision="2" placeholder="From Y" controls-position="right" style="width: 120px" />
               <span class="arrow">→</span>
-              <el-input-number v-model="row.options.to_x" :precision="2" placeholder="To X" controls-position="right" style="width: 80px" />
-              <el-input-number v-model="row.options.to_y" :precision="2" placeholder="To Y" controls-position="right" style="width: 80px" />
+              <el-input-number v-model="row.options.to_x" :precision="2" placeholder="To X" controls-position="right" style="width: 120px" />
+              <el-input-number v-model="row.options.to_y" :precision="2" placeholder="To Y" controls-position="right" style="width: 120px" />
             </template>
             
              <template v-else-if="['ai_action', 'ai_assert'].includes(row.method)">
-              <el-input v-model="row.params" type="textarea" :rows="1" placeholder="请输入AI提示词/断言描述" />
+              <el-input v-model="row.params" type="textarea" :rows="1" placeholder="请输入AI提示词/断言描述" style="flex: 1" />
             </template>
             
             <!-- 通用选项按钮 -->
@@ -241,7 +241,7 @@ const initSortable = () => {
 
 <style scoped>
 .mobile-action-list {
-  padding: 10px;
+  padding: 20px 10px 10px 10px;
 }
 .toolbar {
   margin-bottom: 10px;
@@ -252,7 +252,7 @@ const initSortable = () => {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
+  width: 100%;
 }
 .unit {
   color: #666;
