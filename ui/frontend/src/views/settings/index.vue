@@ -1,36 +1,36 @@
 <template>
   <div :class="['settings-container', { page: !embedded }]">
-    <a-card class="card" :bordered="false" :title="embedded ? '' : '设置'">
+    <a-card class="card" :bordered="false" :title="embedded ? '' : t('settings.title')">
       <a-tabs default-active-key="general">
-        <a-tab-pane key="general" title="常规设置">
+        <a-tab-pane key="general" :title="t('settings.general')">
           <a-form :model="form" layout="vertical" class="tab-content">
-            <a-form-item field="baseURL" label="扬帆自动化测试平台域名（BaseURL）">
+            <a-form-item field="baseURL" :label="t('settings.baseURL')">
               <a-input v-model="form.baseURL" placeholder="https://xx.demo.com" />
             </a-form-item>
-            <a-form-item field="theme" label="主题">
+            <a-form-item field="theme" :label="t('settings.theme')">
               <a-radio-group v-model="form.theme" type="button" @change="onThemeChange">
-                <a-radio value="light">亮色</a-radio>
-                <a-radio value="dark">暗黑</a-radio>
+                <a-radio value="light">{{ t('settings.themeLight') }}</a-radio>
+                <a-radio value="dark">{{ t('settings.themeDark') }}</a-radio>
               </a-radio-group>
             </a-form-item>
           </a-form>
         </a-tab-pane>
 
-        <a-tab-pane key="logs" title="日志配置">
+        <a-tab-pane key="logs" :title="t('settings.logConfig')">
           <a-form :model="form" layout="vertical" class="tab-content">
-            <a-form-item field="logLevel" label="日志级别">
-              <a-select v-model="form.logLevel" placeholder="请选择日志级别">
-                <a-option value="debug">调试 (Debug)</a-option>
-                <a-option value="info">信息 (Info)</a-option>
-                <a-option value="warn">警告 (Warning)</a-option>
-                <a-option value="error">错误 (Error)</a-option>
-                <a-option value="fatal">致命 (Fatal)</a-option>
+            <a-form-item field="logLevel" :label="t('settings.logLevel')">
+              <a-select v-model="form.logLevel" :placeholder="t('settings.selectLogLevel')">
+                <a-option value="debug">{{ t('settings.levels.debug') }}</a-option>
+                <a-option value="info">{{ t('settings.levels.info') }}</a-option>
+                <a-option value="warn">{{ t('settings.levels.warn') }}</a-option>
+                <a-option value="error">{{ t('settings.levels.error') }}</a-option>
+                <a-option value="fatal">{{ t('settings.levels.fatal') }}</a-option>
               </a-select>
             </a-form-item>
-            <a-form-item field="logPrefix" label="日志前缀">
+            <a-form-item field="logPrefix" :label="t('settings.logPrefix')">
               <a-input v-model="form.logPrefix" placeholder="[ https://github.com/test-instructor/yangfan/ui ]" />
             </a-form-item>
-            <a-form-item field="logRetention" label="日志留存时间（天）">
+            <a-form-item field="logRetention" :label="t('settings.logRetention')">
               <a-input-number v-model="form.logRetention" :min="1" :max="365" />
             </a-form-item>
           </a-form>
@@ -39,8 +39,8 @@
 
       <div class="actions">
         <a-space>
-          <a-button type="primary" :loading="saving" @click="save">保存</a-button>
-          <a-button v-if="!embedded" @click="goLogin">去登录</a-button>
+          <a-button type="primary" :loading="saving" @click="save">{{ t('settings.save') }}</a-button>
+          <a-button v-if="!embedded" @click="goLogin">{{ t('settings.goLogin') }}</a-button>
         </a-space>
       </div>
     </a-card>
@@ -51,6 +51,7 @@
 import { Modal, Message } from '@arco-design/web-vue'
 import { reactive, ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { getStoredTheme, setTheme } from '../../utils/theme'
 import {
   getBaseURL,
@@ -70,6 +71,7 @@ const props = defineProps({
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 
 const form = reactive({
   baseURL: '',
@@ -130,14 +132,14 @@ const save = async () => {
 
     if (isBaseURLChanged) {
       await clearAuth()
-      Message.success('保存成功，域名已修改，请重新登录')
+      Message.success(t('settings.saveSuccessRelogin'))
       if (props.embedded) {
         await router.replace({ name: 'login' })
       } else {
         await router.replace({ name: 'login' })
       }
     } else {
-      Message.success('保存成功')
+      Message.success(t('settings.saveSuccess'))
       if (!props.embedded) {
         await router.replace({ name: 'login' })
       }
@@ -145,7 +147,7 @@ const save = async () => {
 
     originalBaseURL.value = form.baseURL
   } catch (e) {
-    Message.error(e?.message || '保存失败')
+    Message.error(e?.message || t('settings.saveError'))
   } finally {
     saving.value = false
   }
@@ -159,8 +161,8 @@ onMounted(async () => {
   await load()
   if (route.query?.missing === '1') {
     Modal.warning({
-      title: '需要先设置域名',
-      content: '请先设置扬帆自动化测试平台域名（BaseURL），保存后再登录。'
+      title: t('settings.needSetDomain'),
+      content: t('settings.setDomainTip')
     })
   }
 })

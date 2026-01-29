@@ -4,18 +4,18 @@
     :closable="false"
     :mask-closable="false"
     :footer="false"
-    title="设置服务器地址"
+    :title="t('globalBaseURL.title')"
     width="500px"
   >
     <div style="margin-bottom: 20px;">
       <a-alert type="warning" style="margin-bottom: 16px;">
-        检测到未配置服务器地址（BaseURL），请先配置扬帆自动化测试平台域名。
+        {{ t('globalBaseURL.alert') }}
       </a-alert>
       <a-form :model="form" layout="vertical">
-        <a-form-item field="baseURL" label="扬帆自动化测试平台域名（BaseURL）" required>
+        <a-form-item field="baseURL" :label="t('globalBaseURL.label')" required>
           <a-input 
             v-model="form.baseURL" 
-            placeholder="例如: https://yangfan.demo.com" 
+            :placeholder="t('globalBaseURL.placeholder')" 
             allow-clear
             @press-enter="save"
           />
@@ -23,7 +23,7 @@
       </a-form>
       <div style="text-align: right; margin-top: 24px;">
         <a-button type="primary" :loading="saving" @click="save" long>
-          保存并进入
+          {{ t('globalBaseURL.saveAndEnter') }}
         </a-button>
       </div>
     </div>
@@ -33,6 +33,7 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { Message } from '@arco-design/web-vue'
+import { useI18n } from 'vue-i18n'
 import { checkBaseURLConnectivity, setBaseURL, clearAuth } from '../services/appBridge'
 
 const props = defineProps({
@@ -43,6 +44,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['success'])
+const { t } = useI18n()
 
 const form = reactive({
   baseURL: ''
@@ -51,7 +53,7 @@ const saving = ref(false)
 
 const save = async () => {
   if (!form.baseURL) {
-    Message.warning('请输入域名')
+    Message.warning(t('globalBaseURL.enterDomain'))
     return
   }
 
@@ -66,10 +68,10 @@ const save = async () => {
       form.baseURL = normalized
     }
     
-    Message.success('配置成功')
+    Message.success(t('globalBaseURL.configSuccess'))
     emit('success')
   } catch (e) {
-    Message.error(e?.message || '保存失败')
+    Message.error(e?.message || t('globalBaseURL.saveError'))
   } finally {
     saving.value = false
   }

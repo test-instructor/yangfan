@@ -8,6 +8,7 @@ import { initTheme } from './utils/theme'
 import { initPerformance } from './utils/performance'
 import { errorHandler } from './utils/errorHandler'
 import { devTools } from './utils/devTools'
+import i18n from './i18n'
 
 // 初始化主题
 initTheme()
@@ -30,4 +31,5 @@ app.config.globalProperties.$dev = devTools
 
 app.use(ArcoVue)
 app.use(router)
+app.use(i18n)
 app.mount('#app')
