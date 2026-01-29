@@ -426,6 +426,9 @@
   // 打开弹窗
   const openDialog = () => {
     type.value = 'create'
+    if (!formData.value.type) {
+      formData.value.type = caseType.value
+    }
     dialogFormVisible.value = true
   }
 
@@ -434,6 +437,7 @@
     dialogFormVisible.value = false
     formData.value = {
       name: '',
+      type: caseType.value,
       variables: null,
       parameters: null,
       setup_hooks: [],

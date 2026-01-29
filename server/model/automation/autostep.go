@@ -19,10 +19,11 @@ type AutoStep struct {
 	Harmony *MobileStep `json:"harmony,omitempty" gorm:"column:harmony;type:json;serializer:json"`
 	Browser *MobileStep `json:"browser,omitempty" gorm:"column:browser;type:json;serializer:json"`
 
-	ProjectId int64 `json:"projectId" form:"projectId" gorm:"column:project_id;"` //项目信息
-	Menu      int64 `json:"menu" form:"menu" gorm:"column:menu;"`
-	ParentId  uint  `json:"parentId" form:"parentId" gorm:"column:parent_id;"`
-	StepType  int   `json:"type" form:"type" gorm:"column:step_type;"`
+	ProjectId int64  `json:"projectId" form:"projectId" gorm:"column:project_id;"` //项目信息
+	Menu      int64  `json:"menu" form:"menu" gorm:"column:menu;"`
+	ParentId  uint   `json:"parentId" form:"parentId" gorm:"column:parent_id;"`
+	StepType  int    `json:"step_type" form:"step_type" gorm:"column:step_type;"`
+	Type      string `json:"type" form:"type" gorm:"column:type;"`
 }
 
 // TableName 自动化步骤 AutoStep自定义表名 AutoStep

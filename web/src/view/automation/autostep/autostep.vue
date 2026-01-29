@@ -379,6 +379,7 @@
     // 重置 formData
     formData.value = {
       name: '',
+      type: currentPlatform.value,
       loops: 0,
       retry: 0,
       request: {
@@ -624,6 +625,7 @@
       if (currentPlatform.value === 'api') {
         formData.value = {
           name: '',
+          type: currentPlatform.value,
           loops: 0,
           retry: 0,
           request: {

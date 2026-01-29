@@ -20,6 +20,7 @@ type AutoCaseStep struct {
 	EnvID      int64  `json:"envID" form:"envID" gorm:"column:env_id;"`             //运行环境ID
 	ProjectId  int64  `json:"projectId" form:"projectId" gorm:"column:project_id;"` //项目信息
 	Menu       int64  `json:"menu" form:"menu" gorm:"column:menu;"`
+	Type       string `json:"type" form:"type" gorm:"column:type;"`
 	ParentId   uint   `json:"parentId" form:"parentId" gorm:"column:parent_id;"`
 }
 
