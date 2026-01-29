@@ -154,6 +154,14 @@
       </template>
 
       <el-form :model="formData" label-position="top" ref="elFormRef" :rules="rule" label-width="80px">
+        <el-form-item label="任务类型:" prop="type">
+          <el-select v-model="formData.type" placeholder="请选择任务类型" style="width: 100%">
+            <el-option label="API" value="api" />
+            <el-option label="UI" value="ui" />
+            <el-option label="Mobile" value="mobile" />
+            <el-option label="Performance" value="performance" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="任务名称:" prop="name">
           <el-input v-model="formData.name" :clearable="false" placeholder="请输入任务名称" />
         </el-form-item>
@@ -447,8 +455,8 @@
     runTime: '',
     nextRunTime: new Date(),
     status: false,
-      failfast: false,
-      runNumber: 0,
+    failfast: false,
+    runNumber: 0,
     configName: '',
     configID: null,
     tag: [],
@@ -459,7 +467,8 @@
     notifyEnabled: false,
     notifyRule: 'always',
     describe: '',
-    runnerNodeName: ''
+    runnerNodeName: '',
+    type: 'api'
   })
 
 

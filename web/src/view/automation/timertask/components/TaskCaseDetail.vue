@@ -8,50 +8,117 @@
         </div>
       </div>
       <div class="panel-content">
-        <div class="menu-container custom-scrollbar">
-          <ApiMenu
-            menutype="21"
-            eventType="1"
-            @getTreeID="handleMenuClick"
-            detail=true
-          />
-        </div>
-        <div class="table-container">
-          <div class="search-box">
-            <el-form ref="elSearchFormRef" :inline="true" :model="searchInfo" class="search-form" @keyup.enter="onSubmit">
-              <el-form-item prop="caseName" class="search-item">
-                <el-input 
-                  v-model="searchInfo.caseName" 
-                  placeholder="搜索用例名称" 
-                  clearable 
-                  prefix-icon="Search" 
-                  class="search-input"
-                />
-              </el-form-item>
-              <el-form-item class="action-item">
-                <el-button type="primary" icon="search" @click="onSubmit" circle plain></el-button>
-                <el-button icon="refresh" @click="onReset" circle plain></el-button>
-              </el-form-item>
-            </el-form>
-          </div>
-          <div class="table-wrapper">
-            <el-table
-              ref="leftTableRef"
-              style="width: 100%"
-              :show-header="true"
-              :data="leftTableData"
-              row-key="ID"
-              :cell-style="{ paddingTop: '8px', paddingBottom: '8px' }"
-              :header-cell-style="{ background: 'var(--el-fill-color-light)', color: 'var(--el-text-color-secondary)', fontWeight: '600' }"
-              height="100%"
-              stripe
-              highlight-current-row
-              class="custom-table"
-            >
-              <el-table-column align="left" label="用例名称" prop="caseName" show-overflow-tooltip min-width="150" />
-              <el-table-column align="left" label="运行配置" prop="configName" width="120" show-overflow-tooltip />
-            </el-table>
-          </div>
+        <div class="left-content-wrapper" style="display: flex; flex-direction: column; width: 100%; height: 100%;">
+          <el-tabs v-model="activeTab" type="border-card" class="left-tabs" style="height: 100%; display: flex; flex-direction: column; border: none; box-shadow: none;">
+            <el-tab-pane label="类型步骤" name="type_step" class="custom-tab-pane">
+              <div class="type-selector-bar" style="padding: 8px 12px; border-bottom: 1px solid var(--el-border-color-light);">
+                <el-radio-group v-model="stepType" size="small">
+                  <el-radio-button label="casestep_android">安卓</el-radio-button>
+                  <el-radio-button label="casestep_ios">iOS</el-radio-button>
+                  <el-radio-button label="casestep_harmony">鸿蒙</el-radio-button>
+                  <el-radio-button label="casestep_browser">浏览器</el-radio-button>
+                </el-radio-group>
+              </div>
+              <div class="pane-content-inner" style="display: flex; flex: 1; height: calc(100% - 40px);">
+                <div class="menu-container custom-scrollbar">
+                  <ApiMenu
+                    :key="currentMenuType"
+                    :menutype="currentMenuType"
+                    eventType="1"
+                    @getTreeID="handleMenuClick"
+                    detail=true
+                  />
+                </div>
+                <div class="table-container">
+                  <div class="search-box">
+                    <el-form ref="elSearchFormRef" :inline="true" :model="searchInfo" class="search-form" @keyup.enter="onSubmit">
+                      <el-form-item prop="caseName" class="search-item">
+                        <el-input 
+                          v-model="searchInfo.caseName" 
+                          placeholder="搜索用例名称" 
+                          clearable 
+                          prefix-icon="Search" 
+                          class="search-input"
+                        />
+                      </el-form-item>
+                      <el-form-item class="action-item">
+                        <el-button type="primary" icon="search" @click="onSubmit" circle plain></el-button>
+                        <el-button icon="refresh" @click="onReset" circle plain></el-button>
+                      </el-form-item>
+                    </el-form>
+                  </div>
+                  <div class="table-wrapper">
+                    <el-table
+                      ref="leftTableRef"
+                      style="width: 100%"
+                      :show-header="true"
+                      :data="leftTableData"
+                      row-key="ID"
+                      :cell-style="{ paddingTop: '8px', paddingBottom: '8px' }"
+                      :header-cell-style="{ background: 'var(--el-fill-color-light)', color: 'var(--el-text-color-secondary)', fontWeight: '600' }"
+                      height="100%"
+                      stripe
+                      highlight-current-row
+                      class="custom-table"
+                    >
+                      <el-table-column align="left" label="用例名称" prop="caseName" show-overflow-tooltip min-width="150" />
+                      <el-table-column align="left" label="运行配置" prop="configName" width="120" show-overflow-tooltip />
+                    </el-table>
+                  </div>
+                </div>
+              </div>
+            </el-tab-pane>
+            <el-tab-pane label="接口列表" name="interface_list" class="custom-tab-pane">
+              <div class="pane-content-inner" style="display: flex; flex: 1; height: 100%;">
+                <div class="menu-container custom-scrollbar">
+                  <ApiMenu
+                    :key="'21'"
+                    menutype="21"
+                    eventType="1"
+                    @getTreeID="handleMenuClick"
+                    detail=true
+                  />
+                </div>
+                <div class="table-container">
+                  <div class="search-box">
+                    <el-form ref="elSearchFormRef2" :inline="true" :model="searchInfo" class="search-form" @keyup.enter="onSubmit">
+                      <el-form-item prop="caseName" class="search-item">
+                        <el-input 
+                          v-model="searchInfo.caseName" 
+                          placeholder="搜索用例名称" 
+                          clearable 
+                          prefix-icon="Search" 
+                          class="search-input"
+                        />
+                      </el-form-item>
+                      <el-form-item class="action-item">
+                        <el-button type="primary" icon="search" @click="onSubmit" circle plain></el-button>
+                        <el-button icon="refresh" @click="onReset" circle plain></el-button>
+                      </el-form-item>
+                    </el-form>
+                  </div>
+                  <div class="table-wrapper">
+                    <el-table
+                      ref="leftTableRef2"
+                      style="width: 100%"
+                      :show-header="true"
+                      :data="leftTableData"
+                      row-key="ID"
+                      :cell-style="{ paddingTop: '8px', paddingBottom: '8px' }"
+                      :header-cell-style="{ background: 'var(--el-fill-color-light)', color: 'var(--el-text-color-secondary)', fontWeight: '600' }"
+                      height="100%"
+                      stripe
+                      highlight-current-row
+                      class="custom-table"
+                    >
+                      <el-table-column align="left" label="用例名称" prop="caseName" show-overflow-tooltip min-width="150" />
+                      <el-table-column align="left" label="运行配置" prop="configName" width="120" show-overflow-tooltip />
+                    </el-table>
+                  </div>
+                </div>
+              </div>
+            </el-tab-pane>
+          </el-tabs>
         </div>
       </div>
     </div>
@@ -112,11 +179,20 @@ const props = defineProps({
   taskName: { type: String, default: '' }
 })
 
+const activeTab = ref('type_step')
+const stepType = ref('casestep_android')
+const currentMenuType = computed(() => {
+  return stepType.value
+})
+
 const leftTableData = ref([])
 const rightTableData = ref([])
 const searchInfo = ref({})
 const leftTableRef = ref(null)
+const leftTableRef2 = ref(null)
 const rightTableRef = ref(null)
+const elSearchFormRef = ref()
+const elSearchFormRef2 = ref()
 let leftSortable = null
 let rightSortable = null
 const rightDomKey = ref(true)
@@ -126,6 +202,11 @@ const handleMenuClick = (id) => {
   menuId.value = id
   getLeftTableData()
 }
+
+watch(activeTab, () => {
+  menuId.value = null
+  leftTableData.value = []
+})
 
 const getLeftTableData = async () => {
   const table = await getAutoCaseList({ page: 1, pageSize: 99999, menu: menuId.value, ...searchInfo.value })
@@ -140,9 +221,9 @@ const onReset = () => {
   getLeftTableData()
 }
 
-const elSearchFormRef = ref()
 const onSubmit = () => {
-  elSearchFormRef.value?.validate(async (valid) => {
+  const ref = activeTab.value === 'type_step' ? elSearchFormRef : elSearchFormRef2
+  ref.value?.validate(async (valid) => {
     if (!valid) return
     getLeftTableData()
   })
@@ -281,6 +362,25 @@ onMounted(() => {
 
 .card-panel:hover {
   box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+}
+
+.left-tabs :deep(.el-tabs__content) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 !important;
+}
+
+.left-tabs :deep(.el-tab-pane) {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.custom-tab-pane {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .left-panel {

@@ -16,6 +16,7 @@ type AutoCase struct {
 	EnvID      int64  `json:"envID" form:"envID" gorm:"column:env_id;"`                                                                      //运行环境ID
 	Desc       string `json:"desc" form:"desc" gorm:"column:desc;"`                                                                          //描述
 	ConfigName string `json:"configName" form:"configName" gorm:"column:config_name;"`                                                       //配置名称
+	Type       string `json:"type" form:"type" gorm:"column:type;comment:用例类型"`
 	Menu       int64  `json:"menu" form:"menu" gorm:"column:menu;"`
 	ProjectId  int64  `json:"projectId" form:"projectId" gorm:"column:project_id;"` //项目信息
 }

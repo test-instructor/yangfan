@@ -18,6 +18,10 @@ type TimerTaskService struct{}
 // CreateTimerTask 创建定时任务记录
 // Author [yourname](https://github.com/yourname)
 func (tkService *TimerTaskService) CreateTimerTask(ctx context.Context, tk *automation.TimerTask) (err error) {
+	if tk.Type == nil || *tk.Type == "" {
+		t := "api"
+		tk.Type = &t
+	}
 	if err := tkService.validateTimerTaskRunnerNode(ctx, tk.ProjectId, tk.RunnerNodeName); err != nil {
 		return err
 	}

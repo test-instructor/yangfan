@@ -1,13 +1,15 @@
 <template>
   <div class="autocase-step-container">
     <div class="left-panel">
-      <div class="panel-header">
-        <span class="title">接口列表</span>
-      </div>
+      <el-tabs v-model="activeTab" type="border-card" class="step-tabs" @tab-change="handleTabChange">
+        <el-tab-pane :label="typeStepLabel" name="typeSteps" />
+        <el-tab-pane label="接口列表" name="interfaces" />
+      </el-tabs>
       <div class="panel-content">
         <div class="menu-container">
           <ApiMenu
-            menutype="11"
+            :key="activeTab"
+            :menutype="currentMenuType"
             @getTreeID="handleMenuClick"
             detail=true
           />
@@ -132,7 +134,7 @@
 <script setup>
 
   import ApiMenu from '@/components/platform/menu/index.vue'
-  import { ref, nextTick, onMounted, watch } from 'vue'
+  import { ref, nextTick, onMounted, watch, computed } from 'vue'
   import { getAutoCaseStepList } from '@/api/automation/autocasestep.js'
   import {
     getAutoCaseSteps,
@@ -196,8 +198,37 @@
       type: String,
       required: true,
       default: ''
+    },
+    caseType: {
+      type: String,
+      default: 'api'
     }
   })
+
+  const activeTab = ref('typeSteps')
+  const typeStepLabel = computed(() => {
+    const map = {
+      'api': '接口',
+      'android': '安卓',
+      'ios': 'iOS',
+      'harmony': '鸿蒙',
+      'browser': '浏览器'
+    }
+    return (map[props.caseType] || props.caseType) + '步骤'
+  })
+
+  const currentMenuType = computed(() => {
+    if (activeTab.value === 'interfaces') {
+      return '11'
+    }
+    return `casestep_${props.caseType}`
+  })
+
+  const handleTabChange = () => {
+    menuId.value = null
+    searchInfo.value = {}
+    tableData.value = []
+  }
 
   const getTableApiData = async () => {
     if (!props.caseID) return
@@ -469,5 +500,9 @@
     color: var(--el-text-color-secondary);
     writing-mode: vertical-rl;
     letter-spacing: 2px;
+  }
+
+  .step-tabs :deep(.el-tabs__content) {
+    display: none;
   }
 </style>

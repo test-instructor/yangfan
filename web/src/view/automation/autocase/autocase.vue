@@ -86,6 +86,8 @@
 
             <el-table-column sortable align="left" label="用例名称" prop="caseName" width="120" />
 
+            <el-table-column align="left" label="类型" prop="type" width="120" />
+
             <el-table-column align="left" label="运行次数" prop="runNumber" width="120" />
 
             <el-table-column align="left" label="状态" prop="status" width="120" />
@@ -137,6 +139,11 @@
       </template>
 
       <el-form :model="formData" label-position="top" ref="elFormRef" :rules="rule" label-width="80px">
+        <el-form-item label="用例类型:" prop="type">
+          <el-select v-model="formData.type" placeholder="请选择类型" style="width:100%" filterable :clearable="false">
+             <el-option v-for="item in ['api','android','ios','harmony','browser']" :key="item" :label="item" :value="item" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="用例名称:" prop="caseName">
           <el-input v-model="formData.caseName" :clearable="false" placeholder="请输入用例名称" />
         </el-form-item>
@@ -241,6 +248,7 @@
   // 自动化生成的字典（可能为空）以及字段
   const formData = ref({
     caseName: '',
+    type: 'api',
     runNumber: undefined,
     status: null,
     envName: '',
