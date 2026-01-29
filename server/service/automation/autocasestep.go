@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/test-instructor/yangfan/server/v2/global"
 	"github.com/test-instructor/yangfan/server/v2/model/automation"
@@ -21,30 +22,84 @@ func (acsService *AutoCaseStepService) CreateAutoCaseStep(ctx context.Context, a
 }
 
 func (acsService *AutoCaseStepService) AddAutoCaseStepApi(ctx context.Context, acs *automationReq.AutoCaseStepSearchApi) (data map[string]interface{}, err error) {
-	var as automation.AutoStep
-	err = global.GVA_DB.Model(&automation.AutoStep{}).Preload("Request").Where("id = ?", acs.ApiID).First(&as).Error
+	if acs == nil {
+		return nil, fmt.Errorf("请求参数不能为空")
+	}
+	if acs.ID == 0 {
+		return nil, fmt.Errorf("步骤集合ID不能为空")
+	}
+	if acs.ApiID == 0 {
+		return nil, fmt.Errorf("api_id不能为空")
+	}
+
+	db := global.GVA_DB.WithContext(ctx)
+	var createdStepID uint
+	err = db.Transaction(func(tx *gorm.DB) error {
+		var src automation.AutoStep
+		if e := tx.Preload("Request").First(&src, "id = ?", acs.ApiID).Error; e != nil {
+			return e
+		}
+
+		hasRequest := src.Request != nil
+		hasAndroid := src.Android != nil && len(src.Android.Actions) > 0
+		hasIOS := src.IOS != nil && len(src.IOS.Actions) > 0
+		hasHarmony := src.Harmony != nil && len(src.Harmony.Actions) > 0
+		hasBrowser := src.Browser != nil && len(src.Browser.Actions) > 0
+		if !hasRequest && !hasAndroid && !hasIOS && !hasHarmony && !hasBrowser {
+			if src.RequestID != 0 {
+				return fmt.Errorf("该步骤的HTTP Request不存在或已被删除")
+			}
+			return fmt.Errorf("该步骤未配置 Request/Android/IOS/Harmony/Browser，无法添加为接口步骤")
+		}
+
+		var reqCopyID uint
+		if src.Request != nil {
+			reqCopy := *src.Request
+			reqCopy.ID = 0
+			reqCopy.CreatedAt = time.Time{}
+			reqCopy.UpdatedAt = time.Time{}
+			reqCopy.DeletedAt = gorm.DeletedAt{}
+			reqCopy.Request = nil
+			reqCopy.RequestID = 0
+			if e := tx.Create(&reqCopy).Error; e != nil {
+				return e
+			}
+			reqCopyID = reqCopy.ID
+		}
+
+		stepCopy := src
+		stepCopy.ID = 0
+		stepCopy.CreatedAt = time.Time{}
+		stepCopy.UpdatedAt = time.Time{}
+		stepCopy.DeletedAt = gorm.DeletedAt{}
+		stepCopy.StepType = 11
+		stepCopy.Request = nil
+		stepCopy.RequestID = reqCopyID
+		if e := tx.Create(&stepCopy).Error; e != nil {
+			return e
+		}
+
+		sort := uint(999)
+		if acs.Sort != 0 {
+			sort = acs.Sort
+		}
+		rel := automation.AutoCaseStepRelation{
+			AutoCaseStepID: acs.ID,
+			AutoStepID:     stepCopy.ID,
+			Sort:           sort,
+			ProjectId:      stepCopy.ProjectId,
+		}
+		if e := tx.Create(&rel).Error; e != nil {
+			return e
+		}
+
+		createdStepID = stepCopy.ID
+		return nil
+	})
 	if err != nil {
-		return
+		return nil, err
 	}
-	as.ID = 0
-	as.Request.ID = 0
-	as.StepType = 11
-	err = global.GVA_DB.Create(&as).Error
-	if err != nil {
-		return
-	}
-	var acsRequest automation.AutoCaseStepRelation
-	acsRequest.AutoCaseStepID = acs.ID
-	acsRequest.AutoStepID = as.ID
-	acsRequest.Sort = 999
-	err = global.GVA_DB.Create(&acsRequest).Error
-	if err != nil {
-		return
-	}
-	data = map[string]interface{}{
-		"id": as.ID,
-	}
-	return
+	return map[string]interface{}{"id": createdStepID}, nil
 }
 
 func (acsService *AutoCaseStepService) SortAutoCaseStepApi(ctx context.Context, acs *automationReq.AutoCaseStepSearchApi) (err error) {
@@ -188,7 +243,9 @@ func (acsService *AutoCaseStepService) GetAutoCaseStep(ctx context.Context, ID s
 
 func (acsService *AutoCaseStepService) GetAutoCaseStepApi(ctx context.Context, ID string) (setpApiList []automation.AutoStep, err error) {
 	var acsps []automation.AutoCaseStepRelation
-	err = global.GVA_DB.Model(&automation.AutoCaseStepRelation{}).Preload("AutoStep.Request").
+	err = global.GVA_DB.Model(&automation.AutoCaseStepRelation{}).
+		Preload("AutoStep").
+		Preload("AutoStep.Request").
 		Where("auto_case_step_id = ?", ID).Order("sort ASC").
 		Find(&acsps).Error
 	if err != nil {

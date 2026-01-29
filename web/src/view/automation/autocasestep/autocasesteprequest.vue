@@ -2,14 +2,19 @@
   <div class="autocase-step-request-container">
     <div class="left-panel">
       <div class="panel-header">
-        <span class="title">接口列表</span>
+        <span v-if="platformType === 'api'" class="title">接口列表</span>
+        <el-tabs v-else v-model="leftTab" class="left-tab-header">
+          <el-tab-pane label="接口列表" name="api" />
+          <el-tab-pane :label="elementTabLabel" name="element" />
+        </el-tabs>
       </div>
       <div class="panel-content">
         <div class="menu-container">
           <ApiMenu
-            menutype="1"
+            :menutype="leftMenuType"
             @getTreeID="handleMenuClick"
-            detail=true
+            :detail="true"
+            :default-first="true"
           />
         </div>
         <div class="table-container">
@@ -17,7 +22,7 @@
             <el-form ref="elSearchFormRef" :inline="true" :model="searchInfo" class="demo-form-inline"
                      @keyup.enter="onSubmit">
               <el-form-item prop="name" style="margin-bottom: 0; margin-right: 10px;">
-                <el-input v-model="searchInfo.name" placeholder="请输入接口名称" clearable prefix-icon="Search" />
+                <el-input v-model="searchInfo.name" placeholder="请输入名称" clearable prefix-icon="Search" />
               </el-form-item>
               <el-form-item style="margin-bottom: 0;">
                 <el-button type="primary" icon="search" @click="onSubmit" circle></el-button>
@@ -29,7 +34,7 @@
             ref="multipleTable"
             style="width: 100%"
             :show-header="false"
-            :data="tableData"
+            :data="leftTableData"
             row-key="ID"
             :cell-style="{ paddingTop: '4px', paddingBottom: '4px' }"
             height="calc(100% - 50px)"
@@ -44,20 +49,20 @@
                   class="block"
                   :class="`block_${scope.row.request.method.toLowerCase()}`"
                 >
-          <span
-            class="block-method block_method_color"
-            :class="`block_method_${scope.row.request.method.toLowerCase()}`"
-          >
-            {{ scope.row.request.method }}
-          </span>
+                  <span
+                    class="block-method block_method_color"
+                    :class="`block_method_${scope.row.request.method.toLowerCase()}`"
+                  >
+                    {{ scope.row.request.method }}
+                  </span>
                   <div class="block">
-            <span
-              class="block-method block_method_color block_method_options"
-              v-if="scope.row.creator === 'yapi'"
-              :title="'从YAPI导入的接口'"
-            >
-              YAPI
-            </span>
+                    <span
+                      class="block-method block_method_color block_method_options"
+                      v-if="scope.row.creator === 'yapi'"
+                      :title="'从YAPI导入的接口'"
+                    >
+                      YAPI
+                    </span>
                   </div>
                   <span class="block-method block_url">{{
                       scope.row.request.url
@@ -68,21 +73,21 @@
                 </div>
 
                 <!-- Grpc 接口展示 -->
-                <div v-if="scope.row.gRPC" class="block" :class="`block_put`">
-          <span
-            class="block-method block_method_color"
-            :class="`block_method_put`"
-          >
-            {{ 'gRPC' }}
-          </span>
+                <div v-else-if="scope.row.gRPC" class="block" :class="`block_put`">
+                  <span
+                    class="block-method block_method_color"
+                    :class="`block_method_put`"
+                  >
+                    {{ 'gRPC' }}
+                  </span>
                   <div class="block">
-            <span
-              class="block-method block_method_color block_method_options"
-              v-if="scope.row.creator === 'yapi'"
-              :title="'从YAPI导入的接口'"
-            >
-              YAPI
-            </span>
+                    <span
+                      class="block-method block_method_color block_method_options"
+                      v-if="scope.row.creator === 'yapi'"
+                      :title="'从YAPI导入的接口'"
+                    >
+                      YAPI
+                    </span>
                   </div>
                   <span class="block-method block_url">{{
                       scope.row.gRPC.url
@@ -90,6 +95,50 @@
                   <span class="block-summary-description">{{
                       scope.row.name
                     }}</span>
+                </div>
+
+                <!-- Android 动作展示 -->
+                <div v-else-if="scope.row.android" class="block block_post">
+                      <span class="block-method block_method_color block_method_post">
+                          ANDROID
+                      </span>
+                  <span class="block-summary-description" style="margin-left: 10px;">{{ scope.row.name }}</span>
+                  <span class="block-method block_url" style="margin-left: 10px; color: #999;">
+                          {{ (scope.row.android?.actions || []).length }} Actions
+                      </span>
+                </div>
+
+                <!-- iOS 动作展示 -->
+                <div v-else-if="scope.row.ios" class="block block_delete">
+                      <span class="block-method block_method_color block_method_delete">
+                          IOS
+                      </span>
+                  <span class="block-summary-description" style="margin-left: 10px;">{{ scope.row.name }}</span>
+                  <span class="block-method block_url" style="margin-left: 10px; color: #999;">
+                          {{ (scope.row.ios?.actions || []).length }} Actions
+                      </span>
+                </div>
+
+                <!-- Harmony 动作展示 -->
+                <div v-else-if="scope.row.harmony" class="block block_get">
+                      <span class="block-method block_method_color block_method_get">
+                          HARMONY
+                      </span>
+                  <span class="block-summary-description" style="margin-left: 10px;">{{ scope.row.name }}</span>
+                  <span class="block-method block_url" style="margin-left: 10px; color: #999;">
+                          {{ (scope.row.harmony?.actions || []).length }} Actions
+                      </span>
+                </div>
+
+                <!-- Browser 动作展示 -->
+                <div v-else-if="scope.row.browser" class="block block_put">
+                      <span class="block-method block_method_color block_method_put">
+                          BROWSER
+                      </span>
+                  <span class="block-summary-description" style="margin-left: 10px;">{{ scope.row.name }}</span>
+                  <span class="block-method block_url" style="margin-left: 10px; color: #999;">
+                          {{ (scope.row.browser?.actions || []).length }} Actions
+                      </span>
                 </div>
               </template>
             </el-table-column>
@@ -107,7 +156,7 @@
 
     <div class="right-panel">
       <div class="panel-header">
-        <span class="title">步骤「{{ stepName }}」接口</span>
+        <span class="title">步骤「{{ stepName }}」</span>
         <span class="subtitle">（拖拽可排序）</span>
       </div>
       <div class="panel-content">
@@ -155,7 +204,7 @@
               </div>
 
               <!-- Grpc 接口展示 -->
-              <div v-if="scope.row.gRPC" class="block" :class="`block_put`">
+              <div v-else-if="scope.row.gRPC" class="block" :class="`block_put`">
           <span
             class="block-method block_method_color"
             :class="`block_method_put`"
@@ -177,6 +226,50 @@
                 <span class="block-summary-description">{{
                     scope.row.name
                   }}</span>
+              </div>
+
+              <!-- Android 动作展示 -->
+              <div v-else-if="scope.row.android" class="block block_post">
+                      <span class="block-method block_method_color block_method_post">
+                          ANDROID
+                      </span>
+                <span class="block-summary-description" style="margin-left: 10px;">{{ scope.row.name }}</span>
+                <span class="block-method block_url" style="margin-left: 10px; color: #999;">
+                          {{ (scope.row.android?.actions || []).length }} Actions
+                      </span>
+              </div>
+
+              <!-- iOS 动作展示 -->
+              <div v-else-if="scope.row.ios" class="block block_delete">
+                      <span class="block-method block_method_color block_method_delete">
+                          IOS
+                      </span>
+                <span class="block-summary-description" style="margin-left: 10px;">{{ scope.row.name }}</span>
+                <span class="block-method block_url" style="margin-left: 10px; color: #999;">
+                          {{ (scope.row.ios?.actions || []).length }} Actions
+                      </span>
+              </div>
+
+              <!-- Harmony 动作展示 -->
+              <div v-else-if="scope.row.harmony" class="block block_get">
+                      <span class="block-method block_method_color block_method_get">
+                          HARMONY
+                      </span>
+                <span class="block-summary-description" style="margin-left: 10px;">{{ scope.row.name }}</span>
+                <span class="block-method block_url" style="margin-left: 10px; color: #999;">
+                          {{ (scope.row.harmony?.actions || []).length }} Actions
+                      </span>
+              </div>
+
+              <!-- Browser 动作展示 -->
+              <div v-else-if="scope.row.browser" class="block block_put">
+                      <span class="block-method block_method_color block_method_put">
+                          BROWSER
+                      </span>
+                <span class="block-summary-description" style="margin-left: 10px;">{{ scope.row.name }}</span>
+                <span class="block-method block_url" style="margin-left: 10px; color: #999;">
+                          {{ (scope.row.browser?.actions || []).length }} Actions
+                      </span>
               </div>
 
             </template>
@@ -210,12 +303,21 @@
                :close-on-press-escape="false"
                :close-on-click-modal="false"
                top="0"
-               :title="type === 'create' ? '新增接口' :type === 'update' ? '编辑接口' :'复制接口'"
+               :title="stepDialogMode === 'create' ? '新增接口' : stepDialogMode === 'update' ? '编辑接口' : '复制接口'"
     >
       <stepForm
+        v-if="dialogPlatform === 'api'"
         :menu="99999999"
         :formData="formData"
-        :stepType="type"
+        :stepType="stepDialogMode"
+        @close="closeDialog"
+      />
+      <uiStepForm
+        v-else
+        :menu="99999999"
+        :formData="formData"
+        :stepType="stepDialogMode"
+        :platform="dialogPlatform"
         @close="closeDialog"
       />
     </el-dialog>
@@ -231,11 +333,12 @@
     sortAutoCaseStepApi,
     deleteAutoCaseStep, deleteAutoCaseStepApi
   } from '@/api/automation/autocasestep.js'
-  import { ref, onMounted, nextTick } from 'vue'
+  import { ref, onMounted, nextTick, computed } from 'vue'
   import Sortable from 'sortablejs'
   import { watch } from 'vue'
   import { ElMessage, ElMessageBox } from 'element-plus'
   import stepForm from '@/components/platform/step/index.vue'
+  import uiStepForm from '@/components/platform/step/ui.vue'
 
   const tableData = ref([])
   const tableApiData = ref([])
@@ -247,6 +350,7 @@
   const rightDomKey = ref(true)
   const stepName = ref('')
   const searchInfo = ref({})
+  const page = ref(1)
   const props = defineProps({
     stepID: {
       type: [Number, String],
@@ -257,11 +361,45 @@
       type: String,
       required: true,
       default: ''
+    },
+    type: {
+      type: String,
+      default: 'api'
     }
   })
 
+  const platformType = computed(() => {
+    return props.type || 'api'
+  })
+
+  const leftTab = ref('api')
+
+  const elementTabLabel = computed(() => {
+    const upper = (platformType.value || '').toUpperCase()
+    return `${upper}元素操作`
+  })
+
+  const leftMenuType = computed(() => {
+    if (platformType.value === 'api' || leftTab.value === 'api') {
+      return '1'
+    }
+    const typeMap = {
+      'android': '100',
+      'ios': '200',
+      'harmony': '300',
+      'browser': '400'
+    }
+    return typeMap[platformType.value] || `autostep_${platformType.value}`
+  })
+
   const getTableData = async () => {
-    const table = await getAutoStepList({ page: 1, pageSize: 9999, meun: Number(menuId.value), ...searchInfo.value })
+    const menuNumber = Number(menuId.value)
+    const table = await getAutoStepList({
+      page: 1,
+      pageSize: 9999,
+      menu: Number.isFinite(menuNumber) ? menuNumber : 0,
+      ...searchInfo.value
+    })
     if (table.code === 0) {
       tableData.value = table.data.list
       // 重新初始化左侧拖动
@@ -316,6 +454,26 @@
     menuId.value = id
     getTableData()
   }
+
+  watch(() => leftMenuType.value, () => {
+    menuId.value = null
+    getTableData()
+  }, { immediate: true })
+
+  const isApiRow = (row) => {
+    return Boolean(row?.request || row?.gRPC)
+  }
+
+  const isElementRow = (row) => {
+    if (platformType.value === 'api') return false
+    return Boolean(row?.[platformType.value])
+  }
+
+  const leftTableData = computed(() => {
+    if (platformType.value === 'api') return tableData.value
+    if (leftTab.value === 'api') return tableData.value.filter(isApiRow)
+    return tableData.value.filter(isElementRow)
+  })
 
   const addAutoCaseStepApiFunc = (row, targetIndex) => {
     // 深拷贝原始数据避免修改源数据
@@ -426,7 +584,7 @@
             // 只处理跨列表拖拽
             if (evt.from === evt.to) return
 
-            const draggedRow = tableData.value[evt.oldIndex]
+            const draggedRow = leftTableData.value[evt.oldIndex]
             if (draggedRow) {
               const targetIndex = evt.newIndex
               addAutoCaseStepApiFunc(draggedRow, targetIndex)
@@ -479,13 +637,24 @@
     })
   }
   const formData = ref()
-  const type = ref('')
+  const stepDialogMode = ref('')
+  const dialogPlatform = ref('api')
   const dialogFormVisible = ref(false)
+  
+  const detectStepPlatform = (data) => {
+    if (data?.request) return 'api'
+    for (const p of ['android', 'ios', 'harmony', 'browser']) {
+      if (data?.[p]) return p
+    }
+    return platformType.value || 'api'
+  }
+
   const updateAutoStepFunc = async (row) => {
     const res = await findAutoStep({ ID: row.ID })
     if (res.code === 0) {
       formData.value = res.data
-      type.value = 'update'
+      dialogPlatform.value = detectStepPlatform(res.data)
+      stepDialogMode.value = 'update'
       dialogFormVisible.value = true
     }
   }
@@ -605,6 +774,14 @@
     padding: 5px;
     display: flex;
     align-items: center;
+  }
+
+  .left-tab-header {
+    width: 100%;
+  }
+
+  .left-tab-header :deep(.el-tabs__header) {
+    margin: 0;
   }
 
   .block_url {

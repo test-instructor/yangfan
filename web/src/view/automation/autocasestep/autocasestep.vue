@@ -3,7 +3,7 @@
     <div style="display: flex; width: 100%; overflow: hidden;">
       <div style="width: 250px; flex-shrink: 0;">
         <ApiMenu
-          menutype="11"
+          :menutype="currentMenuType"
           @getTreeID="handleMenuClick"
         />
       </div>
@@ -91,7 +91,7 @@
                 <div style="display: flex; align-items: center;">
                   <Runner case_type="step" :case_id="scope.row.ID" style="margin-right: 10px;" />
                   <el-button type="primary" link icon="step-api" class="table-button" @click="openApiDetail(scope.row)">
-                    接口管理
+                    {{ manageTitle }}
                   </el-button>
                   <el-button type="primary" link icon="edit" class="table-button" @click="updateAutoCaseStepFunc(scope.row)">
                     编辑
@@ -147,9 +147,9 @@
       v-model="dialogApiDetail"
       :show-close="true"
       :before-close="closeApiDetail"
-      title="接口管理"
+      :title="manageTitle"
     >
-      <Autocasesteprequest :stepID="stepId" :stepName="stepName"/>
+      <Autocasesteprequest :stepID="stepId" :stepName="stepName" :type="caseType"/>
     </el-drawer>
 
   </div>
@@ -180,7 +180,7 @@
     onDownloadFile
   } from '@/utils/format'
   import { ElMessage, ElMessageBox } from 'element-plus'
-  import { ref, reactive } from 'vue'
+  import { ref, reactive, computed } from 'vue'
   import { useAppStore } from '@/pinia'
   import AutoCaseStepForm from '@/view/automation/autocasestep/autocasestepForm.vue'
   import ApiMenu from '@/components/platform/menu/index.vue'
@@ -191,8 +191,26 @@
   import DataWarehouseFieldSelector from '@/components/platform/button/DataWarehouseFieldSelector.vue'
   import Runner from '@/components/platform/Runner.vue'
 
+  import { useRoute } from 'vue-router'
+
   defineOptions({
     name: 'AutoCaseStep'
+  })
+
+  const route = useRoute()
+  const caseType = computed(() => {
+    return route.query.type || 'api'
+  })
+
+  const currentMenuType = computed(() => {
+    if (caseType.value === 'api') {
+      return '11'
+    }
+    return `casestep_${caseType.value}`
+  })
+
+  const manageTitle = computed(() => {
+    return caseType.value === 'api' ? '接口管理' : '元素操作管理'
   })
 
   // 提交按钮loading

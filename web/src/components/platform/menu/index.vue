@@ -320,31 +320,36 @@
     nextTick(() => {
       if (trees.value && trees.value.length > 0) {
 
-        let getTreeID = localStorage.getItem('getTreeID')
-        let treeData
-        try {
-          // 尝试解析为对象，如果解析失败（比如是数字、字符串），则初始化为空对象
-          treeData = JSON.parse(getTreeID) || {}
-          // 确保解析后是对象（如果原始值是数组/其他类型，也转为对象）
-          if (typeof treeData !== 'object' || treeData === null) {
+        let targetNode = null
+        
+        if (!props.defaultFirst) {
+          let getTreeID = localStorage.getItem('getTreeID')
+          let treeData
+          try {
+            // 尝试解析为对象，如果解析失败（比如是数字、字符串），则初始化为空对象
+            treeData = JSON.parse(getTreeID) || {}
+            // 确保解析后是对象（如果原始值是数组/其他类型，也转为对象）
+            if (typeof treeData !== 'object' || treeData === null) {
+              treeData = {}
+            }
+          } catch (e) {
+            // 解析出错（比如原始值不是JSON格式），直接初始化为空对象
             treeData = {}
           }
-        } catch (e) {
-          // 解析出错（比如原始值不是JSON格式），直接初始化为空对象
-          treeData = {}
-        }
-        const storedTreeId = treeData[props.menutype]
+          const storedTreeId = treeData[props.menutype]
 
-        let targetId = storedTreeId ? Number(storedTreeId) : null
+          let targetId = storedTreeId ? Number(storedTreeId) : null
 
-        let targetNode = null
-        if (targetId) {
-          targetNode = findTreeNodeById(trees.value, targetId)
+          if (targetId) {
+            targetNode = findTreeNodeById(trees.value, targetId)
+          }
         }
 
         if (!targetNode) {
           let defaultData = trees.value[0]
-          defaultData = getDefaultTreeNode(defaultData)
+          if (!props.defaultFirst) {
+            defaultData = getDefaultTreeNode(defaultData)
+          }
           targetNode = defaultData
         }
 
