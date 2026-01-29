@@ -1,9 +1,25 @@
-const callApp = (method, ...args) => {
-  const fn = window?.go?.main?.App?.[method]
-  if (!fn) {
-    throw new Error(`Go 方法不可用: ${method}`)
+import { handleNetworkError } from '@/utils/errorHandler'
+
+const callApp = async (method, ...args) => {
+  try {
+    const fn = window?.go?.main?.App?.[method]
+    if (!fn) {
+      throw new Error(`Go 方法不可用: ${method}`)
+    }
+    
+    const result = await fn(...args)
+    
+    // 统一处理返回结果
+    if (result && typeof result === 'object' && result.error) {
+      throw new Error(result.error)
+    }
+    
+    return result
+  } catch (error) {
+    console.error(`调用 Go 方法失败 [${method}]:`, error)
+    handleNetworkError(error)
+    throw error
   }
-  return fn(...args)
 }
 
 export const getBaseURL = async () => {
@@ -68,4 +84,25 @@ export const setSelfInfo = async (info) => {
 
 export const changePassword = async ({ password, newPassword }) => {
   return await callApp('ChangePassword', password, newPassword)
+}
+
+export const getAppConfig = async () => {
+  return await callApp('GetAppConfig')
+}
+
+export const setAppConfig = async (config) => {
+  const { environment, debugMode, theme, language, autoLogin, rememberMe } = config
+  return await callApp('SetAppConfig', environment, debugMode, theme, language, autoLogin, rememberMe)
+}
+
+export const getSystemInfo = async () => {
+  return await callApp('GetSystemInfo')
+}
+
+export const trackPerformance = async (metrics) => {
+  return await callApp('TrackPerformance', metrics)
+}
+
+export const trackError = async (errorInfo) => {
+  return await callApp('TrackError', errorInfo)
 }

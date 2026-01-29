@@ -3,11 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
+	"runtime"
 	"strings"
 	"time"
 
 	"yangfan-ui/internal/auth"
 	"yangfan-ui/internal/config"
+	"yangfan-ui/internal/devtools"
 	"yangfan-ui/internal/logger"
 	"yangfan-ui/internal/platformapi"
 	"yangfan-ui/internal/platformclient"
@@ -17,11 +19,12 @@ import (
 )
 
 type App struct {
-	ctx    context.Context
-	store  *config.Store
-	auth   *auth.Manager
-	client *platformclient.Client
-	svc    *service.PlatformService
+	ctx      context.Context
+	store    *config.Store
+	auth     *auth.Manager
+	client   *platformclient.Client
+	svc      *service.PlatformService
+	devTools *devtools.DevTools
 }
 
 func NewApp() *App {
@@ -50,6 +53,7 @@ func (a *App) startup(ctx context.Context) {
 	a.auth = auth.New(store)
 	a.client = platformclient.New(store)
 	a.svc = service.NewPlatformService(a.client, a.auth)
+	a.devTools = devtools.New(logger.Log)
 	logger.Info("App services initialized", zap.String("BaseURL", store.BaseURL()))
 }
 
@@ -248,4 +252,85 @@ func (a *App) ChangePassword(password string, newPassword string) (map[string]an
 		return nil, fmt.Errorf("service 未初始化")
 	}
 	return a.svc.ChangePassword(a.ctx, password, newPassword)
+}
+
+func (a *App) GetAppConfig() (map[string]any, error) {
+	if a.store == nil {
+		return nil, fmt.Errorf("config store 未初始化")
+	}
+	cfg := a.store.Get()
+	return map[string]any{
+		"environment": cfg.Environment,
+		"debugMode":   cfg.DebugMode,
+		"theme":       cfg.Theme,
+		"language":    cfg.Language,
+		"autoLogin":   cfg.AutoLogin,
+		"rememberMe":  cfg.RememberMe,
+	}, nil
+}
+
+func (a *App) SetAppConfig(environment string, debugMode bool, theme string, language string, autoLogin bool, rememberMe bool) error {
+	if a.store == nil {
+		return fmt.Errorf("config store 未初始化")
+	}
+
+	// 验证环境
+	env := config.Environment(environment)
+	if env != config.EnvDevelopment && env != config.EnvTesting && env != config.EnvProduction {
+		return fmt.Errorf("无效的环境: %s", environment)
+	}
+
+	// 更新配置
+	if err := a.store.SetEnvironment(env); err != nil {
+		return err
+	}
+	if err := a.store.SetDebugMode(debugMode); err != nil {
+		return err
+	}
+	if err := a.store.SetTheme(theme); err != nil {
+		return err
+	}
+	if err := a.store.SetLanguage(language); err != nil {
+		return err
+	}
+	if err := a.store.SetAutoLogin(autoLogin); err != nil {
+		return err
+	}
+	if err := a.store.SetRememberMe(rememberMe); err != nil {
+		return err
+	}
+
+	logger.Info("App configuration updated",
+		zap.String("environment", environment),
+		zap.Bool("debugMode", debugMode),
+		zap.String("theme", theme),
+		zap.String("language", language))
+	return nil
+}
+
+func (a *App) GetSystemInfo() (map[string]any, error) {
+	if a.devTools == nil {
+		return map[string]any{
+			"appName":      "扬帆自动化测试平台-UI自动化节点",
+			"version":      "1.0.0",
+			"buildTime":    "2024-01-29",
+			"goVersion":    runtime.Version(),
+			"wailsVersion": "2.11.0",
+			"platform":     runtime.GOOS,
+			"arch":         runtime.GOARCH,
+		}, nil
+	}
+	return a.devTools.GetSystemInfo(), nil
+}
+
+func (a *App) TrackPerformance(metrics map[string]any) error {
+	logger.Debug("Performance metrics received", zap.Any("metrics", metrics))
+	// 可以在这里添加性能数据存储或分析逻辑
+	return nil
+}
+
+func (a *App) TrackError(errorInfo map[string]any) error {
+	logger.Error("Frontend error tracked", zap.Any("error", errorInfo))
+	// 可以在这里添加错误日志存储或分析逻辑
+	return nil
 }

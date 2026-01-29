@@ -10,13 +10,28 @@ import (
 	"sync"
 )
 
+// Environment 环境类型
+type Environment string
+
+const (
+	EnvDevelopment Environment = "development"
+	EnvTesting     Environment = "testing"
+	EnvProduction  Environment = "production"
+)
+
 type Config struct {
-	BaseURL      string `json:"baseURL"`
-	Token        string `json:"token"`
-	ExpiresAt    int64  `json:"expiresAt"`
-	LogLevel     string `json:"logLevel"`     // debug, info, warn, error, dpanic, panic, fatal
-	LogPrefix    string `json:"logPrefix"`    // e.g. [ https://github.com/test-instructor/yangfan/ui ]
-	LogRetention int    `json:"logRetention"` // days
+	BaseURL      string      `json:"baseURL"`
+	Token        string      `json:"token"`
+	ExpiresAt    int64       `json:"expiresAt"`
+	LogLevel     string      `json:"logLevel"`     // debug, info, warn, error, dpanic, panic, fatal
+	LogPrefix    string      `json:"logPrefix"`    // e.g. [ https://github.com/test-instructor/yangfan/ui ]
+	LogRetention int         `json:"logRetention"` // days
+	Environment  Environment `json:"environment"`
+	DebugMode    bool        `json:"debugMode"`
+	Theme        string      `json:"theme"`
+	Language     string      `json:"language"`
+	AutoLogin    bool        `json:"autoLogin"`
+	RememberMe   bool        `json:"rememberMe"`
 }
 
 type Store struct {
@@ -54,6 +69,12 @@ func (s *Store) load() error {
 			LogLevel:     "info",
 			LogPrefix:    "[ https://github.com/test-instructor/yangfan/ui ]",
 			LogRetention: 30,
+			Environment:  EnvDevelopment,
+			DebugMode:    false,
+			Theme:        "light",
+			Language:     "zh-CN",
+			AutoLogin:    false,
+			RememberMe:   false,
 		}
 		return nil // treat as no error, use defaults
 	}
@@ -70,6 +91,15 @@ func (s *Store) load() error {
 	}
 	if cfg.LogRetention <= 0 {
 		cfg.LogRetention = 30
+	}
+	if cfg.Environment == "" {
+		cfg.Environment = EnvDevelopment
+	}
+	if cfg.Theme == "" {
+		cfg.Theme = "light"
+	}
+	if cfg.Language == "" {
+		cfg.Language = "zh-CN"
 	}
 	s.cfg = cfg
 	return nil
@@ -138,6 +168,68 @@ func (s *Store) SetToken(token string, expiresAt int64) error {
 	defer s.mu.Unlock()
 	s.cfg.Token = token
 	s.cfg.ExpiresAt = expiresAt
+	return s.saveLocked()
+}
+
+// Environment 获取环境
+func (s *Store) Environment() Environment {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.cfg.Environment
+}
+
+// IsDebugMode 是否为调试模式
+func (s *Store) IsDebugMode() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.cfg.DebugMode
+}
+
+// SetEnvironment 设置环境
+func (s *Store) SetEnvironment(env Environment) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.cfg.Environment = env
+	return s.saveLocked()
+}
+
+// SetDebugMode 设置调试模式
+func (s *Store) SetDebugMode(debug bool) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.cfg.DebugMode = debug
+	return s.saveLocked()
+}
+
+// SetTheme 设置主题
+func (s *Store) SetTheme(theme string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.cfg.Theme = theme
+	return s.saveLocked()
+}
+
+// SetLanguage 设置语言
+func (s *Store) SetLanguage(language string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.cfg.Language = language
+	return s.saveLocked()
+}
+
+// SetAutoLogin 设置自动登录
+func (s *Store) SetAutoLogin(autoLogin bool) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.cfg.AutoLogin = autoLogin
+	return s.saveLocked()
+}
+
+// SetRememberMe 设置记住我
+func (s *Store) SetRememberMe(remember bool) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.cfg.RememberMe = remember
 	return s.saveLocked()
 }
 
