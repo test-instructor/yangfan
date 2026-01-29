@@ -6,19 +6,21 @@
           <el-input v-model="formData.name" :clearable="false" placeholder="请输入步骤名称" />
         </el-form-item>
 
+        <el-form-item label="设备:">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <el-select v-model="deviceSerial" :placeholder="devicePlaceholder" clearable filterable style="width: 420px" @change="handleDeviceChange">
+              <el-option v-for="item in deviceOptions" :key="item.ID" :label="getDeviceLabel(item)" :value="getDeviceValue(item)" />
+            </el-select>
+            <el-button type="primary" plain :disabled="!deviceSerial" @click="applyDeviceToAllActions">
+              应用到全部动作
+            </el-button>
+          </div>
+        </el-form-item>
+
         <el-form-item>
           <div style="height: 560px;width: 1200px">
             <el-tabs v-model="activeTab">
               <el-tab-pane label="动作列表" name="actions">
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                  <span style="width: 64px; color: #606266;">设备</span>
-                  <el-select v-model="deviceSerial" :placeholder="devicePlaceholder" clearable filterable style="width: 420px" @change="handleDeviceChange">
-                    <el-option v-for="item in deviceOptions" :key="item.ID" :label="getDeviceLabel(item)" :value="getDeviceValue(item)" />
-                  </el-select>
-                  <el-button type="primary" plain :disabled="!deviceSerial" @click="applyDeviceToAllActions">
-                    应用到全部动作
-                  </el-button>
-                </div>
                 <MobileActionList v-model="actions" />
               </el-tab-pane>
 

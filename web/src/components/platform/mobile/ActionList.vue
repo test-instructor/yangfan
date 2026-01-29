@@ -13,11 +13,12 @@
       row-key="id"
       @selection-change="handleSelectionChange"
       class="action-table"
+      height="400"
     >
       <el-table-column type="selection" width="55" />
       <el-table-column label="序号" type="index" width="60" align="center" />
       
-      <el-table-column label="动作类型" width="180">
+      <el-table-column label="动作类型" width="240">
         <template #default="{ row }">
           <el-select v-model="row.method" placeholder="选择动作" filterable @change="handleMethodChange(row)">
             <el-option-group label="常用动作">
@@ -50,7 +51,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="参数配置" min-width="300">
+      <el-table-column label="参数配置" min-width="280">
         <template #default="{ row }">
           <div class="params-container">
             <!-- 动态渲染参数输入框 -->
