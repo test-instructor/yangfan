@@ -21,6 +21,41 @@
             扬帆是一套面向企业研发团队的接口自动化测试平台，围绕“用例资产沉淀、任务调度执行、测试数据治理、报告与通知闭环”搭建一体化能力。
             平台以 HttpRunner V5 为核心运行引擎，通过标准化的资产管理与可扩展的运行能力，把零散的脚本执行升级为可复用、可追踪、可治理的质量体系。
           </div>
+          <div class="mt-4 space-y-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-medium">Gitee:</span>
+              <a
+                href="https://gitee.com/test-instructor/yangfan"
+                target="_blank"
+                class="text-blue-600 hover:text-blue-500"
+                >https://gitee.com/test-instructor/yangfan</a
+              >
+              <el-tag>GVP</el-tag>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-medium">GitCode:</span>
+              <a
+                href="https://gitcode.com/yangfanz/yangfan"
+                target="_blank"
+                class="text-blue-600 hover:text-blue-500"
+                >https://gitcode.com/yangfanz/yangfan</a
+              >
+              <img
+                src="https://img.shields.io/badge/GitCode-G--Star-blue"
+                alt="G-Star"
+                class="h-5"
+              />
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-medium">GitHub:</span>
+              <a
+                href="https://github.com/test-instructor/yangfan"
+                target="_blank"
+                class="text-blue-600 hover:text-blue-500"
+                >https://github.com/test-instructor/yangfan</a
+              >
+            </div>
+          </div>
         </section>
 
         <section>
@@ -61,20 +96,24 @@
             扫码联系作者或加入交流群（二维码位于本文末尾）
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div
               class="border border-gray-200 dark:border-slate-700 rounded-lg p-4 flex flex-col items-center bg-gray-50 dark:bg-slate-900"
             >
               <div class="font-medium text-gray-700 dark:text-gray-200 mb-3">
                 作者二维码
               </div>
-              <el-image
-                class="w-48 h-48 rounded"
-                :src="authorQrUrl"
-                fit="cover"
-                :preview-src-list="[authorQrUrl]"
-                preview-teleported
-              />
+              <div class="w-full flex justify-center">
+                <div class="w-full max-w-[200px] aspect-square">
+                  <el-image
+                    class="w-full h-full rounded"
+                    :src="authorQrUrl"
+                    fit="contain"
+                    :preview-src-list="[authorQrUrl]"
+                    preview-teleported
+                  />
+                </div>
+              </div>
             </div>
 
             <div
@@ -83,13 +122,36 @@
               <div class="font-medium text-gray-700 dark:text-gray-200 mb-3">
                 群二维码
               </div>
-              <el-image
-                class="w-48 h-48 rounded"
-                :src="groupQrUrl"
-                fit="cover"
-                :preview-src-list="[groupQrUrl]"
-                preview-teleported
-              />
+              <div class="w-full flex justify-center">
+                <div class="w-full max-w-[200px] aspect-square">
+                  <el-image
+                    class="w-full h-full rounded"
+                    :src="groupQrUrl"
+                    fit="contain"
+                    :preview-src-list="[groupQrUrl]"
+                    preview-teleported
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="border border-gray-200 dark:border-slate-700 rounded-lg p-4 flex flex-col items-center bg-gray-50 dark:bg-slate-900"
+            >
+              <div class="font-medium text-gray-700 dark:text-gray-200 mb-3">
+                公众号二维码
+              </div>
+              <div class="w-full flex justify-center">
+                <div >
+                  <el-image
+                    class="w-full h-full rounded"
+                    :src="mpQrUrl"
+                    fit="contain"
+                    :preview-src-list="[mpQrUrl]"
+                    preview-teleported
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -101,4 +163,5 @@
 <script setup>
   const authorQrUrl = 'http://qiniu.yangfan.gd.cn/about/author.jpeg'
   const groupQrUrl = 'http://qiniu.yangfan.gd.cn/about/group.jpeg'
+  const mpQrUrl = 'https://qiniu.yangfan.gd.cn/about/mp.png'
 </script>
