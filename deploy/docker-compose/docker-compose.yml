@@ -3,6 +3,16 @@ services:
     image: "${REGISTRY:-yangfanz/}server${IMAGE_SUFFIX:-}:${IMAGE_TAG:-latest}"
     container_name: yangfan-server
     restart: always
+    healthcheck:
+      test:
+        - CMD
+        - python3
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8888/health', timeout=2).read()"
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
     volumes:
       - ./config/docker.config.yaml:/yangfan/docker.config.yaml:rw
     ports:
@@ -15,7 +25,8 @@ services:
     container_name: yangfan-run
     restart: always
     depends_on:
-      - server
+      server:
+        condition: service_healthy
     environment:
       RUN_SERVICE_MODE: runner
       NODE_NAME: runner
@@ -29,7 +40,8 @@ services:
     container_name: yangfan-run-all
     restart: always
     depends_on:
-      - server
+      server:
+        condition: service_healthy
     environment:
       RUN_SERVICE_MODE: all
       NODE_NAME: runner-all
@@ -43,7 +55,8 @@ services:
     container_name: yangfan-run-timer
     restart: always
     depends_on:
-      - server
+      server:
+        condition: service_healthy
     environment:
       RUN_SERVICE_MODE: timer
       NODE_NAME: runner-timer
@@ -68,7 +81,8 @@ services:
     container_name: yangfan-web
     restart: always
     depends_on:
-      - server
+      server:
+        condition: service_healthy
     ports:
       - "8080:8080"
     environment:
