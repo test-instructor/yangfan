@@ -68,16 +68,16 @@ module.exports = {
 					children: [
 						{title: '运行配置', path: '/documentation/platform/rc'},
 						{title: '环境变量管理', path: '/documentation/platform/envDetail'},
-						{
-							title: '函数插件',
-							collapsable: true,
-							children: [
-								{title: 'Python 函数', path: '/documentation/platform/FunctionPlugin/pc'},
-								{title: '调试信息', path: '/documentation/platform/FunctionPlugin/pcd'},
-								{title: 'Python 第三方库', path: '/documentation/platform/FunctionPlugin/pp'},
-							],
-						},
 						{title: '运行节点', path: '/documentation/platform/rn'},
+					],
+				},
+				{
+					title: '函数插件',
+					collapsable: true,
+					children: [
+						{title: 'Python 函数', path: '/documentation/platform/FunctionPlugin/pc'},
+						{title: '调试信息', path: '/documentation/platform/FunctionPlugin/pcd'},
+						{title: 'Python 第三方库', path: '/documentation/platform/FunctionPlugin/pp'},
 					],
 				},
 				{

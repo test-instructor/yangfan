@@ -44,3 +44,8 @@ deploy/docker/logs
 /deploy/docker-compose/redis/
 /deploy/docker-compose/mysql/
 /examples/
+/doc/node_modules/
+/ui/yangfan-ui
+/ui/frontend/node_modules/
+/ui/logs/
+/ui/frontend/dist/
