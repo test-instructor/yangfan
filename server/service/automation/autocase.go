@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/test-instructor/yangfan/server/v2/global"
 	"github.com/test-instructor/yangfan/server/v2/model/automation"
@@ -77,8 +78,8 @@ func (acService *AutoCaseService) GetAutoCaseInfoList(ctx context.Context, info 
 	if len(info.CreatedAtRange) == 2 {
 		db = db.Where("created_at BETWEEN ? AND ?", info.CreatedAtRange[0], info.CreatedAtRange[1])
 	}
-	db.Order("id desc")
-	db.Where("project_id = ? ", info.ProjectId)
+	db = db.Order("id desc")
+	db = db.Where("project_id = ? ", info.ProjectId)
 
 	if info.CaseName != nil && *info.CaseName != "" {
 		db = db.Where("case_name LIKE ?", "%"+*info.CaseName+"%")
@@ -91,6 +92,17 @@ func (acService *AutoCaseService) GetAutoCaseInfoList(ctx context.Context, info 
 	}
 	if info.ConfigName != nil && *info.ConfigName != "" {
 		db = db.Where("config_name LIKE ?", "%"+*info.ConfigName+"%")
+	}
+	if info.Type != nil {
+		t := strings.TrimSpace(*info.Type)
+		if t == "" || strings.EqualFold(t, "api") {
+			db = db.Where("(type = ? OR type = '' OR type IS NULL)", "api")
+		} else {
+			db = db.Where("type = ?", t)
+		}
+	}
+	if info.Menu != nil && *info.Menu != 0 {
+		db = db.Where("menu = ?", *info.Menu)
 	}
 	err = db.Count(&total).Error
 	if err != nil {

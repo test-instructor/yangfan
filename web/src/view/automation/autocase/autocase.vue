@@ -3,7 +3,7 @@
     <div style="display: flex; width: 100%; overflow: hidden;">
       <div style="width: 250px; flex-shrink: 0;">
         <ApiMenu
-          menutype="21"
+          :menutype="currentMenuType"
           @getTreeID="handleMenuClick"
         />
       </div>
@@ -224,7 +224,7 @@
     onDownloadFile
   } from '@/utils/format'
   import { ElMessage, ElMessageBox } from 'element-plus'
-  import { ref, reactive } from 'vue'
+  import { ref, reactive, computed, watch } from 'vue'
   import { useAppStore } from '@/pinia'
   import ApiMenu from '@/components/platform/menu/index.vue'
 
@@ -233,9 +233,34 @@
   import Env from '@/components/platform/env.vue'
   import AutocaseStep from '@/view/automation/autocase/autocaseStep.vue'
   import Runner from '@/components/platform/Runner.vue'
+  import { useRoute } from 'vue-router'
 
   defineOptions({
     name: 'AutoCase'
+  })
+
+  const route = useRoute()
+  const normalizePlatform = (val) => {
+    const raw = String(val || '').trim().toLowerCase()
+    if (!raw) return 'api'
+    if (raw === 'web') return 'browser'
+    return raw
+  }
+
+  // 计算当前平台类型（优先 query.type，其次 meta.type，默认为 api）
+  const currentPlatform = computed(() => {
+    const hasQueryType = route.query?.type !== undefined && route.query?.type !== null && String(route.query.type).trim() !== ''
+    if (hasQueryType) return normalizePlatform(route.query.type)
+    return normalizePlatform(route.meta?.type) || 'api'
+  })
+
+  // 计算当前 MenuType（默认为 21）
+  const currentMenuType = computed(() => {
+    // 假设非 api 类型使用 autocase_{type} 作为菜单类型
+    if (currentPlatform.value === 'api') {
+      return '21'
+    }
+    return `autocase_${currentPlatform.value}`
   })
 
   // 提交按钮loading
@@ -248,14 +273,15 @@
   // 自动化生成的字典（可能为空）以及字段
   const formData = ref({
     caseName: '',
-    type: 'api',
+    type: currentPlatform.value,
     runNumber: undefined,
     status: null,
     envName: '',
     desc: '',
     configName: '',
     configID: 0,
-    envID: 0
+    envID: 0,
+    menu: 0
   })
 
 
@@ -288,7 +314,7 @@
   const total = ref(0)
   const pageSize = ref(10)
   const tableData = ref([])
-  const searchInfo = ref({})
+  const searchInfo = ref({ type: currentPlatform.value })
   // 排序
   const sortChange = ({ prop, order }) => {
     const sortMap = {
@@ -308,7 +334,11 @@
   }
   // 重置
   const onReset = () => {
-    searchInfo.value = {}
+    const next = { type: currentPlatform.value }
+    if (menuId.value !== null && menuId.value !== undefined) {
+      next.menu = menuId.value
+    }
+    searchInfo.value = next
     getTableData()
   }
 
@@ -335,7 +365,12 @@
 
   // 查询
   const getTableData = async () => {
-    const table = await getAutoCaseList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    // 自动带上当前的 type 过滤
+    const params = { page: page.value, pageSize: pageSize.value, ...searchInfo.value }
+    if (!params.type) {
+        params.type = currentPlatform.value
+    }
+    const table = await getAutoCaseList(params)
     if (table.code === 0) {
       tableData.value = table.data.list
       total.value = table.data.total
@@ -343,6 +378,15 @@
       pageSize.value = table.data.pageSize
     }
   }
+
+  // 监听路由变化，重置搜索条件并刷新列表
+  watch(() => currentPlatform.value, (newVal) => {
+      searchInfo.value = { type: newVal }
+      formData.value.type = newVal
+      menuId.value = null
+      page.value = 1
+      getTableData()
+  })
 
   getTableData()
 
@@ -442,6 +486,18 @@
   // 打开弹窗
   const openDialog = () => {
     type.value = 'create'
+    formData.value = {
+      caseName: '',
+      type: currentPlatform.value,
+      runNumber: undefined,
+      status: null,
+      envName: '',
+      desc: '',
+      configName: '',
+      configID: 0,
+      envID: 0,
+      menu: menuId.value ?? 0
+    }
     dialogFormVisible.value = true
   }
 
@@ -450,11 +506,15 @@
     dialogFormVisible.value = false
     formData.value = {
       caseName: '',
+      type: currentPlatform.value,
       runNumber: undefined,
       status: null,
       envName: '',
       desc: '',
-      configName: ''
+      configName: '',
+      configID: 0,
+      envID: 0,
+      menu: menuId.value ?? 0
     }
   }
   // 弹窗确定
@@ -463,6 +523,12 @@
     elFormRef.value?.validate(async (valid) => {
       if (!valid) return btnLoading.value = false
       let res
+      if (!formData.value.type) {
+        formData.value.type = currentPlatform.value
+      }
+      if ((formData.value.menu === null || formData.value.menu === undefined || formData.value.menu === 0) && menuId.value) {
+        formData.value.menu = menuId.value
+      }
       switch (type.value) {
         case 'create':
           res = await createAutoCase(formData.value)

@@ -168,7 +168,7 @@
 
 <script setup>
 import ApiMenu from '@/components/platform/menu/index.vue'
-import { ref, nextTick, onMounted, watch } from 'vue'
+import { ref, nextTick, onMounted, watch, computed } from 'vue'
 import Sortable from 'sortablejs'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getAutoCaseList } from '@/api/automation/autocase.js'
@@ -176,11 +176,45 @@ import { getTimerTaskCases, addTimerTaskCase, sortTimerTaskCase, delTimerTaskCas
 
 const props = defineProps({
   taskID: { type: [Number, String], required: true },
-  taskName: { type: String, default: '' }
+  taskName: { type: String, default: '' },
+  taskType: { type: String, default: 'api' }
 })
 
 const activeTab = ref('type_step')
 const stepType = ref('casestep_android')
+const normalizePlatform = (raw) => String(raw ?? '').trim().toLowerCase()
+const normalizedTaskType = computed(() => normalizePlatform(props.taskType) || 'api')
+
+const stepTypeFromPlatform = (t) => {
+  if (t === 'android') return 'casestep_android'
+  if (t === 'ios') return 'casestep_ios'
+  if (t === 'harmony') return 'casestep_harmony'
+  if (t === 'browser') return 'casestep_browser'
+  return ''
+}
+
+const platformFromStepType = (t) => {
+  if (t === 'casestep_android') return 'android'
+  if (t === 'casestep_ios') return 'ios'
+  if (t === 'casestep_harmony') return 'harmony'
+  if (t === 'casestep_browser') return 'browser'
+  return ''
+}
+
+const effectiveCaseType = computed(() => {
+  if (activeTab.value === 'interface_list') return 'api'
+  return platformFromStepType(stepType.value) || normalizedTaskType.value
+})
+
+const initTab = () => {
+  if (normalizedTaskType.value === 'api') {
+    activeTab.value = 'interface_list'
+    return
+  }
+  activeTab.value = 'type_step'
+  const st = stepTypeFromPlatform(normalizedTaskType.value)
+  if (st) stepType.value = st
+}
 const currentMenuType = computed(() => {
   return stepType.value
 })
@@ -209,7 +243,7 @@ watch(activeTab, () => {
 })
 
 const getLeftTableData = async () => {
-  const table = await getAutoCaseList({ page: 1, pageSize: 99999, menu: menuId.value, ...searchInfo.value })
+  const table = await getAutoCaseList({ page: 1, pageSize: 99999, menu: menuId.value, type: effectiveCaseType.value, ...searchInfo.value })
   if (table.code === 0) {
     leftTableData.value = table.data.list
     nextTick(() => { initLeftDrag() })
@@ -334,6 +368,7 @@ watch(() => props.taskID, (newVal) => { if (newVal) getRightTableData() }, { imm
 watch(() => props.taskName, (newVal) => { /* no-op: title reactive */ }, { immediate: true })
 
 onMounted(() => {
+  initTab()
   nextTick(() => { initLeftDrag(); initRightSort() })
 })
 </script>

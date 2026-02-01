@@ -222,6 +222,14 @@ func (tkService *TimerTaskService) GetTimerTaskInfoList(ctx context.Context, inf
 	if info.MessageName != nil && *info.MessageName != "" {
 		db = db.Where("message_name LIKE ?", "%"+*info.MessageName+"%")
 	}
+	if info.Type != nil {
+		t := strings.TrimSpace(*info.Type)
+		if t == "" || strings.EqualFold(t, "api") {
+			db = db.Where("(type = ? OR type = '' OR type IS NULL)", "api")
+		} else {
+			db = db.Where("type = ?", t)
+		}
+	}
 	err = db.Count(&total).Error
 	if err != nil {
 		return

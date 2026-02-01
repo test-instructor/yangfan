@@ -157,9 +157,11 @@
         <el-form-item label="任务类型:" prop="type">
           <el-select v-model="formData.type" placeholder="请选择任务类型" style="width: 100%">
             <el-option label="API" value="api" />
-            <el-option label="UI" value="ui" />
-            <el-option label="Mobile" value="mobile" />
-            <el-option label="Performance" value="performance" />
+            <el-option label="UI(浏览器)" value="browser" />
+            <el-option label="Android" value="android" />
+            <el-option label="iOS" value="ios" />
+            <el-option label="鸿蒙" value="harmony" />
+            <el-option label="性能" value="performance" />
           </el-select>
         </el-form-item>
         <el-form-item label="任务名称:" prop="name">
@@ -395,7 +397,7 @@
     </el-dialog>
 
     <el-drawer destroy-on-close size="1200px" v-model="caseDetailVisible" :show-close="true" :before-close="closeCaseDetail" title="任务-用例详情">
-      <TaskCaseDetail :taskID="currentTask.ID" :taskName="currentTask.name || ''" />
+      <TaskCaseDetail :taskID="currentTask.ID" :taskName="currentTask.name || ''" :taskType="currentTask.type || 'api'" />
     </el-drawer>
 
   </div>
@@ -432,7 +434,8 @@
     onDownloadFile
   } from '@/utils/format'
   import { ElMessage, ElMessageBox } from 'element-plus'
-  import { ref, reactive, computed, onMounted } from 'vue'
+  import { ref, reactive, computed, onMounted, watch } from 'vue'
+  import { useRoute } from 'vue-router'
   import { useAppStore } from '@/pinia'
   import { useUserStore } from '@/pinia/modules/user'
 
@@ -445,6 +448,7 @@
   const btnLoading = ref(false)
   const appStore = useAppStore()
   const userStore = useUserStore()
+  const route = useRoute()
 
   // 控制更多查询条件显示/隐藏状态
   const showAllQuery = ref(false)
@@ -484,9 +488,21 @@
   const pageSize = ref(10)
   const tableData = ref([])
   const searchInfo = ref({})
+
+  const normalizeTimerTaskType = (raw) => {
+    const t = String(raw ?? '').trim().toLowerCase()
+    if (!t) return ''
+    return t
+  }
+
+  const pageTaskType = computed(() => normalizeTimerTaskType(route.query?.type) || 'api')
+
+  const applyPageTypeToSearch = () => {
+    searchInfo.value = { ...searchInfo.value, type: pageTaskType.value }
+  }
   // 重置
   const onReset = () => {
-    searchInfo.value = {}
+    searchInfo.value = { type: pageTaskType.value }
     getTableData()
   }
 
@@ -516,6 +532,7 @@
 
   // 查询
   const getTableData = async () => {
+    applyPageTypeToSearch()
     const table = await getTimerTaskList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
     if (table.code === 0) {
       tableData.value = table.data.list
@@ -617,9 +634,19 @@
   }
 
   onMounted(() => {
+    applyPageTypeToSearch()
     getTableData()
     loadRunnerNodeOptions()
     setOptions()
+  })
+
+  watch(pageTaskType, (newType) => {
+    searchInfo.value = { ...searchInfo.value, type: newType || 'api' }
+    if (type.value === 'create' || !dialogFormVisible.value) {
+      formData.value.type = newType || 'api'
+    }
+    page.value = 1
+    getTableData()
   })
 
   const ciDialogVisible = ref(false)
@@ -837,6 +864,7 @@
   // 打开弹窗
   const openDialog = () => {
     type.value = 'create'
+    formData.value.type = pageTaskType.value
     dialogFormVisible.value = true
   }
 
@@ -876,7 +904,8 @@
       notifyEnabled: false,
       notifyRule: 'always',
       describe: '',
-      runnerNodeName: ''
+      runnerNodeName: '',
+      type: pageTaskType.value
     }
   }
   // 弹窗确定

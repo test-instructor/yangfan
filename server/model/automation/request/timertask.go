@@ -10,6 +10,7 @@ type TimerTaskSearch struct {
 	ConfigName     *string     `json:"configName" form:"configName"`
 	EnvName        *string     `json:"envName" form:"envName"`
 	MessageName    *string     `json:"messageName" form:"messageName"`
+	Type           *string     `json:"type" form:"type"`
 	request.PageInfo
 	ProjectId uint `json:"projectId" form:"projectId"`
 }

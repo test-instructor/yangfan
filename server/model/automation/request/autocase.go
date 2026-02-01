@@ -12,6 +12,8 @@ type AutoCaseSearch struct {
 	Status         string      `json:"status" form:"status"`
 	EnvName        *string     `json:"envName" form:"envName"`
 	ConfigName     *string     `json:"configName" form:"configName"`
+	Type           *string     `json:"type" form:"type"`
+	Menu           *int64      `json:"menu" form:"menu"`
 	ProjectId      uint        `json:"projectId" form:"projectId"`
 	Sort           string      `json:"sort" form:"sort"`
 	Order          string      `json:"order" form:"order"`
