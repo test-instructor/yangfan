@@ -1,19 +1,23 @@
+# 快速开始
 
-## 环境准备
-* 安装docker环境
+本章节用于帮助你在已有部署环境下快速跑通核心链路：项目 → 配置 → 资产沉淀 → 执行 → 报告与通知。
 
-## 执行脚本
-```shell
-# 进入目录
-mkdir -p /home/yangfan && cd /home/yangfan
-# 执行安装
-bash -c "$(curl -fsSLk http://docs.yangfan.gd.cn/install/install.sh)"
-```
+## 1. 登录平台
 
-## 配置修改
-1. 脚本默认安装在/data/yangfan目录下
-2. 如需修改配置请到安装目录下修改`./config/docker.config.yaml`文件
-3. `./config/docker.config.yaml`中的`yang-fan.grafana-host`需要手动修改为`http://IP:3000`，否则无法访问grafana
-4. `./config/docker.config.yaml`中的`yang-fan.front`需要手动修改为前端`http://IP:8080`，否则无法通过测试报告通知跳转到测试报告详情
-5. `./config/docker.config.yaml`中的`fs`需要手动修改为飞书登录相关配置，否则无法登录
-6. 修改配置后重新执行安装脚本即可
+- 在线 Demo：<http://demo.yangfan.gd.cn/>（用户名：admin，密码：123456）
+- 私有部署：访问你自己的前端地址（默认 8080 端口）
+
+## 2. 首次初始化（首次部署必做）
+
+首次启动后，建议通过前端“初始化”页面完成建库建表与管理员初始化，而不是手动导入 SQL。
+
+## 3. 创建一个最小可运行回归
+
+1. 创建项目（pm / 项目配置）
+2. 配置环境变量（platform / 环境变量管理）
+3. 配置运行配置（platform / 运行配置）
+4. 沉淀接口（APIAutomation / 接口管理）
+5. 封装步骤（APIAutomation / 测试步骤）
+6. 编排用例并调试（APIAutomation / 测试用例）
+7. 创建定时任务并执行（APIAutomation / 定时任务）
+8. 在自动报告查看结果（APIAutomation / 自动报告），并配置报告通知（pm / 报告通知）

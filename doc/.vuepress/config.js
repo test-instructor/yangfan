@@ -3,7 +3,7 @@
 // https://vuepress-theme-reco.recoluan.com/views/1.x/
 module.exports = {
 	title: '扬帆测试平台 官方文档',
-	description: '扬帆测试平台，由个人开发的项目，已入选本年度码云最有价值开源项目。扬帆测试平台是一款高效、可靠的自动化测试平台，旨在帮助团队提升测试效率、降低测试成本。该平台包括用例管理、定时任务、执行记录等功能模块，支持多种类型的测试用例，目前支持API(http和grpc协议)、性能、CI调用等功能，并且可定制化，灵活满足不同场景的需求。 其中，支持批量执行、并发执行等高级功能。通过用例设置，可以设置用例的基本信息、运行配置、环境变量等，灵活控制用例的执行。',
+	description: '扬帆测试平台是一款面向团队的自动化测试平台，聚焦“测试资产沉淀、任务调度执行、运行与扩展、报告与通知、测试数据管理”等能力，帮助提升回归效率与质量可控性。',
 	// base:'/docs/',
 	markdown: {
 		lineNumbers: true
@@ -52,16 +52,57 @@ module.exports = {
 						{title: '部署服务', path: '/documentation/deploy'},
 						{title: '开发调试', path: '/documentation/debug'},
 					],
-				},{
-					title: '操作手册',
+				},
+				{
+					title: '项目管理',
 					collapsable: true,
 					children: [
-						{title: '配置管理', path: '/documentation/config'},
-						{title: '环境变量', path: '/documentation/env'},
-						{title: '用例管理', path: '/documentation/case'},
-						{title: '定时任务', path: '/documentation/task'},
-						{title: '测试报告', path: '/documentation/report'},
-						{title: '性能测试', path: '/documentation/performance'},
+						{title: '项目配置', path: '/documentation/pm/pj'},
+						{title: '项目成员与权限', path: '/documentation/pm/upa'},
+						{title: '报告通知', path: '/documentation/pm/reportNotify'},
+					],
+				},
+				{
+					title: '配置管理',
+					collapsable: true,
+					children: [
+						{title: '运行配置', path: '/documentation/platform/rc'},
+						{title: '环境变量管理', path: '/documentation/platform/envDetail'},
+						{
+							title: '函数插件',
+							collapsable: true,
+							children: [
+								{title: 'Python 函数', path: '/documentation/platform/FunctionPlugin/pc'},
+								{title: '调试信息', path: '/documentation/platform/FunctionPlugin/pcd'},
+								{title: 'Python 第三方库', path: '/documentation/platform/FunctionPlugin/pp'},
+							],
+						},
+						{title: '运行节点', path: '/documentation/platform/rn'},
+					],
+				},
+				{
+					title: '接口自动化',
+					collapsable: true,
+					children: [
+						{title: '接口管理', path: '/documentation/APIAutomation/as'},
+						{title: '测试步骤', path: '/documentation/APIAutomation/acs'},
+						{title: '测试用例', path: '/documentation/APIAutomation/ac'},
+						{title: '定时任务', path: '/documentation/APIAutomation/tk'},
+						{title: '自动报告', path: '/documentation/APIAutomation/ar'},
+					],
+				},
+				{
+					title: '数据仓库',
+					collapsable: true,
+					children: [
+						{title: '数据分类管理', path: '/documentation/dataWarehouse/dcm'},
+					],
+				},
+				{
+					title: '其他',
+					collapsable: true,
+					children: [
+						{title: '代码测试3', path: '/documentation/pc3'},
 					],
 				}
 			],

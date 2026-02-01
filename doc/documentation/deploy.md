@@ -1,67 +1,31 @@
+# 部署服务
 
+平台支持 Docker Compose 与 Kubernetes 两种部署方式。部署前请先准备好依赖服务（MySQL / RabbitMQ / Redis 可选，按你的实际配置启用）。
 
-# 在线demo
+## Docker Compose（推荐）
 
-首页：http://82.157.150.119:8080/
-用户名：admin
-密码： 123456
+### 1. 配置文件
 
-# 部署方式
+- 后端配置：`deploy/docker-compose/config/docker.config.yaml`（数据库、飞书登录等）
+- 前端环境变量：`deploy/docker-compose/*.yml` 中的 `ENV_VITE_FS_APP_ID`、`ENV_VITE_FS_LOGIN`
 
-1. 新建数据库，并导入`docs/sql/yangfan.sql`文件
-2. 管理员账号`yangfan`,密码`123456`
+### 2. 启动方式
 
-## shell 脚本一键安装
-```shell
-# 进入目录
-mkdir -p /home/yangfan && cd /home/yangfan
-# 执行安装
-bash -c "$(curl -fsSLk http://docs.yangfan.gd.cn/install/install.sh)"
-```
-> 1. 脚本默认安装在/data/yangfan目录下
-> 2. 如需修改配置请到安装目录下修改`./config/docker.config.yaml`文件
-> 3. `./config/docker.config.yaml`中的`grafana-host`需要手动修改为`http://IP:3000`，否则无法访问grafana
-> 4. `./config/docker.config.yaml`中的`fs`需要手动修改为飞书登录相关配置，否则无法登录
-> 5. 修改配置后重新执行安装脚本即可
+`deploy/docker-compose` 目录下提供了不同模式的 compose 文件（本地构建/镜像模式/调试模式），按需选择其一启动即可。
 
-## docker 部署
+## Kubernetes
 
-* 前端：修改对应`docker-compose`文件中的`ENV_VITE_FS_APP_ID`、`ENV_VITE_FS_LOGIN`
-* 后端：修改`deploy/docker-compose/config/docker.config.yaml`中的数据库`mysql`、飞书登录`fs`相关配置
-* docker镜像源：目前使用阿里云镜像源(registry.cn-hangzhou.aliyuncs.com)，如需使用docker官方镜像源，请将阿里云镜像源(registry.cn-hangzhou.aliyuncs.com/)删除即可
+部署文件位于 `deploy/kubernetes`，主要入口为 `k8s_yangfan.yaml`。通常需要：
 
-1. 本地构建模式文件：`deploy/docker-compose/docker-compose-build.yaml`
-2. 远程镜像模式文件: `deploy/docker-compose/docker-compose-image.yaml`
-3. 执行命令：
-   ```shell
-   cd deploy/docker-compose
-   # 本地构建模式
-   docker-compose up --build -f docker-compose-build.yaml --force-recreate -d
-   # 远程镜像模式
-   docker-compose up -f docker-compose-image.yaml
-      
-   ```
+1. 修改 ConfigMap 中的数据库与登录配置
+2. 修改 Web Deployment 的前端环境变量
+3. `kubectl apply -f k8s_yangfan.yaml`
 
-## k8s 部署
-文件目录`./deploy/kubernetes`
-```shell
-kubernetes
-    ├── grafana-prometheus-pushgateway    # 性能测试报告监控
-    ├── httpbin                           # http、grpc demo
-    ├── k8s_yangfan.yaml                  # 部署文件
-    ├── server                            # 后端部署文件
-    ├── web                               # 前端部署文件
-    └── yangfan-namespace.yaml            # 命名空间
-```
+## 首次初始化
 
-1. 修改`ConfigMap/docker-config-yaml`中的数据库`mysql`、飞书登录`fs`相关配置
-2. 修改`Deployment/yangfan-web`中的`ENV_VITE_FS_APP_ID`、`ENV_VITE_FS_LOGIN`
-3. 执行命令：
-   ```shell
-   cd deploy/kubernetes
-   kubectl apply -f k8s_yangfan.yaml
-   ```
+首次启动后，建议通过前端“初始化”页面完成建库建表与管理员初始化，而不是手动导入 SQL。
 
+## 更完整的部署说明
 
-
+请参考项目中的部署文档：[deploy/README.md](file:///Users/taylor/Documents/yangfan/python/yangfan/deploy/README.md)
 
