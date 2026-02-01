@@ -109,7 +109,7 @@ func (arService *AutoReportService) GetAutoReportInfoList(ctx context.Context, i
 		db = db.Where("created_at BETWEEN ? AND ?", info.CreatedAtRange[0], info.CreatedAtRange[1])
 	}
 	db.Order("id desc")
-	db.Where("project_id = ? ", info.ProjectId)
+	db = db.Where("project_id = ? ", info.ProjectId)
 
 	err = db.Count(&total).Error
 	if err != nil {

@@ -211,7 +211,7 @@ func (tkService *TimerTaskService) GetTimerTaskInfoList(ctx context.Context, inf
 		db = db.Where("created_at BETWEEN ? AND ?", info.CreatedAtRange[0], info.CreatedAtRange[1])
 	}
 	db.Order("id desc")
-	db.Where("project_id = ? ", info.ProjectId)
+	db = db.Where("project_id = ? ", info.ProjectId)
 
 	if info.ConfigName != nil && *info.ConfigName != "" {
 		db = db.Where("config_name LIKE ?", "%"+*info.ConfigName+"%")

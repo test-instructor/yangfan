@@ -3,6 +3,7 @@ package automation
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"github.com/test-instructor/yangfan/server/v2/global"
 	"github.com/test-instructor/yangfan/server/v2/model/automation"
@@ -15,6 +16,9 @@ type AutoStepService struct{}
 // Author [yourname](https://github.com/yourname)
 func (asService *AutoStepService) CreateAutoStep(ctx context.Context, as *automation.AutoStep) (err error) {
 	as.StepType = 1
+	if strings.TrimSpace(as.Type) == "" {
+		as.Type = "api"
+	}
 	err = global.GVA_DB.Create(as).Error
 	return err
 }
@@ -51,6 +55,9 @@ func (asService *AutoStepService) UpdateAutoStep(ctx context.Context, as automat
 	}
 	if oldAutoStep.ProjectId != projectId {
 		return errors.New("没有该项目的操作权限")
+	}
+	if strings.TrimSpace(as.Type) == "" {
+		as.Type = "api"
 	}
 
 	if as.RequestID != 0 && as.Request != nil {
@@ -90,6 +97,15 @@ func (asService *AutoStepService) GetAutoStepInfoList(ctx context.Context, info 
 		stepType = *info.StepType
 	}
 	db = db.Where("step_type = ?", stepType)
+	t := ""
+	if info.Type != nil {
+		t = strings.TrimSpace(*info.Type)
+	}
+	if t == "" || strings.EqualFold(t, "api") {
+		db = db.Where("(type = ? OR type = '' OR type IS NULL)", "api")
+	} else {
+		db = db.Where("type = ?", t)
+	}
 	db.Order("id desc")
 	db = db.Where("project_id = ?", info.ProjectId)
 	err = db.Count(&total).Error

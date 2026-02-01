@@ -450,7 +450,7 @@
     }
     return list.filter(item => item?.[currentPlatform.value])
   })
-  const searchInfo = ref({})
+  const searchInfo = ref({ type: currentPlatform.value })
   // 排序
   const sortChange = ({ prop, order }) => {
     const sortMap = {
@@ -470,7 +470,11 @@
   }
   // 重置
   const onReset = () => {
-    searchInfo.value = {}
+    const next = { type: currentPlatform.value }
+    if (menuId.value !== null && menuId.value !== undefined) {
+      next.menu = menuId.value
+    }
+    searchInfo.value = next
     getTableData()
   }
 
@@ -500,7 +504,11 @@
 
   // 查询
   const getTableData = async () => {
-    const table = await getAutoStepList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    const params = { page: page.value, pageSize: pageSize.value, ...searchInfo.value }
+    if (!params.type) {
+      params.type = currentPlatform.value
+    }
+    const table = await getAutoStepList(params)
     if (table.code === 0) {
       tableData.value = table.data.list
       total.value = table.data.total
@@ -645,6 +653,7 @@
       } else {
         formData.value = {
           name: '',
+          type: currentPlatform.value,
           loops: 0,
           retry: 0,
           [currentPlatform.value]: { actions: [] },
@@ -828,7 +837,7 @@
   const menuId = ref(null)
   watch(() => [currentPlatform.value, currentMenuType.value], () => {
     menuId.value = null
-    delete searchInfo.value.menu
+    searchInfo.value = { type: currentPlatform.value }
     multipleSelection.value = []
     page.value = 1
     getTableData()

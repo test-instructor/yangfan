@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/test-instructor/yangfan/server/v2/global"
@@ -17,6 +18,9 @@ type AutoCaseStepService struct{}
 // CreateAutoCaseStep 创建测试步骤记录
 // Author [yourname](https://github.com/yourname)
 func (acsService *AutoCaseStepService) CreateAutoCaseStep(ctx context.Context, acs *automation.AutoCaseStep) (err error) {
+	if strings.TrimSpace(acs.Type) == "" {
+		acs.Type = "api"
+	}
 	err = global.GVA_DB.Create(acs).Error
 	return err
 }
@@ -277,7 +281,16 @@ func (acsService *AutoCaseStepService) GetAutoCaseStepInfoList(ctx context.Conte
 		db = db.Where("menu = ?", info.Menu)
 	}
 	db.Order("id desc")
-	db.Where("project_id = ? ", info.ProjectId)
+	db = db.Where("project_id = ? ", info.ProjectId)
+	t := ""
+	if info.Type != nil {
+		t = strings.TrimSpace(*info.Type)
+	}
+	if t == "" || strings.EqualFold(t, "api") {
+		db = db.Where("(type = ? OR type = '' OR type IS NULL)", "api")
+	} else if t != "" {
+		db = db.Where("type = ?", t)
+	}
 	err = db.Count(&total).Error
 	if err != nil {
 		return

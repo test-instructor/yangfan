@@ -180,7 +180,7 @@
     onDownloadFile
   } from '@/utils/format'
   import { ElMessage, ElMessageBox } from 'element-plus'
-  import { ref, reactive, computed } from 'vue'
+  import { ref, reactive, computed, watch } from 'vue'
   import { useAppStore } from '@/pinia'
   import AutoCaseStepForm from '@/view/automation/autocasestep/autocasestepForm.vue'
   import ApiMenu from '@/components/platform/menu/index.vue'
@@ -199,7 +199,8 @@
 
   const route = useRoute()
   const caseType = computed(() => {
-    return route.query.type || 'api'
+    const t = String(route.query?.type ?? '').trim()
+    return t || 'api'
   })
 
   const currentMenuType = computed(() => {
@@ -269,7 +270,7 @@
   const total = ref(0)
   const pageSize = ref(10)
   const tableData = ref([])
-  const searchInfo = ref({})
+  const searchInfo = ref({ type: caseType.value })
   // 排序
   const sortChange = ({ prop, order }) => {
     const sortMap = {
@@ -289,7 +290,11 @@
   }
   // 重置
   const onReset = () => {
-    searchInfo.value = {}
+    const next = { type: caseType.value }
+    if (menuId.value !== null && menuId.value !== undefined) {
+      next.menu = menuId.value
+    }
+    searchInfo.value = next
     getTableData()
   }
 
@@ -319,7 +324,11 @@
 
   // 查询
   const getTableData = async () => {
-    const table = await getAutoCaseStepList({ page: page.value, pageSize: pageSize.value,menu: menuId.value, ...searchInfo.value })
+    const params = { page: page.value, pageSize: pageSize.value, menu: menuId.value, ...searchInfo.value }
+    if (!params.type) {
+      params.type = caseType.value
+    }
+    const table = await getAutoCaseStepList(params)
     if (table.code === 0) {
       tableData.value = table.data.list
       total.value = table.data.total
@@ -327,6 +336,13 @@
       pageSize.value = table.data.pageSize
     }
   }
+
+  watch(() => caseType.value, (newVal) => {
+    searchInfo.value = { type: newVal || 'api' }
+    menuId.value = null
+    page.value = 1
+    getTableData()
+  })
 
   // getTableData()
 
