@@ -1,58 +1,120 @@
-## 前端环境
-1. 前往https://nodejs.org/zh-cn/下载当前版本node 
-2. 命令行运行 node -v 若控制台输出版本号则前端环境搭建成功 
-3. node 版本需大于 16.4 
-4. 开发工具推荐vscode https://code.visualstudio.com/
-5. 安装依赖
-   ```shell
-   cd web
-   npm install
-   ```
+# 开发调试（本地）
 
-## 后端环境
-1. 下载golang安装 版本号需>=1.19
-   * 国际: https://golang.org/dl/
-   * 国内: https://golang.google.cn/dl/
-2. 命令行运行 go 若控制台输出各类提示命令 则安装成功 输入 go version 确认版本大于 1.18 
-3. 开发工具推荐 Goland
-4. 安装依赖
-   ```shell
-   cd server
-   go mod tidy
-   ```
-### 服务初始化 
-1. 服务列表
-   * server 后端服务
-   * run 用例运行服务
-   * timer 定时任务服务
-   * master 性能测试master服务
-   * work 性能测试worker服务
-   * web 前端服务
-2. 安装依赖
-    ```shell
-    cd server # 其他服务同理，每个服务都需要安装
-    go mod tidy
-    ```
-### 本地调试
+本文档描述在本地启动扬帆测试平台（server/web/run/data）用于开发调试的推荐流程。
 
-#### 软件包路径
+## 前置条件
 
-* server ：github.com/test-instructor/yangfan/server
-* run ：github.com/test-instructor/yangfan/run
-* timer ：github.com/test-instructor/yangfan/timer
-* master ：github.com/test-instructor/yangfan/master
-* work：github.com/test-instructor/yangfan/work
+- Go：>= 1.23
+- Node.js：>= 16.4
+- Docker + Docker Compose：用于快速启动 MySQL/Redis/RabbitMQ
 
-#### 添加配置
+## 1. 启动依赖服务（MySQL/Redis/RabbitMQ）
 
-1. 进入编辑配置页面
-2. 添加“Go 构建”的配置
-3. 运行种类选择软件包
-4. 软件包路径选择对应的服务
-5. 名称默认为软件包路径，为了更加简洁可以直接改成对应服务的名称
+在项目根目录执行：
 
-![image-20230928162540358](http://qiniu.yangfan.gd.cn//markdown/image-20230928162540358.png)
+```bash
+docker-compose -f deploy/docker-compose/docker-compose.data.yml up -d
+```
 
-![image-20230928162759825](http://qiniu.yangfan.gd.cn//markdown/image-20230928162759825.png)
+默认端口（宿主机）：
 
-![image-20230928162928134](http://qiniu.yangfan.gd.cn//markdown/image-20230928162928134.png)
+- MySQL：43306（root/123456，默认库 yf）
+- RabbitMQ：45672（AMQP），45673（管理台）
+- Redis：46378
+
+## 2. 首次启动（只启动 server + web）
+
+### 2.1 启动 server（后端 API）
+
+server 需要能够读取到配置文件（默认是 `config.yaml`），建议二选一：
+
+- IDE（推荐）：运行 `server` 模块的 `main.go`，并把 Working Directory 设为 `server/`
+- 命令行：
+
+```bash
+cd server
+go run .
+```
+
+### 2.2 启动 web（前端）
+
+```bash
+cd web
+npm install
+npm run serve
+```
+
+默认会在 `http://localhost:8080` 启动前端，并把 `/api` 代理到 `http://127.0.0.1:8888`（见 `web/.env.development`）。
+
+## 3. 在前端完成初始化（首次必做）
+
+打开 `http://localhost:8080`，如果系统检测到未初始化，会跳转到“初始化”页面。推荐使用本地 docker-compose 的 MySQL：
+
+- DBType：mysql
+- Host：127.0.0.1
+- Port：43306
+- UserName：root
+- Password：123456
+- DBName：yf
+- AdminPassword：设置管理员账号 `admin` 的密码
+
+提交初始化后，后端会建库/建表/写入初始数据，并把 DB 配置写入配置文件。
+
+## 4. 重启 server，并配置 MQ / 平台配置
+
+初始化完成后，需要重启 server 让配置在进程内生效（MQ 初始化、定时任务、数据仓库端口等都在启动时加载）。
+
+server 重启完成后，进入前端：
+
+- 系统工具 → 系统配置 → MQ配置：填写 RabbitMQ 连接信息
+  - Host：127.0.0.1
+  - Port：45672
+  - Username/Password：guest/guest（按你的实际环境）
+- 系统工具 → 系统配置 → 平台配置：填写数据仓库（data）服务地址
+  - Host：127.0.0.1
+  - Port：9000（与 `data` 服务启动端口保持一致）
+
+修改后会落盘到配置文件；若你已启动过 run/data，需要在修改配置后重启它们以重新加载。
+
+## 5. 启动 run、data 服务
+
+### 5.1 启动 data（数据仓库服务）
+
+```bash
+cd data
+go run .
+```
+
+data 默认监听配置文件里的 `data-warehouse.port`（默认 9000）。
+
+### 5.2 启动 run（用例运行服务）
+
+```bash
+cd run
+go run .
+```
+
+run 默认以 `RUN_SERVICE_MODE=runner` 启动（消费执行队列）。如需同时启用定时调度，可用：
+
+```bash
+RUN_SERVICE_MODE=all go run .
+```
+
+## 6. 多节点 run（本地模拟）
+
+在本地可以起多个 run 实例模拟多节点，关键是每个节点必须使用不同的 `NODE_NAME`：
+
+```bash
+# 节点 1：执行（runner）
+NODE_NAME=runner-a RUN_SERVICE_MODE=runner go run .
+
+# 节点 2：执行（runner）
+NODE_NAME=runner-b RUN_SERVICE_MODE=runner go run .
+
+# 节点 3：只跑定时（timer）
+NODE_NAME=timer-a RUN_SERVICE_MODE=timer go run .
+```
+
+可选：
+
+- `NODE_ALIAS`：节点别名（用于前端展示）

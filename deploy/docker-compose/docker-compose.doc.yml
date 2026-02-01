@@ -1,0 +1,14 @@
+services:
+  doc:
+    image: "yangfanz/doc:debug"
+    container_name: yangfan-doc
+    restart: always
+    ports:
+      - "29999:80"
+    networks:
+      - yangfan-network
+
+networks:
+  yangfan-network:
+    name: yangfan-network
+    driver: bridge
