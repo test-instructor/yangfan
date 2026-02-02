@@ -17,7 +17,8 @@
 
 <img src="./img/mp.png" alt="微信二维码" width="513" height="187">
 
-* QQ群：873175584
 * 微信交流群：
 
 <img src="./img/author.jpeg" alt="微信二维码" width="273" height="367">
+
+<img src="https://qiniu.yangfan.gd.cn/about/group.jpeg" alt="微信交流群二维码" width="273" height="367">
