@@ -1,0 +1,52 @@
+name: Doc
+
+on:
+  push:
+    branches:
+      - doc/v2
+
+env:
+  REGISTRY: yangfanz/
+  ALIYUN_REGISTRY: registry.cn-hangzhou.aliyuncs.com/yangfanz/
+  IMAGE_NAME_DOC: doc
+
+jobs:
+  doc:
+    name: Building a doc image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine image_tag and image_suffix
+        id: determine
+        run: |
+          echo "image_tag=debug" >> $GITHUB_OUTPUT
+          echo "image_suffix=" >> $GITHUB_OUTPUT
+          echo "push_latest=false" >> $GITHUB_OUTPUT
+      - uses: actions/checkout@v3
+      - name: Login to Docker Container Registry
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: Build and push Docker image
+        run: |
+          docker build -t doc -f ./doc/Dockerfile ./doc
+          docker tag doc ${{ env.REGISTRY }}${{ env.IMAGE_NAME_DOC }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
+          docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_DOC }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
+          if [[ "${{ steps.determine.outputs.push_latest }}" == "true" ]]; then
+            docker tag doc ${{ env.REGISTRY }}${{ env.IMAGE_NAME_DOC }}${{ steps.determine.outputs.image_suffix }}:latest
+            docker push ${{ env.REGISTRY }}${{ env.IMAGE_NAME_DOC }}${{ steps.determine.outputs.image_suffix }}:latest
+          fi
+      - name: Login to Aliyun Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_DOC }}
+          username: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
+          password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
+      - name: Push to Aliyun Docker image
+        run: |
+          docker tag doc ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_DOC }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
+          docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_DOC }}${{ steps.determine.outputs.image_suffix }}:${{ steps.determine.outputs.image_tag }}
+          if [[ "${{ steps.determine.outputs.push_latest }}" == "true" ]]; then
+            docker tag doc ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_DOC }}${{ steps.determine.outputs.image_suffix }}:latest
+            docker push ${{ env.ALIYUN_REGISTRY }}${{ env.IMAGE_NAME_DOC }}${{ steps.determine.outputs.image_suffix }}:latest
+          fi

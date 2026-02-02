@@ -49,3 +49,4 @@ deploy/docker/logs
 /ui/frontend/node_modules/
 /ui/logs/
 /ui/frontend/dist/
+/doc/.vuepress/dist/
