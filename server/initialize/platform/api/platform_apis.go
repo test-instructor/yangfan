@@ -71,5 +71,12 @@ func platformApis() []sysModel.SysApi {
 		{Path: "/rn/getRunnerNodeList", Description: "获取节点列表", ApiGroup: "节点", Method: "GET"},
 
 		{Path: "/runner/api", Description: "接口自动化运行", ApiGroup: "运行服务", Method: "POST"},
+
+		{Path: "/llmconfig/createLLMModelConfig", Description: "新增大语言模型配置", ApiGroup: "大语言模型配置", Method: "POST"},
+		{Path: "/llmconfig/deleteLLMModelConfig", Description: "删除大语言模型配置", ApiGroup: "大语言模型配置", Method: "DELETE"},
+		{Path: "/llmconfig/deleteLLMModelConfigByIds", Description: "批量删除大语言模型配置", ApiGroup: "大语言模型配置", Method: "DELETE"},
+		{Path: "/llmconfig/updateLLMModelConfig", Description: "更新大语言模型配置", ApiGroup: "大语言模型配置", Method: "PUT"},
+		{Path: "/llmconfig/findLLMModelConfig", Description: "根据ID获取大语言模型配置", ApiGroup: "大语言模型配置", Method: "GET"},
+		{Path: "/llmconfig/getLLMModelConfigList", Description: "获取大语言模型配置列表", ApiGroup: "大语言模型配置", Method: "GET"},
 	}
 }

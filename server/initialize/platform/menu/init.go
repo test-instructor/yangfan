@@ -1,6 +1,7 @@
 package menu
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/test-instructor/yangfan/server/v2/global"
@@ -14,7 +15,10 @@ func Init() error {
 	if global.GVA_DB == nil {
 		return nil
 	}
-	return ensureSysBaseMenus(global.GVA_DB, Seeds())
+	if err := ensureSysBaseMenus(global.GVA_DB, Seeds()); err != nil {
+		return err
+	}
+	return ensureSysBaseMenuParameters(global.GVA_DB, ParameterSeeds())
 }
 
 func ensureSysBaseMenus(db *gorm.DB, seeds []MenuSeed) error {
@@ -117,6 +121,66 @@ func ensureSysBaseMenus(db *gorm.DB, seeds []MenuSeed) error {
 	for _, s := range seeds {
 		if err := ensureOne(s.Path); err != nil {
 			return err
+		}
+	}
+	return nil
+}
+
+func ensureSysBaseMenuParameters(db *gorm.DB, seeds []MenuParameterSeed) error {
+	if db == nil || len(seeds) == 0 {
+		return nil
+	}
+
+	for _, s := range seeds {
+		if s.MenuPath == "" || s.Type == "" || s.Key == "" {
+			continue
+		}
+
+		query := db.Model(&sysModel.SysBaseMenu{}).Select("id").Where("path = ?", s.MenuPath)
+		if s.Component != "" {
+			query = query.Where("component = ?", s.Component)
+		}
+
+		var menus []sysModel.SysBaseMenu
+		if err := query.Find(&menus).Error; err != nil {
+			return err
+		}
+		if len(menus) == 0 {
+			return fmt.Errorf("menu not found when ensuring menu parameter: path=%s component=%s", s.MenuPath, s.Component)
+		}
+
+		for _, m := range menus {
+			if m.ID == 0 {
+				continue
+			}
+
+			var existing sysModel.SysBaseMenuParameter
+			err := db.Where(map[string]any{
+				"sys_base_menu_id": m.ID,
+				"type":             s.Type,
+				"key":              s.Key,
+			}).First(&existing).Error
+			if err == nil {
+				if existing.Value != s.Value {
+					if err := db.Model(&existing).Update("value", s.Value).Error; err != nil {
+						return err
+					}
+				}
+				continue
+			}
+			if !errors.Is(err, gorm.ErrRecordNotFound) {
+				return err
+			}
+
+			toCreate := sysModel.SysBaseMenuParameter{
+				SysBaseMenuID: m.ID,
+				Type:          s.Type,
+				Key:           s.Key,
+				Value:         s.Value,
+			}
+			if err := db.Create(&toCreate).Error; err != nil {
+				return err
+			}
 		}
 	}
 	return nil
