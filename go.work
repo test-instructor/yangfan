@@ -3,7 +3,7 @@ go 1.23.9
 use (
 	./data
 	./httprunner
-	./server
 	./run
+	./server
 	./ui
 )

@@ -1,11 +1,11 @@
 <template>
   <div class="dashboard-page">
     <a-card class="dashboard-card">
-      <template #title>当前授权</template>
+      <template #title>{{ t('home.currentAuth') }}</template>
       <a-space direction="vertical" fill>
-        <div>用户：{{ userInfo?.userName || '-' }}</div>
-        <div>项目：{{ currentProject?.name || '-' }}</div>
-        <div>角色：{{ currentAuthority?.authorityName || '-' }}</div>
+        <div>{{ t('home.user') }}：{{ userInfo?.userName || '-' }}</div>
+        <div>{{ t('home.project') }}：{{ currentProject?.name || '-' }}</div>
+        <div>{{ t('home.role') }}：{{ currentAuthority?.authorityName || '-' }}</div>
       </a-space>
     </a-card>
   </div>
@@ -13,7 +13,9 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps({
   userInfo: Object
 })
@@ -47,4 +49,3 @@ const currentAuthority = computed(() => {
   width: 100%;
 }
 </style>
-

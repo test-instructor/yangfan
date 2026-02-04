@@ -8,21 +8,20 @@ export const mainRoutes = [
         path: 'home',
         name: 'home',
         component: () => import('../../views/home/index.vue'),
-        meta: { title: 'Dashboard' }
+        meta: { title: 'common.dashboard' }
       },
       {
         path: 'settings',
         name: 'settings',
         component: () => import('../../views/settings/index.vue'),
-        meta: { title: 'Settings' }
+        meta: { title: 'common.settings' }
       },
       {
         path: 'person',
         name: 'person',
         component: () => import('../../views/person/index.vue'),
-        meta: { title: 'User Info' }
+        meta: { title: 'common.profile' }
       }
     ]
   }
 ]
-

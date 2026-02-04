@@ -3,16 +3,16 @@
     <a-layout-sider collapsible breakpoint="xl" class="sider" v-model:collapsed="collapsed">
       <div class="logo">
         <img :src="logo" alt="logo" class="logo-img" />
-        <div class="logo-text" v-if="!collapsed">扬帆测试平台</div>
+        <div class="logo-text" v-if="!collapsed">{{ t('common.appName') }}</div>
       </div>
       <a-menu :selected-keys="[activeKey]" @menu-item-click="onMenuClick">
         <a-menu-item key="home">
           <template #icon><IconHome /></template>
-          Dashboard
+          {{ t('common.dashboard') }}
         </a-menu-item>
         <a-menu-item key="settings">
           <template #icon><IconSettings /></template>
-          Settings
+          {{ t('common.settings') }}
         </a-menu-item>
       </a-menu>
     </a-layout-sider>
@@ -24,7 +24,7 @@
               <IconHome />
             </a-breadcrumb-item>
             <a-breadcrumb-item v-for="(item, index) in breadcrumbs" :key="index">
-              {{ item.meta?.title || item.name }}
+              {{ item.meta?.title ? t(item.meta.title) : item.name }}
             </a-breadcrumb-item>
           </a-breadcrumb>
         </a-space>
@@ -35,7 +35,7 @@
                 <template #icon>
                   <IconApps />
                 </template>
-                {{ currentProjectName || '选择项目' }}
+                {{ currentProjectName || t('common.selectProject') }}
                 <IconDown class="icon-down" />
               </a-button>
               <template #content>
@@ -56,7 +56,7 @@
                 <template #icon>
                   <IconUserGroup />
                 </template>
-                {{ currentAuthorityName || '选择角色' }}
+                {{ currentAuthorityName || t('common.selectRole') }}
                 <IconDown class="icon-down" />
               </a-button>
               <template #content>
@@ -72,16 +72,20 @@
             </a-dropdown>
           </li>
           <li>
-            <a-tooltip content="语言">
+            <a-dropdown @select="handleLanguageSwitch">
               <a-button class="nav-btn" type="outline" :shape="'circle'">
                 <template #icon>
                   <IconLanguage />
                 </template>
               </a-button>
-            </a-tooltip>
+              <template #content>
+                <a-doption value="zh">中文</a-doption>
+                <a-doption value="en">English</a-doption>
+              </template>
+            </a-dropdown>
           </li>
           <li>
-            <a-tooltip :content="theme === 'light' ? '点击切换为暗黑模式' : '点击切换为亮色模式'">
+            <a-tooltip :content="theme === 'light' ? t('common.switchThemeDark') : t('common.switchThemeLight')">
               <a-button class="nav-btn" type="outline" :shape="'circle'" @click="toggleTheme">
                 <template #icon>
                   <IconMoon v-if="theme === 'dark'" />
@@ -91,7 +95,7 @@
             </a-tooltip>
           </li>
           <li>
-            <a-tooltip content="消息通知">
+            <a-tooltip :content="t('common.notifications')">
               <div class="message-box-trigger">
                 <a-badge :count="9" dot>
                   <a-button class="nav-btn" type="outline" :shape="'circle'">
@@ -115,15 +119,15 @@
               <template #content>
                 <a-doption value="person">
                   <template #icon><IconUser /></template>
-                  个人信息
+                  {{ t('common.profile') }}
                 </a-doption>
                 <a-doption value="settings">
                   <template #icon><IconSettings /></template>
-                  用户设置
+                  {{ t('common.userSettings') }}
                 </a-doption>
                 <a-doption value="logout">
                   <template #icon><IconPoweroff /></template>
-                  退出登录
+                  {{ t('common.logout') }}
                 </a-doption>
               </template>
             </a-dropdown>
@@ -155,12 +159,14 @@ import {
 } from '@arco-design/web-vue/es/icon'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { getUserInfo as getUserInfoApi, setUserAuthority as setUserAuthorityApi, clearAuth } from '../../services/appBridge'
 import { getStoredTheme, setTheme, ThemeMode } from '../../utils/theme'
 import logo from '../../assets/images/logo-universal.png'
 
 const router = useRouter()
 const route = useRoute()
+const { t, locale } = useI18n()
 const activeKey = ref('home')
 const theme = ref(getStoredTheme())
 const collapsed = ref(false)
@@ -172,6 +178,11 @@ const breadcrumbs = computed(() => {
 const toggleTheme = () => {
   theme.value = theme.value === ThemeMode.dark ? ThemeMode.light : ThemeMode.dark
   setTheme(theme.value)
+}
+
+const handleLanguageSwitch = (val) => {
+  locale.value = val
+  localStorage.setItem('locale', val)
 }
 
 watch(() => route.name, (newVal) => {
@@ -215,7 +226,7 @@ const loadUserInfo = async () => {
     selectedProjectId.value = userInfo.value?.projectId
     selectedAuthorityId.value = userInfo.value?.authorityId
   } catch (e) {
-    Message.error(e?.message || '获取用户信息失败')
+    Message.error(e?.message || t('message.fetchUserInfoError'))
     await router.replace({ name: 'login' })
   }
 }
@@ -231,9 +242,9 @@ const switchContext = async () => {
     })
     selectedProjectId.value = userInfo.value?.projectId
     selectedAuthorityId.value = userInfo.value?.authorityId
-    Message.success('切换成功')
+    Message.success(t('message.switchSuccess'))
   } catch (e) {
-    Message.error(e?.message || '切换失败')
+    Message.error(e?.message || t('message.switchError'))
     await loadUserInfo()
   } finally {
     switching.value = false
@@ -267,10 +278,10 @@ const handleUserCommand = async (val) => {
   } else if (val === 'logout') {
     try {
       await clearAuth()
-      Message.success('已退出登录')
+      Message.success(t('message.logoutSuccess'))
       await router.replace({ name: 'login' })
     } catch (e) {
-      Message.error('退出登录失败')
+      Message.error(t('message.logoutError'))
     }
   } else if (val === 'settings') {
      await router.push({ name: 'settings' })

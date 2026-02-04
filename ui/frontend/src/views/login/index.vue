@@ -1,14 +1,14 @@
 <template>
   <div class="page">
-    <a-card class="card" title="登录">
+    <a-card class="card" :title="t('login.title')">
       <a-form :model="form" layout="vertical">
-        <a-form-item field="username" label="用户名">
+        <a-form-item field="username" :label="t('login.username')">
           <a-input v-model="form.username" autocomplete="username" />
         </a-form-item>
-        <a-form-item field="password" label="密码">
+        <a-form-item field="password" :label="t('login.password')">
           <a-input-password v-model="form.password" autocomplete="current-password" />
         </a-form-item>
-        <a-form-item v-if="form.openCaptcha" field="captcha" label="验证码">
+        <a-form-item v-if="form.openCaptcha" field="captcha" :label="t('login.captcha')">
           <div class="captcha-row">
             <a-input v-model="form.captcha" />
           </div>
@@ -18,16 +18,16 @@
         </a-form-item>
 
         <a-space>
-          <a-button type="primary" :loading="submitting" @click="submit">登录</a-button>
-          <a-button @click="openSettings">设置域名</a-button>
+          <a-button type="primary" :loading="submitting" @click="submit">{{ t('login.submit') }}</a-button>
+          <a-button @click="openSettings">{{ t('login.setDomain') }}</a-button>
         </a-space>
       </a-form>
     </a-card>
 
-    <a-modal v-model:visible="showSettingsModal" title="设置域名" @ok="saveSettings" :ok-loading="savingSettings">
+    <a-modal v-model:visible="showSettingsModal" :title="t('login.setDomain')" @ok="saveSettings" :ok-loading="savingSettings">
       <a-form :model="settingsForm" layout="vertical">
-        <a-form-item field="baseURL" label="扬帆自动化测试平台域名（BaseURL）">
-          <a-input v-model="settingsForm.baseURL" placeholder="https://xx.demo.com" />
+        <a-form-item field="baseURL" :label="t('login.domainLabel')">
+          <a-input v-model="settingsForm.baseURL" :placeholder="t('login.domainPlaceholder')" />
         </a-form-item>
       </a-form>
     </a-modal>
@@ -38,6 +38,7 @@
 import { Message } from '@arco-design/web-vue'
 import { reactive, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import {
   captcha as captchaApi,
   login as loginApi,
@@ -48,6 +49,7 @@ import {
 } from '../../services/appBridge'
 
 const router = useRouter()
+const { t } = useI18n()
 const submitting = ref(false)
 
 const showSettingsModal = ref(false)
@@ -75,7 +77,7 @@ const refreshCaptcha = async () => {
     form.picPath = res.picPath || ''
     form.openCaptcha = Boolean(res.openCaptcha)
   } catch (e) {
-    const errMsg = e?.message || '获取验证码失败'
+    const errMsg = e?.message || t('login.getCaptchaError')
     Message.error(errMsg)
   }
 }
@@ -89,10 +91,10 @@ const submit = async () => {
       captcha: form.captcha,
       captchaId: form.captchaId
     })
-    Message.success('登录成功')
+    Message.success(t('login.loginSuccess'))
     await router.replace({ name: 'home' })
   } catch (e) {
-    Message.error(e?.message || '登录失败')
+    Message.error(e?.message || t('login.loginError'))
     await refreshCaptcha()
   } finally {
     submitting.value = false
@@ -106,13 +108,13 @@ const openSettings = async () => {
     originalBaseURL.value = baseURL
     showSettingsModal.value = true
   } catch (e) {
-    Message.error('获取配置失败')
+    Message.error(t('login.getConfigError'))
   }
 }
 
 const saveSettings = async () => {
   if (!settingsForm.baseURL) {
-    Message.warning('请输入域名')
+    Message.warning(t('login.pleaseEnterDomain'))
     return
   }
 
@@ -138,12 +140,12 @@ const saveSettings = async () => {
       await clearAuth()
     }
 
-    Message.success('保存成功')
+    Message.success(t('login.saveSuccess'))
     showSettingsModal.value = false
 
     await refreshCaptcha()
   } catch (e) {
-    Message.error(e?.message || '保存失败')
+    Message.error(e?.message || t('login.saveError'))
   } finally {
     savingSettings.value = false
   }
@@ -155,7 +157,7 @@ onMounted(async () => {
     settingsForm.baseURL = ''
     originalBaseURL.value = ''
     showSettingsModal.value = true
-    Message.info('请先配置服务域名')
+    Message.info(t('login.configureDomainFirst'))
   } else {
     await refreshCaptcha()
   }
@@ -193,4 +195,3 @@ onMounted(async () => {
   object-fit: contain;
 }
 </style>
-

@@ -4,3 +4,4 @@ frontend/dist
 /build/
 /frontend/package.json.md5
 logs
+/yangfan-ui

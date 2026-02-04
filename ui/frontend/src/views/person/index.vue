@@ -35,23 +35,23 @@
 
           <a-divider />
           
-          <div class="section-title">联系方式</div>
+          <div class="section-title">{{ t('person.contact') }}</div>
           <div class="contact-list">
              <div class="contact-item">
                <IconPhone />
-               <span>{{ userInfo.phone || '未设置' }}</span>
-               <a-link @click="changePhoneVisible = true">修改</a-link>
+               <span>{{ userInfo.phone || t('person.notSet') }}</span>
+               <a-link @click="changePhoneVisible = true">{{ t('person.edit') }}</a-link>
              </div>
              <div class="contact-item">
                <IconEmail />
-               <span>{{ userInfo.email || '未设置' }}</span>
-               <a-link @click="changeEmailVisible = true">修改</a-link>
+               <span>{{ userInfo.email || t('person.notSet') }}</span>
+               <a-link @click="changeEmailVisible = true">{{ t('person.edit') }}</a-link>
              </div>
           </div>
 
           <a-divider />
 
-          <div class="section-title">技能特长</div>
+          <div class="section-title">{{ t('person.skills') }}</div>
           <div class="tags-list">
              <a-tag v-for="tag in tags" :key="tag" color="arcoblue">{{ tag }}</a-tag>
              <a-tag class="add-tag" @click="addTag"><IconPlus /></a-tag>
@@ -62,10 +62,10 @@
       <a-col :span="16">
         <a-card class="content-card">
           <a-tabs default-active-key="1">
-            <a-tab-pane key="1" title="文章">
-              <a-empty description="暂无文章" />
+            <a-tab-pane key="1" :title="t('person.articles')">
+              <a-empty :description="t('person.noArticles')" />
             </a-tab-pane>
-            <a-tab-pane key="2" title="项目">
+            <a-tab-pane key="2" :title="t('person.projects')">
                <div class="project-list">
                  <a-card v-for="i in 4" :key="i" class="project-item" hoverable>
                     <template #title>Project {{ i }}</template>
@@ -77,7 +77,7 @@
                  </a-card>
                </div>
             </a-tab-pane>
-            <a-tab-pane key="3" title="动态">
+            <a-tab-pane key="3" :title="t('person.activities')">
               <a-timeline>
                 <a-timeline-item v-for="(activity, index) in activities" :key="index" :dotColor="activity.color">
                   <div class="timeline-title">{{ activity.title }}</div>
@@ -86,27 +86,27 @@
                 </a-timeline-item>
               </a-timeline>
             </a-tab-pane>
-            <a-tab-pane key="4" title="安全设置">
+            <a-tab-pane key="4" :title="t('person.security')">
               <a-list>
                 <a-list-item>
-                  <a-list-item-meta title="登录密码" description="已设置。密码至少6位字符，支持数字、字母和除空格外的特殊字符，且必须同时包含数字和大小写字母。">
+                  <a-list-item-meta :title="t('person.loginPassword')" :description="t('person.passwordDesc')">
                   </a-list-item-meta>
                   <template #actions>
-                    <a-button type="text" @click="changePasswordVisible = true">修改</a-button>
+                    <a-button type="text" @click="changePasswordVisible = true">{{ t('person.edit') }}</a-button>
                   </template>
                 </a-list-item>
                 <a-list-item>
-                  <a-list-item-meta title="安全手机" :description="userInfo.phone ? `已绑定：${userInfo.phone}` : '未绑定手机'">
+                  <a-list-item-meta :title="t('person.securePhone')" :description="userInfo.phone ? `${t('person.bound')}：${userInfo.phone}` : t('person.notBoundPhone')">
                   </a-list-item-meta>
                   <template #actions>
-                    <a-button type="text" @click="changePhoneVisible = true">修改</a-button>
+                    <a-button type="text" @click="changePhoneVisible = true">{{ t('person.edit') }}</a-button>
                   </template>
                 </a-list-item>
                 <a-list-item>
-                  <a-list-item-meta title="安全邮箱" :description="userInfo.email ? `已绑定：${userInfo.email}` : '未绑定邮箱'">
+                  <a-list-item-meta :title="t('person.secureEmail')" :description="userInfo.email ? `${t('person.bound')}：${userInfo.email}` : t('person.notBoundEmail')">
                   </a-list-item-meta>
                   <template #actions>
-                    <a-button type="text" @click="changeEmailVisible = true">修改</a-button>
+                    <a-button type="text" @click="changeEmailVisible = true">{{ t('person.edit') }}</a-button>
                   </template>
                 </a-list-item>
               </a-list>
@@ -117,51 +117,51 @@
     </a-row>
 
     <!-- Modals -->
-    <a-modal v-model:visible="editNickNameVisible" title="修改昵称" @ok="saveNickName">
+    <a-modal v-model:visible="editNickNameVisible" :title="t('person.editNickname')" @ok="saveNickName">
       <a-form :model="nickNameForm">
-        <a-form-item field="nickName" label="昵称">
-          <a-input v-model="nickNameForm.nickName" placeholder="请输入昵称" />
+        <a-form-item field="nickName" :label="t('person.nickname')">
+          <a-input v-model="nickNameForm.nickName" :placeholder="t('person.enterNickname')" />
         </a-form-item>
       </a-form>
     </a-modal>
 
-    <a-modal v-model:visible="changePasswordVisible" title="修改密码" @ok="savePassword">
+    <a-modal v-model:visible="changePasswordVisible" :title="t('person.changePassword')" @ok="savePassword">
       <a-form :model="passwordForm">
-        <a-form-item field="password" label="原密码">
-          <a-input-password v-model="passwordForm.password" placeholder="请输入原密码" />
+        <a-form-item field="password" :label="t('person.oldPassword')">
+          <a-input-password v-model="passwordForm.password" :placeholder="t('person.enterOldPassword')" />
         </a-form-item>
-        <a-form-item field="newPassword" label="新密码">
-          <a-input-password v-model="passwordForm.newPassword" placeholder="请输入新密码" />
+        <a-form-item field="newPassword" :label="t('person.newPassword')">
+          <a-input-password v-model="passwordForm.newPassword" :placeholder="t('person.enterNewPassword')" />
         </a-form-item>
-        <a-form-item field="confirmPassword" label="确认密码">
-          <a-input-password v-model="passwordForm.confirmPassword" placeholder="请再次输入新密码" />
+        <a-form-item field="confirmPassword" :label="t('person.confirmPassword')">
+          <a-input-password v-model="passwordForm.confirmPassword" :placeholder="t('person.enterNewPasswordAgain')" />
         </a-form-item>
       </a-form>
     </a-modal>
 
-    <a-modal v-model:visible="changePhoneVisible" title="修改手机号" @ok="savePhone">
+    <a-modal v-model:visible="changePhoneVisible" :title="t('person.changePhone')" @ok="savePhone">
       <a-form :model="phoneForm">
-        <a-form-item field="phone" label="手机号">
-          <a-input v-model="phoneForm.phone" placeholder="请输入手机号" />
+        <a-form-item field="phone" :label="t('person.phone')">
+          <a-input v-model="phoneForm.phone" :placeholder="t('person.enterPhone')" />
         </a-form-item>
-        <a-form-item field="code" label="验证码">
-          <a-input v-model="phoneForm.code" placeholder="请输入验证码" />
+        <a-form-item field="code" :label="t('person.captcha')">
+          <a-input v-model="phoneForm.code" :placeholder="t('person.enterCaptcha')" />
           <a-button class="ml-2" :disabled="timer > 0" @click="sendCode">
-            {{ timer > 0 ? `${timer}s` : '获取验证码' }}
+            {{ timer > 0 ? `${timer}s` : t('person.getCaptcha') }}
           </a-button>
         </a-form-item>
       </a-form>
     </a-modal>
 
-    <a-modal v-model:visible="changeEmailVisible" title="修改邮箱" @ok="saveEmail">
+    <a-modal v-model:visible="changeEmailVisible" :title="t('person.changeEmail')" @ok="saveEmail">
       <a-form :model="emailForm">
-        <a-form-item field="email" label="邮箱">
-          <a-input v-model="emailForm.email" placeholder="请输入邮箱" />
+        <a-form-item field="email" :label="t('person.email')">
+          <a-input v-model="emailForm.email" :placeholder="t('person.enterEmail')" />
         </a-form-item>
-        <a-form-item field="code" label="验证码">
-          <a-input v-model="emailForm.code" placeholder="请输入验证码" />
+        <a-form-item field="code" :label="t('person.captcha')">
+          <a-input v-model="emailForm.code" :placeholder="t('person.enterCaptcha')" />
           <a-button class="ml-2" :disabled="emailTimer > 0" @click="sendEmailCode">
-            {{ emailTimer > 0 ? `${emailTimer}s` : '获取验证码' }}
+            {{ emailTimer > 0 ? `${emailTimer}s` : t('person.getCaptcha') }}
           </a-button>
         </a-form-item>
       </a-form>
@@ -172,6 +172,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { Message } from '@arco-design/web-vue'
+import { useI18n } from 'vue-i18n'
 import {
   IconUser,
   IconEdit,
@@ -186,6 +187,7 @@ import {
 } from '@arco-design/web-vue/es/icon'
 import { getUserInfo, setSelfInfo, changePassword } from '../../services/appBridge'
 
+const { t } = useI18n()
 const userInfo = ref({})
 const editNickNameVisible = ref(false)
 const changePhoneVisible = ref(false)
@@ -212,7 +214,7 @@ const loadUserInfo = async () => {
     userInfo.value = res || {}
   } catch (e) {
     console.error(e)
-    Message.error('获取用户信息失败')
+    Message.error(t('person.fetchInfoError'))
   }
 }
 
@@ -224,10 +226,10 @@ const openEditNickName = () => {
 const saveNickName = async () => {
   try {
     await setSelfInfo({ nickName: nickNameForm.nickName })
-    Message.success('修改成功')
+    Message.success(t('person.editSuccess'))
     await loadUserInfo()
   } catch (e) {
-    Message.error(e.message || '修改失败')
+    Message.error(e.message || t('person.editError'))
   }
 }
 
@@ -242,10 +244,10 @@ const sendCode = () => {
 const savePhone = async () => {
   try {
     await setSelfInfo({ phone: phoneForm.phone })
-    Message.success('修改成功')
+    Message.success(t('person.editSuccess'))
     await loadUserInfo()
   } catch (e) {
-    Message.error(e.message || '修改失败')
+    Message.error(e.message || t('person.editError'))
   }
 }
 
@@ -260,16 +262,16 @@ const sendEmailCode = () => {
 const saveEmail = async () => {
   try {
     await setSelfInfo({ email: emailForm.email })
-    Message.success('修改成功')
+    Message.success(t('person.editSuccess'))
     await loadUserInfo()
   } catch (e) {
-    Message.error(e.message || '修改失败')
+    Message.error(e.message || t('person.editError'))
   }
 }
 
 const savePassword = async () => {
   if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-    Message.error('两次密码不一致')
+    Message.error(t('person.passwordMismatch'))
     return
   }
   try {
@@ -277,10 +279,10 @@ const savePassword = async () => {
       password: passwordForm.password,
       newPassword: passwordForm.newPassword
     })
-    Message.success('修改密码成功')
+    Message.success(t('person.changePasswordSuccess'))
     changePasswordVisible.value = false
   } catch (e) {
-    Message.error(e.message || '修改失败')
+    Message.error(e.message || t('person.editError'))
   }
 }
 
@@ -449,4 +451,3 @@ onMounted(() => {
   margin-left: 8px;
 }
 </style>
-

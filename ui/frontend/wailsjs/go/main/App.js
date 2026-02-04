@@ -18,12 +18,20 @@ export function ClearAuth() {
   return window['go']['main']['App']['ClearAuth']();
 }
 
+export function GetAppConfig() {
+  return window['go']['main']['App']['GetAppConfig']();
+}
+
 export function GetBaseURL() {
   return window['go']['main']['App']['GetBaseURL']();
 }
 
 export function GetLogConfig() {
   return window['go']['main']['App']['GetLogConfig']();
+}
+
+export function GetSystemInfo() {
+  return window['go']['main']['App']['GetSystemInfo']();
 }
 
 export function GetUserInfo() {
@@ -46,6 +54,10 @@ export function RunTestCase(arg1) {
   return window['go']['main']['App']['RunTestCase'](arg1);
 }
 
+export function SetAppConfig(arg1, arg2, arg3, arg4, arg5, arg6) {
+  return window['go']['main']['App']['SetAppConfig'](arg1, arg2, arg3, arg4, arg5, arg6);
+}
+
 export function SetBaseURL(arg1) {
   return window['go']['main']['App']['SetBaseURL'](arg1);
 }
@@ -60,4 +72,12 @@ export function SetSelfInfo(arg1) {
 
 export function SetUserAuthority(arg1, arg2) {
   return window['go']['main']['App']['SetUserAuthority'](arg1, arg2);
+}
+
+export function TrackError(arg1) {
+  return window['go']['main']['App']['TrackError'](arg1);
+}
+
+export function TrackPerformance(arg1) {
+  return window['go']['main']['App']['TrackPerformance'](arg1);
 }
