@@ -9,6 +9,7 @@ import (
 	"github.com/test-instructor/yangfan/server/v2/global"
 	"github.com/test-instructor/yangfan/server/v2/model/system"
 	systemReq "github.com/test-instructor/yangfan/server/v2/model/system/request"
+	"go.uber.org/zap"
 )
 
 func ClearToken(c *gin.Context) {
@@ -44,12 +45,21 @@ func GetToken(c *gin.Context) string {
 	if token == "" {
 		j := NewJWT()
 		token, _ = c.Cookie("x-token")
+		if token == "" {
+			return ""
+		}
 		claims, err := j.ParseToken(token)
 		if err != nil {
-			global.GVA_LOG.Error("重新写入cookie token失败,未能成功解析token,请检查请求头是否存在x-token且claims是否为规定结构")
-			return token
+			global.GVA_LOG.Warn("cookie token 解析失败，将清理 cookie x-token", zap.Error(err))
+			ClearToken(c)
+			return ""
 		}
-		SetToken(c, token, int((claims.ExpiresAt.Unix()-time.Now().Unix())/60))
+		if claims.ExpiresAt != nil {
+			maxAgeSeconds := int(time.Until(claims.ExpiresAt.Time).Seconds())
+			if maxAgeSeconds > 0 {
+				SetToken(c, token, maxAgeSeconds)
+			}
+		}
 	}
 	return token
 }
@@ -59,7 +69,9 @@ func GetClaims(c *gin.Context) (*systemReq.CustomClaims, error) {
 	j := NewJWT()
 	claims, err := j.ParseToken(token)
 	if err != nil {
-		global.GVA_LOG.Error("从Gin的Context中获取从jwt解析信息失败, 请检查请求头是否存在x-token且claims是否为规定结构")
+		if token != "" {
+			global.GVA_LOG.Error("从 Gin 的 Context 获取 jwt 解析信息失败", zap.Error(err))
+		}
 	}
 	return claims, err
 }

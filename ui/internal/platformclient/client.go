@@ -7,6 +7,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -59,7 +60,12 @@ func (c *Client) doRaw(ctx context.Context, baseURL string, method string, path 
 	if !strings.HasPrefix(path, "/") {
 		path = "/" + path
 	}
-	url := strings.TrimRight(baseURL, "/") + path
+	base, err := url.Parse(strings.TrimSpace(baseURL))
+	if err != nil {
+		return 0, nil, nil, err
+	}
+	full := base.ResolveReference(&url.URL{Path: path})
+	urlStr := full.String()
 
 	var bodyReader io.Reader
 	if reqBody != nil {
@@ -70,7 +76,7 @@ func (c *Client) doRaw(ctx context.Context, baseURL string, method string, path 
 		bodyReader = bytes.NewReader(b)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, method, url, bodyReader)
+	req, err := http.NewRequestWithContext(ctx, method, urlStr, bodyReader)
 	if err != nil {
 		return 0, nil, nil, err
 	}

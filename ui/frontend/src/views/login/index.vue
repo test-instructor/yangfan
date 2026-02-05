@@ -92,7 +92,7 @@ const submit = async () => {
       captchaId: form.captchaId
     })
     Message.success(t('login.loginSuccess'))
-    await router.replace({ name: 'home' })
+    await router.replace({ name: 'routeInit' })
   } catch (e) {
     Message.error(e?.message || t('login.loginError'))
     await refreshCaptcha()

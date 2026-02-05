@@ -7,6 +7,7 @@ import (
 	"github.com/test-instructor/yangfan/server/v2/global"
 	"github.com/test-instructor/yangfan/server/v2/initialize"
 	platformInit "github.com/test-instructor/yangfan/server/v2/initialize/platform"
+	uiNodeInit "github.com/test-instructor/yangfan/server/v2/initialize/ui_node"
 	automationService "github.com/test-instructor/yangfan/server/v2/service/automation"
 	_ "go.uber.org/automaxprocs"
 	"go.uber.org/zap"
@@ -53,6 +54,7 @@ func initializeSystem() {
 	if global.GVA_DB != nil {
 		initialize.RegisterTables() // 初始化表
 		platformInit.Init()         // 初始化业务路由/菜单（按版本）
+		uiNodeInit.Init()           // 初始化 UI Node 菜单/接口（独立于 web）
 		automationService.RefreshTimerTaskSchedules(context.Background())
 	}
 	go func() {

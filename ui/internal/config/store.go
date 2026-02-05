@@ -24,7 +24,7 @@ type Config struct {
 	Token        string      `json:"token"`
 	ExpiresAt    int64       `json:"expiresAt"`
 	LogLevel     string      `json:"logLevel"`     // debug, info, warn, error, dpanic, panic, fatal
-	LogPrefix    string      `json:"logPrefix"`    // e.g. [ https://github.com/test-instructor/yangfan/ui ]
+	LogPrefix    string      `json:"logPrefix"`    // e.g. [ yangfan-ui ]
 	LogRetention int         `json:"logRetention"` // days
 	Environment  Environment `json:"environment"`
 	DebugMode    bool        `json:"debugMode"`
@@ -67,7 +67,7 @@ func (s *Store) load() error {
 		// Default values if file not found
 		s.cfg = Config{
 			LogLevel:     "info",
-			LogPrefix:    "[ https://github.com/test-instructor/yangfan/ui ]",
+			LogPrefix:    "[ yangfan-ui ]",
 			LogRetention: 30,
 			Environment:  EnvDevelopment,
 			DebugMode:    false,
@@ -87,7 +87,7 @@ func (s *Store) load() error {
 		cfg.LogLevel = "info"
 	}
 	if cfg.LogPrefix == "" {
-		cfg.LogPrefix = "[ https://github.com/test-instructor/yangfan/ui ]"
+		cfg.LogPrefix = "[ yangfan-ui ]"
 	}
 	if cfg.LogRetention <= 0 {
 		cfg.LogRetention = 30

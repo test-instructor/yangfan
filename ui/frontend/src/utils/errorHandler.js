@@ -1,6 +1,8 @@
 // 错误处理工具
 export class ErrorHandler {
   constructor() {
+    this.lastReloginAt = 0
+    this.lastReloginToastAt = 0
     this.setupGlobalErrorHandler()
   }
   
@@ -57,7 +59,7 @@ export class ErrorHandler {
     console.error(`Business Error [${context}]:`, error)
     
     // 显示用户友好的错误信息
-    if (window.$message) {
+    if (window.$message && !this.shouldSuppressToast(errorMessage)) {
       window.$message.error({
         content: errorMessage,
         duration: 4000,
@@ -83,9 +85,52 @@ export class ErrorHandler {
     
     return '操作失败，请稍后重试'
   }
+
+  shouldSuppressToast(errorMessage) {
+    const now = Date.now()
+    if (now - this.lastReloginAt > 2000) return false
+    return /权限不足|登录已过期|重新登录/i.test(String(errorMessage || ''))
+  }
+
+  shouldRelogin(error, errorMessage, context = {}) {
+    if (error?.response?.status === 401) return true
+    const msg = String(errorMessage || '')
+    if (!msg) return false
+    if (/登录已过期|token.*过期|token.*失效/i.test(msg)) return true
+    if (context?.method === 'GetUINodeMenuTree' && /权限不足/i.test(msg)) return true
+    return false
+  }
+
+  async triggerRelogin() {
+    const now = Date.now()
+    if (now - this.lastReloginAt < 1200) return
+    this.lastReloginAt = now
+
+    try {
+      const fn = window?.go?.main?.App?.ClearAuth
+      if (fn) await fn()
+    } catch (_) {
+    }
+
+    const hash = String(window.location.hash || '')
+    if (!hash.startsWith('#/login')) {
+      window.location.hash = '#/login'
+    }
+  }
   
   // 网络错误处理
-  handleNetworkError(error) {
+  handleNetworkError(error, context = {}) {
+    const errorMessage = this.getErrorMessage(error)
+    if (this.shouldRelogin(error, errorMessage, context)) {
+      const now = Date.now()
+      if (now - this.lastReloginToastAt > 1200) {
+        this.lastReloginToastAt = now
+        this.handleBusinessError('权限不足，请重新登录', context?.method || '')
+      }
+      this.triggerRelogin()
+      return '权限不足，请重新登录'
+    }
+
     if (!navigator.onLine) {
       return this.handleBusinessError('网络连接已断开，请检查网络连接')
     }
@@ -95,6 +140,7 @@ export class ErrorHandler {
     }
     
     if (error?.response?.status === 401) {
+      this.triggerRelogin()
       return this.handleBusinessError('登录已过期，请重新登录')
     }
     
@@ -114,6 +160,6 @@ export function handleError(error, context = '') {
   return errorHandler.handleBusinessError(error, context)
 }
 
-export function handleNetworkError(error) {
-  return errorHandler.handleNetworkError(error)
+export function handleNetworkError(error, context = {}) {
+  return errorHandler.handleNetworkError(error, context)
 }

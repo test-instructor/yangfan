@@ -1,3 +1,5 @@
 package ui
 
-type ServiceGroup struct{}
+type ServiceGroup struct {
+	UINodeMenuService
+}

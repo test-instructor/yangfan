@@ -18,7 +18,7 @@ func main() {
 	// Initialize logger with defaults (will be reconfigured in app.startup)
 	logger.Setup(logger.Config{
 		Level:     "info",
-		Prefix:    "[ https://github.com/test-instructor/yangfan/ui ]",
+		Prefix:    "[ yangfan-ui ]",
 		Retention: 30,
 	})
 	logger.Info("Starting application...")

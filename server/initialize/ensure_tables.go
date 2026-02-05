@@ -2,6 +2,7 @@ package initialize
 
 import (
 	"context"
+
 	adapter "github.com/casbin/gorm-adapter/v3"
 	"github.com/test-instructor/yangfan/server/v2/model/example"
 	sysModel "github.com/test-instructor/yangfan/server/v2/model/system"
@@ -39,6 +40,7 @@ func (e *ensureTables) MigrateTable(ctx context.Context) (context.Context, error
 		sysModel.SysApi{},
 		sysModel.SysUser{},
 		sysModel.SysBaseMenu{},
+		sysModel.SysUINodeMenu{},
 		sysModel.SysAuthority{},
 		sysModel.JwtBlacklist{},
 		sysModel.SysDictionary{},
@@ -46,6 +48,7 @@ func (e *ensureTables) MigrateTable(ctx context.Context) (context.Context, error
 		sysModel.SysOperationRecord{},
 		sysModel.SysDictionaryDetail{},
 		sysModel.SysBaseMenuParameter{},
+		sysModel.SysUINodeMenuParameter{},
 		sysModel.SysBaseMenuBtn{},
 		sysModel.SysAuthorityBtn{},
 		sysModel.SysAutoCodePackage{},
@@ -55,6 +58,8 @@ func (e *ensureTables) MigrateTable(ctx context.Context) (context.Context, error
 		sysModel.SysParams{},
 		sysModel.SysVersion{},
 		adapter.CasbinRule{},
+		sysModel.SysUINodeMenu{},
+		sysModel.SysUINodeMenuParameter{},
 
 		example.ExaFile{},
 		example.ExaCustomer{},
@@ -81,6 +86,7 @@ func (e *ensureTables) TableCreated(ctx context.Context) bool {
 		sysModel.SysApi{},
 		sysModel.SysUser{},
 		sysModel.SysBaseMenu{},
+		sysModel.SysUINodeMenu{},
 		sysModel.SysAuthority{},
 		sysModel.JwtBlacklist{},
 		sysModel.SysDictionary{},
@@ -88,12 +94,12 @@ func (e *ensureTables) TableCreated(ctx context.Context) bool {
 		sysModel.SysOperationRecord{},
 		sysModel.SysDictionaryDetail{},
 		sysModel.SysBaseMenuParameter{},
+		sysModel.SysUINodeMenuParameter{},
 		sysModel.SysBaseMenuBtn{},
 		sysModel.SysAuthorityBtn{},
 		sysModel.SysAutoCodePackage{},
 		sysModel.SysExportTemplate{},
 		sysModel.Condition{},
-		sysModel.JoinTemplate{},
 
 		adapter.CasbinRule{},
 

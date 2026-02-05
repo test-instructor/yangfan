@@ -1,3 +1,11 @@
 package ui
 
-type ApiGroup struct{}
+import "github.com/test-instructor/yangfan/server/v2/service"
+
+type ApiGroup struct {
+	UINodeMenuApi
+}
+
+var (
+	uiNodeMenuService = service.ServiceGroupApp.UiServiceGroup.UINodeMenuService
+)

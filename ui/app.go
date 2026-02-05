@@ -254,6 +254,286 @@ func (a *App) ChangePassword(password string, newPassword string) (map[string]an
 	return a.svc.ChangePassword(a.ctx, password, newPassword)
 }
 
+func (a *App) GetUINodeMenuTree() ([]map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.GetUINodeMenuTree(a.ctx)
+}
+
+func (a *App) GetAndroidDeviceOptionsList(query map[string]any) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.GetAndroidDeviceOptionsList(a.ctx, query)
+}
+
+func (a *App) CreateAndroidDeviceOptions(payload map[string]any) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.CreateAndroidDeviceOptions(a.ctx, payload)
+}
+
+func (a *App) UpdateAndroidDeviceOptions(payload map[string]any) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.UpdateAndroidDeviceOptions(a.ctx, payload)
+}
+
+func (a *App) DeleteAndroidDeviceOptions(id uint) error {
+	if a.svc == nil {
+		return fmt.Errorf("service 未初始化")
+	}
+	return a.svc.DeleteAndroidDeviceOptions(a.ctx, id)
+}
+
+func (a *App) GetRunConfigList(query map[string]any) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.GetRunConfigList(a.ctx, query)
+}
+
+func (a *App) CreateRunConfig(payload map[string]any) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.CreateRunConfig(a.ctx, payload)
+}
+
+func (a *App) UpdateRunConfig(payload map[string]any) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.UpdateRunConfig(a.ctx, payload)
+}
+
+func (a *App) DeleteRunConfig(id uint) error {
+	if a.svc == nil {
+		return fmt.Errorf("service 未初始化")
+	}
+	return a.svc.DeleteRunConfig(a.ctx, id)
+}
+
+func (a *App) GetAutoStepList(query map[string]any) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.GetAutoStepList(a.ctx, query)
+}
+
+func (a *App) CreateAutoStep(payload map[string]any) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.CreateAutoStep(a.ctx, payload)
+}
+
+func (a *App) UpdateAutoStep(payload map[string]any) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.UpdateAutoStep(a.ctx, payload)
+}
+
+func (a *App) DeleteAutoStep(id uint) error {
+	if a.svc == nil {
+		return fmt.Errorf("service 未初始化")
+	}
+	return a.svc.DeleteAutoStep(a.ctx, id)
+}
+
+func (a *App) GetAutoCaseStepList(query map[string]any) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.GetAutoCaseStepList(a.ctx, query)
+}
+
+func (a *App) CreateAutoCaseStep(payload map[string]any) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.CreateAutoCaseStep(a.ctx, payload)
+}
+
+func (a *App) UpdateAutoCaseStep(payload map[string]any) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.UpdateAutoCaseStep(a.ctx, payload)
+}
+
+func (a *App) DeleteAutoCaseStep(id uint) error {
+	if a.svc == nil {
+		return fmt.Errorf("service 未初始化")
+	}
+	return a.svc.DeleteAutoCaseStep(a.ctx, id)
+}
+
+func (a *App) GetAutoCaseList(query map[string]any) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.GetAutoCaseList(a.ctx, query)
+}
+
+func (a *App) CreateAutoCase(payload map[string]any) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.CreateAutoCase(a.ctx, payload)
+}
+
+func (a *App) UpdateAutoCase(payload map[string]any) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.UpdateAutoCase(a.ctx, payload)
+}
+
+func (a *App) DeleteAutoCase(id uint) error {
+	if a.svc == nil {
+		return fmt.Errorf("service 未初始化")
+	}
+	return a.svc.DeleteAutoCase(a.ctx, id)
+}
+
+func (a *App) GetTimerTaskList(query map[string]any) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.GetTimerTaskList(a.ctx, query)
+}
+
+func (a *App) CreateTimerTask(payload map[string]any) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.CreateTimerTask(a.ctx, payload)
+}
+
+func (a *App) UpdateTimerTask(payload map[string]any) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.UpdateTimerTask(a.ctx, payload)
+}
+
+func (a *App) DeleteTimerTask(id uint) error {
+	if a.svc == nil {
+		return fmt.Errorf("service 未初始化")
+	}
+	return a.svc.DeleteTimerTask(a.ctx, id)
+}
+
+func (a *App) GetAutoReportList(query map[string]any) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.GetAutoReportList(a.ctx, query)
+}
+
+func (a *App) FindAutoReport(id uint) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.FindAutoReport(a.ctx, id)
+}
+
+func (a *App) FindAutoCaseStepApis(autoCaseStepId uint) ([]map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.FindAutoCaseStepApis(a.ctx, autoCaseStepId)
+}
+
+func (a *App) AddAutoCaseStepApi(autoCaseStepId uint, apiId uint, sort uint) (map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.AddAutoCaseStepApi(a.ctx, autoCaseStepId, apiId, sort)
+}
+
+func (a *App) DeleteAutoCaseStepApi(autoStepId uint) error {
+	if a.svc == nil {
+		return fmt.Errorf("service 未初始化")
+	}
+	return a.svc.DeleteAutoCaseStepApi(a.ctx, autoStepId)
+}
+
+func (a *App) SortAutoCaseStepApis(data []map[string]any) error {
+	if a.svc == nil {
+		return fmt.Errorf("service 未初始化")
+	}
+	return a.svc.SortAutoCaseStepApis(a.ctx, data)
+}
+
+func (a *App) GetAutoCaseSteps(autoCaseId uint) ([]map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.GetAutoCaseSteps(a.ctx, autoCaseId)
+}
+
+func (a *App) AddAutoCaseStep(caseId uint, stepId uint) error {
+	if a.svc == nil {
+		return fmt.Errorf("service 未初始化")
+	}
+	return a.svc.AddAutoCaseStep(a.ctx, caseId, stepId)
+}
+
+func (a *App) DeleteAutoCaseStepRef(refId uint) error {
+	if a.svc == nil {
+		return fmt.Errorf("service 未初始化")
+	}
+	return a.svc.DeleteAutoCaseStepRef(a.ctx, refId)
+}
+
+func (a *App) SortAutoCaseSteps(caseId uint, data []map[string]any) error {
+	if a.svc == nil {
+		return fmt.Errorf("service 未初始化")
+	}
+	return a.svc.SortAutoCaseSteps(a.ctx, caseId, data)
+}
+
+func (a *App) SetAutoCaseStepConfig(refId uint, isConfig bool, isStepConfig bool) error {
+	if a.svc == nil {
+		return fmt.Errorf("service 未初始化")
+	}
+	return a.svc.SetAutoCaseStepConfig(a.ctx, refId, isConfig, isStepConfig)
+}
+
+func (a *App) GetTimerTaskCases(taskId uint) ([]map[string]any, error) {
+	if a.svc == nil {
+		return nil, fmt.Errorf("service 未初始化")
+	}
+	return a.svc.GetTimerTaskCases(a.ctx, taskId)
+}
+
+func (a *App) AddTimerTaskCase(taskId uint, caseId uint) error {
+	if a.svc == nil {
+		return fmt.Errorf("service 未初始化")
+	}
+	return a.svc.AddTimerTaskCase(a.ctx, taskId, caseId)
+}
+
+func (a *App) DeleteTimerTaskCaseRef(refId uint) error {
+	if a.svc == nil {
+		return fmt.Errorf("service 未初始化")
+	}
+	return a.svc.DeleteTimerTaskCaseRef(a.ctx, refId)
+}
+
+func (a *App) SortTimerTaskCases(taskId uint, data []map[string]any) error {
+	if a.svc == nil {
+		return fmt.Errorf("service 未初始化")
+	}
+	return a.svc.SortTimerTaskCases(a.ctx, taskId, data)
+}
+
 func (a *App) GetAppConfig() (map[string]any, error) {
 	if a.store == nil {
 		return nil, fmt.Errorf("config store 未初始化")
